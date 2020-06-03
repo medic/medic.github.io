@@ -1306,6 +1306,211 @@ medic-conf initialise-project-layout
     </item>
     
     <item>
+      <title>Apps: App Settings Validation</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Validation rules are code fragments used to determine if some input is valid. For example, to say a field is only valid if the value has at least five characters, you would use the lenMin(5). They are used in &lt;code&gt;registrations[].validations.list[].rule&lt;/code&gt; and &lt;code&gt;patient_reports[].validations.list[].rule&lt;/code&gt; to determine if an incoming report is accepted. A report is accepted as valid only if all rules return &lt;code&gt;true&lt;/code&gt;. If any validation rule returns &lt;code&gt;false&lt;/code&gt; then the report is marked as invalid, and a message is automatically sent to the submitter. The content for the message is set in the &lt;code&gt;translation_key&lt;/code&gt; associated to each rule. If a report fails multiple validations then each message will be sent. These can be combined into a single SMS by specifying &lt;code&gt;&amp;quot;*.validations.join_responses&amp;quot; : true&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;operators&#34;&gt;Operators&lt;/h2&gt;
+&lt;p&gt;The available operators are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Operator&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;&amp;amp;&lt;/td&gt;
+&lt;td&gt;and&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;||&lt;/td&gt;
+&lt;td&gt;or&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!&lt;/td&gt;
+&lt;td&gt;not&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;a ? b : c&lt;/td&gt;
+&lt;td&gt;ternary, ie: if &amp;lsquo;a&amp;rsquo; is true, then check &amp;lsquo;b&amp;rsquo;, otherwise check &amp;lsquo;c&amp;rsquo;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;()&lt;/td&gt;
+&lt;td&gt;nested blocks, eg: &amp;lsquo;a &amp;amp;&amp;amp; (b&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;rules&#34;&gt;Rules&lt;/h2&gt;
+&lt;p&gt;Validation settings may consist of Pupil.js rules and rules specific to Medic Mobile.
+These two types of rules cannot be combined as part of the same rule.&lt;/p&gt;
+&lt;p&gt;Not OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; unique(&#39;patient_id&#39;)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; max(11111)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If for example you want to validate that patient_id is 5 numbers and it
+is unique (or some other custom validation) you need to define two
+validation configs/separate rules in your settings. Example validation
+settings:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;regex(\d{5})&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be 5 numbers.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+	}]
+	},
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;unique(&#39;patient_id&#39;)&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be unique.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+		}]
+	}
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;validate()&lt;/code&gt; modifies the property value of the second item to
+&lt;code&gt;patient_id_unique&lt;/code&gt; so that pupil.validate() still returns a valid
+result.  Then we process the result once more to extract the custom
+validation results and error messages.&lt;/p&gt;
+&lt;h3 id=&#34;pupiljs-validation-functions&#34;&gt;Pupil.js validation functions&lt;/h3&gt;
+&lt;p&gt;Available validation functions are available at &lt;a href=&#34;https://www.npmjs.com/package/pupil#validation-functions&#34;&gt;https://www.npmjs.com/package/pupil#validation-functions&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following functions are available by default:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;iEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Case insensitive comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;siEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive case insensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMin&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMax&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Exact length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;between&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum and maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;in&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One of the provided values&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;required&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Must have a value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Always valid&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;numeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;integer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Integer numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alpha&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alphaNumeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers and letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;email&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Email address format&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A custom regular expression&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equalsTo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Compare to another field by its key&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;sample-usage&#34;&gt;Sample usage&lt;/h4&gt;
+&lt;p&gt;For case-insensitive comparison &lt;code&gt;iEquals&lt;/code&gt; function in Pupil,
+And you can use &lt;code&gt;||&lt;/code&gt; for logical OR : &lt;a href=&#34;https://www.npmjs.com/package/pupil#rule-strings&#34;&gt;https://www.npmjs.com/package/pupil#rule-strings&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;So you can do this :
+&lt;code&gt;rule: &#39;iEquals(&amp;quot;mary&amp;quot;) || iEquals(&amp;quot;john&amp;quot;)&#39;&lt;/code&gt;
+matches &amp;ldquo;mary&amp;rdquo;, &amp;ldquo;Mary&amp;rdquo;, &amp;ldquo;john&amp;rdquo;, &amp;ldquo;John&amp;rdquo;, &amp;ldquo;JOhN&amp;rdquo;, etc. Not &amp;ldquo;maryjohn&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;medic-mobile-validation-functions&#34;&gt;Medic Mobile validation functions&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;unique(*fields)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if no existing valid report has the same value for all of the listed fields. Fields are compared to those at the top level and within &lt;code&gt;fields&lt;/code&gt; for every report doc. To include the form type use &lt;code&gt;&#39;form&#39;&lt;/code&gt; as one of the fields. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;, &#39;1 week&#39;)&lt;/code&gt; checks that the same report wasn&amp;rsquo;t submitted for this patient in the past week.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;uniqueWithin(*fields, time_period)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Same as &lt;code&gt;unique&lt;/code&gt; but the last argument is the time period in which to search. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that this report was never submitted for this patient.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;exists(form_id, field)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if a report matches the &lt;code&gt;form_id&lt;/code&gt; and value for &lt;code&gt;field&lt;/code&gt;. This is useful to check that a patient was registered for a service before reporting about it. Eg &lt;code&gt;exists(&#39;REG&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that a &lt;code&gt;REG&lt;/code&gt; form was already submitted for a patient. As of 2.12 most uses of this function are obsolete because checking for a valid &lt;code&gt;patient_id&lt;/code&gt; is done automatically by the &lt;code&gt;accept_patient_report&lt;/code&gt; transition using &lt;code&gt;registration_not_found&lt;/code&gt; in the &lt;code&gt;messages.event_type&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;isISOWeek(weekFieldName[, yearFieldName])&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if the current report has a week value that is less or equal to the number of ISO weeks of the current year or the year value of the same report. The first parameter is the field name for the week and the second parameter is the field name for the year: &lt;code&gt;isISOWeek(&#39;week&#39;, &#39;year&#39;)&lt;/code&gt;. If the second parameter is not specified, then the current year is used: &lt;code&gt;isISOWeek(&#39;week&#39;)&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Collect Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/collect-forms/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2852,6 +3057,37 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 ## Case Reports
 ### `app_settings.json .case_reports[]`
 --&gt;
+&lt;h2 id=&#34;variables-in-outgoing-sms&#34;&gt;Variables in outgoing SMS&lt;/h2&gt;
+&lt;p&gt;Outgoing messages can use &lt;a href=&#34;https://mustache.github.io/mustache.5.html&#34;&gt;Mustache templating&lt;/a&gt; to insert variables and specify data formats.&lt;/p&gt;
+&lt;p&gt;All the fields on the report doc are available as variables. Additionally, the &lt;code&gt;contact&lt;/code&gt; variable is the sender of the report.&lt;/p&gt;
+&lt;h3 id=&#34;code-sample&#34;&gt;Code sample&lt;/h3&gt;
+&lt;p&gt;The following translation label includes the &lt;code&gt;name&lt;/code&gt; field of &lt;code&gt;contact&lt;/code&gt;, along with the submitted &lt;code&gt;patient_name&lt;/code&gt; field, and the generated &lt;code&gt;patient_id&lt;/code&gt; field.&lt;/p&gt;
+&lt;h4 id=&#34;translationsmessages-enproperties&#34;&gt;&lt;code&gt;translations/messages-en.properties&lt;/code&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;messages.registration.report_accepted = Thank you {{contact.name}} for registering {{patient_name}}. Their ID is {{patient_id}}.
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;date-format-filters&#34;&gt;Date Format Filters&lt;/h3&gt;
+&lt;p&gt;The following filter functions are available for formating dates.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;filter&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;datetime&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;reported_date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;bikram_sambat_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates in Bikram Sambat calendar (most commonly used calendar in Nepal). Currently display format is hardcoded to e.g. &amp;ldquo;१५ चैत २०७३&amp;rdquo;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
@@ -3004,6 +3240,12 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;td&gt;&lt;code&gt;visible&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;Whether the target is visible in the targets page. &lt;strong&gt;Default: true&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;aggregate&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As of 3.9, defines whether the target will be displayed on the TargetAggregates page&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -4563,6 +4805,103 @@ For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/serv
 &lt;li&gt;Run &lt;code&gt;horti --local --bootstrap=XXX&lt;/code&gt;, where &lt;code&gt;XXX&lt;/code&gt; is the version you want to use (maybe the same one as production?)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;You should now be able to log in as that user locally!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Conncting to RDBMS in Windows</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p&gt;
+&lt;h2 id=&#34;ssh-key-generation-and-importing&#34;&gt;SSH Key Generation and Importing&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Download Puttygen from &lt;a href=&#34;https://www.ssh.com/ssh/putty/download&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new key pair for your computer.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttygen-run-key-generate.png&#34; alt=&#34;Putty-gen-key-pair&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;Convert the key generated from ssh2 format to openssh. Puttygen supports this. Guide &lt;a href=&#34;https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygenwindows-into-key-pairs-use?answertab=votes#tab-top&#34;&gt;here&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;1. Open PuttyGen
+2. Click Load
+3. Load your private key
+4. Go to Conversions-&amp;gt;Export OpenSSH and export your private key
+5. Copy your private key to ~/.ssh/id_dsa (or id_rsa).
+6. Create the RFC 4716 version of the public key using ssh-keygen
+    ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
+6. Convert the RFC 4716 version of the public key to the OpenSSH format:
+    ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub
+    
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;Import the file using PuTTYgen:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-gen-import.png&#34; alt=&#34;puttty-import-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;Save it as PuTTY Private Key File .ppk:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-save-key.png&#34; alt=&#34;puttty-save-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;Add the key (.ppk) to Pageant (PuTTY authentication agent):&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-add-key.png&#34; alt=&#34;puttty-add-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;Now you can connect to RDBMS using PuTTY:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttty-connect.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;putty-connect-final.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If you are connecting to rdbms in order to use a posgres client. You may not need to tunnel the connection. The client can do it for you.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_1.png&#34; alt=&#34;rdbms_1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_2.png&#34; alt=&#34;rdbms_2&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Update Collect Forms Remotely</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/collect-forms-update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/collect-forms-update/</guid>
+      <description>
+        
+        
+        &lt;p&gt;To do over the air Medic Collect form updates via HTTP rather than sending APKs which have a long manual install process, follow the steps below:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Have your xls forms ready in the folder.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;They should use underscore as name separators. e.g form_name.xlsx&lt;/li&gt;
+&lt;li&gt;They should have &lt;code&gt;form_id&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt;  properties in the settings&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;xform_name_settings.png&#34; alt=&#34;Name property&#34;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Upload the forms to the instance using &lt;code&gt;Medic-Conf&lt;/code&gt; Using the &lt;code&gt;upload-collect-forms&lt;/code&gt; &lt;a href=&#34;https://github.com/medic/medic-conf/blob/master/src/cli/supported-actions.js&#34;&gt;action&lt;/a&gt; as shown below.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;medic-conf --instance=user:pass@instancename.app.medicmobile.org upload-collect-forms
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Go to the Collect App. Delete All forms then go to &lt;code&gt;Get Blank Form&lt;/code&gt; and select all the forms you need.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h1&gt;
+&lt;p&gt;When you go to &lt;code&gt;Get Blank Forms&lt;/code&gt; and instead of getting a list of the forms available, you get a pop-up error which has a portion of this message instead&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;...OpenRosa Version 1.0 standard: Forms list entry 1 is missing one or more tags: formId, name or downloadUrl
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This means you probably uploaded a XLS file without a &lt;code&gt;name&lt;/code&gt; or &lt;code&gt;form_id&lt;/code&gt; property. To find out which form is missing that, use this command:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -vvvv -H &amp;quot;x-openrosa-version: 1&amp;quot; http://user:pass@host:port/api/v1/forms
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Should bring a list like this one&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;xform_list.png&#34; alt=&#34;Xform List&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Go through the list and see which form has  a missing &lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;formID&amp;gt;&lt;/code&gt; property. Add it and reuploadthe forms using &lt;code&gt;medic-conf&lt;/code&gt; again.&lt;/p&gt;
 
       </description>
     </item>

@@ -694,6 +694,211 @@
     </item>
     
     <item>
+      <title>Apps: App Settings Validation</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Validation rules are code fragments used to determine if some input is valid. For example, to say a field is only valid if the value has at least five characters, you would use the lenMin(5). They are used in &lt;code&gt;registrations[].validations.list[].rule&lt;/code&gt; and &lt;code&gt;patient_reports[].validations.list[].rule&lt;/code&gt; to determine if an incoming report is accepted. A report is accepted as valid only if all rules return &lt;code&gt;true&lt;/code&gt;. If any validation rule returns &lt;code&gt;false&lt;/code&gt; then the report is marked as invalid, and a message is automatically sent to the submitter. The content for the message is set in the &lt;code&gt;translation_key&lt;/code&gt; associated to each rule. If a report fails multiple validations then each message will be sent. These can be combined into a single SMS by specifying &lt;code&gt;&amp;quot;*.validations.join_responses&amp;quot; : true&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;operators&#34;&gt;Operators&lt;/h2&gt;
+&lt;p&gt;The available operators are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Operator&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;&amp;amp;&lt;/td&gt;
+&lt;td&gt;and&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;||&lt;/td&gt;
+&lt;td&gt;or&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!&lt;/td&gt;
+&lt;td&gt;not&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;a ? b : c&lt;/td&gt;
+&lt;td&gt;ternary, ie: if &amp;lsquo;a&amp;rsquo; is true, then check &amp;lsquo;b&amp;rsquo;, otherwise check &amp;lsquo;c&amp;rsquo;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;()&lt;/td&gt;
+&lt;td&gt;nested blocks, eg: &amp;lsquo;a &amp;amp;&amp;amp; (b&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;rules&#34;&gt;Rules&lt;/h2&gt;
+&lt;p&gt;Validation settings may consist of Pupil.js rules and rules specific to Medic Mobile.
+These two types of rules cannot be combined as part of the same rule.&lt;/p&gt;
+&lt;p&gt;Not OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; unique(&#39;patient_id&#39;)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; max(11111)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If for example you want to validate that patient_id is 5 numbers and it
+is unique (or some other custom validation) you need to define two
+validation configs/separate rules in your settings. Example validation
+settings:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;regex(\d{5})&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be 5 numbers.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+	}]
+	},
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;unique(&#39;patient_id&#39;)&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be unique.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+		}]
+	}
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;validate()&lt;/code&gt; modifies the property value of the second item to
+&lt;code&gt;patient_id_unique&lt;/code&gt; so that pupil.validate() still returns a valid
+result.  Then we process the result once more to extract the custom
+validation results and error messages.&lt;/p&gt;
+&lt;h3 id=&#34;pupiljs-validation-functions&#34;&gt;Pupil.js validation functions&lt;/h3&gt;
+&lt;p&gt;Available validation functions are available at &lt;a href=&#34;https://www.npmjs.com/package/pupil#validation-functions&#34;&gt;https://www.npmjs.com/package/pupil#validation-functions&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following functions are available by default:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;iEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Case insensitive comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;siEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive case insensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMin&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMax&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Exact length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;between&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum and maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;in&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One of the provided values&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;required&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Must have a value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Always valid&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;numeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;integer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Integer numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alpha&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alphaNumeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers and letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;email&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Email address format&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A custom regular expression&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equalsTo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Compare to another field by its key&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;sample-usage&#34;&gt;Sample usage&lt;/h4&gt;
+&lt;p&gt;For case-insensitive comparison &lt;code&gt;iEquals&lt;/code&gt; function in Pupil,
+And you can use &lt;code&gt;||&lt;/code&gt; for logical OR : &lt;a href=&#34;https://www.npmjs.com/package/pupil#rule-strings&#34;&gt;https://www.npmjs.com/package/pupil#rule-strings&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;So you can do this :
+&lt;code&gt;rule: &#39;iEquals(&amp;quot;mary&amp;quot;) || iEquals(&amp;quot;john&amp;quot;)&#39;&lt;/code&gt;
+matches &amp;ldquo;mary&amp;rdquo;, &amp;ldquo;Mary&amp;rdquo;, &amp;ldquo;john&amp;rdquo;, &amp;ldquo;John&amp;rdquo;, &amp;ldquo;JOhN&amp;rdquo;, etc. Not &amp;ldquo;maryjohn&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;medic-mobile-validation-functions&#34;&gt;Medic Mobile validation functions&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;unique(*fields)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if no existing valid report has the same value for all of the listed fields. Fields are compared to those at the top level and within &lt;code&gt;fields&lt;/code&gt; for every report doc. To include the form type use &lt;code&gt;&#39;form&#39;&lt;/code&gt; as one of the fields. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;, &#39;1 week&#39;)&lt;/code&gt; checks that the same report wasn&amp;rsquo;t submitted for this patient in the past week.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;uniqueWithin(*fields, time_period)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Same as &lt;code&gt;unique&lt;/code&gt; but the last argument is the time period in which to search. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that this report was never submitted for this patient.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;exists(form_id, field)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if a report matches the &lt;code&gt;form_id&lt;/code&gt; and value for &lt;code&gt;field&lt;/code&gt;. This is useful to check that a patient was registered for a service before reporting about it. Eg &lt;code&gt;exists(&#39;REG&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that a &lt;code&gt;REG&lt;/code&gt; form was already submitted for a patient. As of 2.12 most uses of this function are obsolete because checking for a valid &lt;code&gt;patient_id&lt;/code&gt; is done automatically by the &lt;code&gt;accept_patient_report&lt;/code&gt; transition using &lt;code&gt;registration_not_found&lt;/code&gt; in the &lt;code&gt;messages.event_type&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;isISOWeek(weekFieldName[, yearFieldName])&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if the current report has a week value that is less or equal to the number of ISO weeks of the current year or the year value of the same report. The first parameter is the field name for the week and the second parameter is the field name for the year: &lt;code&gt;isISOWeek(&#39;week&#39;, &#39;year&#39;)&lt;/code&gt;. If the second parameter is not specified, then the current year is used: &lt;code&gt;isISOWeek(&#39;week&#39;)&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Collect Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/collect-forms/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2240,6 +2445,37 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 ## Case Reports
 ### `app_settings.json .case_reports[]`
 --&gt;
+&lt;h2 id=&#34;variables-in-outgoing-sms&#34;&gt;Variables in outgoing SMS&lt;/h2&gt;
+&lt;p&gt;Outgoing messages can use &lt;a href=&#34;https://mustache.github.io/mustache.5.html&#34;&gt;Mustache templating&lt;/a&gt; to insert variables and specify data formats.&lt;/p&gt;
+&lt;p&gt;All the fields on the report doc are available as variables. Additionally, the &lt;code&gt;contact&lt;/code&gt; variable is the sender of the report.&lt;/p&gt;
+&lt;h3 id=&#34;code-sample&#34;&gt;Code sample&lt;/h3&gt;
+&lt;p&gt;The following translation label includes the &lt;code&gt;name&lt;/code&gt; field of &lt;code&gt;contact&lt;/code&gt;, along with the submitted &lt;code&gt;patient_name&lt;/code&gt; field, and the generated &lt;code&gt;patient_id&lt;/code&gt; field.&lt;/p&gt;
+&lt;h4 id=&#34;translationsmessages-enproperties&#34;&gt;&lt;code&gt;translations/messages-en.properties&lt;/code&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;messages.registration.report_accepted = Thank you {{contact.name}} for registering {{patient_name}}. Their ID is {{patient_id}}.
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;date-format-filters&#34;&gt;Date Format Filters&lt;/h3&gt;
+&lt;p&gt;The following filter functions are available for formating dates.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;filter&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;datetime&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;reported_date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;bikram_sambat_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates in Bikram Sambat calendar (most commonly used calendar in Nepal). Currently display format is hardcoded to e.g. &amp;ldquo;१५ चैत २०७३&amp;rdquo;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
@@ -2392,6 +2628,12 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;td&gt;&lt;code&gt;visible&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;Whether the target is visible in the targets page. &lt;strong&gt;Default: true&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;aggregate&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As of 3.9, defines whether the target will be displayed on the TargetAggregates page&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
