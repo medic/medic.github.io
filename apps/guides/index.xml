@@ -210,6 +210,364 @@ X-CouchDB-Body-Time: 0
     </item>
     
     <item>
+      <title>Apps: CouchDB Authentication</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;to-invalidate-a-session-in-couchdb-there-are-two-options&#34;&gt;To invalidate a session in couchdb, there are two options:&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Change the session signing certificate on the server&lt;/li&gt;
+&lt;li&gt;Change the password and/or salt for the user whose session should be invalidated&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are drawbacks to note with each.  Option &lt;strong&gt;1&lt;/strong&gt; will invalidate &lt;em&gt;all&lt;/em&gt; sessions; option &lt;strong&gt;2&lt;/strong&gt; will invalidate all sessions &lt;em&gt;for that user&lt;/em&gt;, and also their password.&lt;/p&gt;
+&lt;p&gt;Because of the nature of couch&amp;rsquo;s session management, there is no way to see a list of active/open sessions.  Invalidating a specific session key could be achieved by blacklisting a cookie value in e.g. nginx or API, but this is unlikely to be of practical value.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: CSV to Docs</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/csv-to-docs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/csv-to-docs/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;seeding-data-with-medic-conf&#34;&gt;Seeding data with medic-conf&lt;/h2&gt;
+&lt;p&gt;Users, contacts, and report data can be specified in comma-separated value (CSV) files, then converted to JavaScript Object Notation (JSON) files and uploaded into your instance using &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;medic-conf&lt;/a&gt;. This documentation will cover the CSV notation used, fetching CSV files from Google Sheets, converting the CSV files into JSON docs, and then uploading the data from the JSON files to your instance.&lt;/p&gt;
+&lt;h3 id=&#34;converting-csvs&#34;&gt;Converting CSVs&lt;/h3&gt;
+&lt;p&gt;Running &lt;code&gt;medic-conf&lt;/code&gt; with the &lt;code&gt;csv-to-docs&lt;/code&gt; action converts CSV files from the &lt;code&gt;csv&lt;/code&gt; folder into JSON docs to be uploaded to your instance. The JSON files are stored in the &lt;code&gt;json_docs&lt;/code&gt; folder. Instructions for creating the CSV files are in sections below.&lt;/p&gt;
+&lt;h3 id=&#34;uploading-csvs&#34;&gt;Uploading CSVs&lt;/h3&gt;
+&lt;p&gt;Running &lt;code&gt;medic-conf&lt;/code&gt; with the &lt;code&gt;upload-docs&lt;/code&gt; action will upload the JSON docs that were generated from the CSV files to your instance. For example, running &lt;code&gt;medic-conf --local upload-docs&lt;/code&gt; will upload the converted docs into your local instance. The target location &lt;code&gt;--local&lt;/code&gt; can be replaced with an instance or URL. See &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;medic-conf&lt;/a&gt; for detailed instructions.&lt;/p&gt;
+&lt;h3 id=&#34;creating-csv-files-for-contacts-reports&#34;&gt;Creating CSV files for Contacts, Reports&lt;/h3&gt;
+&lt;p&gt;A separate CSV file is needed for each type of place, person, or report in your project&amp;rsquo;s local &lt;code&gt;csv&lt;/code&gt; folder. The name of the file determines the type of doc created for rows contained in the file. The possible types are: &lt;code&gt;report&lt;/code&gt;, &lt;code&gt;person&lt;/code&gt;, and &lt;code&gt;place&lt;/code&gt;. Each of these has a further specifier provided in the filename:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;place.{place_type}.csv&lt;/code&gt;:  where &lt;code&gt;{place_type}&lt;/code&gt; is the type of place specified in the file. By default, the place types are one of &lt;code&gt;clinic&lt;/code&gt;, &lt;code&gt;health_center&lt;/code&gt;, or &lt;code&gt;district_hospital&lt;/code&gt;. As of 3.7 of the &lt;a href=&#34;https://github.com/medic/cht-core&#34;&gt;Core Framework&lt;/a&gt;, the number of place types and their names can be configured — the &lt;code&gt;{place_type}&lt;/code&gt; should match with the hierarchy names used.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;person.{parent_place_type}.csv&lt;/code&gt;:  where &lt;code&gt;{parent_place_type}&lt;/code&gt; is the type of place to which the people in the file will belong.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;report.{form_id}.csv&lt;/code&gt;:  where &lt;code&gt;{form_id}&lt;/code&gt; is the form ID for all the reports in the file. You will need one file per form ID&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here are some examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;File named &lt;code&gt;place.district_hospital.csv&lt;/code&gt; adds the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;district_hospital&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;File named &lt;code&gt;person.clinic.csv&lt;/code&gt; add the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;person&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;File named &lt;code&gt;report.immunization_visit.csv&lt;/code&gt; add the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;report&amp;quot;, &amp;quot;form&amp;quot;:&amp;quot;immunization_visit&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In each of these files a header row is used to specify the JSON field names, and each subsequent row specifies the corresponding values for a doc. A &lt;code&gt;_id&lt;/code&gt; field is automatically generated with a universally unique identifier.&lt;/p&gt;
+&lt;p&gt;Here is an example of a &lt;code&gt;csv/person.clinic.csv&lt;/code&gt; file for people belonging to clinics:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;name,sex,date_of_birth
+Adriana Akiyama,female,1985-12-31
+Becky Backlund,female,1987-10-17
+Carson Crane,male,2015-01-23
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here is the table representation of the CSV:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;sex&lt;/th&gt;
+&lt;th&gt;date_of_birth&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Adriana Akiyama&lt;/td&gt;
+&lt;td&gt;female&lt;/td&gt;
+&lt;td&gt;1985-12-31&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Becky Backlund&lt;/td&gt;
+&lt;td&gt;female&lt;/td&gt;
+&lt;td&gt;1987-10-17&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Carson Crane&lt;/td&gt;
+&lt;td&gt;male&lt;/td&gt;
+&lt;td&gt;2015-01-23&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Converting that CSV file to JSON docs with the &lt;code&gt;csv-to-docs&lt;/code&gt; action would generate three files, one for each person. Here is one of the corresponding JSON files, &lt;code&gt;json_docs/dbfbc0f0-117a-59ec-9542-3313fb10ef25.doc.json&lt;/code&gt;, which was created from the CSV data above:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Adriana Akiyama&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sex&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;female&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;date_of_birth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1985-12-31&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dbfbc0f0-117a-59ec-9542-3313fb10ef25&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;special-notations&#34;&gt;Special notations&lt;/h4&gt;
+&lt;h5 id=&#34;specifying-property-type&#34;&gt;Specifying property type&lt;/h5&gt;
+&lt;p&gt;By default, values are parsed as strings. To parse a CSV column as a different JSON type, append the JSON type name to the column definition, e.g.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;column_one,column_two:bool,column_three:int,column_four:float,column_five:date,column_six:timestamp
+some string,true,1,2.3,2017-12-31,1513255007072
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This would create a structure such as:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;09efb53f-9cd8-524c-9dfd-f62c242f1817&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_one&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some string&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_two&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_three&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_four&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2.3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_five&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2017-12-31T00:00:00.000Z&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_six&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1513255007072&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h5 id=&#34;excluding-column&#34;&gt;Excluding column&lt;/h5&gt;
+&lt;p&gt;A special column type, &lt;code&gt;excluded&lt;/code&gt;, is used for excluding a column from the final JSON data:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;my_column_that_will_not_be_a_property:excluded
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This can be useful if using a column for doc references.&lt;/p&gt;
+&lt;h4 id=&#34;including-another-doc&#34;&gt;Including another doc&lt;/h4&gt;
+&lt;p&gt;Often times database documents need to include or refer to other documents in the database. This can be achieved with queries across CSV files, which is done by specifying a query in the column header. The query specifies the doc type (&lt;code&gt;person&lt;/code&gt; or &lt;code&gt;place&lt;/code&gt;) and matching condition.&lt;/p&gt;
+&lt;p&gt;For instance, to include the parent district&amp;rsquo;s doc in a health center&amp;rsquo;s doc, the &lt;code&gt;parent:place WHERE reference_id=COL_VAL&lt;/code&gt; column header is used. The &lt;code&gt;COL_VAL&lt;/code&gt; is a special notation for that column&amp;rsquo;s value for the row, and it will be used to match against the &lt;code&gt;reference_id&lt;/code&gt; field in all other places. Given these example CSVs, you can see the corresponding JSON structure:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;place.district.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;reference_id:excluded&lt;/th&gt;
+&lt;th&gt;is_name_generated&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;reported_date:timestamp&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;district_1&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;D1&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;district_2&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;D2&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;district_3&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;D3&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;place.health_center.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;reference_id:excluded&lt;/th&gt;
+&lt;th&gt;parent:place WHERE reference_id=COL_VAL&lt;/th&gt;
+&lt;th&gt;is_name_generated&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;reported_date:timestamp&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_1&lt;/td&gt;
+&lt;td&gt;district_1&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC1&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_2&lt;/td&gt;
+&lt;td&gt;district_2&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC2&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_3&lt;/td&gt;
+&lt;td&gt;district_3&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC3&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;480d0cd0-c021-5d55-8c63-d86576d592fc.doc.json&lt;/code&gt;&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;D2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;f223f240-5d6a-5a7a-91d4-46d3c59de73e&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC7&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;480d0cd0-c021-5d55-8c63-d86576d592fc&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h5 id=&#34;including-value-from-another-doc&#34;&gt;Including value from another doc&lt;/h5&gt;
+&lt;p&gt;Similar to including another doc, it is also possible to get the value of a specific field in another doc. For instance, if &lt;code&gt;parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/code&gt; were used in the example above, the &lt;code&gt;parent&lt;/code&gt; field&amp;rsquo;s value would have been set to the &lt;code&gt;_id&lt;/code&gt; of the refered to doc instead of including the whole doc. Note that &lt;code&gt;_id&lt;/code&gt; is a generated value included in all generated docs.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;reference_id:excluded&lt;/th&gt;
+&lt;th&gt;parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/th&gt;
+&lt;th&gt;is_name_generated&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;reported_date:timestamp&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_1&lt;/td&gt;
+&lt;td&gt;district_1&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC1&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_2&lt;/td&gt;
+&lt;td&gt;district_2&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC2&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;health_center_3&lt;/td&gt;
+&lt;td&gt;district_3&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;td&gt;HC3&lt;/td&gt;
+&lt;td&gt;1544031155715&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The resulting doc would be as follows, with the &lt;code&gt;_id&lt;/code&gt; from &lt;code&gt;district_1&lt;/code&gt; as the &lt;code&gt;parent&lt;/code&gt; value:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;creating-csv-files-for-users&#34;&gt;Creating CSV files for users&lt;/h3&gt;
+&lt;p&gt;To create user accounts from CSV files, a &lt;code&gt;users.csv&lt;/code&gt; file will be needed in the &lt;code&gt;csv&lt;/code&gt; folder. The &lt;code&gt;users.csv&lt;/code&gt; file requires columns for &lt;code&gt;username&lt;/code&gt; and &lt;code&gt;password&lt;/code&gt;. Additional columns can be used for any additional fields needed on the user&amp;rsquo;s doc, for example &lt;code&gt;roles&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;. Running the &lt;code&gt;csv-to-docs&lt;/code&gt; &lt;code&gt;upload-docs&lt;/code&gt; &lt;code&gt;create-users&lt;/code&gt; actions in that order will generate the necessary JSON docs with a &lt;code&gt;users.csv&lt;/code&gt; file in your working directory, and then create the people, places, and users.&lt;/p&gt;
+&lt;p&gt;The following sections describe the different ways to associate the new users to contacts.&lt;/p&gt;
+&lt;h4 id=&#34;creating-new-users-with-existing-contacts&#34;&gt;Creating new users with existing contacts&lt;/h4&gt;
+&lt;p&gt;When creating users that are associated to existing contacts, &lt;code&gt;contact&lt;/code&gt; and &lt;code&gt;place&lt;/code&gt; columns should be created. Each row should have the UUID of an existing person for &lt;code&gt;contact&lt;/code&gt;, and an existing place for &lt;code&gt;place&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;creating-new-users-with-new-contacts&#34;&gt;Creating new users with new contacts&lt;/h3&gt;
+&lt;p&gt;To create new contacts for each new user provide values for &lt;code&gt;contact.name&lt;/code&gt;, &lt;code&gt;place.name&lt;/code&gt;, and &lt;code&gt;place.parent&lt;/code&gt; (can be existing place), as seen in this example CSV:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;username,password,roles,name,phone,contact.name,place.c_prop,place.type,place.name,place.parent
+alice,Secret_1,district-admin,Alice Example,+123456789,Alice,p_val_a,health_center,alice area, district_uuid
+bob,Secret_1,district-admin,bob Example,+123456789,bob,p_val_a,health_center,bob area,disctrict_uuid
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The &lt;code&gt;username&lt;/code&gt;, &lt;code&gt;password&lt;/code&gt;, &lt;code&gt;contact.name&lt;/code&gt;, &lt;code&gt;place.type&lt;/code&gt;, &lt;code&gt;place.name&lt;/code&gt; columns are required to have functional users with new places.&lt;/p&gt;
+&lt;h3 id=&#34;creating-new-users-linked-to-contacts-in-csv-files&#34;&gt;Creating new users linked to contacts in CSV files&lt;/h3&gt;
+&lt;p&gt;To associate the new users to contacts that will also be created with the &lt;code&gt;csv-to-docs&lt;/code&gt; action, use reference queries to the contacts.
+For instance, the column header for the person would be &lt;code&gt;contact:person WHERE reference_id=COL_VAL&lt;/code&gt;, and for the place would be &lt;code&gt;place:GET _id OF place WHERE reference_id=COL_VAL&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Here is a example of how the three CSV files need to be configured to setup a user linked to existing place and contact.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/place.health_center.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;reference_id:excluded,parent:place WHERE reference_id=COL_VAL,is_name_generated,name,reported_date:timestamp
+health_center_1,district_1,FALSE,HC1,1544031155715
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Generated JSON doc for the health center:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;District1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;FALSE&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/person.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;reference_id:excluded,parent:place WHERE reference_id=COL_VAL,name,phone,sex,role,reported_date,patient_id
+p_hc1,health_center_1,Bob Johnson 1,+16143291527,male,manager,1552494835669,60951
+p_hc2,health_center_1,Bob Johnson 2,+16143291528,male,manager,1552494835669,60951
+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Generated JSON doc for the person:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;District1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;FALSE&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Bob Johnson 1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;phone&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;+16143291527&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sex&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;male&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;manager&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1552494835669&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;patient_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;60951&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/users.csv&lt;/code&gt;&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;username,password,roles,phone,contact:person WHERE reference_id=COL_VAL,place:GET _id OF place WHERE reference_id=COL_VAL
+ac1,Secret_1,district_admin:red1,+123456789,p_hc1,health_center_1
+ac2,Secret_1,district_admin:supervisor,+123456789,p_hc2,health_center_1
+ac3,Secret_1,district_admin,+123456789,p_hc3,health_center_1
+ac4,Secret_1,district_admin,+123456789,p_hc4,health_center_1
+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This will generate the &lt;code&gt;users.csv&lt;/code&gt; file in the working directory which is used by the &lt;code&gt;create-users&lt;/code&gt; action. The contact and place fields should be resolved to the actual UUIDs.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;p_hc1&amp;quot;username&amp;quot;,&amp;quot;password&amp;quot;,&amp;quot;roles&amp;quot;,&amp;quot;contact&amp;quot;,&amp;quot;phone&amp;quot;,&amp;quot;place&amp;quot;
+&amp;quot;ac1&amp;quot;,&amp;quot;Secret_1&amp;quot;,&amp;quot;district_admin:red1&amp;quot;,&amp;quot;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;quot;,&amp;quot;+123456789&amp;quot;,&amp;quot;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;quot;
+&amp;quot;ac2&amp;quot;,&amp;quot;Secret_1&amp;quot;,&amp;quot;district_admin:supervisor&amp;quot;,&amp;quot;b7d0dbd5-beeb-52a8-8e4c-513d0baece8e&amp;quot;,&amp;quot;+123456789&amp;quot;,&amp;quot;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;using-csv-files-on-google-drive&#34;&gt;Using CSV files on Google Drive&lt;/h3&gt;
+&lt;p&gt;Individual Google Sheets can be used for each CSV file, which can be exported manually to CSV file format, or linked to your project to be downloaded by medic-conf.&lt;/p&gt;
+&lt;p&gt;To fetch the files from Google Drive run the &lt;code&gt;fetch-csvs-from-google-drive&lt;/code&gt; action in medic-conf. This will download the CSV files specified in the &lt;code&gt;csvs-on-google-drive.json&lt;/code&gt; file, and place them into the &lt;code&gt;csv&lt;/code&gt; folder.&lt;/p&gt;
+&lt;h4 id=&#34;linking-to-google-drive&#34;&gt;Linking to Google Drive&lt;/h4&gt;
+&lt;p&gt;The file &lt;code&gt;csvs-on-google-drive.json&lt;/code&gt; in your project&amp;rsquo;s home directory will consist of a key value pair for each CSV file. The keys must be the filename where the CSV will be stored locally — see the CSV &lt;a href=&#34;https://github.com/medic/medic-conf#csv-file-name&#34;&gt;file documentation&lt;/a&gt; for the notation. The value of each key must be the ID of the corresponding file in Google Drive — the ID can be obtained from the URL eg &lt;code&gt;https://docs.google.com/spreadsheets/d/{FILE_ID}/edit&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;person.clinic.csv&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;google_drive_ID&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;google-drive-authentication&#34;&gt;Google Drive authentication&lt;/h3&gt;
+&lt;p&gt;Medic-conf leverages Google authentication to access Google Drive. You will need to create a client_secrets file named &lt;code&gt;.gdrive.secrets.json&lt;/code&gt; and place it in your working directory, and &lt;a href=&#34;https://developers.google.com/identity/protocols/OAuth2InstalledApp&#34;&gt;create a token&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Create the &lt;code&gt;.gdrive.secrets.json&lt;/code&gt; file by downloading the &lt;code&gt;client_secrets.json&lt;/code&gt; from Google. You will need a &lt;code&gt;CLIENT_ID&lt;/code&gt;, &lt;code&gt;CLIENT_SECRET&lt;/code&gt; and &lt;code&gt;REDIRECT_URL&lt;/code&gt;. You can find these pieces of information by going to the Developer Console, clicking your project &amp;ndash;&amp;gt; APIs &amp;amp; auth &amp;ndash;&amp;gt; credentials &amp;ndash;&amp;gt; Download JSON. This will download the credentials but will need modified to be in this structure.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;client_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;client_id&amp;gt;.apps.googleusercontent.com&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;project_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;proj_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;auth_uri&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://accounts.google.com/o/oauth2/auth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;token_uri&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://accounts.google.com/o/oauth2/token&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;auth_provider_x509_cert_url&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://www.googleapis.com/oauth2/v1/certs&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;client_secret&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;client_secret&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;redirect_uris&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;urn:ietf:wg:oauth:2.0:oob&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;See Google&amp;rsquo;s docs &lt;a href=&#34;https://github.com/googleapis/google-api-nodejs-client#oauth2-client&#34;&gt;here&lt;/a&gt; on Oauth2&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Database Conflicts</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -360,6 +718,138 @@ curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic
 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this example, there are two references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, both in the &lt;code&gt;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code&gt; document, one at &lt;code&gt;fields.inputs.contact._id&lt;/code&gt; and one at &lt;code&gt;fields.patient_id&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code&gt;#development&lt;/code&gt;) and they can help you out.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: EC2 Setup</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;configure-self-hosting&#34;&gt;Configure self-hosting&lt;/h2&gt;
+&lt;h4 id=&#34;1-create-ec2-use-security-best-practices&#34;&gt;1. Create EC2 (use security best practices)&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;Be sure to change the file permissions to 0600 or lower
+for the .pem file:
+sudo chmod 0600 ~/Downloads/name_of_file.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html&#34;&gt;Create Elastic IP and Associate EIP to EC2&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: SSH into instance&lt;/p&gt;
+&lt;h4 id=&#34;2-create-or-restore-ebs-volume&#34;&gt;2. Create or Restore EBS Volume&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Create EBS Volume&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be sure to tag appropriately&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html&#34;&gt;Restore EBS Volume&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Attach volume to EC2 instance&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Optional): &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;Increase disk size&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you are using a newly created EBS Volume, you will have to format the disk approriately:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;SSH into instance&lt;/li&gt;
+&lt;li&gt;Follow the instructions here: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html&#34;&gt;Using EBS Volumes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code&gt; in step 4&lt;/li&gt;
+&lt;li&gt;Mount disk to /srv&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: Mount EBS volume to /srv&lt;/p&gt;
+&lt;h4 id=&#34;3-provision-docker-server&#34;&gt;3. Provision Docker server&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Follow README &amp;amp; Run scripts: &lt;a href=&#34;https://github.com/medic/medic-infrastructure/tree/master/self-hosting/prepare-system&#34;&gt;Prepare Self-Hosting System&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;A zip will be shared via Slack until the scripts are moved to a public repo&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: CHT Application bootstraps and comes online&lt;/p&gt;
+&lt;h4 id=&#34;4-dns-configuration&#34;&gt;4. DNS configuration&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Point A records to Elastic IP given to Docker server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;5-review-ssl-certs&#34;&gt;5. Review SSL certs&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Location of certs is &lt;code&gt;/srv/settings/medic-core/nginx/private/&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Name the key file as &lt;code&gt;default.key&lt;/code&gt; and the certificate file as &lt;code&gt;default.crt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Restarting nginx with new certs: &lt;code&gt;svc-restart medic-core nginx&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;6-configure-couch2pg&#34;&gt;6. Configure couch2pg&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic configuration: &lt;a href=&#34;https://github.com/medic/medic-couch2pg/blob/master/README.md&#34;&gt;https://github.com/medic/medic-couch2pg/blob/master/README.md&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Supervision/monitoring/notification&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;7-setup-postgres-to-work-with-couch2pg&#34;&gt;7. Setup postgres to work with couch2pg&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Creating the database, setting up permissions, exploring the tables and what they store&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;8debugging-couch2pgpostgres&#34;&gt;8.Debugging couch2pg/postgres&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Understanding the log and what the entries mean&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h2&gt;
+&lt;h4 id=&#34;1-restarting-processes&#34;&gt;1. Restarting processes&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-investigating-logs&#34;&gt;2. Investigating logs&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Log into container: &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/exec/&#34;&gt;https://docs.docker.com/engine/reference/commandline/exec/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Helpful docker commands: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Inside container, all appropriate logs can be found in: &lt;code&gt;/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;3upgrading-the-container&#34;&gt;3.Upgrading the container&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Backup all data (EBS)&lt;/li&gt;
+&lt;li&gt;Log into container and stop all services&lt;/li&gt;
+&lt;li&gt;DO NOT REMOVE &lt;code&gt;/srv/storage/medic-core/&lt;/code&gt;, &lt;code&gt;/srv/settings/medic-core/couchdb/local.ini&lt;/code&gt;, wipe all other files in /srv [Note: Make script publicly accessibile]&lt;/li&gt;
+&lt;li&gt;Change the image tag to the newest image release version:
+&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Change image tag in docker-compose file: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Launch new containers with appropriate COUCHDB_ADMIN_PASSWORD &amp;amp; HA_PASSWORD environment variables&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4upgrading-the-webapp&#34;&gt;4.Upgrading the webapp&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Use Admin GUI page&lt;/li&gt;
+&lt;li&gt;CLI via horticulturalist: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4a-rds-help&#34;&gt;4a. RDS help&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&#34;&gt;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;restore-from-backup-and-monitoring&#34;&gt;Restore from backup and monitoring&lt;/h2&gt;
+&lt;h4 id=&#34;1-configure-backups&#34;&gt;1. Configure backups&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;EBS Snapshot Lifecycle Manager: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-restoring-from-backup&#34;&gt;2. Restoring from backup&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Create volume from snapshot&lt;/li&gt;
+&lt;li&gt;Tag appropriately for backups&lt;/li&gt;
+&lt;li&gt;Mount volume to docker server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;3-process-supervison&#34;&gt;3. Process supervison&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;supvisorctl&lt;/li&gt;
+&lt;li&gt;/boot/supervisor-inspect&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4-monitoring&#34;&gt;4. Monitoring&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;own-infrastructure-setup&#34;&gt;Own Infrastructure Setup&lt;/h2&gt;
+&lt;h4 id=&#34;1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above&#34;&gt;1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4&gt;
 
       </description>
     </item>
@@ -670,6 +1160,47 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
     </item>
     
     <item>
+      <title>Apps: Self Hosting</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;self-hosting&#34;&gt;Self Hosting&lt;/h2&gt;
+&lt;h3 id=&#34;how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;How to access container, retrieve logs, isolate security groups&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;How to restart services: Link to medic-os documentation
+&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;
+&lt;code&gt;/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;aws-docs-for-increasing-disk-size&#34;&gt;AWS docs for increasing disk size:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Stop medic: &lt;code&gt;sudo supervisorctl stop medic&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Go to EBS in AWS and take a snapshot of the volume.&lt;/li&gt;
+&lt;li&gt;Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li&gt;
+&lt;li&gt;Follow the following link to make the instance recognize the additional space: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Turn medic back on: &lt;code&gt;sudo supervisorctl start medic&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;Links to medic documentation for horticulturalist for upgrades:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;log into container &amp;amp; run: &lt;code&gt;COUCH_NODE_NAME=couchdb@127.0.0.1 COUCH_URL=http://medic:&amp;lt;pw&amp;gt;@localhost:5984/medic /srv/software/horticulturalist/node_modules/.bin/horti --medic-os --install=&amp;lt;version&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;monitoring--backup&#34;&gt;Monitoring &amp;amp; Backup&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li&gt;
+&lt;li&gt;Set up Lifecycle Management for EBS snapshots:
+&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li&gt;
+&lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
+&lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: SSH into a Docker image</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -693,6 +1224,42 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
 &lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: SSL Cert Install</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssl-cert-install/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssl-cert-install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;requirements&#34;&gt;Requirements&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Installed CHT-Core 3.x via docker-compose&lt;/li&gt;
+&lt;li&gt;Your own SSL certifications (Let&amp;rsquo;s Encrypt)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;copy-certs-into-medic-os-container&#34;&gt;Copy certs into medic-os container&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside your server (you may need to use sudo before each command):
+$ docker ps
+$ docker cp /path/to/ssl.cert medic-os:/srv/settings/medic-core/nginx/private/ssl.crt
+$ docker cp /path/to/ssl.key medic-os:/srv/settings/medic-core/nginx/private/ssl.key
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;edit-nginx-configuration-file&#34;&gt;Edit nginx configuration file&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside the medic-os docker container:
+$ docker exec -it medic-os /bin/bash
+# sed -i &amp;quot;s|default.crt|ssl.crt|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
+# sed -i &amp;quot;s|default.key|ssl.key|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;restart-services&#34;&gt;Restart services&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside medic-os container:
+$ docker exec -it medic-os /bin/bash
+# /boot/svc-restart medic-core nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;view-nginx-logs&#34;&gt;View Nginx Logs&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside container:
+# cd /srv/storage/medic-core/nginx/logs/ 
+access.log error-ssl.log error.log startup.og
+&lt;/code&gt;&lt;/pre&gt;
       </description>
     </item>
     
