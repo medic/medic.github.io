@@ -1306,6 +1306,211 @@ medic-conf initialise-project-layout
     </item>
     
     <item>
+      <title>Apps: App Settings Validation</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Validation rules are code fragments used to determine if some input is valid. For example, to say a field is only valid if the value has at least five characters, you would use the lenMin(5). They are used in &lt;code&gt;registrations[].validations.list[].rule&lt;/code&gt; and &lt;code&gt;patient_reports[].validations.list[].rule&lt;/code&gt; to determine if an incoming report is accepted. A report is accepted as valid only if all rules return &lt;code&gt;true&lt;/code&gt;. If any validation rule returns &lt;code&gt;false&lt;/code&gt; then the report is marked as invalid, and a message is automatically sent to the submitter. The content for the message is set in the &lt;code&gt;translation_key&lt;/code&gt; associated to each rule. If a report fails multiple validations then each message will be sent. These can be combined into a single SMS by specifying &lt;code&gt;&amp;quot;*.validations.join_responses&amp;quot; : true&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;operators&#34;&gt;Operators&lt;/h2&gt;
+&lt;p&gt;The available operators are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Operator&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;&amp;amp;&lt;/td&gt;
+&lt;td&gt;and&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;||&lt;/td&gt;
+&lt;td&gt;or&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!&lt;/td&gt;
+&lt;td&gt;not&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;a ? b : c&lt;/td&gt;
+&lt;td&gt;ternary, ie: if &amp;lsquo;a&amp;rsquo; is true, then check &amp;lsquo;b&amp;rsquo;, otherwise check &amp;lsquo;c&amp;rsquo;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;()&lt;/td&gt;
+&lt;td&gt;nested blocks, eg: &amp;lsquo;a &amp;amp;&amp;amp; (b&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;rules&#34;&gt;Rules&lt;/h2&gt;
+&lt;p&gt;Validation settings may consist of Pupil.js rules and rules specific to Medic Mobile.
+These two types of rules cannot be combined as part of the same rule.&lt;/p&gt;
+&lt;p&gt;Not OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; unique(&#39;patient_id&#39;)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; max(11111)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If for example you want to validate that patient_id is 5 numbers and it
+is unique (or some other custom validation) you need to define two
+validation configs/separate rules in your settings. Example validation
+settings:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;regex(\d{5})&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be 5 numbers.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+	}]
+	},
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;unique(&#39;patient_id&#39;)&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be unique.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+		}]
+	}
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;validate()&lt;/code&gt; modifies the property value of the second item to
+&lt;code&gt;patient_id_unique&lt;/code&gt; so that pupil.validate() still returns a valid
+result.  Then we process the result once more to extract the custom
+validation results and error messages.&lt;/p&gt;
+&lt;h3 id=&#34;pupiljs-validation-functions&#34;&gt;Pupil.js validation functions&lt;/h3&gt;
+&lt;p&gt;Available validation functions are available at &lt;a href=&#34;https://www.npmjs.com/package/pupil#validation-functions&#34;&gt;https://www.npmjs.com/package/pupil#validation-functions&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following functions are available by default:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;iEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Case insensitive comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;siEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive case insensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMin&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMax&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Exact length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;between&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum and maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;in&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One of the provided values&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;required&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Must have a value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Always valid&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;numeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;integer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Integer numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alpha&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alphaNumeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers and letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;email&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Email address format&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A custom regular expression&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equalsTo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Compare to another field by its key&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;sample-usage&#34;&gt;Sample usage&lt;/h4&gt;
+&lt;p&gt;For case-insensitive comparison &lt;code&gt;iEquals&lt;/code&gt; function in Pupil,
+And you can use &lt;code&gt;||&lt;/code&gt; for logical OR : &lt;a href=&#34;https://www.npmjs.com/package/pupil#rule-strings&#34;&gt;https://www.npmjs.com/package/pupil#rule-strings&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;So you can do this :
+&lt;code&gt;rule: &#39;iEquals(&amp;quot;mary&amp;quot;) || iEquals(&amp;quot;john&amp;quot;)&#39;&lt;/code&gt;
+matches &amp;ldquo;mary&amp;rdquo;, &amp;ldquo;Mary&amp;rdquo;, &amp;ldquo;john&amp;rdquo;, &amp;ldquo;John&amp;rdquo;, &amp;ldquo;JOhN&amp;rdquo;, etc. Not &amp;ldquo;maryjohn&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;medic-mobile-validation-functions&#34;&gt;Medic Mobile validation functions&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;unique(*fields)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if no existing valid report has the same value for all of the listed fields. Fields are compared to those at the top level and within &lt;code&gt;fields&lt;/code&gt; for every report doc. To include the form type use &lt;code&gt;&#39;form&#39;&lt;/code&gt; as one of the fields. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;, &#39;1 week&#39;)&lt;/code&gt; checks that the same report wasn&amp;rsquo;t submitted for this patient in the past week.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;uniqueWithin(*fields, time_period)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Same as &lt;code&gt;unique&lt;/code&gt; but the last argument is the time period in which to search. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that this report was never submitted for this patient.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;exists(form_id, field)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if a report matches the &lt;code&gt;form_id&lt;/code&gt; and value for &lt;code&gt;field&lt;/code&gt;. This is useful to check that a patient was registered for a service before reporting about it. Eg &lt;code&gt;exists(&#39;REG&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that a &lt;code&gt;REG&lt;/code&gt; form was already submitted for a patient. As of 2.12 most uses of this function are obsolete because checking for a valid &lt;code&gt;patient_id&lt;/code&gt; is done automatically by the &lt;code&gt;accept_patient_report&lt;/code&gt; transition using &lt;code&gt;registration_not_found&lt;/code&gt; in the &lt;code&gt;messages.event_type&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;isISOWeek(weekFieldName[, yearFieldName])&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if the current report has a week value that is less or equal to the number of ISO weeks of the current year or the year value of the same report. The first parameter is the field name for the week and the second parameter is the field name for the year: &lt;code&gt;isISOWeek(&#39;week&#39;, &#39;year&#39;)&lt;/code&gt;. If the second parameter is not specified, then the current year is used: &lt;code&gt;isISOWeek(&#39;week&#39;)&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Collect Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/collect-forms/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2852,6 +3057,37 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 ## Case Reports
 ### `app_settings.json .case_reports[]`
 --&gt;
+&lt;h2 id=&#34;variables-in-outgoing-sms&#34;&gt;Variables in outgoing SMS&lt;/h2&gt;
+&lt;p&gt;Outgoing messages can use &lt;a href=&#34;https://mustache.github.io/mustache.5.html&#34;&gt;Mustache templating&lt;/a&gt; to insert variables and specify data formats.&lt;/p&gt;
+&lt;p&gt;All the fields on the report doc are available as variables. Additionally, the &lt;code&gt;contact&lt;/code&gt; variable is the sender of the report.&lt;/p&gt;
+&lt;h3 id=&#34;code-sample&#34;&gt;Code sample&lt;/h3&gt;
+&lt;p&gt;The following translation label includes the &lt;code&gt;name&lt;/code&gt; field of &lt;code&gt;contact&lt;/code&gt;, along with the submitted &lt;code&gt;patient_name&lt;/code&gt; field, and the generated &lt;code&gt;patient_id&lt;/code&gt; field.&lt;/p&gt;
+&lt;h4 id=&#34;translationsmessages-enproperties&#34;&gt;&lt;code&gt;translations/messages-en.properties&lt;/code&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;messages.registration.report_accepted = Thank you {{contact.name}} for registering {{patient_name}}. Their ID is {{patient_id}}.
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;date-format-filters&#34;&gt;Date Format Filters&lt;/h3&gt;
+&lt;p&gt;The following filter functions are available for formating dates.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;filter&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;datetime&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;reported_date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;bikram_sambat_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates in Bikram Sambat calendar (most commonly used calendar in Nepal). Currently display format is hardcoded to e.g. &amp;ldquo;१५ चैत २०७३&amp;rdquo;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
@@ -3004,6 +3240,12 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;td&gt;&lt;code&gt;visible&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;Whether the target is visible in the targets page. &lt;strong&gt;Default: true&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;aggregate&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As of 3.9, defines whether the target will be displayed on the TargetAggregates page&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -4244,364 +4486,6 @@ X-CouchDB-Body-Time: 0
     </item>
     
     <item>
-      <title>Apps: CouchDB Authentication</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</guid>
-      <description>
-        
-        
-        &lt;h3 id=&#34;to-invalidate-a-session-in-couchdb-there-are-two-options&#34;&gt;To invalidate a session in couchdb, there are two options:&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Change the session signing certificate on the server&lt;/li&gt;
-&lt;li&gt;Change the password and/or salt for the user whose session should be invalidated&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;There are drawbacks to note with each.  Option &lt;strong&gt;1&lt;/strong&gt; will invalidate &lt;em&gt;all&lt;/em&gt; sessions; option &lt;strong&gt;2&lt;/strong&gt; will invalidate all sessions &lt;em&gt;for that user&lt;/em&gt;, and also their password.&lt;/p&gt;
-&lt;p&gt;Because of the nature of couch&amp;rsquo;s session management, there is no way to see a list of active/open sessions.  Invalidating a specific session key could be achieved by blacklisting a cookie value in e.g. nginx or API, but this is unlikely to be of practical value.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: CSV to Docs</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/csv-to-docs/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/csv-to-docs/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;seeding-data-with-medic-conf&#34;&gt;Seeding data with medic-conf&lt;/h2&gt;
-&lt;p&gt;Users, contacts, and report data can be specified in comma-separated value (CSV) files, then converted to JavaScript Object Notation (JSON) files and uploaded into your instance using &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;medic-conf&lt;/a&gt;. This documentation will cover the CSV notation used, fetching CSV files from Google Sheets, converting the CSV files into JSON docs, and then uploading the data from the JSON files to your instance.&lt;/p&gt;
-&lt;h3 id=&#34;converting-csvs&#34;&gt;Converting CSVs&lt;/h3&gt;
-&lt;p&gt;Running &lt;code&gt;medic-conf&lt;/code&gt; with the &lt;code&gt;csv-to-docs&lt;/code&gt; action converts CSV files from the &lt;code&gt;csv&lt;/code&gt; folder into JSON docs to be uploaded to your instance. The JSON files are stored in the &lt;code&gt;json_docs&lt;/code&gt; folder. Instructions for creating the CSV files are in sections below.&lt;/p&gt;
-&lt;h3 id=&#34;uploading-csvs&#34;&gt;Uploading CSVs&lt;/h3&gt;
-&lt;p&gt;Running &lt;code&gt;medic-conf&lt;/code&gt; with the &lt;code&gt;upload-docs&lt;/code&gt; action will upload the JSON docs that were generated from the CSV files to your instance. For example, running &lt;code&gt;medic-conf --local upload-docs&lt;/code&gt; will upload the converted docs into your local instance. The target location &lt;code&gt;--local&lt;/code&gt; can be replaced with an instance or URL. See &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;medic-conf&lt;/a&gt; for detailed instructions.&lt;/p&gt;
-&lt;h3 id=&#34;creating-csv-files-for-contacts-reports&#34;&gt;Creating CSV files for Contacts, Reports&lt;/h3&gt;
-&lt;p&gt;A separate CSV file is needed for each type of place, person, or report in your project&amp;rsquo;s local &lt;code&gt;csv&lt;/code&gt; folder. The name of the file determines the type of doc created for rows contained in the file. The possible types are: &lt;code&gt;report&lt;/code&gt;, &lt;code&gt;person&lt;/code&gt;, and &lt;code&gt;place&lt;/code&gt;. Each of these has a further specifier provided in the filename:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;place.{place_type}.csv&lt;/code&gt;:  where &lt;code&gt;{place_type}&lt;/code&gt; is the type of place specified in the file. By default, the place types are one of &lt;code&gt;clinic&lt;/code&gt;, &lt;code&gt;health_center&lt;/code&gt;, or &lt;code&gt;district_hospital&lt;/code&gt;. As of 3.7 of the &lt;a href=&#34;https://github.com/medic/cht-core&#34;&gt;Core Framework&lt;/a&gt;, the number of place types and their names can be configured — the &lt;code&gt;{place_type}&lt;/code&gt; should match with the hierarchy names used.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;person.{parent_place_type}.csv&lt;/code&gt;:  where &lt;code&gt;{parent_place_type}&lt;/code&gt; is the type of place to which the people in the file will belong.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;report.{form_id}.csv&lt;/code&gt;:  where &lt;code&gt;{form_id}&lt;/code&gt; is the form ID for all the reports in the file. You will need one file per form ID&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Here are some examples:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;File named &lt;code&gt;place.district_hospital.csv&lt;/code&gt; adds the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;district_hospital&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;File named &lt;code&gt;person.clinic.csv&lt;/code&gt; add the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;person&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;File named &lt;code&gt;report.immunization_visit.csv&lt;/code&gt; add the property &lt;code&gt;&amp;quot;type&amp;quot;:&amp;quot;report&amp;quot;, &amp;quot;form&amp;quot;:&amp;quot;immunization_visit&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;In each of these files a header row is used to specify the JSON field names, and each subsequent row specifies the corresponding values for a doc. A &lt;code&gt;_id&lt;/code&gt; field is automatically generated with a universally unique identifier.&lt;/p&gt;
-&lt;p&gt;Here is an example of a &lt;code&gt;csv/person.clinic.csv&lt;/code&gt; file for people belonging to clinics:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;name,sex,date_of_birth
-Adriana Akiyama,female,1985-12-31
-Becky Backlund,female,1987-10-17
-Carson Crane,male,2015-01-23
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here is the table representation of the CSV:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;sex&lt;/th&gt;
-&lt;th&gt;date_of_birth&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Adriana Akiyama&lt;/td&gt;
-&lt;td&gt;female&lt;/td&gt;
-&lt;td&gt;1985-12-31&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Becky Backlund&lt;/td&gt;
-&lt;td&gt;female&lt;/td&gt;
-&lt;td&gt;1987-10-17&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Carson Crane&lt;/td&gt;
-&lt;td&gt;male&lt;/td&gt;
-&lt;td&gt;2015-01-23&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;Converting that CSV file to JSON docs with the &lt;code&gt;csv-to-docs&lt;/code&gt; action would generate three files, one for each person. Here is one of the corresponding JSON files, &lt;code&gt;json_docs/dbfbc0f0-117a-59ec-9542-3313fb10ef25.doc.json&lt;/code&gt;, which was created from the CSV data above:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Adriana Akiyama&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sex&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;female&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;date_of_birth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1985-12-31&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dbfbc0f0-117a-59ec-9542-3313fb10ef25&amp;#34;&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;special-notations&#34;&gt;Special notations&lt;/h4&gt;
-&lt;h5 id=&#34;specifying-property-type&#34;&gt;Specifying property type&lt;/h5&gt;
-&lt;p&gt;By default, values are parsed as strings. To parse a CSV column as a different JSON type, append the JSON type name to the column definition, e.g.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;column_one,column_two:bool,column_three:int,column_four:float,column_five:date,column_six:timestamp
-some string,true,1,2.3,2017-12-31,1513255007072
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This would create a structure such as:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;09efb53f-9cd8-524c-9dfd-f62c242f1817&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_one&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some string&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_two&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_three&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_four&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2.3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_five&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2017-12-31T00:00:00.000Z&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;column_six&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1513255007072&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h5 id=&#34;excluding-column&#34;&gt;Excluding column&lt;/h5&gt;
-&lt;p&gt;A special column type, &lt;code&gt;excluded&lt;/code&gt;, is used for excluding a column from the final JSON data:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;my_column_that_will_not_be_a_property:excluded
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This can be useful if using a column for doc references.&lt;/p&gt;
-&lt;h4 id=&#34;including-another-doc&#34;&gt;Including another doc&lt;/h4&gt;
-&lt;p&gt;Often times database documents need to include or refer to other documents in the database. This can be achieved with queries across CSV files, which is done by specifying a query in the column header. The query specifies the doc type (&lt;code&gt;person&lt;/code&gt; or &lt;code&gt;place&lt;/code&gt;) and matching condition.&lt;/p&gt;
-&lt;p&gt;For instance, to include the parent district&amp;rsquo;s doc in a health center&amp;rsquo;s doc, the &lt;code&gt;parent:place WHERE reference_id=COL_VAL&lt;/code&gt; column header is used. The &lt;code&gt;COL_VAL&lt;/code&gt; is a special notation for that column&amp;rsquo;s value for the row, and it will be used to match against the &lt;code&gt;reference_id&lt;/code&gt; field in all other places. Given these example CSVs, you can see the corresponding JSON structure:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;place.district.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;reference_id:excluded&lt;/th&gt;
-&lt;th&gt;is_name_generated&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;reported_date:timestamp&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;district_1&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;D1&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;district_2&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;D2&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;district_3&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;D3&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;place.health_center.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;reference_id:excluded&lt;/th&gt;
-&lt;th&gt;parent:place WHERE reference_id=COL_VAL&lt;/th&gt;
-&lt;th&gt;is_name_generated&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;reported_date:timestamp&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_1&lt;/td&gt;
-&lt;td&gt;district_1&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC1&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_2&lt;/td&gt;
-&lt;td&gt;district_2&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC2&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_3&lt;/td&gt;
-&lt;td&gt;district_3&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC3&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;480d0cd0-c021-5d55-8c63-d86576d592fc.doc.json&lt;/code&gt;&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;D2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;f223f240-5d6a-5a7a-91d4-46d3c59de73e&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC7&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;480d0cd0-c021-5d55-8c63-d86576d592fc&amp;#34;&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h5 id=&#34;including-value-from-another-doc&#34;&gt;Including value from another doc&lt;/h5&gt;
-&lt;p&gt;Similar to including another doc, it is also possible to get the value of a specific field in another doc. For instance, if &lt;code&gt;parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/code&gt; were used in the example above, the &lt;code&gt;parent&lt;/code&gt; field&amp;rsquo;s value would have been set to the &lt;code&gt;_id&lt;/code&gt; of the refered to doc instead of including the whole doc. Note that &lt;code&gt;_id&lt;/code&gt; is a generated value included in all generated docs.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;reference_id:excluded&lt;/th&gt;
-&lt;th&gt;parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/th&gt;
-&lt;th&gt;is_name_generated&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;reported_date:timestamp&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_1&lt;/td&gt;
-&lt;td&gt;district_1&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC1&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_2&lt;/td&gt;
-&lt;td&gt;district_2&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC2&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;health_center_3&lt;/td&gt;
-&lt;td&gt;district_3&lt;/td&gt;
-&lt;td&gt;false&lt;/td&gt;
-&lt;td&gt;HC3&lt;/td&gt;
-&lt;td&gt;1544031155715&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;The resulting doc would be as follows, with the &lt;code&gt;_id&lt;/code&gt; from &lt;code&gt;district_1&lt;/code&gt; as the &lt;code&gt;parent&lt;/code&gt; value:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;creating-csv-files-for-users&#34;&gt;Creating CSV files for users&lt;/h3&gt;
-&lt;p&gt;To create user accounts from CSV files, a &lt;code&gt;users.csv&lt;/code&gt; file will be needed in the &lt;code&gt;csv&lt;/code&gt; folder. The &lt;code&gt;users.csv&lt;/code&gt; file requires columns for &lt;code&gt;username&lt;/code&gt; and &lt;code&gt;password&lt;/code&gt;. Additional columns can be used for any additional fields needed on the user&amp;rsquo;s doc, for example &lt;code&gt;roles&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;. Running the &lt;code&gt;csv-to-docs&lt;/code&gt; &lt;code&gt;upload-docs&lt;/code&gt; &lt;code&gt;create-users&lt;/code&gt; actions in that order will generate the necessary JSON docs with a &lt;code&gt;users.csv&lt;/code&gt; file in your working directory, and then create the people, places, and users.&lt;/p&gt;
-&lt;p&gt;The following sections describe the different ways to associate the new users to contacts.&lt;/p&gt;
-&lt;h4 id=&#34;creating-new-users-with-existing-contacts&#34;&gt;Creating new users with existing contacts&lt;/h4&gt;
-&lt;p&gt;When creating users that are associated to existing contacts, &lt;code&gt;contact&lt;/code&gt; and &lt;code&gt;place&lt;/code&gt; columns should be created. Each row should have the UUID of an existing person for &lt;code&gt;contact&lt;/code&gt;, and an existing place for &lt;code&gt;place&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id=&#34;creating-new-users-with-new-contacts&#34;&gt;Creating new users with new contacts&lt;/h3&gt;
-&lt;p&gt;To create new contacts for each new user provide values for &lt;code&gt;contact.name&lt;/code&gt;, &lt;code&gt;place.name&lt;/code&gt;, and &lt;code&gt;place.parent&lt;/code&gt; (can be existing place), as seen in this example CSV:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;username,password,roles,name,phone,contact.name,place.c_prop,place.type,place.name,place.parent
-alice,Secret_1,district-admin,Alice Example,+123456789,Alice,p_val_a,health_center,alice area, district_uuid
-bob,Secret_1,district-admin,bob Example,+123456789,bob,p_val_a,health_center,bob area,disctrict_uuid
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The &lt;code&gt;username&lt;/code&gt;, &lt;code&gt;password&lt;/code&gt;, &lt;code&gt;contact.name&lt;/code&gt;, &lt;code&gt;place.type&lt;/code&gt;, &lt;code&gt;place.name&lt;/code&gt; columns are required to have functional users with new places.&lt;/p&gt;
-&lt;h3 id=&#34;creating-new-users-linked-to-contacts-in-csv-files&#34;&gt;Creating new users linked to contacts in CSV files&lt;/h3&gt;
-&lt;p&gt;To associate the new users to contacts that will also be created with the &lt;code&gt;csv-to-docs&lt;/code&gt; action, use reference queries to the contacts.
-For instance, the column header for the person would be &lt;code&gt;contact:person WHERE reference_id=COL_VAL&lt;/code&gt;, and for the place would be &lt;code&gt;place:GET _id OF place WHERE reference_id=COL_VAL&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Here is a example of how the three CSV files need to be configured to setup a user linked to existing place and contact.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/place.health_center.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;reference_id:excluded,parent:place WHERE reference_id=COL_VAL,is_name_generated,name,reported_date:timestamp
-health_center_1,district_1,FALSE,HC1,1544031155715
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Generated JSON doc for the health center:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;District1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;FALSE&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/person.csv&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;reference_id:excluded,parent:place WHERE reference_id=COL_VAL,name,phone,sex,role,reported_date,patient_id
-p_hc1,health_center_1,Bob Johnson 1,+16143291527,male,manager,1552494835669,60951
-p_hc2,health_center_1,Bob Johnson 2,+16143291528,male,manager,1552494835669,60951
-
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Generated JSON doc for the person:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_hospital&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;false&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;District1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;external_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;geolocation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;is_name_generated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;FALSE&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HC1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1544031155715&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Bob Johnson 1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;phone&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;+16143291527&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sex&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;male&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;manager&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reported_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1552494835669&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;patient_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;60951&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;csv/users.csv&lt;/code&gt;&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;username,password,roles,phone,contact:person WHERE reference_id=COL_VAL,place:GET _id OF place WHERE reference_id=COL_VAL
-ac1,Secret_1,district_admin:red1,+123456789,p_hc1,health_center_1
-ac2,Secret_1,district_admin:supervisor,+123456789,p_hc2,health_center_1
-ac3,Secret_1,district_admin,+123456789,p_hc3,health_center_1
-ac4,Secret_1,district_admin,+123456789,p_hc4,health_center_1
-
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This will generate the &lt;code&gt;users.csv&lt;/code&gt; file in the working directory which is used by the &lt;code&gt;create-users&lt;/code&gt; action. The contact and place fields should be resolved to the actual UUIDs.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34; data-lang=&#34;csv&#34;&gt;p_hc1&amp;quot;username&amp;quot;,&amp;quot;password&amp;quot;,&amp;quot;roles&amp;quot;,&amp;quot;contact&amp;quot;,&amp;quot;phone&amp;quot;,&amp;quot;place&amp;quot;
-&amp;quot;ac1&amp;quot;,&amp;quot;Secret_1&amp;quot;,&amp;quot;district_admin:red1&amp;quot;,&amp;quot;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;quot;,&amp;quot;+123456789&amp;quot;,&amp;quot;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;quot;
-&amp;quot;ac2&amp;quot;,&amp;quot;Secret_1&amp;quot;,&amp;quot;district_admin:supervisor&amp;quot;,&amp;quot;b7d0dbd5-beeb-52a8-8e4c-513d0baece8e&amp;quot;,&amp;quot;+123456789&amp;quot;,&amp;quot;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;using-csv-files-on-google-drive&#34;&gt;Using CSV files on Google Drive&lt;/h3&gt;
-&lt;p&gt;Individual Google Sheets can be used for each CSV file, which can be exported manually to CSV file format, or linked to your project to be downloaded by medic-conf.&lt;/p&gt;
-&lt;p&gt;To fetch the files from Google Drive run the &lt;code&gt;fetch-csvs-from-google-drive&lt;/code&gt; action in medic-conf. This will download the CSV files specified in the &lt;code&gt;csvs-on-google-drive.json&lt;/code&gt; file, and place them into the &lt;code&gt;csv&lt;/code&gt; folder.&lt;/p&gt;
-&lt;h4 id=&#34;linking-to-google-drive&#34;&gt;Linking to Google Drive&lt;/h4&gt;
-&lt;p&gt;The file &lt;code&gt;csvs-on-google-drive.json&lt;/code&gt; in your project&amp;rsquo;s home directory will consist of a key value pair for each CSV file. The keys must be the filename where the CSV will be stored locally — see the CSV &lt;a href=&#34;https://github.com/medic/medic-conf#csv-file-name&#34;&gt;file documentation&lt;/a&gt; for the notation. The value of each key must be the ID of the corresponding file in Google Drive — the ID can be obtained from the URL eg &lt;code&gt;https://docs.google.com/spreadsheets/d/{FILE_ID}/edit&lt;/code&gt;.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;person.clinic.csv&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;google_drive_ID&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;google-drive-authentication&#34;&gt;Google Drive authentication&lt;/h3&gt;
-&lt;p&gt;Medic-conf leverages Google authentication to access Google Drive. You will need to create a client_secrets file named &lt;code&gt;.gdrive.secrets.json&lt;/code&gt; and place it in your working directory, and &lt;a href=&#34;https://developers.google.com/identity/protocols/OAuth2InstalledApp&#34;&gt;create a token&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Create the &lt;code&gt;.gdrive.secrets.json&lt;/code&gt; file by downloading the &lt;code&gt;client_secrets.json&lt;/code&gt; from Google. You will need a &lt;code&gt;CLIENT_ID&lt;/code&gt;, &lt;code&gt;CLIENT_SECRET&lt;/code&gt; and &lt;code&gt;REDIRECT_URL&lt;/code&gt;. You can find these pieces of information by going to the Developer Console, clicking your project &amp;ndash;&amp;gt; APIs &amp;amp; auth &amp;ndash;&amp;gt; credentials &amp;ndash;&amp;gt; Download JSON. This will download the credentials but will need modified to be in this structure.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;client_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;client_id&amp;gt;.apps.googleusercontent.com&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;project_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;proj_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;auth_uri&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://accounts.google.com/o/oauth2/auth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;token_uri&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://accounts.google.com/o/oauth2/token&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;auth_provider_x509_cert_url&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;https://www.googleapis.com/oauth2/v1/certs&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;client_secret&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;client_secret&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-		&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;redirect_uris&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;urn:ietf:wg:oauth:2.0:oob&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;See Google&amp;rsquo;s docs &lt;a href=&#34;https://github.com/googleapis/google-api-nodejs-client#oauth2-client&#34;&gt;here&lt;/a&gt; on Oauth2&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: Database Conflicts</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -4752,138 +4636,6 @@ curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic
 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this example, there are two references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, both in the &lt;code&gt;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code&gt; document, one at &lt;code&gt;fields.inputs.contact._id&lt;/code&gt; and one at &lt;code&gt;fields.patient_id&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code&gt;#development&lt;/code&gt;) and they can help you out.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: EC2 Setup</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;configure-self-hosting&#34;&gt;Configure self-hosting&lt;/h2&gt;
-&lt;h4 id=&#34;1-create-ec2-use-security-best-practices&#34;&gt;1. Create EC2 (use security best practices)&lt;/h4&gt;
-&lt;pre&gt;&lt;code&gt;Be sure to change the file permissions to 0600 or lower
-for the .pem file:
-sudo chmod 0600 ~/Downloads/name_of_file.pem
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html&#34;&gt;Create Elastic IP and Associate EIP to EC2&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: SSH into instance&lt;/p&gt;
-&lt;h4 id=&#34;2-create-or-restore-ebs-volume&#34;&gt;2. Create or Restore EBS Volume&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Create EBS Volume&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Be sure to tag appropriately&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html&#34;&gt;Restore EBS Volume&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Attach volume to EC2 instance&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;(Optional): &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;Increase disk size&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If you are using a newly created EBS Volume, you will have to format the disk approriately:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;SSH into instance&lt;/li&gt;
-&lt;li&gt;Follow the instructions here: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html&#34;&gt;Using EBS Volumes&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Use &lt;code&gt;sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code&gt; in step 4&lt;/li&gt;
-&lt;li&gt;Mount disk to /srv&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: Mount EBS volume to /srv&lt;/p&gt;
-&lt;h4 id=&#34;3-provision-docker-server&#34;&gt;3. Provision Docker server&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Follow README &amp;amp; Run scripts: &lt;a href=&#34;https://github.com/medic/medic-infrastructure/tree/master/self-hosting/prepare-system&#34;&gt;Prepare Self-Hosting System&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;A zip will be shared via Slack until the scripts are moved to a public repo&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: CHT Application bootstraps and comes online&lt;/p&gt;
-&lt;h4 id=&#34;4-dns-configuration&#34;&gt;4. DNS configuration&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Point A records to Elastic IP given to Docker server&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;5-review-ssl-certs&#34;&gt;5. Review SSL certs&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Location of certs is &lt;code&gt;/srv/settings/medic-core/nginx/private/&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Name the key file as &lt;code&gt;default.key&lt;/code&gt; and the certificate file as &lt;code&gt;default.crt&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Restarting nginx with new certs: &lt;code&gt;svc-restart medic-core nginx&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;6-configure-couch2pg&#34;&gt;6. Configure couch2pg&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Basic configuration: &lt;a href=&#34;https://github.com/medic/medic-couch2pg/blob/master/README.md&#34;&gt;https://github.com/medic/medic-couch2pg/blob/master/README.md&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Supervision/monitoring/notification&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;7-setup-postgres-to-work-with-couch2pg&#34;&gt;7. Setup postgres to work with couch2pg&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Creating the database, setting up permissions, exploring the tables and what they store&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;8debugging-couch2pgpostgres&#34;&gt;8.Debugging couch2pg/postgres&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Understanding the log and what the entries mean&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h2&gt;
-&lt;h4 id=&#34;1-restarting-processes&#34;&gt;1. Restarting processes&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;2-investigating-logs&#34;&gt;2. Investigating logs&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Log into container: &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/exec/&#34;&gt;https://docs.docker.com/engine/reference/commandline/exec/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Helpful docker commands: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Inside container, all appropriate logs can be found in: &lt;code&gt;/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;3upgrading-the-container&#34;&gt;3.Upgrading the container&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Backup all data (EBS)&lt;/li&gt;
-&lt;li&gt;Log into container and stop all services&lt;/li&gt;
-&lt;li&gt;DO NOT REMOVE &lt;code&gt;/srv/storage/medic-core/&lt;/code&gt;, &lt;code&gt;/srv/settings/medic-core/couchdb/local.ini&lt;/code&gt;, wipe all other files in /srv [Note: Make script publicly accessibile]&lt;/li&gt;
-&lt;li&gt;Change the image tag to the newest image release version:
-&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Change image tag in docker-compose file: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Launch new containers with appropriate COUCHDB_ADMIN_PASSWORD &amp;amp; HA_PASSWORD environment variables&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4upgrading-the-webapp&#34;&gt;4.Upgrading the webapp&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Use Admin GUI page&lt;/li&gt;
-&lt;li&gt;CLI via horticulturalist: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4a-rds-help&#34;&gt;4a. RDS help&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&#34;&gt;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;restore-from-backup-and-monitoring&#34;&gt;Restore from backup and monitoring&lt;/h2&gt;
-&lt;h4 id=&#34;1-configure-backups&#34;&gt;1. Configure backups&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;EBS Snapshot Lifecycle Manager: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;2-restoring-from-backup&#34;&gt;2. Restoring from backup&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Create volume from snapshot&lt;/li&gt;
-&lt;li&gt;Tag appropriately for backups&lt;/li&gt;
-&lt;li&gt;Mount volume to docker server&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;3-process-supervison&#34;&gt;3. Process supervison&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;supvisorctl&lt;/li&gt;
-&lt;li&gt;/boot/supervisor-inspect&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4-monitoring&#34;&gt;4. Monitoring&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;own-infrastructure-setup&#34;&gt;Own Infrastructure Setup&lt;/h2&gt;
-&lt;h4 id=&#34;1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above&#34;&gt;1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4&gt;
 
       </description>
     </item>
@@ -5058,6 +4810,103 @@ For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/serv
     </item>
     
     <item>
+      <title>Apps: Conncting to RDBMS in Windows</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p&gt;
+&lt;h2 id=&#34;ssh-key-generation-and-importing&#34;&gt;SSH Key Generation and Importing&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Download Puttygen from &lt;a href=&#34;https://www.ssh.com/ssh/putty/download&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new key pair for your computer.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttygen-run-key-generate.png&#34; alt=&#34;Putty-gen-key-pair&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;Convert the key generated from ssh2 format to openssh. Puttygen supports this. Guide &lt;a href=&#34;https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygenwindows-into-key-pairs-use?answertab=votes#tab-top&#34;&gt;here&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;1. Open PuttyGen
+2. Click Load
+3. Load your private key
+4. Go to Conversions-&amp;gt;Export OpenSSH and export your private key
+5. Copy your private key to ~/.ssh/id_dsa (or id_rsa).
+6. Create the RFC 4716 version of the public key using ssh-keygen
+    ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
+6. Convert the RFC 4716 version of the public key to the OpenSSH format:
+    ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub
+    
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;Import the file using PuTTYgen:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-gen-import.png&#34; alt=&#34;puttty-import-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;Save it as PuTTY Private Key File .ppk:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-save-key.png&#34; alt=&#34;puttty-save-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;Add the key (.ppk) to Pageant (PuTTY authentication agent):&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-add-key.png&#34; alt=&#34;puttty-add-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;Now you can connect to RDBMS using PuTTY:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttty-connect.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;putty-connect-final.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If you are connecting to rdbms in order to use a posgres client. You may not need to tunnel the connection. The client can do it for you.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_1.png&#34; alt=&#34;rdbms_1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_2.png&#34; alt=&#34;rdbms_2&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Update Collect Forms Remotely</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/collect-forms-update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/collect-forms-update/</guid>
+      <description>
+        
+        
+        &lt;p&gt;To do over the air Medic Collect form updates via HTTP rather than sending APKs which have a long manual install process, follow the steps below:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Have your xls forms ready in the folder.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;They should use underscore as name separators. e.g form_name.xlsx&lt;/li&gt;
+&lt;li&gt;They should have &lt;code&gt;form_id&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt;  properties in the settings&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;xform_name_settings.png&#34; alt=&#34;Name property&#34;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Upload the forms to the instance using &lt;code&gt;Medic-Conf&lt;/code&gt; Using the &lt;code&gt;upload-collect-forms&lt;/code&gt; &lt;a href=&#34;https://github.com/medic/medic-conf/blob/master/src/cli/supported-actions.js&#34;&gt;action&lt;/a&gt; as shown below.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;medic-conf --instance=user:pass@instancename.app.medicmobile.org upload-collect-forms
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Go to the Collect App. Delete All forms then go to &lt;code&gt;Get Blank Form&lt;/code&gt; and select all the forms you need.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h1&gt;
+&lt;p&gt;When you go to &lt;code&gt;Get Blank Forms&lt;/code&gt; and instead of getting a list of the forms available, you get a pop-up error which has a portion of this message instead&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;...OpenRosa Version 1.0 standard: Forms list entry 1 is missing one or more tags: formId, name or downloadUrl
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This means you probably uploaded a XLS file without a &lt;code&gt;name&lt;/code&gt; or &lt;code&gt;form_id&lt;/code&gt; property. To find out which form is missing that, use this command:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -vvvv -H &amp;quot;x-openrosa-version: 1&amp;quot; http://user:pass@host:port/api/v1/forms
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Should bring a list like this one&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;xform_list.png&#34; alt=&#34;Xform List&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Go through the list and see which form has  a missing &lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;formID&amp;gt;&lt;/code&gt; property. Add it and reuploadthe forms using &lt;code&gt;medic-conf&lt;/code&gt; again.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Securing Android Devices</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/securing-android/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -5097,47 +4946,6 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
     </item>
     
     <item>
-      <title>Apps: Self Hosting</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;self-hosting&#34;&gt;Self Hosting&lt;/h2&gt;
-&lt;h3 id=&#34;how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;How to access container, retrieve logs, isolate security groups&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;How to restart services: Link to medic-os documentation
-&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;
-&lt;code&gt;/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;aws-docs-for-increasing-disk-size&#34;&gt;AWS docs for increasing disk size:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;Stop medic: &lt;code&gt;sudo supervisorctl stop medic&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Go to EBS in AWS and take a snapshot of the volume.&lt;/li&gt;
-&lt;li&gt;Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li&gt;
-&lt;li&gt;Follow the following link to make the instance recognize the additional space: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Turn medic back on: &lt;code&gt;sudo supervisorctl start medic&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;Links to medic documentation for horticulturalist for upgrades:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;log into container &amp;amp; run: &lt;code&gt;COUCH_NODE_NAME=couchdb@127.0.0.1 COUCH_URL=http://medic:&amp;lt;pw&amp;gt;@localhost:5984/medic /srv/software/horticulturalist/node_modules/.bin/horti --medic-os --install=&amp;lt;version&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;monitoring--backup&#34;&gt;Monitoring &amp;amp; Backup&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li&gt;
-&lt;li&gt;Set up Lifecycle Management for EBS snapshots:
-&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li&gt;
-&lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
-&lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: SSH into a Docker image</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -5160,6 +4968,307 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
 &lt;li&gt;Work out the name of the Docker container you want to connect to, eg: &amp;ldquo;alpha-dev&amp;rdquo;. Get a list of available containers with: &lt;code&gt;sudo docker ps&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: User telemetry</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/telemetry/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/telemetry/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;Introduced in v3.4.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The app collects performance data on certain user actions which is then aggregated over each calendar month and replicated to the server. This can be used to evaluate the performance of the code and configuration and to evaluate where improvements can be made.&lt;/p&gt;
+&lt;p&gt;The aggregate doc for the previous month is created when the first telemetry item is recorded each month. This is stored in the &lt;code&gt;medic-user-&amp;lt;username&amp;gt;-meta&lt;/code&gt; database on the device and replicated to the server when an internet connection is available. This user specific server db is then replicated into the &lt;code&gt;medic-users-meta&lt;/code&gt; database which holds all aggregate telemetry docs for all users.&lt;/p&gt;
+&lt;p&gt;The aggregate docs&amp;rsquo; IDs follow the pattern &lt;code&gt;telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;performance-data&#34;&gt;Performance data&lt;/h2&gt;
+&lt;p&gt;Each aggregate data point has the following fields.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sum&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A sum of all the recorded times in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The smallest time recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The largest time recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;count&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of times recorded.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sumsqr&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The sum of squares of the times recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The telemetry data gathered changes with different versions of the framework. Currently, the data points collected are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The overall boot time including loading the code, purging, and accessing the database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:1:to_first_code_execution&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between the page loading and the JavaScript starting to run.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:2:to_bootstrap&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between JavaScript starting and the bootstrapping (purging, initial replication, etc) to complete.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:3:to_angular_bootstrap&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between bootstrapping completing and the webapp being ready to use.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:4:to_db_warmed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between the webapp being ready to use and the database being ready to use.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:reports:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fill in Enketo forms. The &lt;code&gt;action&lt;/code&gt; can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;. The &lt;code&gt;component&lt;/code&gt; is one of: &amp;ldquo;render&amp;rdquo; covers getting the form and rendering it on screen; &amp;ldquo;user_edit_time&amp;rdquo; is the time the user took to fill in and submit the form; or &amp;ldquo;save&amp;rdquo; is about converting the form into a report and saving it.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:contacts:&amp;lt;form&amp;gt;:add:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As above but for Contact creation forms.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:tasks:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As above but for forms on the Tasks tab.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to list all contacts.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:contacts:&amp;lt;filter[:filter]&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to search all contacts using the given filters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:reports&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to list all reports.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:reports:&amp;lt;filter[:filter]&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to search all reports using the given filters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;client-date-offset&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The difference between the client datetime and the server datetime. Only recorded if the difference is large enough that it may cause issues.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;analytics:targets:load&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to load the targets page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;tasks:load&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to load the tasks page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;tasks:refresh&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to refresh tasks on the tasks page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:initialize&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to initialize the rules-engine . Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:update-emissions&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to update emissions in the rules-engine, when receiving a change. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:all-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fetch tasks for all contacts in rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:some-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fetch tasks for some specific contacts in rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:targets&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Time taken for the rules-engine to fetch targets. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:targets:dirty-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching targets in the rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:dirty-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching tasks in the rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:ensureTaskFreshness:cancel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to cancel the automated task freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:ensureTargetFreshness:cancel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to cancel the automated target freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;[1] &amp;ldquo;Dirty&amp;rdquo; indicates that the contact&amp;rsquo;s task documents are not up to date. They will be refreshed before being used.&lt;/p&gt;
+&lt;h2 id=&#34;metadata&#34;&gt;Metadata&lt;/h2&gt;
+&lt;p&gt;When the aggregate doc is created the Telemetry service also includes a snapshot of some metadata.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;year&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The year the data was collected.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;month&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The month the data was collected.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;user&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The username of the logged in user.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceId&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A unique key for this device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;versions.app&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of the webapp.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;versions.forms.&amp;lt;form&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of each form.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;userAgent&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The userAgent string from the user&amp;rsquo;s browser.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;hardwareConcurrency&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of cores reported from the browser.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;screen.width&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The width of the screen in pixels.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;screen.height&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The height of the screen in pixels.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.app.version&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of the Android app.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.androidVersion&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of Android OS.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.osApiLevel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The API of the Android OS.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.osVersion&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of Android OS (detailed).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.device&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.model&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android model name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.manufacturer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device manufacturer.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.hardware&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device hardware.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.cpuInfo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device CPU information.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.storage.free&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The available storage on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.storage.total&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The total storage on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.free&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The available RAM on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.total&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The total RAM on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.threshold&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The level of RAM at which certain services will be killed by Android.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.network.downSpeed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The reported download speed of the network.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.network.upSpeed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The reported upload speed of the network.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.doc_count&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of docs in the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.update_seq&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The update sequence of the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.idb_attachment_format&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The format of database attachments.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.db_name&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The name of the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.auto_compaction&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Whether or not auto compaction is set.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.adapter&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The database adapter being used.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
