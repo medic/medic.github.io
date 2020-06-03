@@ -169,6 +169,222 @@ curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp
     </item>
     
     <item>
+      <title>Apps: Fixing couch2pg Memory Errors</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couch2pg-oom-errors/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/couch2pg-oom-errors/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors.
+To fix this, we need to delete this document so that couch2pg can proceed.  Below are steps to follow to achieve this.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Reduce the size of the replicated docs to a value of say 4 in the couch2pg.conf file so that you can get within the range of the failing document.&lt;/li&gt;
+&lt;li&gt;Clone the existing &lt;a href=&#34;https://github.com/medic/couch2pg&#34;&gt;couch2pg&lt;/a&gt; repo so that you can run couch2pg locally&lt;/li&gt;
+&lt;li&gt;Edit the file &lt;code&gt;lib/importer.js&lt;/code&gt; in the couch2pg source code to be able to log the doc-id of the problem doc&lt;/li&gt;
+&lt;li&gt;Edit just logs doc_ids to the console, around line 100 of importer.js &lt;code&gt;console.log(row.doc._id);&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Get the remote couch2pg environment variable settings and export them into your profile terminal&lt;/li&gt;
+&lt;li&gt;Create an ssh reverse tunnel from the postgres server to your laptop&lt;/li&gt;
+&lt;li&gt;Run couch2pg locally so that you can see the doc-ids on console till it fails&lt;/li&gt;
+&lt;li&gt;From the ids printed on console try loading the docs in the couchdb web access(Futon or Fauxton), the problem doc is usually big and won&amp;rsquo;t load&lt;/li&gt;
+&lt;li&gt;This will help you identify the problem doc&lt;/li&gt;
+&lt;li&gt;Curl the document to your pc and back it up&lt;/li&gt;
+&lt;li&gt;Back up the document for further analysis&lt;/li&gt;
+&lt;li&gt;Delete the document using curl
+&lt;code&gt;curl --head &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;&amp;quot;&lt;/code&gt;
+This returns something like&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Content-Length: 307
+Content-Type: application/json
+Date: Tue, 25 Jun 2019 11:58:29 GMT
+ETag: &amp;quot;2-6beeb38da9b096bacfe2fa769e5171be&amp;quot;
+Server: CouchDB/2.3.1 (Erlang OTP/21)
+X-Couch-Request-ID: e4aa7a8696
+X-CouchDB-Body-Time: 0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The ETag is the rev. Delete document with curl: &lt;code&gt;curl -X DELETE &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;?rev=&amp;lt;THE_REV&amp;gt;&amp;quot;&lt;/code&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Database Conflicts</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Conflicts are a natural and unavoidable part of working in a distributed system.&lt;/p&gt;
+&lt;p&gt;Conflicts occur when one client (eg PouchDB) attempts to replicate to another (eg CouchDB), and the document that the first has does not have the same tree of changes that the second one has.&lt;/p&gt;
+&lt;h2 id=&#34;an-example&#34;&gt;An example&lt;/h2&gt;
+&lt;p&gt;To make it clear what&amp;rsquo;s happening, let&amp;rsquo;s walk through an example. If you already understand conflicts feel free to skip this section.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say you register a pregnancy in the UI. And then you notice that you got the LMP wrong, so you hit edit and quickly make the change.&lt;/p&gt;
+&lt;p&gt;Meanwhile, sentinel notices that you registers a pregnancy, and before you have a chance to change the LMP, sets up a bunch of recurring messages, editing the document.&lt;/p&gt;
+&lt;p&gt;Sentinel has now made a change to the first version of your document, and you&amp;rsquo;re trying to also make a change to the first version. These conflict.&lt;/p&gt;
+&lt;h2 id=&#34;how-to-manage-conflicts&#34;&gt;How to manage conflicts&lt;/h2&gt;
+&lt;p&gt;Conflicts will appear on the #downtime Slack channel, along with the other alerts. If a server you manage has a conflict, you should do the following:&lt;/p&gt;
+&lt;h3 id=&#34;identify-why-conflicts-are-occuring&#34;&gt;Identify why conflicts are occuring&lt;/h3&gt;
+&lt;p&gt;Take a look at the conflicts view, at &lt;code&gt;https://yourserver/medic/_design/medic-conflicts/_view/conflicts&lt;/code&gt;. Each entry in that view looks like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1-82d9a42305a79e403d9eca6a9a9daae9&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;,&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The &lt;code&gt;id&lt;/code&gt; is the &lt;code&gt;_id&lt;/code&gt; of the conflicting document, and the &lt;code&gt;key&lt;/code&gt; is a list of conflicting &lt;code&gt;_rev&lt;/code&gt;s.&lt;/p&gt;
+&lt;p&gt;For each conflicting document, download that document, as well as all the &lt;code&gt;_rev&lt;/code&gt;s indicated in the &lt;code&gt;key&lt;/code&gt; above. To download a document with a specific &lt;code&gt;_rev&lt;/code&gt;, pass the &lt;code&gt;rev&lt;/code&gt; parameter.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#39;&lt;/span&gt; &amp;gt; doc.json
+curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8?rev=1-82d9a42305a79e403d9eca6a9a9daae9&amp;#39;&lt;/span&gt; &amp;gt; doc-conflict1.json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now you have all versions of the document, you can diff them and try to determine what went wrong.&lt;/p&gt;
+&lt;p&gt;A common problem, for example, might be sentinel hitting a document really quickly between you creating it and editing it.&lt;/p&gt;
+&lt;p&gt;A less common problem that requires some special attention, is UUID collisions (see below).&lt;/p&gt;
+&lt;p&gt;If you get stuck feel free to escalate to a developer, who can take a look.&lt;/p&gt;
+&lt;h3 id=&#34;if-appropriate-raise-a-bug&#34;&gt;If appropriate, raise a bug&lt;/h3&gt;
+&lt;p&gt;If you determine (or just suspect) that the problem could be in our code or data structures, feel free to raise a bug to development. For example, historically read status has been stored against the document, which can easily cause conflicts if you create a document and then instantly view it with sentinel processing in the background.&lt;/p&gt;
+&lt;p&gt;While some conflicts are inevitable, we want to architect away from them as much as possible. Ideally tech leads would never have to resolve conflicts.&lt;/p&gt;
+&lt;h3 id=&#34;regardless-resolve-the-conflicts&#34;&gt;Regardless, resolve the conflicts&lt;/h3&gt;
+&lt;p&gt;Now that you&amp;rsquo;ve diagnosed the problem, and perhaps reported a bug, you should resolve the conflict.&lt;/p&gt;
+&lt;p&gt;This is &lt;strong&gt;extremely&lt;/strong&gt; important. Conflicts cause saved changes to not appear against documents silently, and could cause important document changes (eg fixing someone&amp;rsquo;s EDD) to not occur.&lt;/p&gt;
+&lt;p&gt;For a document to no longer be conflicted, there must only be one active &lt;code&gt;_rev&lt;/code&gt;. You would do this by picking one rev and updating it with the changes you want to make, and then updating the others with the &lt;code&gt;_deleted: true&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;You can tell that a document is no longer conflicted if they don&amp;rsquo;t appear in the view, or if when you request the document with &lt;code&gt;?conflicts=true&lt;/code&gt; the &lt;code&gt;_conflicts&lt;/code&gt; property either doesn&amp;rsquo;t appear or is empty:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
+
+{
+  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
+  &amp;quot;_rev&amp;quot;: &amp;quot;2-the-current-rev&amp;quot;
+  &amp;quot;_conflicts&amp;quot;: [
+    &amp;quot;2-a-conflicting-rev&amp;quot;
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In the above example, &lt;code&gt;yourdocid&lt;/code&gt; has two revisions that conflict with each other. Here you would need to update one of the revs (it doesn&amp;rsquo;t matter which) with the other&amp;rsquo;s changes, then delete the other rev. You would then see:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
+
+{
+  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
+  &amp;quot;_rev&amp;quot;: &amp;quot;3-the-new-rev&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;a-trivial-example&#34;&gt;A trivial example&lt;/h4&gt;
+&lt;p&gt;Let&amp;rsquo;s say that you have two documents, and the diff between them looks something like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;===================================================================
+&lt;/span&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;--- 277533E3-A41B-3C46-909F-BCA038197C1E___2-2fff60be1557fdfef9915aa09e1b5119.json
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+++ 277533E3-A41B-3C46-909F-BCA038197C1E___2-d2a7186380b72306d75cd64b64402575.json
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;@@ -1,7 +1,7 @@
+&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;&lt;/span&gt; {
+   &amp;#34;_id&amp;#34;: &amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;,
+&lt;span style=&#34;color:#a40000&#34;&gt;-  &amp;#34;_rev&amp;#34;: &amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+  &amp;#34;_rev&amp;#34;: &amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   &amp;#34;data&amp;#34;: &amp;#34;some shared data&amp;#34;,
+   &amp;#34;read&amp;#34;: [
+&lt;span style=&#34;color:#a40000&#34;&gt;-    &amp;#34;some_user&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+    &amp;#34;admin&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   ]
+ }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The problem here is clear: &lt;code&gt;some_user&lt;/code&gt; and &lt;code&gt;admin&lt;/code&gt; read the document at the same time. To solve this, we could add &lt;code&gt;some_user&lt;/code&gt; to the revision with &lt;code&gt;admin&lt;/code&gt; already in it, and then delete the &lt;code&gt;some_user&lt;/code&gt; revision:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
+   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+ &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_deleted&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
+   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+ &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;resolving-uuid-collisions&#34;&gt;Resolving UUID collisions&lt;/h4&gt;
+&lt;p&gt;A UUID collision is a rare event where two clients (eg two android phones running our application) generate the same UUID ID for two completely different documents.&lt;/p&gt;
+&lt;p&gt;You can tell when your conflict is a UUID collision as there is no common root between the two conflicting versions. For example, one might be of type person and one might of type data_record.&lt;/p&gt;
+&lt;p&gt;These situations are more complicated, and require that you essentially recreate all conflicting versions as new documents, and fix any linkages that exist in the database.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say you find the following situation:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;{
+  &amp;#34;_id&amp;#34;: &amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;
+&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;_rev&amp;#34;: &amp;#34;1-e4da228c29dc4ebc8b156967bbf48bd1&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;_rev&amp;#34;: &amp;#34;1-ce40d1dc470643e2b9be9368ea9ff240&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;type&amp;#34;: &amp;#34;data_record&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&amp;lt;snip a bunch more stuff that doesn&amp;#39;t relate to each other&amp;gt;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You will want to do four things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Download the &lt;code&gt;_rev&lt;/code&gt; for the &lt;code&gt;person&lt;/code&gt; and create a new document, with a new uuid, for that document (you can do this by uploadig the document without an &lt;code&gt;_id&lt;/code&gt; or &lt;code&gt;_rev&lt;/code&gt; parameter and let CouchDB generate them for you)&lt;/li&gt;
+&lt;li&gt;Do the same for the &lt;code&gt;data_record&lt;/code&gt; version&lt;/li&gt;
+&lt;li&gt;Delete the main conflicting document &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And finally, find any references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, work out which doc they were &lt;em&gt;supposed&lt;/em&gt; to point to, and then edit those UUIDs to be the correct UUID &lt;code&gt;_id&lt;/code&gt; from the docs you created above.&lt;/p&gt;
+&lt;p&gt;Because this should be a rare event and a generic view would be enormous, we do not ship a view that helps you find this out.&lt;/p&gt;
+&lt;p&gt;However, you can create your own view! You&amp;rsquo;re going to want to create a DDOC specifically for this view. You can follow the following template to create what you want:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_design/docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;views&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;map&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;function(doc) {\n  var KEYS = [];\n\n  // TODO: consider switching this around to whitelist doc types\n  if (doc._id.match(/-info$/) ||\n      doc._id.match(/^_local/)) {\n    return;\n  }\n\n  var goDeeper = function(obj, path) {\n    Object.keys(obj).forEach(function(key) {\n      if (typeof obj[key] === &amp;#39;string&amp;#39; &amp;amp;&amp;amp;\n          KEYS.indexOf(obj[key]) !== -1) {\n        emit(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n\n      if (obj[key] &amp;amp;&amp;amp; typeof obj[key] === &amp;#39;object&amp;#39;) {\n        goDeeper(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n    });\n  };\n\n  goDeeper(doc, doc._id);\n}&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this, add any IDs you want to be found in the &lt;code&gt;KEYS&lt;/code&gt; variable at the top of the function. So in our case, we would change &lt;code&gt;KEYS&lt;/code&gt; to look like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;KEYS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Upload this document to CouchDB (do not just add the view to an existing DDOC, as you will force all views on that DDOC to regenerate) and then warm up the views by querying it once (it may take a long time to run).&lt;/p&gt;
+&lt;p&gt;Once it is complete you can query the view again to return a list of documents that reference the ids you hard-coded above.&lt;/p&gt;
+&lt;p&gt;This will help you to identify which documents are affected by this change. Usually the only change needed is to change the ID located to the new ones you generated.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;total_rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;offset&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.inputs.contact._id&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.patient_id&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this example, there are two references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, both in the &lt;code&gt;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code&gt; document, one at &lt;code&gt;fields.inputs.contact._id&lt;/code&gt; and one at &lt;code&gt;fields.patient_id&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code&gt;#development&lt;/code&gt;) and they can help you out.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Message Loops</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/message-loops/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/message-loops/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Endless messaging loops can between the webapp and a mobile number via the gateway due to autoreplies from the webapp.&lt;/p&gt;
+&lt;p&gt;See the &lt;a href=&#34;https://github.com/medic/medic/issues/750#issuecomment-146254467&#34;&gt;Github Issue&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; Add the offending number(e.g &lt;code&gt;800&lt;/code&gt; or &lt;code&gt;SAFARICOM&lt;/code&gt;) to the &lt;code&gt;Outgoing Deny List&lt;/code&gt; in the webapp&amp;rsquo;s &lt;code&gt;app_settings&lt;/code&gt; configuration file.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  &amp;quot;multipart_sms_limit&amp;quot;: 10,
+  &amp;quot;outgoing_deny_list&amp;quot;: &amp;quot;800, SAFARICOM&amp;quot;,
+  &amp;quot;contact_summary&amp;quot;: &amp;quot;&amp;quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Moving Contacts within the Hierarchy</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/moving-contacts/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -221,6 +437,465 @@ medic-conf --local upload-docs -- --docDirectoryPath=my_folder
 &lt;p&gt;Move the contact with the id &lt;code&gt;contact_1&lt;/code&gt; to the top of the hierarchy (no parent).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;medic-conf --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
 &lt;/code&gt;&lt;/pre&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Obtaining Logs</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/obtaining-logs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/obtaining-logs/</guid>
+      <description>
+        
+        
+        &lt;p&gt;There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p&gt;
+&lt;h2 id=&#34;browser-logs&#34;&gt;Browser logs&lt;/h2&gt;
+&lt;p&gt;To check if there are relevant logs open up the developer console. The shortcut is probably COMMAND+ALT+I on MacOS, or CTRL+ALT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p&gt;
+&lt;h2 id=&#34;server-logs&#34;&gt;Server logs&lt;/h2&gt;
+&lt;p&gt;The easiest way is to use &lt;code&gt;medic-logs&lt;/code&gt;, a tool that comes with &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;&lt;code&gt;medic-conf&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;medic-logs anInstance gardener
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See &lt;a href=&#34;https://github.com/medic/medic-conf#medic-logs&#34;&gt;medic-logs documentation&lt;/a&gt; for more details.&lt;/p&gt;
+&lt;p&gt;This will download logs to your current directory. You will need to look through these logs to work out what is relevant.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Replicating Production Data Locally</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/replicating-production-data-locally/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/replicating-production-data-locally/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Copy the data from an instance to a local CouchDB database&lt;/li&gt;
+&lt;li&gt;Run a local webapp instance with that data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;first-a-note-about-data-safety&#34;&gt;First, a note about data safety&lt;/h2&gt;
+&lt;p&gt;Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an &lt;a href=&#34;../support/securing-computers.md&#34;&gt;encrypted drive&lt;/a&gt; and delete it once you&amp;rsquo;re done with it.&lt;/p&gt;
+&lt;h2 id=&#34;step-1-get-the-data&#34;&gt;Step 1: Get the data&lt;/h2&gt;
+&lt;p&gt;First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p&gt;
+&lt;h3 id=&#34;small-production-instances&#34;&gt;Small production instances&lt;/h3&gt;
+&lt;p&gt;If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p&gt;
+&lt;p&gt;For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
+For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&#34;&gt;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code&gt;login&lt;/code&gt; (ie &lt;code&gt;https://url/login&lt;/code&gt;) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p&gt;
+&lt;h3 id=&#34;large-production-instances&#34;&gt;Large production instances&lt;/h3&gt;
+&lt;p&gt;If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Open Firefox and navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt; to disable Content Security Policies.&lt;/li&gt;
+&lt;li&gt;Navigate to the instance and login as the user with the data you want. &lt;em&gt;(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em&gt;(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Make sure your local CouchDB has CORS enabled: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&#34;&gt;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&lt;/a&gt;. Consider using &lt;a href=&#34;https://github.com/pouchdb/add-cors-to-couchdb#what-it-does&#34;&gt;add-cors-to-couchdb&lt;/a&gt; or its recommended settings.&lt;/li&gt;
+&lt;li&gt;Allow your CouchDB to be accessible via &lt;code&gt;https&lt;/code&gt;. One way is to run &lt;code&gt;ngrok http 5984&lt;/code&gt; to make your CouchDB accessible via a url like &lt;a href=&#34;https://abcd1234.ngrok.io&#34;&gt;https://abcd1234.ngrok.io&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Open the console in Firefox and run &lt;code&gt;await PouchDB.replicate(&#39;medic-user-XXX&#39;, &#39;https://your:admin@abcd1234.ngrok.io/YYY&#39;);&lt;/code&gt;. Here &lt;code&gt;XXX&lt;/code&gt; is the name you logged in as, and &lt;code&gt;YYY&lt;/code&gt; is the name of a database in which to store the data.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt;: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth);  and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code&gt;5984&lt;/code&gt; and &lt;code&gt;5986&lt;/code&gt; to localhost.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li&gt;
+&lt;li&gt;Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li&gt;
+&lt;li&gt;Navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt; to re-enable Content Security Policies.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;regardless-do-this-too&#34;&gt;Regardless, do this too&lt;/h3&gt;
+&lt;p&gt;To log in as a specific prod user you need to also copy them from the prod &lt;code&gt;_users&lt;/code&gt; database into your own local &lt;code&gt;_users&lt;/code&gt; database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code&gt;_users&lt;/code&gt; DB and paste it in, deleting the &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code&gt;password&lt;/code&gt; property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p&gt;
+&lt;h2 id=&#34;step-2-run-it-locally&#34;&gt;Step 2, run it locally&lt;/h2&gt;
+&lt;p&gt;First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;Horticulturalist&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A local development environment will be useful to you if:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;You want to change code locally&lt;/li&gt;
+&lt;li&gt;You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li&gt;
+&lt;li&gt;You want to deploy a version of the code older than &lt;code&gt;2.14.0&lt;/code&gt;, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;option-1-local-development-environment&#34;&gt;Option 1, local development environment&lt;/h3&gt;
+&lt;p&gt;If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href=&#34;https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md&#34;&gt;development setup instructions&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Then you need to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Push the code you want to run via &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY grunt deploy&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Start API and Sentinel by running &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p&gt;
+&lt;h3 id=&#34;option-2-horticulturalist&#34;&gt;Option 2, horticulturalist&lt;/h3&gt;
+&lt;p&gt;Follow the instructions on the &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;horticulturalist repo&lt;/a&gt; to get it installed. Then:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Make sure that the &lt;code&gt;medic&lt;/code&gt; DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li&gt;
+&lt;li&gt;Replicate your local PROD DB into a new &lt;code&gt;medic&lt;/code&gt; database using the Fauxton console.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;horti --local --bootstrap=XXX&lt;/code&gt;, where &lt;code&gt;XXX&lt;/code&gt; is the version you want to use (maybe the same one as production?)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You should now be able to log in as that user locally!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Securing Android Devices</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/securing-android/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/securing-android/</guid>
+      <description>
+        
+        
+        &lt;p&gt;To secure an android device you should enable at least a pin code lock on the device, enable FDE (full disc encryption) and setup remote wiping capabilities by enabling mobile device management.&lt;/p&gt;
+&lt;h2 id=&#34;pin-setup-and-fde&#34;&gt;PIN Setup and FDE&lt;/h2&gt;
+&lt;p&gt;Instructions are slightly different per device. Enabling FDE has the added benefit that you must also lock the device with a pin code or password.&lt;/p&gt;
+&lt;h3 id=&#34;android-50-or-later&#34;&gt;Android 5.0 or later&lt;/h3&gt;
+&lt;p&gt;Open the &lt;code&gt;Security&lt;/code&gt; menu under settings. On unmodified versions of Android, this
+can be found under &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Personal&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt;. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt;, &lt;code&gt;Encrypt Tablet&lt;/code&gt;, or &lt;code&gt;Encrypt Device&lt;/code&gt;. If you haven&amp;rsquo;t already set a PIN
+or passcode for the lock screen, you will be prompted to do so. Remember this
+PIN and do not write it down.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;encrypt-50.jpg&#34; alt=&#34;Screenshot for Android 5.0&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;android-44-or-earlier&#34;&gt;Android 4.4 or earlier&lt;/h3&gt;
+&lt;p&gt;First, you&amp;rsquo;ll need to set up a PIN. Navigate to &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt;
+&lt;code&gt;Screen Lock&lt;/code&gt;, and set a numeric PIN for the device of &lt;em&gt;at least&lt;/em&gt; four digits.
+Remember this PIN and do not write it down.&lt;/p&gt;
+&lt;p&gt;Then, open the &lt;code&gt;Security&lt;/code&gt; menu under settings. On unmodified versions of
+Android, this can be found under &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Personal&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt;.
+On some devices, the exact menu layout may have been modified by the hardware
+manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encrypt Tablet&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;encrypt-44.jpg&#34; alt=&#34;Screenshot for Android 4.4&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;android-versions-before-30&#34;&gt;Android Versions before 3.0&lt;/h3&gt;
+&lt;p&gt;Android does not support disk encryption in versions earlier than 3.0
+(Honeycomb). If you have one of these devices, we recommend that you do not use it.&lt;/p&gt;
+&lt;h2 id=&#34;mobile-device-management&#34;&gt;Mobile device management&lt;/h2&gt;
+&lt;p&gt;Setting up mobile device management that if a phone gets lost or stolen you can ensure the data on it is deleted safely.&lt;/p&gt;
+&lt;p&gt;You can enable this if the Google accounts used on the phones are part of a paid-for plan of Google&amp;rsquo;s G Suite.&lt;/p&gt;
+&lt;p&gt;Up to date instructions for enabling mobile device management can be found here: &lt;a href=&#34;https://support.google.com/a/answer/7400753&#34;&gt;https://support.google.com/a/answer/7400753&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If you need to remotely wipe a device, see instructions here: &lt;a href=&#34;https://support.google.com/a/answer/173390&#34;&gt;https://support.google.com/a/answer/173390&lt;/a&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: SSH into a Docker image</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</guid>
+      <description>
+        
+        
+        &lt;ol&gt;
+&lt;li&gt;Work out the name of the AWS instance your Docker container is running in, eg: &amp;ldquo;development-2a-1&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Log in to AWS&lt;/li&gt;
+&lt;li&gt;Select the availability zone (likely to be London)&lt;/li&gt;
+&lt;li&gt;Go to EC2 instances and select the instance&lt;/li&gt;
+&lt;li&gt;Check the tags for the name&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;ssh in to the Docker instance: &lt;code&gt;ssh -J admin@gateway.dev.medicmobile.org admin@&amp;lt;instance_name&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Work out the name of the Docker container you want to connect to, eg: &amp;ldquo;alpha-dev&amp;rdquo;. Get a list of available containers with: &lt;code&gt;sudo docker ps&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: User telemetry</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/telemetry/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/telemetry/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;Introduced in v3.4.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The app collects performance data on certain user actions which is then aggregated over each calendar month and replicated to the server. This can be used to evaluate the performance of the code and configuration and to evaluate where improvements can be made.&lt;/p&gt;
+&lt;p&gt;The aggregate doc for the previous month is created when the first telemetry item is recorded each month. This is stored in the &lt;code&gt;medic-user-&amp;lt;username&amp;gt;-meta&lt;/code&gt; database on the device and replicated to the server when an internet connection is available. This user specific server db is then replicated into the &lt;code&gt;medic-users-meta&lt;/code&gt; database which holds all aggregate telemetry docs for all users.&lt;/p&gt;
+&lt;p&gt;The aggregate docs&amp;rsquo; IDs follow the pattern &lt;code&gt;telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;performance-data&#34;&gt;Performance data&lt;/h2&gt;
+&lt;p&gt;Each aggregate data point has the following fields.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sum&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A sum of all the recorded times in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The smallest time recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The largest time recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;count&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of times recorded.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sumsqr&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The sum of squares of the times recorded in milliseconds.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The telemetry data gathered changes with different versions of the framework. Currently, the data points collected are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The overall boot time including loading the code, purging, and accessing the database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:1:to_first_code_execution&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between the page loading and the JavaScript starting to run.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:2:to_bootstrap&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between JavaScript starting and the bootstrapping (purging, initial replication, etc) to complete.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:3:to_angular_bootstrap&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between bootstrapping completing and the webapp being ready to use.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;boot_time:4:to_db_warmed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time between the webapp being ready to use and the database being ready to use.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:reports:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fill in Enketo forms. The &lt;code&gt;action&lt;/code&gt; can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;. The &lt;code&gt;component&lt;/code&gt; is one of: &amp;ldquo;render&amp;rdquo; covers getting the form and rendering it on screen; &amp;ldquo;user_edit_time&amp;rdquo; is the time the user took to fill in and submit the form; or &amp;ldquo;save&amp;rdquo; is about converting the form into a report and saving it.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:contacts:&amp;lt;form&amp;gt;:add:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As above but for Contact creation forms.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;enketo:tasks:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As above but for forms on the Tasks tab.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to list all contacts.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:contacts:&amp;lt;filter[:filter]&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to search all contacts using the given filters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:reports&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to list all reports.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;search:reports:&amp;lt;filter[:filter]&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to search all reports using the given filters.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;client-date-offset&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The difference between the client datetime and the server datetime. Only recorded if the difference is large enough that it may cause issues.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;analytics:targets:load&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to load the targets page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;tasks:load&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to load the tasks page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;tasks:refresh&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to refresh tasks on the tasks page. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:initialize&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to initialize the rules-engine . Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:update-emissions&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to update emissions in the rules-engine, when receiving a change. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:all-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fetch tasks for all contacts in rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:some-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to fetch tasks for some specific contacts in rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:targets&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Time taken for the rules-engine to fetch targets. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:targets:dirty-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching targets in the rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:tasks:dirty-contacts&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching tasks in the rules-engine. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:ensureTaskFreshness:cancel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to cancel the automated task freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;rules-engine:ensureTargetFreshness:cancel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The time taken to cancel the automated target freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;[1] &amp;ldquo;Dirty&amp;rdquo; indicates that the contact&amp;rsquo;s task documents are not up to date. They will be refreshed before being used.&lt;/p&gt;
+&lt;h2 id=&#34;metadata&#34;&gt;Metadata&lt;/h2&gt;
+&lt;p&gt;When the aggregate doc is created the Telemetry service also includes a snapshot of some metadata.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;year&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The year the data was collected.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;month&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The month the data was collected.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;user&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The username of the logged in user.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceId&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A unique key for this device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;versions.app&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of the webapp.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;versions.forms.&amp;lt;form&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of each form.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;userAgent&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The userAgent string from the user&amp;rsquo;s browser.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;hardwareConcurrency&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of cores reported from the browser.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;screen.width&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The width of the screen in pixels.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;screen.height&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The height of the screen in pixels.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.app.version&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of the Android app.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.androidVersion&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of Android OS.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.osApiLevel&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The API of the Android OS.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.software.osVersion&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The version of Android OS (detailed).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.device&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.model&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android model name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.manufacturer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device manufacturer.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.hardware&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device hardware.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.hardware.cpuInfo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The Android device CPU information.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.storage.free&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The available storage on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.storage.total&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The total storage on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.free&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The available RAM on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.total&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The total RAM on the device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.ram.threshold&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The level of RAM at which certain services will be killed by Android.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.network.downSpeed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The reported download speed of the network.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;deviceInfo.network.upSpeed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The reported upload speed of the network.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.doc_count&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The number of docs in the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.update_seq&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The update sequence of the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.idb_attachment_format&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The format of database attachments.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.db_name&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The name of the local database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.auto_compaction&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Whether or not auto compaction is set.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbInfo.adapter&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The database adapter being used.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
