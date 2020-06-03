@@ -92,9 +92,8 @@
 &lt;li&gt;Exposing an API for DHIS2 app developers to pull aggregate data from CHT Core&lt;/li&gt;
 &lt;li&gt;Receiving data from DHIS2&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Sending patient, event, and pre-aggregated data can be achieved using the Outbound push feature. Receiving data from DHIS2 can be achieved using the &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/api&#34;&gt;CHT Core Web API&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Sending patient, event, and pre-aggregated data can be achieved using the &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/reference/outbound/&#34;&gt;Outbound push&lt;/a&gt; feature. Receiving data from DHIS2 can be achieved using the &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/api&#34;&gt;CHT Core Web API&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Aggregating data across multiple health workers requires a somewhat specific workflow and was designed with three key user personas in mind. The aggregate workflow is described in more detail below.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/outbound/#&gt;Outbound Push&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;aggregate-workflow&#34;&gt;Aggregate Workflow&lt;/h2&gt;
 &lt;p&gt;The aggregate workflow was designed specifically for CHWs, Supervisors, and Health Records Information Officers (HRIO) but may be adapted to other contexts.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;CHW (Offline user)&lt;/strong&gt;: Conducts home visits and records information in the app. Reviews aggregate data throughout the month and makes sure to sync at the end of the month.&lt;/p&gt;
@@ -488,6 +487,110 @@ medic-conf initialise-project-layout
 &lt;li&gt;&lt;a href=&#34;https://forum.communityhealthtoolkit.org/t/is-there-any-downside-of-creating-too-many-users/531&#34;&gt;Is there any downside of creating too many users?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://forum.communityhealthtoolkit.org/t/for-offline-users-how-often-does-the-app-try-to-refresh-if-there-is-an-available-internet-connection/503&#34;&gt;For offline users, how often does the app try to refresh if there is an available internet connection?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://forum.communityhealthtoolkit.org/t/can-one-person-belong-to-multiple-places-in-the-same-hierarchy/101&#34;&gt;Can one person belong to multiple places in the same hierarchy?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: DHIS2 Aggregate</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</guid>
+      <description>
+        
+        
+        &lt;p&gt;One of the first things you’ll need to do is identify the specific &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-sets-and-forms.html#what-is-a-data-set&#34;&gt;DHIS2 data set&lt;/a&gt; that you plan to implement. You’ll need a list of all the &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-elements-and-custom-dimensions.html#data-elements&#34;&gt;data elements&lt;/a&gt; on that data set, a detailed understanding of how each is calculated, the frequency in which the data set is submitted (weekly, monthly, etc…), and for which &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/organisation-units.html&#34;&gt;organisation units&lt;/a&gt; the data set applies. You’ll also want to identify and engage the appropriate DHIS2 stakeholders to get access to DHIS2 metadata, test environments, and discuss workflows. The DHIS2 documentation site provides additional background and advice &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/integration-concepts.html#integration-concepts&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;design-considerations&#34;&gt;Design Considerations&lt;/h2&gt;
+&lt;p&gt;There are a few very important considerations related to how you design workflows and set up your CHT application to make sure you will be able to integrate with DHIS2. The main areas are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Hierarchies&lt;/li&gt;
+&lt;li&gt;Fields and calculations&lt;/li&gt;
+&lt;li&gt;Workflows and user access.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;These considerations are summarized below.&lt;/p&gt;
+&lt;h3 id=&#34;hierarchies&#34;&gt;Hierarchies&lt;/h3&gt;
+&lt;p&gt;The CHT relies on your Place hierarchy to determine how data should be aggregated for DHIS2. As such, it’s important that you consider how organization units are configured in the DHIS2 instance that you need to integrate data into. If your CHT Place hierarchy does not align with the DHIS2 organisation unit structure, the CHT will not be able to aggregate data in the way DHIS2 needs it.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TIP: There should be a one-to-one relationship between DHIS2 organistion units and CHT places.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/hierarchy/#&gt;Hierarchies&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;fields-and-calculations&#34;&gt;Fields and calculations&lt;/h3&gt;
+&lt;p&gt;It’s important to understand each data element on the DHIS2 data set you want to integrate data into and how each data element is calculated. When you are designing your forms in the CHT, you will need to make sure you are capturing information in your forms so that every data element on the chosen DHIS2 data set can be calculated within the CHT.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TIP: Once you obtain the list of data elements on the data set, be sure to go through them one by one and figure out how to calculate each one using information available in your CHT forms.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/forms/#&gt;Forms&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;workflows-and-user-access&#34;&gt;Workflows and User Access&lt;/h3&gt;
+&lt;p&gt;The aggregate data workflow is really designed around 3 key user personas. You’ll need to make sure that your context can support those assumptions and will be able to have access to the appropriate features in the CHT and DHIS2.&lt;/p&gt;
+&lt;p&gt;Moving data from the CHT to DHIS2 can be done in three main ways.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Manually downloading from the CHT&lt;/li&gt;
+&lt;li&gt;Building an app in DHIS2 and calling an API in the CHT&lt;/li&gt;
+&lt;li&gt;Orchestrating the steps using an interoperability layer such as &lt;a href=&#34;http://openhim.org/&#34;&gt;OpenHIM&lt;/a&gt;, &lt;a href=&#34;https://www.openfn.org/&#34;&gt;OpenFn&lt;/a&gt;, etc&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
+&lt;p&gt;Once you have designed your hierarchies, forms, calculations, and workflows, there are a few key configurations that need to be made.&lt;/p&gt;
+&lt;h3 id=&#34;data-sets&#34;&gt;Data sets&lt;/h3&gt;
+&lt;p&gt;For the CHT to be able to export the file for DHIS2, it needs to know the specific name and ID of the data set in DHIS2. You will need to obtain the ID from the test or production DHIS2 environment.&lt;/p&gt;
+&lt;p&gt;Configure the data set in &lt;code&gt;app_settings.json&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/dhis2/#&gt;DHIS2 in App Settings&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;organisation-units&#34;&gt;Organisation units&lt;/h3&gt;
+&lt;p&gt;Aggregation in the CHT is based on your Place hierarchy. As mentioned in the Hierarchies Design Considerations above, your Places must align with DHIS2 organisation units. You will need to specify the DHIS2 organisation unit&amp;rsquo;s ID on the Place document in the CHT.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Update the contact document of each place you wish to map to an organisation unit. Add a &lt;code&gt;dhis.orgUnit&lt;/code&gt; attribute.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/contact-forms/#&gt;Contact Forms&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;my_place&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;dhis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;orgUnit&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HJiPOcmziQA&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;data-elements&#34;&gt;Data elements&lt;/h3&gt;
+&lt;p&gt;Calculations for DHIS2 indicators are done using CHT Target functionality. For each DHIS2 data element, you will need to configure a corresponding CHT Target and specify the ID of the DHIS2 data set and data element. If you do not include the data set, this data element will be included in every data set.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;In &lt;code&gt;targets.js&lt;/code&gt;, configure one or more data elements by setting the &lt;code&gt;dhis.dataSet&lt;/code&gt; and &lt;code&gt;dhis.dataElement&lt;/code&gt; attributes in the target schema.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/targets/#&gt;Targets&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;module&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;births-this-month&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;icon-infant&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.births.title&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;subtitle_translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.this_month.subtitle&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;goal&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;contacts&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesToType&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesIf&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;!!&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;date_of_birth&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;dhis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#000&#34;&gt;dataSet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;VMuFODsyWaO&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#000&#34;&gt;dataElement&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kB0ZBFisE0e&amp;#39;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;users&#34;&gt;Users&lt;/h3&gt;
+&lt;p&gt;For the HRIO role, create a new user role and a new user with that role; or update an existing user role. To export DHIS2 metrics, users need to have the following permissions: &lt;code&gt;can_configure&lt;/code&gt;, &lt;code&gt;can_export_all&lt;/code&gt;, and &lt;code&gt;can_export_dhis&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/users/#&gt;Users&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;user-experience&#34;&gt;User experience&lt;/h2&gt;
+&lt;p&gt;Once your CHT project is configured to integrate with DHIS2, follow these steps to export the data from CHT and import it into DHIS:&lt;/p&gt;
+&lt;h3 id=&#34;export-data&#34;&gt;Export data&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Login to the CHT instance using a user account with the required permissions. You should be automatically navigated to the Admin Console.&lt;/li&gt;
+&lt;li&gt;Select &amp;ldquo;Import &amp;amp; export data&amp;rdquo; from the side&lt;/li&gt;
+&lt;li&gt;Select &amp;ldquo;DHIS2&amp;rdquo; from the header along the top&lt;/li&gt;
+&lt;li&gt;Select the data set, org unit, and time period that you&amp;rsquo;d like to send to DHIS2. Click &amp;ldquo;Export&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;A file should download in your browser. This file contains a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/webapi_data_values.html&#34;&gt;dataValueSet&lt;/a&gt; with aggregated user&amp;rsquo;s data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;import-data&#34;&gt;Import data&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Login to DHIS2 using a user account with permission to manage the relevant dataset and organisation units.&lt;/li&gt;
+&lt;li&gt;Select the &amp;ldquo;import/export&amp;rdquo; application inside DHIS2. Select &amp;ldquo;import data&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;Upload the file you downloaded in Step 5.&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;Import&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Check the UI for any errors. If you get errors you don&amp;rsquo;t understand or are unable to resolve an error, you can always ask for assistance on the &lt;a href=&#34;https://forum.communityhealthtoolkit.org/c/support/18&#34;&gt;CHT Forum&lt;/a&gt;. If there are no errors, you can review the numbers that resulted by reviewing the data set in DHIS2.&lt;/p&gt;
+&lt;h2 id=&#34;known-limitations&#34;&gt;Known limitations&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li&gt;
+&lt;li&gt;Integrations are limited to &lt;em&gt;monthly&lt;/em&gt; DHIS2 data sets.&lt;/li&gt;
+&lt;li&gt;Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html&#34;&gt;DHIS2 App&lt;/a&gt; for your project.&lt;/li&gt;
 &lt;/ul&gt;
 
       </description>
@@ -1531,7 +1634,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href=&#34;#contact-su
     </item>
     
     <item>
-      <title>Apps: Aggregating Data for DHIS2</title>
+      <title>Apps: DHIS2 Integration</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/dhis2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -2765,7 +2868,7 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
         &lt;p&gt;&lt;img src=&#34;counts.png&#34; alt=&#34;Percentages&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;percentages.png&#34; alt=&#34;Percentages&#34;&gt;&lt;/p&gt;
 &lt;p&gt;All targets are defined in the &lt;code&gt;targets.js&lt;/code&gt; file as an array of objects according to the Targets schema defined below. Each object corresponds to a target widget that shows in the app. The order of objects in the array defines the display order of widgets on the Targets tab. The properties of the object are used to define when the target should appear, what it should look like, and the values it will display.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/features/targets/#&gt;Tasks Overview&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/features/targets/#&gt;Targets Overview&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;targetsjs&#34;&gt;&lt;code&gt;targets.js&lt;/code&gt;&lt;/h2&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -2882,7 +2985,7 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;dhis&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;object&lt;/code&gt; or &lt;code&gt;object[]&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Settings relevant to the &lt;a href=&#34;./dhis-integration.md&#34;&gt;DHIS2 Integration&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Settings relevant to the &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/#configuration&#34;&gt;DHIS2 Integration&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -4044,7 +4147,6 @@ The Admin level operates outside of the hierarchy structure and enables access t
 &lt;p&gt;With &lt;strong&gt;interoperability&lt;/strong&gt;, systems work together, even if they weren’t designed specifically to work together, because standard communication protocol techniques are applied. Two (or more) systems that weren&amp;rsquo;t designed to be interoperable require &lt;strong&gt;integration&lt;/strong&gt;.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;a href=&#34;https://ohie.org/&#34;&gt;OpenHIE&lt;/a&gt;, &lt;a href=&#34;https://www.hl7.org/fhir/index.html&#34;&gt;HL7 FHIR&lt;/a&gt;, &lt;a href=&#34;https://www.who.int/classifications/icd/factsheet/en/&#34;&gt;ICD-10&lt;/a&gt;, &lt;a href=&#34;https://loinc.org/&#34;&gt;LOINC&lt;/a&gt;, etc&amp;hellip; are examples of healthcare related protocols and standards used to achieve interoperability. CHT Core can be configured to support many of these standards and also exchange data with other systems through &lt;em&gt;integrations&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/features/integrations/#&gt;Integrations&lt;/a&gt;&lt;/p&gt;
 
       </description>
     </item>
@@ -4096,105 +4198,6 @@ curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp
 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testing&#34;&gt;Testing&lt;/h2&gt;
 &lt;p&gt;To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;, and go to the Sandbox app.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: DHIS2 Aggregate</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</guid>
-      <description>
-        
-        
-        &lt;p&gt;One of the first things you’ll need to do is identify the specific &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-sets-and-forms.html#what-is-a-data-set&#34;&gt;DHIS2 data set&lt;/a&gt; that you plan to implement. You’ll need a list of all the &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-elements-and-custom-dimensions.html#data-elements&#34;&gt;data elements&lt;/a&gt; on that data set, a detailed understanding of how each is calculated, the frequency in which the data set is submitted (weekly, monthly, etc…), and for which &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/organisation-units.html&#34;&gt;organisation units&lt;/a&gt; the data set applies. You’ll also want to identify and engage the appropriate DHIS2 stakeholders to get access to DHIS2 metadata, test environments, and discuss workflows. The DHIS2 documentation site provides additional background and advice &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/integration-concepts.html#integration-concepts&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;design-considerations&#34;&gt;Design Considerations&lt;/h2&gt;
-&lt;p&gt;There are a few very important considerations related to how you design workflows and set up your CHT application to make sure you will be able to integrate with DHIS2. The main areas are:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Hierarchies&lt;/li&gt;
-&lt;li&gt;Fields and calculations&lt;/li&gt;
-&lt;li&gt;Workflows and user access.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;These considerations are summarized below.&lt;/p&gt;
-&lt;h3 id=&#34;hierarchies&#34;&gt;Hierarchies&lt;/h3&gt;
-&lt;p&gt;The CHT relies on your Place hierarchy to determine how data should be aggregated for DHIS2. As such, it’s important that you consider how organization units are configured in the DHIS2 instance that you need to integrate data into. If your CHT Place hierarchy does not align with the DHIS2 organisation unit structure, the CHT will not be able to aggregate data in the way DHIS2 needs it.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TIP: There should be a one-to-one relationship between DHIS2 organistion units and CHT places.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/hierarchy/#&gt;Hierarchies&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;fields-and-calculations&#34;&gt;Fields and calculations&lt;/h3&gt;
-&lt;p&gt;It’s important to understand each data element on the DHIS2 data set you want to integrate data into and how each data element is calculated. When you are designing your forms in the CHT, you will need to make sure you are capturing information in your forms so that every data element on the chosen DHIS2 data set can be calculated within the CHT.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TIP: Once you obtain the list of data elements on the data set, be sure to go through them one by one and figure out how to calculate each one using information available in your CHT forms.&lt;/em&gt;&lt;/p&gt;
-&lt;h3 id=&#34;workflows-and-user-access&#34;&gt;Workflows and User Access&lt;/h3&gt;
-&lt;p&gt;The aggregate data workflow is really designed around 3 key user personas. You’ll need to make sure that your context can support those assumptions and will be able to have access to the appropriate features in the CHT and DHIS2.&lt;/p&gt;
-&lt;p&gt;Moving data from the CHT to DHIS2 can be done in three main ways.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Manually downloading from the CHT&lt;/li&gt;
-&lt;li&gt;Building an app in DHIS2 and calling an API in the CHT&lt;/li&gt;
-&lt;li&gt;Orchestrating the steps using an interoperability layer such as &lt;a href=&#34;http://openhim.org/&#34;&gt;OpenHIM&lt;/a&gt;, &lt;a href=&#34;https://www.openfn.org/&#34;&gt;OpenFn&lt;/a&gt;, etc&amp;hellip;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
-&lt;p&gt;Once you have designed your hierarchies, forms, calculations, and workflows, there are a few key configurations that need to be made.&lt;/p&gt;
-&lt;h3 id=&#34;data-sets&#34;&gt;Data sets&lt;/h3&gt;
-&lt;p&gt;For the CHT to be able to export the file for DHIS2, it needs to know the specific name and ID of the data set in DHIS2. You will need to obtain the ID from the test or production DHIS2 environment.&lt;/p&gt;
-&lt;p&gt;Configure the data set in &lt;code&gt;app_settings.json&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/dhis2/#&gt;DHIS2 Reference&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;organisation-units&#34;&gt;Organisation units&lt;/h3&gt;
-&lt;p&gt;Aggregation in the CHT is based on your Place hierarchy. As mentioned in the Hierarchies Design Considerations above, your Places must align with DHIS2 organisation units. You will need to specify the DHIS2 organisation unit&amp;rsquo;s ID on the Place document in the CHT.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Update the contact document of each place you wish to map to an organisation unit. Add a &lt;code&gt;dhis.orgUnit&lt;/code&gt; attribute.&lt;/em&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;my_place&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;dhis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;orgUnit&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HJiPOcmziQA&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;data-elements&#34;&gt;Data elements&lt;/h3&gt;
-&lt;p&gt;Calculations for DHIS2 indicators are done using CHT Target functionality. For each DHIS2 data element, you will need to configure a corresponding CHT Target and specify the ID of the DHIS2 data element.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;In &lt;code&gt;targets.js&lt;/code&gt;, configure one or more data elements by setting the &lt;code&gt;dhis.dataElement&lt;/code&gt; attribute in the target schema.&lt;/em&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;module&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;births-this-month&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;icon-infant&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.births.title&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;subtitle_translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.this_month.subtitle&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;goal&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;contacts&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesToType&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesIf&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;!!&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;date_of_birth&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;dhis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;dataElement&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kB0ZBFisE0e&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;users&#34;&gt;Users&lt;/h3&gt;
-&lt;p&gt;For the HRIO role, create a new user role and a new user with that role; or update an existing user role. To export DHIS2 metrics, users need to have the following permissions: &lt;code&gt;can_configure&lt;/code&gt;, &lt;code&gt;can_export_all&lt;/code&gt;, and &lt;code&gt;can_export_dhis&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;user-experience&#34;&gt;User experience&lt;/h2&gt;
-&lt;p&gt;Once your CHT project is configured to integrate with DHIS2, follow these steps to export the data from CHT and import it into DHIS:&lt;/p&gt;
-&lt;h3 id=&#34;export-data&#34;&gt;Export data&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Login to the CHT instance using a user account with the required permissions. You should be automatically navigated to the Admin Console.&lt;/li&gt;
-&lt;li&gt;Select &amp;ldquo;Import &amp;amp; export data&amp;rdquo; from the side&lt;/li&gt;
-&lt;li&gt;Select &amp;ldquo;DHIS2&amp;rdquo; from the header along the top&lt;/li&gt;
-&lt;li&gt;Select the data set, org unit, and time period that you&amp;rsquo;d like to send to DHIS2. Click &amp;ldquo;Export&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;A file should download in your browser. This file contains a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/webapi_data_values.html&#34;&gt;dataValueSet&lt;/a&gt; with aggregated user&amp;rsquo;s data.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;import-data&#34;&gt;Import data&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Login to DHIS2 using a user account with permission to manage the relevant dataset and organisation units.&lt;/li&gt;
-&lt;li&gt;Select the &amp;ldquo;import/export&amp;rdquo; application inside DHIS2. Select &amp;ldquo;import data&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;Upload the file you downloaded in Step 5.&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;Import&amp;rdquo;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Check the UI for any errors. If you get errors you don&amp;rsquo;t understand or are unable to resolve an error, you can always ask for assistance on the &lt;a href=&#34;https://forum.communityhealthtoolkit.org/c/support/18&#34;&gt;CHT Forum&lt;/a&gt;. If there are no errors, you can review the numbers that resulted by reviewing the data set in DHIS2.&lt;/p&gt;
-&lt;h2 id=&#34;known-limitations&#34;&gt;Known limitations&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li&gt;
-&lt;li&gt;Integrations are limited to &lt;em&gt;monthly&lt;/em&gt; DHIS2 data sets.&lt;/li&gt;
-&lt;li&gt;Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html&#34;&gt;DHIS2 App&lt;/a&gt; for your project.&lt;/li&gt;
-&lt;/ul&gt;
 
       </description>
     </item>
