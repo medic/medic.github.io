@@ -1273,6 +1273,61 @@ package.json) to specify a organizational scope, like &lt;code&gt;@medic/moment&
     </item>
     
     <item>
+      <title>Core: How to bulk load users</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/users-bulk-load/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/users-bulk-load/</guid>
+      <description>
+        
+        
+        &lt;p&gt;First, using the webapp, create the top level places/facilities like
+districts/branches that the users will belong to.  Save the UUIDs of these
+places in a spreadsheet with their names.&lt;/p&gt;
+&lt;p&gt;Then use curl against the users API to create the user, place and contact. In
+this example the place and contact.parent are the same so we&amp;rsquo;re creating
+&lt;code&gt;demo*&lt;/code&gt; users that can manage records associated to a specific place.&lt;/p&gt;
+&lt;p&gt;Create a comma separated data file like /tmp/data:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Name,Phone,Branch Name,Branch UUID,Username,Password
+Gary Gnu,48839938,Iganga Branch,54cc7-accd-e1cf9-ef203,demo01,keratejevu
+Dianna Dempsey,4999393,Meru Branch,54cc1-1a7a-ccddd-e1203,demo02,duwuradixu
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Create a script like &lt;code&gt;users-bulk-load&lt;/code&gt; and edit it to include the district:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+PHONE_PREFIX=+256
+#DISTRICT=5627c50f05a75003fe51685c596fefee
+
+COUCH_URL=${COUCH_URL-http://admin:secret@localhost:5988}
+LANG=en # no language prompt, please.
+KNOWN=true # no tour, please.
+IFS=$&#39;,&#39; # comma delimited
+
+while IFS=$IFS read name phone district uuid username password; do \
+  curl -v -H &#39;content-type:application/json&#39; -d &#39;{
+    &amp;quot;username&amp;quot;:&amp;quot;&#39;&amp;quot;$username&amp;quot;&#39;&amp;quot;,
+    &amp;quot;password&amp;quot;:&amp;quot;&#39;&amp;quot;$password&amp;quot;&#39;&amp;quot;,
+    &amp;quot;type&amp;quot;:&amp;quot;district-manager&amp;quot;,
+    &amp;quot;place&amp;quot;: {
+      &amp;quot;name&amp;quot;: &amp;quot;&#39;&amp;quot;$name Area&amp;quot;&#39;&amp;quot;,
+      &amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+      &amp;quot;parent&amp;quot;: &amp;quot;&#39;&amp;quot;$uuid&amp;quot;&#39;&amp;quot;
+    },
+    &amp;quot;language&amp;quot;:&amp;quot;&#39;&amp;quot;$LANG&amp;quot;&#39;&amp;quot;,
+    &amp;quot;known&amp;quot;:&#39;&amp;quot;$KNOWN&amp;quot;&#39;,
+    &amp;quot;contact&amp;quot;:{
+      &amp;quot;name&amp;quot;:&amp;quot;&#39;&amp;quot;$name&amp;quot;&#39;&amp;quot;,
+      &amp;quot;phone&amp;quot;: &amp;quot;&#39;&amp;quot;$PHONE_PREFIX$phone&amp;quot;&#39;&amp;quot;
+    }
+  }&#39; &amp;quot;$COUCH_URL/api/v1/users&amp;quot;;
+done
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Load the data into the loop:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tail -n+2 /tmp/data | COUCH_URL=https://admin:secret@myproject.app.medicmobile.org \
+  users-bulk-load # tail skips header row
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+    </item>
+    
+    <item>
       <title>Core: Developing on Windows</title>
       <link>https://docs.communityhealthtoolkit.org/beta/core/guides/using-windows/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1333,6 +1388,78 @@ $: grunt
 $: code .
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;problems&#34;&gt;Problems?&lt;/h2&gt;
 &lt;p&gt;As none of our code developers use Windows as a development environment daily this solution may not be as stable as directly using MacOS or Linux. If you encounter issues please let a developer know&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Core: Get Android Logs</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/get-android-logs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/get-android-logs/</guid>
+      <description>
+        
+        
+        &lt;p&gt;With Android 4.1 (aka Jelly Bean) and upwards the full system log is only visible if you have root.&lt;br&gt;
+To get logs, you have to use &lt;code&gt;adb logcat&lt;/code&gt; via a computer.&lt;/p&gt;
+&lt;p&gt;These are the instructions for getting logs using ADB:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Download adb for the below platforms&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://dl.google.com/android/repository/platform-tools-latest-windows.zip&#34;&gt;Windows&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://dl.google.com/android/repository/platform-tools-latest-darwin.zip&#34;&gt;Mac&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://dl.google.com/android/repository/platform-tools-latest-linux.zip&#34;&gt;Linux&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Copy zip to folder and extract it&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Navigate to the folder you have extracted it to. You should see files like adb, AdbWinApi, etc1tool etc. Open the Command prompt/terminal in the current folder(In Windows, press Alt + D and write &amp;lsquo;cmd&amp;rsquo;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Enable USB debugging on your phone by going to Settings &amp;gt; Developer Options &amp;gt; USB Debugging (this varies from phone to phone, check on the internet if the phone doesn&amp;rsquo;t fit this)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Connect your phone by USB to the computer&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You will see a popup : &amp;ldquo;Allow USB debugging. The computer&amp;rsquo;s RSA fingerprint&amp;hellip;..&amp;quot;. Click OK&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;allow_usb_debugging.png&#34; alt=&#34;Allow USB debugging&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Open the command which was opened previously and write the following command: &lt;code&gt;adb start-server&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;To check if your phone is properly connected, write the command &lt;code&gt;adb devices&lt;/code&gt;. This will list the devices connected. Something like&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;adb_devices.png&#34; alt=&#34;ADB Devices&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;9&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Followup with command: &lt;code&gt;adb logcat &amp;gt; gateway.txt&lt;/code&gt;. This stores the android logs in the file &lt;code&gt;gateway.txt&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Now it is taking android logs. This is the time to to try to reproduce the error.
+Check some of the messages that are &amp;lsquo;WAITING&amp;rsquo; and click retry
+Do this for as many times as you deem necessary to capture logs for that event.
+Wait about 15 minutes to enable capture of sufficient android device environment logs&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Disconnect the phone from the computer&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Open the folder which has the adb executable, you will see a file called gateway.txt
+Send that file to the concerned person (PM or techlead)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;NB. If you get this error &lt;code&gt;command not found&lt;/code&gt; in steps 7, 8 or 9 this means adb is not in your PATH. This is where the shell looks for executables. You&amp;rsquo;ll have to append &lt;code&gt;./&lt;/code&gt; before any &lt;code&gt;adb&lt;/code&gt; command so that you can use the &lt;code&gt;adb&lt;/code&gt; in the current folder you&amp;rsquo;re on.&lt;/p&gt;
+&lt;p&gt;Ex. &lt;code&gt;./adb logcat &amp;gt; gateway.txt&lt;/code&gt;.
+The dot is your current directory, and this tells Bash to use &lt;code&gt;adb&lt;/code&gt; from there.&lt;/p&gt;
 
       </description>
     </item>
