@@ -1,0 +1,308 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Community Health Toolkit – Guides</title>
+    <link>https://docs.communityhealthtoolkit.org/beta/core/guides/</link>
+    <description>Recent content in Guides on Community Health Toolkit</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/core/guides/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Core: Fixing E2E Tests</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/fixing-e2e-tests/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/fixing-e2e-tests/</guid>
+      <description>
+        
+        
+        &lt;h1 id=&#34;how-to-fix-e2e-tests&#34;&gt;How to fix e2e tests&lt;/h1&gt;
+&lt;p&gt;End to end (e2e) tests can be really difficult to debug - sometimes they fail seemingly at random, and sometimes they only fail on certain environments (eg: ci but not locally). This can make reproducing and reliably fixing the issue challenging, so here are some tips to help!&lt;/p&gt;
+&lt;h2 id=&#34;read-the-protractor-logs&#34;&gt;Read the protractor logs&lt;/h2&gt;
+&lt;p&gt;Read the failure carefully - it often has really good info but sometimes it&amp;rsquo;s just hard to find. Most importantly it tells you exactly the line in the test that failed and you can look that up in the source to see what protractor was trying to do. The error message itself is also really useful. Also sometimes one error causes the next, so always start with the first test failure before looking at the others.&lt;/p&gt;
+&lt;h3 id=&#34;known-failure-patterns&#34;&gt;Known failure patterns&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Can&amp;rsquo;t click on an element because another element would get the click. This usually means a modal dialog was being shown. 90% of the time this is the update notification modal which means some settings change has been detected after the test started execution.&lt;/li&gt;
+&lt;li&gt;Stale element. This means the DOM element has been removed after protractor found it on the page but before you tried to do something with it. I generally try to get protractor to find the element just before I need it to reduce the chance of this happening.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;other-logs&#34;&gt;Other logs&lt;/h2&gt;
+&lt;p&gt;The API and Sentinel logs are sometimes useful, particularly if API has crashed. These are available locally under &lt;code&gt;/tests/logs/&lt;/code&gt; and for CI builds &lt;a href=&#34;https://s3.console.aws.amazon.com/s3/buckets/medic-e2e/&#34;&gt;on AWS&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;screenshots&#34;&gt;Screenshots&lt;/h2&gt;
+&lt;p&gt;We automatically take screenshots when a test fails and store it locally in &lt;code&gt;/tests/results/&lt;/code&gt; and for CI builds &lt;a href=&#34;https://s3.console.aws.amazon.com/s3/buckets/medic-e2e/&#34;&gt;on AWS&lt;/a&gt;. These can be particularly useful if a dialog was blocking a click.&lt;/p&gt;
+&lt;h2 id=&#34;running-just-the-failing-test&#34;&gt;Running just the failing test&lt;/h2&gt;
+&lt;h3 id=&#34;option-1&#34;&gt;Option 1&lt;/h3&gt;
+&lt;p&gt;Running e2e tests can be quite slow so to save time modify the &lt;code&gt;specs&lt;/code&gt; property of &lt;code&gt;/tests/base.conf.js&lt;/code&gt; so it only finds your test. You can also change &lt;code&gt;describe&lt;/code&gt; and &lt;code&gt;it&lt;/code&gt; to &lt;code&gt;xdescribe&lt;/code&gt; and &lt;code&gt;xit&lt;/code&gt; to skip specific tests.&lt;/p&gt;
+&lt;h3 id=&#34;option-2&#34;&gt;Option 2&lt;/h3&gt;
+&lt;p&gt;Alternatively you can run API in test mode using:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;API_PORT=4988 COUCH_URL=http://admin:pass@localhost:5984/medic-test node server.js
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then grep for just the tests you want to run:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;protractor /home/kenn/webapp/tests/e2e.tests.conf.js --specs=&#39;/home/kenn/webapp/tests/e2e/api/controllers/_changes.spec.js&#39; --grep=&amp;quot;should allow DB admins to POST to _changes&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;option-3&#34;&gt;Option 3&lt;/h3&gt;
+&lt;p&gt;Use the &amp;ldquo;Protractor test runner&amp;rdquo; extension for VSCode.&lt;/p&gt;
+&lt;h2 id=&#34;watching-the-test-run&#34;&gt;Watching the test run&lt;/h2&gt;
+&lt;p&gt;Running the tests locally with &lt;code&gt;grunt e2e-debug&lt;/code&gt; will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Core: Using Git</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/using-git/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/using-git/</guid>
+      <description>
+        
+        
+        &lt;p&gt;New to Git or need a refesher?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/docs/gittutorial&#34;&gt;A tutorial introduction to Git&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/docs/gittutorial-2&#34;&gt;A tutorial introduction to Git: part two&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/docs/gitcore-tutorial&#34;&gt;A Git core tutorial for developers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you&amp;rsquo;re on Unix, these are also likely installed as man pages:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;man gittutorial
+man gittutorial-2
+man gitcore-tutorial
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;For more reading, &lt;a href=&#34;https://git-scm.com/book&#34;&gt;Pro Git&lt;/a&gt; is available online, and
+&lt;a href=&#34;https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain&#34;&gt;Chapter 10: Git Internals&lt;/a&gt;
+is quite helpful.&lt;/p&gt;
+&lt;p&gt;Published a commit by mistake?  GitHub has a decent writeup on that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://help.github.com/articles/removing-sensitive-data-from-a-repository/&#34;&gt;Removing sensitive data from a repository&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;how-to-extract-a-module-from-an-existing-repo&#34;&gt;How To Extract a Module From an Existing Repo&lt;/h2&gt;
+&lt;p&gt;The following are the steps I used for creating &lt;a href=&#34;https://github.com/medic/medic-smsparser&#34;&gt;medic-smsparser&lt;/a&gt; based off medic.&lt;/p&gt;
+&lt;p&gt;First git clone using a URL scheme rather than plain file system path otherwise
+you will get hard links instead of a copy.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git clone git@github.com:medic/medic.git 
+&lt;/code&gt;&lt;/pre&gt;&lt;p style=&#34;text-align:center&#34;&gt;or&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git clone file:///home/linus/dev/medic
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Then compile a list of files you are interested in.  If you only have a single directory
+you need then read about the &lt;code&gt;--subdirectory-filter&lt;/code&gt; option of
+&lt;code&gt;filter-branch&lt;/code&gt;.  In this how-to I&amp;rsquo;m using a set of files:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cat files
+packages/kujua-sms/kujua-sms/validate.js 
+packages/kujua-sms/views/lib/javarosa_parser.js 
+packages/kujua-sms/views/lib/mp_parser.js 
+packages/kujua-sms/views/lib/smsparser.js 
+packages/kujua-sms/views/lib/textforms_parser.js 
+packages/kujua-sms/kujua-sms/utils.js 
+tests/nodeunit/form_definitions.js 
+tests/nodeunit/unit/kujua-sms/smsparser.js 
+tests/nodeunit/unit/kujua-sms/smsparser_compact_textform.js 
+tests/nodeunit/unit/kujua-sms/textforms_parser.js 
+tests/nodeunit/unit/kujua-sms/validate.js 
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next query the git history for any file renames by using &lt;code&gt;--follow&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;for i in `cat files`; do \
+  git log --oneline --name-only --follow --all -- &amp;quot;$i&amp;quot; | \
+  egrep -v -e &#39;^[0-9A-Fa-f]+\s&#39;; \
+done | sort | uniq &amp;gt; all-files
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In the following commands I assume the branch we are working on is &lt;code&gt;master&lt;/code&gt;, but this could easily be applied to any branch.&lt;/p&gt;
+&lt;p&gt;Take a note of your original commit count.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git rev-list master | wc -l
+    6844
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Run the filter on the current branch, this might take a little while:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git filter-branch -f --prune-empty --index-filter  &#39;\
+     git rm --cached -r -q -- . ; \
+     git reset -q $GIT_COMMIT -- \
+       lib/utils.js \
+       packages/kujua-sms-import/kujua-sms-import/smsparser.js \
+       packages/kujua-sms-import/views/lib/smsparser.js \
+       packages/kujua-sms/kujua-sms/utils.js \
+       packages/kujua-sms/kujua-sms/validate.js \
+       packages/kujua-sms/tests/kujua-sms/smsparser.js \
+       packages/kujua-sms/tests/kujua-sms/smsparser_compact_textform.js \
+       packages/kujua-sms/tests/kujua-sms/textforms_parser.js \
+       packages/kujua-sms/tests/kujua-sms/validate.js \
+       packages/kujua-sms/views/lib/javarosa_parser.js \
+       packages/kujua-sms/views/lib/mp_parser.js \
+       packages/kujua-sms/views/lib/smsparser.js \
+       packages/kujua-sms/views/lib/textforms_parser.js \
+       tests/nodeunit/form_definitions.js \
+       tests/nodeunit/unit/kujua-sms/smsparser.js \
+       tests/nodeunit/unit/kujua-sms/smsparser_compact_textform.js \
+       tests/nodeunit/unit/kujua-sms/textforms_parser.js \
+       tests/nodeunit/unit/kujua-sms/validate.js tests/smsparser.js \
+       views/lib/smsparser.js \
+&#39; -- --all
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nice, less commits!&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git rev-list master | wc -l
+     461
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Peruse git log a bit and do a few spot checks to see if things look right.  The commit hashes have been rewritten and should only include commits where the files listed above were affected.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git log
+$ git show d3b2be79
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;But if we query on all refs (branches/tags) our rev list is still large, hrm&amp;hellip;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git rev-list --all | wc -l
+    7664
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Local repo is also still larger than expected.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ du -hs .git
+ 41M	.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;How many branches and tags do we have?  Yikes, we&amp;rsquo;ve been busy.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git for-each-ref | wc -l
+     183
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ok, we still have some work to do, lots of refs/tags/branches still holding on to
+trees!&lt;/p&gt;
+&lt;p&gt;First order of business is to say goodbye to the origin remote, we no longer call that home.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git remote rm origin
+rm -rf .git/refs/original/ .git/refs/remotes/ .git/*_HEAD .git/logs/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Now delete all related branches and tags:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git for-each-ref --format=&amp;quot;%(refname)&amp;quot; refs/original/ refs/tags | \
+  xargs -n1 git update-ref -d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;One ferocious garbage collection incantation:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git -c gc.reflogExpire=0 -c gc.reflogExpireUnreachable=0 -c gc.rerereresolved=0 \
+    -c gc.rerereunresolved=0 -c gc.pruneExpire=now gc --aggressive
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;A basic check shows no errors:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git fsck --full
+Checking object directories: 100% (256/256), done.
+Checking objects: 100% (2064/2064), done.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Look Ma, I&amp;rsquo;m all cleaned up!&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git for-each-ref
+dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/master
+$ git rev-list --all | wc -l
+     461
+$ du -hs .git
+384K	.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Maybe have a play now and make sure things look right to you.  Then publish your new repo!&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ git remote add origin git@github.com:medic/medic-smsparser.git
+$ git push origin master
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;notes&#34;&gt;Notes&lt;/h3&gt;
+&lt;p&gt;Once you understand a little about git internals, have a look at &lt;code&gt;git-filter-branch&lt;/code&gt; manual (see also the checklist at the bottom):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/docs/git-filter-branch&#34;&gt;git-filter-branch - Rewrite branches&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ferocious GC&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://stackoverflow.com/questions/1904860/how-to-remove-unreferenced-blobs-from-my-git-repo/&#34;&gt;How to remove unreferenced blobs from my git repo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Need to update the &lt;code&gt;rm -rf&lt;/code&gt; command used there, the &lt;code&gt;git update-ref -d&lt;/code&gt; that comes after takes care of most of that except the &lt;code&gt;refs/logs&lt;/code&gt; part.  Will try next time.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Core: Using NPM</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/using-npm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/using-npm/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;npm-orgs&#34;&gt;npm Orgs&lt;/h2&gt;
+&lt;p&gt;We use npm Orgs to organize our npm packages.  It provides a centralized way
+to manage a team&amp;rsquo;s published npm packages and permissions.  Here are some
+guidelines when using this service.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&#34;https://www.npmjs.com/docs/orgs/&#34;&gt;https://www.npmjs.com/docs/orgs/&lt;/a&gt; for more information.&lt;/p&gt;
+&lt;p&gt;Our organization is &lt;code&gt;medic&lt;/code&gt; or using npm&amp;rsquo;s notation, &lt;code&gt;@medic&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We also created &lt;code&gt;@medicmobile&lt;/code&gt; but it&amp;rsquo;s not currently in use, it was created to
+reserve the namespace.&lt;/p&gt;
+&lt;h3 id=&#34;adding-a-package&#34;&gt;Adding a Package&lt;/h3&gt;
+&lt;p&gt;When you publish an npm module on npmjs.com, add it to the developers team
+under the &lt;code&gt;@medic&lt;/code&gt; org.&lt;/p&gt;
+&lt;p&gt;This can be done using the web interface:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Login to npmjs.com then Navigate to &lt;a href=&#34;https://www.npmjs.com/org/medic/team/developers&#34;&gt;Medic Developer&amp;rsquo;s Team&lt;/a&gt;
+and add your package there.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Or command line:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Change your directory to where the package&amp;rsquo;s &lt;code&gt;package.json&lt;/code&gt; lives, then run:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;npm access grant read-write medic:developers
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;Then &lt;code&gt;npm access&lt;/code&gt; should show the updated permissions for the team members.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;$ npm access ls-collaborators
+{
+  &amp;quot;mandric&amp;quot;: &amp;quot;read-write&amp;quot;,
+  &amp;quot;estellecomment&amp;quot;: &amp;quot;read-write&amp;quot;,
+  &amp;quot;garethbowen&amp;quot;: &amp;quot;read-write&amp;quot;,
+  &amp;quot;scdf&amp;quot;: &amp;quot;read-write&amp;quot;,
+  &amp;quot;alxndrsn&amp;quot;: &amp;quot;read-write&amp;quot;,
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;using-an-org-scoped-package&#34;&gt;Using an Org Scoped Package&lt;/h3&gt;
+&lt;p&gt;A scope should be specified when a published package is a fork of an existing
+package, but otherwise scope is not needed since there is no conflict with the
+registry.&lt;/p&gt;
+&lt;p&gt;For example if you fork &lt;code&gt;moment&lt;/code&gt; and you can&amp;rsquo;t get your changes merged upstream
+and need to publish a new package then modify the package name (in
+package.json) to specify a organizational scope, like &lt;code&gt;@medic/moment&lt;/code&gt; and publish it.&lt;/p&gt;
+&lt;p&gt;For more info see &lt;a href=&#34;https://www.npmjs.com/docs/orgs/publishing-an-org-scoped-package.html&#34;&gt;Publishing an Org Scoped Package&lt;/a&gt;.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Core: Developing on Windows</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/core/guides/using-windows/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/core/guides/using-windows/</guid>
+      <description>
+        
+        
+        &lt;p&gt;We don&amp;rsquo;t actively support development on Windows, instead preferring MacOS or Linux.&lt;/p&gt;
+&lt;p&gt;However, Microsoft has recently been stabilizing their &lt;a href=&#34;https://docs.microsoft.com/en-us/windows/wsl/about&#34;&gt;Windows Subsystem for Linux&lt;/a&gt;, which appears to work reasonably well for development.&lt;/p&gt;
+&lt;p&gt;Installation instructions are mostly the same as they written in &lt;a href=&#34;https://github.com/medic/medic/blob/master/README.md&#34;&gt;the README&lt;/a&gt; with a couple of caveats as of time of writing (2019-07-25), noted below.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: both the Windows Subsystem for Linux and Medic&amp;rsquo;s support for developing in it is very much in beta. These are advanced instructions, expect some understanding of linux and may not always work. Be patient and raise bugs as you find them!&lt;/p&gt;
+&lt;h2 id=&#34;installing-ubuntu-in-the-windows-subsystem-for-linux&#34;&gt;Installing Ubuntu in the Windows Subsystem for Linux.&lt;/h2&gt;
+&lt;p&gt;For the rest of this document we&amp;rsquo;re going to presume that you&amp;rsquo;re using Ubuntu (18.04) in WSL. Medic probably works on all distributions, but Ubuntu is likely the best supported.&lt;/p&gt;
+&lt;p&gt;First, follow Microsoft&amp;rsquo;s &lt;a href=&#34;https://docs.microsoft.com/en-us/windows/wsl/install-win10&#34;&gt;instructions on enabling and installing linux&lt;/a&gt;. At the end of this process you should have a linux terminal.&lt;/p&gt;
+&lt;p&gt;Note: for the rest of this tutorial &lt;strong&gt;in linux&lt;/strong&gt; means code executing or performing actions in the WSL, while &lt;strong&gt;in Windows&lt;/strong&gt; means code executing or performing actions in Windows natively.&lt;/p&gt;
+&lt;h2 id=&#34;couchdb&#34;&gt;CouchDB&lt;/h2&gt;
+&lt;p&gt;As of writing CouchDB wouldn&amp;rsquo;t autostart (due to systemd not existing?), and wasn&amp;rsquo;t manually starting due to erlang errors.&lt;/p&gt;
+&lt;p&gt;Luckily, there is a perfectly working CouchDB installation for Windows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Download from &lt;a href=&#34;https://couchdb.apache.org/#download&#34;&gt;CouchDB&lt;/a&gt; and install the Windows version. This will create a Windows service.&lt;/li&gt;
+&lt;li&gt;Run it either by directly executing &lt;code&gt;C:\CouchDB\bin\couchdb.cmd&lt;/code&gt; or by starting the service&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Then go to &lt;code&gt;http://localhost:5984/_utils/#/setup&lt;/code&gt; in Windows and do the single node setup. Once done head back to linux and confirm it works:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: curl http://localhost:5984/
+&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;couchdb&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Welcome&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2.3.1&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;git_sha&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;c298091a4&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;uuid&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5f60350abaaa11c0131a5630e83ae979&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;features&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;pluggable-storage-engines&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;scheduler&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;,&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;vendor&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;:&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;The Apache Software Foundation&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;installing-npm&#34;&gt;Installing NPM&lt;/h2&gt;
+&lt;p&gt;Start your WSL instance (Ubuntu), not WSL as they take you to two different default directories.&lt;/p&gt;
+&lt;p&gt;The default &lt;code&gt;npm&lt;/code&gt; in linux is really old and doesn&amp;rsquo;t have &lt;code&gt;npm ci&lt;/code&gt;, which we need.&lt;/p&gt;
+&lt;p&gt;Instead use &lt;a href=&#34;https://github.com/nvm-sh/nvm&#34;&gt;nvm&lt;/a&gt; to install  &lt;code&gt;nvm install 11.3&lt;/code&gt; .&lt;/p&gt;
+&lt;h2 id=&#34;checking-out-the-code&#34;&gt;Checking out the code&lt;/h2&gt;
+&lt;p&gt;We used git that&amp;rsquo;s preinstalled with Ubuntu to check out the code.&lt;/p&gt;
+&lt;p&gt;You can checkout cht code inside WSL itself. You can checkout anywhere you have write access. We&amp;rsquo;ll checkout inside /home/username/medic directory.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: mkdir ~/medic &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; ~/medic
+$: git clone https://github.com/medic/cht-core.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;setup-environment-variables&#34;&gt;Setup Environment Variables&lt;/h2&gt;
+&lt;p&gt;Using &lt;code&gt;.bashrc&lt;/code&gt; works as expected, and so is a good place to put exports:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Medic stuff&lt;/span&gt;
+&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;COUCH_URL&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;http://admin:pass@localhost:5984/medic
+&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;COUCH_NODE_NAME&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;couchdb@localhost
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;everything-else&#34;&gt;Everything else&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;npm ci&lt;/code&gt; should just work once you&amp;rsquo;ve installed a latest version of node via nvm as noted above.&lt;/p&gt;
+&lt;p&gt;You won&amp;rsquo;t have grunt already installed, so install it by executing following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: npm i -g grunt-cli
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Also install xstproc in your WSL:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: sudo apt-get update
+$: sudo apt-get install xsltproc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now you can build the web app.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; ~/medic/cht-core/
+$: npm ci
+$: grunt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;From this point, follow the setup guide from &lt;code&gt;Enabling a secure CouchDB&lt;/code&gt; section in &lt;a href=&#34;https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md&#34;&gt;Development Guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To get multiple linux terminals (so you can run &lt;code&gt;grunt&lt;/code&gt;, &lt;code&gt;api&lt;/code&gt; and &lt;code&gt;sentinel&lt;/code&gt; at the same time) either install and use something like Tmux, or if you click &lt;code&gt;Ubuntu&lt;/code&gt; in the Windows start menu again it will open up a new terminal in the same linux instance.&lt;/p&gt;
+&lt;p&gt;Once you&amp;rsquo;re done with the default instructions and have api running, check if it works by going to http://localhost:5988 in Chrome or Firefox.&lt;/p&gt;
+&lt;h2 id=&#34;editing-code&#34;&gt;Editing Code&lt;/h2&gt;
+&lt;p&gt;If you want to make changes to your code or contribute to our community health toolkit, you can do so by editing code from your favorite editor. If you editor supports UNC path, you can access and edit files inside WSL from &lt;code&gt;\\wsl$\Ubuntu\&amp;lt;cht-core-location&amp;gt;&lt;/code&gt;. If you use Visual Studio Code, it&amp;rsquo;s even easier to edit your code. Just navigate to where you have checked out cht-core and type &lt;code&gt;code .&lt;/code&gt; This will download VS Code Server for Ubuntu and open the project in Visual Studio Code in windows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$: &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; ~/medic/cht-core
+$: code .
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;problems&#34;&gt;Problems?&lt;/h2&gt;
+&lt;p&gt;As none of our code developers use Windows as a development environment daily this solution may not be as stable as directly using MacOS or Linux. If you encounter issues please let a developer know&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
