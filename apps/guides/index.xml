@@ -14,110 +14,6 @@
     
     
     <item>
-      <title>Apps: DHIS2 Aggregate</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</guid>
-      <description>
-        
-        
-        &lt;p&gt;One of the first things you’ll need to do is identify the specific &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-sets-and-forms.html#what-is-a-data-set&#34;&gt;DHIS2 data set&lt;/a&gt; that you plan to implement. You’ll need a list of all the &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-elements-and-custom-dimensions.html#data-elements&#34;&gt;data elements&lt;/a&gt; on that data set, a detailed understanding of how each is calculated, the frequency in which the data set is submitted (weekly, monthly, etc…), and for which &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/organisation-units.html&#34;&gt;organisation units&lt;/a&gt; the data set applies. You’ll also want to identify and engage the appropriate DHIS2 stakeholders to get access to DHIS2 metadata, test environments, and discuss workflows. The DHIS2 documentation site provides additional background and advice &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/integration-concepts.html#integration-concepts&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;design-considerations&#34;&gt;Design Considerations&lt;/h2&gt;
-&lt;p&gt;There are a few very important considerations related to how you design workflows and set up your CHT application to make sure you will be able to integrate with DHIS2. The main areas are:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Hierarchies&lt;/li&gt;
-&lt;li&gt;Fields and calculations&lt;/li&gt;
-&lt;li&gt;Workflows and user access.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;These considerations are summarized below.&lt;/p&gt;
-&lt;h3 id=&#34;hierarchies&#34;&gt;Hierarchies&lt;/h3&gt;
-&lt;p&gt;The CHT relies on your Place hierarchy to determine how data should be aggregated for DHIS2. As such, it’s important that you consider how organization units are configured in the DHIS2 instance that you need to integrate data into. If your CHT Place hierarchy does not align with the DHIS2 organisation unit structure, the CHT will not be able to aggregate data in the way DHIS2 needs it.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TIP: There should be a one-to-one relationship between DHIS2 organistion units and CHT places.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/hierarchy/#&gt;Hierarchies&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;fields-and-calculations&#34;&gt;Fields and calculations&lt;/h3&gt;
-&lt;p&gt;It’s important to understand each data element on the DHIS2 data set you want to integrate data into and how each data element is calculated. When you are designing your forms in the CHT, you will need to make sure you are capturing information in your forms so that every data element on the chosen DHIS2 data set can be calculated within the CHT.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TIP: Once you obtain the list of data elements on the data set, be sure to go through them one by one and figure out how to calculate each one using information available in your CHT forms.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/forms/#&gt;Forms&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;workflows-and-user-access&#34;&gt;Workflows and User Access&lt;/h3&gt;
-&lt;p&gt;The aggregate data workflow is really designed around 3 key user personas. You’ll need to make sure that your context can support those assumptions and will be able to have access to the appropriate features in the CHT and DHIS2.&lt;/p&gt;
-&lt;p&gt;Moving data from the CHT to DHIS2 can be done in three main ways.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Manually downloading from the CHT&lt;/li&gt;
-&lt;li&gt;Building an app in DHIS2 and calling an API in the CHT&lt;/li&gt;
-&lt;li&gt;Orchestrating the steps using an interoperability layer such as &lt;a href=&#34;http://openhim.org/&#34;&gt;OpenHIM&lt;/a&gt;, &lt;a href=&#34;https://www.openfn.org/&#34;&gt;OpenFn&lt;/a&gt;, etc&amp;hellip;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
-&lt;p&gt;Once you have designed your hierarchies, forms, calculations, and workflows, there are a few key configurations that need to be made.&lt;/p&gt;
-&lt;h3 id=&#34;data-sets&#34;&gt;Data sets&lt;/h3&gt;
-&lt;p&gt;For the CHT to be able to export the file for DHIS2, it needs to know the specific name and ID of the data set in DHIS2. You will need to obtain the ID from the test or production DHIS2 environment.&lt;/p&gt;
-&lt;p&gt;Configure the data set in &lt;code&gt;app_settings.json&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/dhis2/#&gt;DHIS2 in App Settings&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;organisation-units&#34;&gt;Organisation units&lt;/h3&gt;
-&lt;p&gt;Aggregation in the CHT is based on your Place hierarchy. As mentioned in the Hierarchies Design Considerations above, your Places must align with DHIS2 organisation units. You will need to specify the DHIS2 organisation unit&amp;rsquo;s ID on the Place document in the CHT.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Update the contact document of each place you wish to map to an organisation unit. Add a &lt;code&gt;dhis.orgUnit&lt;/code&gt; attribute.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/contact-forms/#&gt;Contact Forms&lt;/a&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;my_place&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;dhis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;orgUnit&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HJiPOcmziQA&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;data-elements&#34;&gt;Data elements&lt;/h3&gt;
-&lt;p&gt;Calculations for DHIS2 indicators are done using CHT Target functionality. For each DHIS2 data element, you will need to configure a corresponding CHT Target and specify the ID of the DHIS2 data set and data element. If you do not include the data set, this data element will be included in every data set.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;In &lt;code&gt;targets.js&lt;/code&gt;, configure one or more data elements by setting the &lt;code&gt;dhis.dataSet&lt;/code&gt; and &lt;code&gt;dhis.dataElement&lt;/code&gt; attributes in the target schema.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/targets/#&gt;Targets&lt;/a&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;module&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;births-this-month&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;icon-infant&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.births.title&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;subtitle_translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.this_month.subtitle&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;goal&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;contacts&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesToType&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;appliesIf&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;!!&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;date_of_birth&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;dhis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;dataSet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;VMuFODsyWaO&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;dataElement&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kB0ZBFisE0e&amp;#39;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;users&#34;&gt;Users&lt;/h3&gt;
-&lt;p&gt;For the HRIO role, create a new user role and a new user with that role; or update an existing user role. To export DHIS2 metrics, users need to have the following permissions: &lt;code&gt;can_configure&lt;/code&gt;, &lt;code&gt;can_export_all&lt;/code&gt;, and &lt;code&gt;can_export_dhis&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/users/#&gt;Users&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&#34;user-experience&#34;&gt;User experience&lt;/h2&gt;
-&lt;p&gt;Once your CHT project is configured to integrate with DHIS2, follow these steps to export the data from CHT and import it into DHIS:&lt;/p&gt;
-&lt;h3 id=&#34;export-data&#34;&gt;Export data&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Login to the CHT instance using a user account with the required permissions. You should be automatically navigated to the Admin Console.&lt;/li&gt;
-&lt;li&gt;Select &amp;ldquo;Import &amp;amp; export data&amp;rdquo; from the side&lt;/li&gt;
-&lt;li&gt;Select &amp;ldquo;DHIS2&amp;rdquo; from the header along the top&lt;/li&gt;
-&lt;li&gt;Select the data set, org unit, and time period that you&amp;rsquo;d like to send to DHIS2. Click &amp;ldquo;Export&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;A file should download in your browser. This file contains a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/webapi_data_values.html&#34;&gt;dataValueSet&lt;/a&gt; with aggregated user&amp;rsquo;s data.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;import-data&#34;&gt;Import data&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Login to DHIS2 using a user account with permission to manage the relevant dataset and organisation units.&lt;/li&gt;
-&lt;li&gt;Select the &amp;ldquo;import/export&amp;rdquo; application inside DHIS2. Select &amp;ldquo;import data&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;Upload the file you downloaded in Step 5.&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;Import&amp;rdquo;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Check the UI for any errors. If you get errors you don&amp;rsquo;t understand or are unable to resolve an error, you can always ask for assistance on the &lt;a href=&#34;https://forum.communityhealthtoolkit.org/c/support/18&#34;&gt;CHT Forum&lt;/a&gt;. If there are no errors, you can review the numbers that resulted by reviewing the data set in DHIS2.&lt;/p&gt;
-&lt;h2 id=&#34;known-limitations&#34;&gt;Known limitations&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li&gt;
-&lt;li&gt;Integrations are limited to &lt;em&gt;monthly&lt;/em&gt; DHIS2 data sets.&lt;/li&gt;
-&lt;li&gt;Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html&#34;&gt;DHIS2 App&lt;/a&gt; for your project.&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: Creating Additional Docs from App Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/additional-docs/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1041,6 +937,110 @@ curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic
     </item>
     
     <item>
+      <title>Apps: DHIS2 Aggregate</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</guid>
+      <description>
+        
+        
+        &lt;p&gt;One of the first things you’ll need to do is identify the specific &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-sets-and-forms.html#what-is-a-data-set&#34;&gt;DHIS2 data set&lt;/a&gt; that you plan to implement. You’ll need a list of all the &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-elements-and-custom-dimensions.html#data-elements&#34;&gt;data elements&lt;/a&gt; on that data set, a detailed understanding of how each is calculated, the frequency in which the data set is submitted (weekly, monthly, etc…), and for which &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/organisation-units.html&#34;&gt;organisation units&lt;/a&gt; the data set applies. You’ll also want to identify and engage the appropriate DHIS2 stakeholders to get access to DHIS2 metadata, test environments, and discuss workflows. The DHIS2 documentation site provides additional background and advice &lt;a href=&#34;https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/integration-concepts.html#integration-concepts&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;design-considerations&#34;&gt;Design Considerations&lt;/h2&gt;
+&lt;p&gt;There are a few very important considerations related to how you design workflows and set up your CHT application to make sure you will be able to integrate with DHIS2. The main areas are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Hierarchies&lt;/li&gt;
+&lt;li&gt;Fields and calculations&lt;/li&gt;
+&lt;li&gt;Workflows and user access.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;These considerations are summarized below.&lt;/p&gt;
+&lt;h3 id=&#34;hierarchies&#34;&gt;Hierarchies&lt;/h3&gt;
+&lt;p&gt;The CHT relies on your Place hierarchy to determine how data should be aggregated for DHIS2. As such, it’s important that you consider how organization units are configured in the DHIS2 instance that you need to integrate data into. If your CHT Place hierarchy does not align with the DHIS2 organisation unit structure, the CHT will not be able to aggregate data in the way DHIS2 needs it.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TIP: There should be a one-to-one relationship between DHIS2 organistion units and CHT places.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/hierarchy/#&gt;Hierarchies&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;fields-and-calculations&#34;&gt;Fields and calculations&lt;/h3&gt;
+&lt;p&gt;It’s important to understand each data element on the DHIS2 data set you want to integrate data into and how each data element is calculated. When you are designing your forms in the CHT, you will need to make sure you are capturing information in your forms so that every data element on the chosen DHIS2 data set can be calculated within the CHT.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TIP: Once you obtain the list of data elements on the data set, be sure to go through them one by one and figure out how to calculate each one using information available in your CHT forms.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/forms/#&gt;Forms&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;workflows-and-user-access&#34;&gt;Workflows and User Access&lt;/h3&gt;
+&lt;p&gt;The aggregate data workflow is really designed around 3 key user personas. You’ll need to make sure that your context can support those assumptions and will be able to have access to the appropriate features in the CHT and DHIS2.&lt;/p&gt;
+&lt;p&gt;Moving data from the CHT to DHIS2 can be done in three main ways.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Manually downloading from the CHT&lt;/li&gt;
+&lt;li&gt;Building an app in DHIS2 and calling an API in the CHT&lt;/li&gt;
+&lt;li&gt;Orchestrating the steps using an interoperability layer such as &lt;a href=&#34;http://openhim.org/&#34;&gt;OpenHIM&lt;/a&gt;, &lt;a href=&#34;https://www.openfn.org/&#34;&gt;OpenFn&lt;/a&gt;, etc&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
+&lt;p&gt;Once you have designed your hierarchies, forms, calculations, and workflows, there are a few key configurations that need to be made.&lt;/p&gt;
+&lt;h3 id=&#34;data-sets&#34;&gt;Data sets&lt;/h3&gt;
+&lt;p&gt;For the CHT to be able to export the file for DHIS2, it needs to know the specific name and ID of the data set in DHIS2. You will need to obtain the ID from the test or production DHIS2 environment.&lt;/p&gt;
+&lt;p&gt;Configure the data set in &lt;code&gt;app_settings.json&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/dhis2/#&gt;DHIS2 in App Settings&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;organisation-units&#34;&gt;Organisation units&lt;/h3&gt;
+&lt;p&gt;Aggregation in the CHT is based on your Place hierarchy. As mentioned in the Hierarchies Design Considerations above, your Places must align with DHIS2 organisation units. You will need to specify the DHIS2 organisation unit&amp;rsquo;s ID on the Place document in the CHT.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Update the contact document of each place you wish to map to an organisation unit. Add a &lt;code&gt;dhis.orgUnit&lt;/code&gt; attribute.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/contact-forms/#&gt;Contact Forms&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;my_place&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;health_center&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;dhis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;orgUnit&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HJiPOcmziQA&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;data-elements&#34;&gt;Data elements&lt;/h3&gt;
+&lt;p&gt;Calculations for DHIS2 indicators are done using CHT Target functionality. For each DHIS2 data element, you will need to configure a corresponding CHT Target and specify the ID of the DHIS2 data set and data element. If you do not include the data set, this data element will be included in every data set.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;In &lt;code&gt;targets.js&lt;/code&gt;, configure one or more data elements by setting the &lt;code&gt;dhis.dataSet&lt;/code&gt; and &lt;code&gt;dhis.dataElement&lt;/code&gt; attributes in the target schema.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/targets/#&gt;Targets&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;module&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;births-this-month&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;icon-infant&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.births.title&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;subtitle_translation_key&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;targets.this_month.subtitle&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;goal&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;contacts&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesToType&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;appliesIf&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;!!&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;date_of_birth&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;dhis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#000&#34;&gt;dataSet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;VMuFODsyWaO&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#000&#34;&gt;dataElement&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kB0ZBFisE0e&amp;#39;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;users&#34;&gt;Users&lt;/h3&gt;
+&lt;p&gt;For the HRIO role, create a new user role and a new user with that role; or update an existing user role. To export DHIS2 metrics, users need to have the following permissions: &lt;code&gt;can_configure&lt;/code&gt;, &lt;code&gt;can_export_all&lt;/code&gt;, and &lt;code&gt;can_export_dhis&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/concepts/users/#&gt;Users&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;user-experience&#34;&gt;User experience&lt;/h2&gt;
+&lt;p&gt;Once your CHT project is configured to integrate with DHIS2, follow these steps to export the data from CHT and import it into DHIS:&lt;/p&gt;
+&lt;h3 id=&#34;export-data&#34;&gt;Export data&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Login to the CHT instance using a user account with the required permissions. You should be automatically navigated to the Admin Console.&lt;/li&gt;
+&lt;li&gt;Select &amp;ldquo;Import &amp;amp; export data&amp;rdquo; from the side&lt;/li&gt;
+&lt;li&gt;Select &amp;ldquo;DHIS2&amp;rdquo; from the header along the top&lt;/li&gt;
+&lt;li&gt;Select the data set, org unit, and time period that you&amp;rsquo;d like to send to DHIS2. Click &amp;ldquo;Export&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;A file should download in your browser. This file contains a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/webapi_data_values.html&#34;&gt;dataValueSet&lt;/a&gt; with aggregated user&amp;rsquo;s data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;import-data&#34;&gt;Import data&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Login to DHIS2 using a user account with permission to manage the relevant dataset and organisation units.&lt;/li&gt;
+&lt;li&gt;Select the &amp;ldquo;import/export&amp;rdquo; application inside DHIS2. Select &amp;ldquo;import data&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;Upload the file you downloaded in Step 5.&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;Import&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Check the UI for any errors. If you get errors you don&amp;rsquo;t understand or are unable to resolve an error, you can always ask for assistance on the &lt;a href=&#34;https://forum.communityhealthtoolkit.org/c/support/18&#34;&gt;CHT Forum&lt;/a&gt;. If there are no errors, you can review the numbers that resulted by reviewing the data set in DHIS2.&lt;/p&gt;
+&lt;h2 id=&#34;known-limitations&#34;&gt;Known limitations&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li&gt;
+&lt;li&gt;Integrations are limited to &lt;em&gt;monthly&lt;/em&gt; DHIS2 data sets.&lt;/li&gt;
+&lt;li&gt;Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href=&#34;https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html&#34;&gt;DHIS2 App&lt;/a&gt; for your project.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: EC2 Setup</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1169,6 +1169,49 @@ sudo chmod 0600 ~/Downloads/name_of_file.pem
 &lt;h2 id=&#34;own-infrastructure-setup&#34;&gt;Own Infrastructure Setup&lt;/h2&gt;
 &lt;h4 id=&#34;1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above&#34;&gt;1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4&gt;
 
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Gateway</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/gateway/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/gateway/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Revalidate invalid reports</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/invalid-reports/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/invalid-reports/</guid>
+      <description>
+        
+        
+        &lt;p&gt;You may encounter a dreaded case when reports coming in to a Medic Webapp instance have a red indicator instead of the green indicator.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;invalid_report.png&#34; alt=&#34;Invalid Reports&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This may be caused by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Missing forms in the &lt;code&gt;app_settings&lt;/code&gt; config.
+-Missing or incorrect fields in the input form. e.g Missing patient ID, or Patient ID with letters&lt;/li&gt;
+&lt;li&gt;Extra fields in the input form. This happens when you don&amp;rsquo;t configure for some fields in the app_settings.json of the webapp&lt;/li&gt;
+&lt;li&gt;Configuring some forms in the wrong section of the app_settings i.e &lt;code&gt;registrations&lt;/code&gt; and &lt;code&gt;patient_reports&lt;/code&gt;. Forms that don&amp;rsquo;t have a patient_id field because it is generated afterwards, e.g ANCR, IMMR, go to the &lt;code&gt;registrations&lt;/code&gt; section, while form that have a patient_id field e.g ANCP, ANCV, IMMV; go to the &lt;code&gt;patient_reports&lt;/code&gt; section&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;how-to-solve&#34;&gt;How to solve&lt;/h2&gt;
+&lt;p&gt;To revalidate an invalid report, we need to clear the errors field on the doc (set it to []). Updating this field from Futon will not work and will result in an endless update process. The recommended way to do it is to download the doc, update it and then upload it. This will also ensure propagation and replication in couchdb.&lt;/p&gt;
+&lt;p&gt;To download a doc, use:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl &#39;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt;&#39; &amp;gt; filename.json
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;filename.json&lt;/code&gt; is the local file in your computer you have stored the doc json&lt;/p&gt;
+&lt;p&gt;Update &lt;code&gt;filename.json&lt;/code&gt;: Set &amp;ldquo;errors&amp;rdquo; to [] and remove &amp;ldquo;accept_patient_reports&amp;rdquo; transition so that sentinel can revalidate the report.&lt;/p&gt;
+&lt;p&gt;Upload &lt;code&gt;filename.json&lt;/code&gt; with:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -X PUT hhttps://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt; -d @filename.json --header &amp;quot;Content-Type: application/json&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
       </description>
     </item>
     
@@ -1432,6 +1475,207 @@ For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/serv
     </item>
     
     <item>
+      <title>Apps: Purging</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/purging/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/purging/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;Only available in 3.7.0 and above&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Purging is a tool that allows you to increase performance and available disk space for offline users (eg CHWs) by removing unneeded documents from their device.&lt;/p&gt;
+&lt;p&gt;As users continually generate new reports their performance may naturally degrade as a result.
+You can use purging to remove older documents that are no longer relevant from their devices.
+Purging only removes documents from user&amp;rsquo;s devices: these reports are still available for
+online analytics and impact metrics.&lt;/p&gt;
+&lt;p&gt;Purging is disabled by default, and is enabled if a purge function is specified in
+&lt;code&gt;app_settings.json&lt;/code&gt;, along with a run schedule.&lt;/p&gt;
+&lt;p&gt;The following example would purge all reports that were created more than a year ago:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;fn&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;function(userCtx, contact, reports, messages) { const old = Date.now() - (1000 * 60 * 60 * 24 * 365); return reports.filter(r =&amp;gt; r.reported_date &amp;lt; old).map(r =&amp;gt; r._id);}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;text_expression&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;at 12 am on Sunday&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Purging is both very powerful and also very dangerous&lt;/strong&gt;. Read the rest of this document carefully to make sure you completely understand how to purge and the ramifications of doing so, before using purging in your project.&lt;/p&gt;
+&lt;h2 id=&#34;server-side&#34;&gt;Server-side&lt;/h2&gt;
+&lt;p&gt;Purging runs on the server on a configurable schedule.&lt;/p&gt;
+&lt;p&gt;It will iterate over all users to generate a list of unique roles groups that represent every user.
+Each group will have their purged docs saved in an individual database.&lt;/p&gt;
+&lt;p&gt;Then, it will iterate over all existent contacts, collecting all reports about that contact along
+with all sms messages that the contact has sent or received.
+This is similar to the scoping you may have encountered when configuring &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/reference/tasks/&#34;&gt;tasks&lt;/a&gt; and &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/reference/targets/&#34;&gt;targets&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The configured purge function runs over all combinations of purge scope (contact + reports + messages)
+and user context (unique list of roles) to determine which docs should be purged.&lt;/p&gt;
+&lt;p&gt;The resulting list of docs to be purged is compared to the existent purged docs so that only the differences
+are saved (old purges are reverted and new purges are added).&lt;/p&gt;
+&lt;p&gt;A document is considered purged for a user if a document with the same id, prefixed by &lt;code&gt;purge&lt;/code&gt;,
+exists in the corresponding purge database.
+The following user:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.couchdb.user:&amp;lt;your user&amp;gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;roles&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+       &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_admin&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+       &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;supervisor&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;would get their purges from a &lt;code&gt;medic-purged-role-&amp;lt;role_hash&amp;gt;&lt;/code&gt; where &lt;code&gt;role_hash&lt;/code&gt; is an md5 hash of the
+user&amp;rsquo;s roles.&lt;/p&gt;
+&lt;p&gt;When users sync (includes initial sync), they will only download documents that are not purged for their roles.&lt;/p&gt;
+&lt;h2 id=&#34;client-side&#34;&gt;Client-side&lt;/h2&gt;
+&lt;p&gt;Purging runs on the user&amp;rsquo;s device at startup, before the application booting, when any of these
+conditions are met:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The device was just setup and so initial sync just occurred.&lt;/li&gt;
+&lt;li&gt;The user&amp;rsquo;s roles list has changed&lt;/li&gt;
+&lt;li&gt;It has been more than 7 days since the user has purged.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Purging will not run on startup if purge is not configured, if last purge occurred recently or if
+the user doesn&amp;rsquo;t have an internet connection.&lt;/p&gt;
+&lt;p&gt;When purging runs, the device calls an API endpoint that returns batches of doc ids that have
+been purged since last time the same device has run purge.
+The system is similar to CouchDB replication, in the sense that a &lt;code&gt;checkpointer&lt;/code&gt; document
+is saved in the corresponding server-side database, that stores the &lt;code&gt;last_seq&lt;/code&gt; that the device has
+downloaded and is used to get the next batch of ids.
+After receiving a batch of ids, the device simply deletes the indicated docs locally,
+marking them with a &lt;code&gt;purged&lt;/code&gt; flag.&lt;/p&gt;
+&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
+&lt;p&gt;To enable purging, write your purge configuration to &lt;code&gt;purge.js&lt;/code&gt; in your project root:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;module&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;exports&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#000&#34;&gt;text_expression&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;at 9 am on Sunday&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#000&#34;&gt;run_every_days&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#000&#34;&gt;cron&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;0 1 * * SUN&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#000&#34;&gt;fn&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;userCtx&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;contact&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;reports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;messages&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;old&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87&#34;&gt;Date&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;now&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;60&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;60&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;24&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;365&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;oldMessages&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87&#34;&gt;Date&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;now&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;60&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;60&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;24&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;90&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+      
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;reportsToPurge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;reports&lt;/span&gt;
+                                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;filter&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;reported_date&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;old&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+                                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;map&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;messagesToPurge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;messages&lt;/span&gt;
+                                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;filter&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;m&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;m&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;reported_date&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;oldMessages&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+                                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;map&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;m&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;m&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+      
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[...&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;reportsToPurge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;...&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;messagesToPurge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt; 
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;purge-configuration&#34;&gt;Purge configuration&lt;/h3&gt;
+&lt;p&gt;As shown above, you should be exporting a property &lt;code&gt;fn&lt;/code&gt; defining a self contained function:
+it should have no outside dependencies - like used variables, required modules or call outside functions.&lt;/p&gt;
+&lt;p&gt;This function takes four parameters:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;userCtx&lt;/code&gt;, an object with the user&amp;rsquo;s &lt;code&gt;roles&lt;/code&gt; as fields. For more information read the &lt;a href=&#34;https://docs.couchdb.org/en/stable/json-structure.html#userctx-object&#34;&gt;documentation for the User Context Object&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact&lt;/code&gt;, the contact document of a patient or other contact who has reports about them.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;reports&lt;/code&gt;, an array of all reports for that patient that are present on the server.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;messages&lt;/code&gt;, an array of sms messages that the contact has sent or received&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And should return an array of &lt;code&gt;_id&lt;/code&gt; values for docs you would like to be purged
+(or &lt;code&gt;undefined&lt;/code&gt; / nothing if you don&amp;rsquo;t wish to purge anything).
+Only ids of docs that were passed to the function are valid for purging: you are not allowed to purge other documents.&lt;/p&gt;
+&lt;p&gt;In the cases of reports that do not have patients or their patients are not found, the &lt;code&gt;purge&lt;/code&gt; function
+will receive an empty object as &lt;code&gt;contact&lt;/code&gt;.
+In the cases of reports about deleted patients, the &lt;code&gt;purge&lt;/code&gt; function will receive a &lt;code&gt;{ _deleted: true }&lt;/code&gt;
+object as the &lt;code&gt;contact&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;schedule-configuration&#34;&gt;Schedule configuration&lt;/h3&gt;
+&lt;p&gt;You must set a schedule for purging to run server-side.
+Depending on the size of the database and server capacity, purging could be a lengthy and
+resource intensive operation, so it is recommended you run purge on a schedule that your server
+can sustain (for example at nighttime in the weekends).&lt;/p&gt;
+&lt;p&gt;You can also change the frequency of local purge downloads (default being every 7 days).&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;property&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;th&gt;required&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;fn&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Self-contained purge function&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;run_every_days&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The interval (in days) at which purges will be downloaded client-side. &lt;em&gt;Default 7&lt;/em&gt;.&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;text_expression&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Any valid text expression to describe the interval of running purge server-side. For more information, see &lt;a href=&#34;https://bunkat.github.io/later/parsers.html#text&#34;&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;no if &lt;code&gt;cron&lt;/code&gt; provided&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;cron&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Any valid Cron expression to describe the interval of running purge server-side. For more information, see &lt;a href=&#34;https://bunkat.github.io/later/parsers.html#cron&#34;&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;no if &lt;code&gt;text_expression&lt;/code&gt; provided&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Example of purge configured in your app_settings:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;,&lt;/span&gt;
+ &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;fn&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;function(userCtx, contact, reports, messages) { return  []; }&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;cron&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;0 1 * * SUN&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;text_expression&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;at 1:00 am on Sun&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;run_every_days&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;considerations&#34;&gt;Considerations&lt;/h2&gt;
+&lt;h3 id=&#34;purged-documents-server-side&#34;&gt;Purged documents server-side&lt;/h3&gt;
+&lt;p&gt;Purging is run as a scheduled task in Sentinel.&lt;/p&gt;
+&lt;p&gt;Purging does not touch documents in the &lt;code&gt;medic&lt;/code&gt; database, everything is done in separate purge databases
+(&lt;code&gt;medic-purged-roles-&amp;lt;roles-hash&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;The purge databases names contain an md5 of the JSON representation of a list of unique roles.
+They also contain a &lt;code&gt;_local/info&lt;/code&gt; doc where the roles are listed in clear text.&lt;/p&gt;
+&lt;p&gt;A &lt;code&gt;purgelog&lt;/code&gt; document is saved in &lt;code&gt;medic-sentinel&lt;/code&gt; after every purge. The purgelog has a meaningful
+ID: &lt;code&gt;purgelog:&amp;lt;timestamp&amp;gt;&lt;/code&gt;, where timestamp represents the moment when purge was completed. The doc
+also contains a property &lt;code&gt;roles&lt;/code&gt; with the collection of roles purge has run for, and a &lt;code&gt;duration&lt;/code&gt; property
+representing the time it took to run purge, in ms.
+You can retrieve a list of all your purge logs, descending from newest to oldest, with this request:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;https(s)://&amp;lt;host&amp;gt;/medic-sentinel/_all_docs?end_key=&amp;quot;purgelog:&amp;quot;&amp;amp;start_key=&amp;quot;purgelog:\ufff0&amp;quot;&amp;amp;descending=true&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Purging is reversible. If you update your purge function, when running purge the old invalid
+purges will be deleted. This does not mean that devices will automatically re-download documents that
+become unpurged. In order for the user to re-download a previously purged document, the document either
+needs to be updated in the &lt;code&gt;medic&lt;/code&gt; database on the server or the user has to download all data again.&lt;/p&gt;
+&lt;p&gt;Running purge will not remove old purge databases, even if they don&amp;rsquo;t correspond to any existent users.
+Their removal is a manual process.&lt;/p&gt;
+&lt;p&gt;Purge does not run when adding new roles or adding said new roles to users. It also does not run when an existent
+user is updated to have a new unique list of roles (one that purge has not run over yet).
+This means that roles need to be planned carefully in order to take advantage of serverside purge. If purge
+has not run for the user&amp;rsquo;s list of roles at the moment of initial replication, the user will download &lt;strong&gt;all&lt;/strong&gt;
+documents - only to be purged later.&lt;/p&gt;
+&lt;h3 id=&#34;purged-documents-client-side&#34;&gt;Purged documents client-side&lt;/h3&gt;
+&lt;p&gt;The key thing to keep in mind while purging is that &lt;strong&gt;documents that you purge are deleted on
+user&amp;rsquo;s device&lt;/strong&gt;. This sounds obvious, but it&amp;rsquo;s important to understand &lt;em&gt;how&lt;/em&gt; this affects
+the running of the application:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Any &lt;strong&gt;rules&lt;/strong&gt; you have written that presume that the document exists may break.
+For example, if the document completes a task, purging it will reopen that task,
+unless you &lt;em&gt;also&lt;/em&gt; purge the document that created the task in the first place
+(while making sure that purging &lt;em&gt;that&lt;/em&gt; report doesn&amp;rsquo;t break more things!)&lt;/li&gt;
+&lt;li&gt;Similarly &lt;strong&gt;targets&lt;/strong&gt; won&amp;rsquo;t be able to use the report to generate values, so counts may go
+down or become inaccurate&lt;/li&gt;
+&lt;li&gt;Additionally, the &lt;strong&gt;contact summary&lt;/strong&gt; will also lose out on being able to use that report&lt;/li&gt;
+&lt;li&gt;Changing the user&amp;rsquo;s roles list (adding/removing roles) will cause the user to download &lt;strong&gt;all purged docs ids&lt;/strong&gt;
+from the purge database corresponding to their new roles list.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;More subtly, you may also confuse your users!&lt;/p&gt;
+&lt;p&gt;If you purge documents too quickly, they may get confused as to whether they created the report
+or not, and may create it again, causing data problems. Users are not told that purging is
+occurring in a very obvious way: the expectation is that purging will naturally occur as
+documents become irrelevant, and so users should never really notice.&lt;/p&gt;
+&lt;p&gt;Users may search for their own documents, and use data from them in novel ways you may not anticipate.
+It&amp;rsquo;s important to work with your users to ensure documents are only removed once there are no uses
+for them.&lt;/p&gt;
+&lt;p&gt;It is key then, that you test your purge rules thoroughly!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Conncting to RDBMS in Windows</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1524,6 +1768,38 @@ For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/serv
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Should bring a list like this one&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;xform_list.png&#34; alt=&#34;Xform List&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Go through the list and see which form has  a missing &lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;formID&amp;gt;&lt;/code&gt; property. Add it and reuploadthe forms using &lt;code&gt;medic-conf&lt;/code&gt; again.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: CouchDB replication</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/replication/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/replication/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Replication is what we call it when users download a copy of the data on to their device.&lt;/p&gt;
+&lt;h2 id=&#34;restricting-replication&#34;&gt;Restricting replication&lt;/h2&gt;
+&lt;p&gt;If the user has an online role they can access all the data, otherwise they will get restricted access to the data.&lt;/p&gt;
+&lt;h3 id=&#34;restriction-by-place&#34;&gt;Restriction by place&lt;/h3&gt;
+&lt;p&gt;The most common restriction is by place. This is where we check the user&amp;rsquo;s &lt;code&gt;facility_id&lt;/code&gt; property, and allow access to all contacts that are descendants of that place, and all reports and messages that are about one of those descendants.&lt;/p&gt;
+&lt;p&gt;For example, if a CHP&amp;rsquo;s &lt;code&gt;facility_id&lt;/code&gt; property is set to the ID of the Maori Hill clinic, then they will be able to see all patients and all reports about patients at that clinic.&lt;/p&gt;
+&lt;h3 id=&#34;depth&#34;&gt;Depth&lt;/h3&gt;
+&lt;p&gt;Sometimes though you want to only access contacts near the top of the hierarchy. This may be because returning all contacts would be too much data to be practical, or for patient privacy, or because it&amp;rsquo;s just not part of your workflow. In this case you can configure a replication depth for a specific role under &lt;code&gt;replication_depth&lt;/code&gt; in the app settings.&lt;/p&gt;
+&lt;p&gt;For example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;district_manager&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;national_manager&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;supervisor-signoff&#34;&gt;Supervisor signoff&lt;/h3&gt;
+&lt;p&gt;Some reports need to be signed off by a supervisor even though that supervisor doesn&amp;rsquo;t have the depth to see the patient the report is about. To achieve this the report needs a field named &lt;code&gt;needs_signoff&lt;/code&gt; with a value of &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;sensitive-documents&#34;&gt;Sensitive documents&lt;/h3&gt;
+&lt;p&gt;We won&amp;rsquo;t replicate documents that are about the user when the sender is someone the user can&amp;rsquo;t access. For example, if a supervisor submits a report about one of their CHPs, that CHP won&amp;rsquo;t be able to see it.&lt;/p&gt;
 
       </description>
     </item>
@@ -1624,6 +1900,37 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
 &lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
 &lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
 &lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Shortcode identifiers</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/shortcodes/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/shortcodes/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Shortcodes used for SMS messaging are generated on &lt;code&gt;doc.patient_id&lt;/code&gt; against any document of &lt;code&gt;type&lt;/code&gt; &lt;code&gt;person&lt;/code&gt;. By default, these shortcodes start at 5 numeric digits long, and will increase in length as deemed necessary by the generation algorithm.&lt;/p&gt;
+&lt;p&gt;If the length is increased, this increase is stored in a CouchDB documented called &lt;code&gt;shortcode-id-length&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;configuring-a-minimum-length&#34;&gt;Configuring a minimum length&lt;/h2&gt;
+&lt;p&gt;If you wish to change the minimum length to of ids to generate, create or edit the &lt;code&gt;shortcode-id-length&lt;/code&gt; document in CouchDB. For example, if you wish for the minimum length to be 7:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;NB: If this file already exists be sure to include the existing &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;NB: If you are changing this document and want to make it relevant straight away, &lt;strong&gt;you must restart Sentinel.&lt;/strong&gt; Otherwise there may be a collection of cached already accepted ids of the previous length that Sentinel will work through first.&lt;/p&gt;
+&lt;h2 id=&#34;configuring-a-maximum-length-locking-down-an-exact-length-etc&#34;&gt;Configuring a maximum length, locking down an exact length etc&lt;/h2&gt;
+&lt;p&gt;It is not possible to either alter the maximum length of ids, to stop it automatically increasing or to tweak when it decides to automatically increase. IDs automatically increasing in length when required is important to the continual correct functioning of Sentinel.&lt;/p&gt;
+&lt;h2 id=&#34;valid-sizes&#34;&gt;Valid sizes&lt;/h2&gt;
+&lt;p&gt;Shortcodes can be between 5 and 13 digits long. Due to the last digit being a checksum digit, there are at most 10,000 5 digit ids, and at most 1,000,000,000,000 13 digit ids.&lt;/p&gt;
 
       </description>
     </item>
