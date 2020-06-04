@@ -1181,6 +1181,9 @@ medic-conf initialise-project-layout
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;h2 id=&#34;uploading-binary-attachments&#34;&gt;Uploading Binary Attachments&lt;/h2&gt;
+&lt;p&gt;Forms can include arbitrary binary data which is submitted and included in the doc as an attachment. If this is an image type it&amp;rsquo;ll then be displayed inline in the report UI.&lt;/p&gt;
+&lt;p&gt;To mark an element as having binary data add an extra column in the XLSForm called &lt;code&gt;instance::type&lt;/code&gt; and specify &lt;code&gt;binary&lt;/code&gt; in the element&amp;rsquo;s row.&lt;/p&gt;
 &lt;h3 id=&#34;code-sample&#34;&gt;Code sample&lt;/h3&gt;
 &lt;p&gt;In this sample properties file, the associated form would only show on a person&amp;rsquo;s page, and only if their sex is unspecified or female and they are between 10 and 65 years old:&lt;/p&gt;
 &lt;h4 id=&#34;formsapppregnancypropertiesjson&#34;&gt;&lt;code&gt;forms/app/pregnancy.properties.json&lt;/code&gt;&lt;/h4&gt;
@@ -1219,7 +1222,9 @@ medic-conf initialise-project-layout
       <description>
         
         
-        &lt;p&gt;Much of the configuration of the app is stored in the database in a document with id &amp;ldquo;settings&amp;rdquo;. Most sections are described on their own in the &lt;a href=&#34;..&#34;&gt;Reference Documentation&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;The settings which control CHT apps are defined in the &lt;code&gt;app_settings.json&lt;/code&gt; file, and stored in the &lt;code&gt;settings&lt;/code&gt; doc in the database. Some settings can be modified in the &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/features/admin/&#34;&gt;&lt;strong&gt;App Management&lt;/strong&gt;&lt;/a&gt; app, which updates the same settings file in the database.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;app_settings.json&lt;/code&gt; file can be manually edited to modify individual settings. The code for some components, like tasks and targets, gets compiled into this file with the &lt;code&gt;compile-app-settings&lt;/code&gt; action in the &lt;code&gt;medic-conf&lt;/code&gt; tool.&lt;/p&gt;
+&lt;p&gt;Most sections are described on their own in the &lt;a href=&#34;..&#34;&gt;Reference Documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;optional-settings&#34;&gt;Optional Settings&lt;/h2&gt;
 &lt;p&gt;The following settings do not need to be specified. They should only be defined when the default implementation needs to be changed.&lt;/p&gt;
 &lt;h3 id=&#34;app_settingsjson&#34;&gt;&lt;code&gt;app_settings.json&lt;/code&gt;&lt;/h3&gt;
@@ -1301,6 +1306,211 @@ medic-conf initialise-project-layout
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: App Settings Validation</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings-validations/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Validation rules are code fragments used to determine if some input is valid. For example, to say a field is only valid if the value has at least five characters, you would use the lenMin(5). They are used in &lt;code&gt;registrations[].validations.list[].rule&lt;/code&gt; and &lt;code&gt;patient_reports[].validations.list[].rule&lt;/code&gt; to determine if an incoming report is accepted. A report is accepted as valid only if all rules return &lt;code&gt;true&lt;/code&gt;. If any validation rule returns &lt;code&gt;false&lt;/code&gt; then the report is marked as invalid, and a message is automatically sent to the submitter. The content for the message is set in the &lt;code&gt;translation_key&lt;/code&gt; associated to each rule. If a report fails multiple validations then each message will be sent. These can be combined into a single SMS by specifying &lt;code&gt;&amp;quot;*.validations.join_responses&amp;quot; : true&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;operators&#34;&gt;Operators&lt;/h2&gt;
+&lt;p&gt;The available operators are:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Operator&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;&amp;amp;&lt;/td&gt;
+&lt;td&gt;and&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;||&lt;/td&gt;
+&lt;td&gt;or&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;!&lt;/td&gt;
+&lt;td&gt;not&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;a ? b : c&lt;/td&gt;
+&lt;td&gt;ternary, ie: if &amp;lsquo;a&amp;rsquo; is true, then check &amp;lsquo;b&amp;rsquo;, otherwise check &amp;lsquo;c&amp;rsquo;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;()&lt;/td&gt;
+&lt;td&gt;nested blocks, eg: &amp;lsquo;a &amp;amp;&amp;amp; (b&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;rules&#34;&gt;Rules&lt;/h2&gt;
+&lt;p&gt;Validation settings may consist of Pupil.js rules and rules specific to Medic Mobile.
+These two types of rules cannot be combined as part of the same rule.&lt;/p&gt;
+&lt;p&gt;Not OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; unique(&#39;patient_id&#39;)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;OK:
+&lt;code&gt;rule: &amp;quot;regex(\d{5}) &amp;amp;&amp;amp; max(11111)&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If for example you want to validate that patient_id is 5 numbers and it
+is unique (or some other custom validation) you need to define two
+validation configs/separate rules in your settings. Example validation
+settings:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;regex(\d{5})&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be 5 numbers.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+	}]
+	},
+	{
+		property: &amp;quot;patient_id&amp;quot;,
+		rule: &amp;quot;unique(&#39;patient_id&#39;)&amp;quot;,
+		message: [{
+		    content: &amp;quot;Patient ID must be unique.&amp;quot;,
+		    locale: &amp;quot;en&amp;quot;
+		}]
+	}
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;validate()&lt;/code&gt; modifies the property value of the second item to
+&lt;code&gt;patient_id_unique&lt;/code&gt; so that pupil.validate() still returns a valid
+result.  Then we process the result once more to extract the custom
+validation results and error messages.&lt;/p&gt;
+&lt;h3 id=&#34;pupiljs-validation-functions&#34;&gt;Pupil.js validation functions&lt;/h3&gt;
+&lt;p&gt;Available validation functions are available at &lt;a href=&#34;https://www.npmjs.com/package/pupil#validation-functions&#34;&gt;https://www.npmjs.com/package/pupil#validation-functions&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following functions are available by default:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;iEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Case insensitive comparison&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;sEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;siEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Type sensitive case insensitive equals&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMin&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenMax&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;lenEquals&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Exact length&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;between&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Minimum and maximum value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;in&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;One of the provided values&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;required&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Must have a value&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;optional&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Always valid&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;numeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;integer&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Integer numbers only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alpha&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;alphaNumeric&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Numbers and letters only&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;email&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Email address format&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;A custom regular expression&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;equalsTo&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Compare to another field by its key&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;sample-usage&#34;&gt;Sample usage&lt;/h4&gt;
+&lt;p&gt;For case-insensitive comparison &lt;code&gt;iEquals&lt;/code&gt; function in Pupil,
+And you can use &lt;code&gt;||&lt;/code&gt; for logical OR : &lt;a href=&#34;https://www.npmjs.com/package/pupil#rule-strings&#34;&gt;https://www.npmjs.com/package/pupil#rule-strings&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;So you can do this :
+&lt;code&gt;rule: &#39;iEquals(&amp;quot;mary&amp;quot;) || iEquals(&amp;quot;john&amp;quot;)&#39;&lt;/code&gt;
+matches &amp;ldquo;mary&amp;rdquo;, &amp;ldquo;Mary&amp;rdquo;, &amp;ldquo;john&amp;rdquo;, &amp;ldquo;John&amp;rdquo;, &amp;ldquo;JOhN&amp;rdquo;, etc. Not &amp;ldquo;maryjohn&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;medic-mobile-validation-functions&#34;&gt;Medic Mobile validation functions&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;unique(*fields)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if no existing valid report has the same value for all of the listed fields. Fields are compared to those at the top level and within &lt;code&gt;fields&lt;/code&gt; for every report doc. To include the form type use &lt;code&gt;&#39;form&#39;&lt;/code&gt; as one of the fields. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;, &#39;1 week&#39;)&lt;/code&gt; checks that the same report wasn&amp;rsquo;t submitted for this patient in the past week.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;uniqueWithin(*fields, time_period)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Same as &lt;code&gt;unique&lt;/code&gt; but the last argument is the time period in which to search. Eg &lt;code&gt;uniqueWithin(&#39;form&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that this report was never submitted for this patient.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;exists(form_id, field)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if a report matches the &lt;code&gt;form_id&lt;/code&gt; and value for &lt;code&gt;field&lt;/code&gt;. This is useful to check that a patient was registered for a service before reporting about it. Eg &lt;code&gt;exists(&#39;REG&#39;, &#39;patient_id&#39;)&lt;/code&gt; checks that a &lt;code&gt;REG&lt;/code&gt; form was already submitted for a patient. As of 2.12 most uses of this function are obsolete because checking for a valid &lt;code&gt;patient_id&lt;/code&gt; is done automatically by the &lt;code&gt;accept_patient_report&lt;/code&gt; transition using &lt;code&gt;registration_not_found&lt;/code&gt; in the &lt;code&gt;messages.event_type&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;isISOWeek(weekFieldName[, yearFieldName])&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Returns &lt;code&gt;true&lt;/code&gt; if the current report has a week value that is less or equal to the number of ISO weeks of the current year or the year value of the same report. The first parameter is the field name for the week and the second parameter is the field name for the year: &lt;code&gt;isISOWeek(&#39;week&#39;, &#39;year&#39;)&lt;/code&gt;. If the second parameter is not specified, then the current year is used: &lt;code&gt;isISOWeek(&#39;week&#39;)&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
@@ -1945,7 +2155,7 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
         
         
         &lt;p&gt;JSON Forms are used for parsing reports from formatted SMS, SIM applications, and Medic Collect. JSON form definitions are also used for interoperability with third-party systems. Each form is defined as an JSON form object according to the following schema.&lt;/p&gt;
-&lt;h3 id=&#34;app_settingsjson-forms&#34;&gt;&lt;code&gt;app_settings.json .forms[]&lt;/code&gt;&lt;/h3&gt;
+&lt;h2 id=&#34;app_settingsjson-forms&#34;&gt;&lt;code&gt;app_settings.json .forms[]&lt;/code&gt;&lt;/h2&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -2054,7 +2264,44 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-
+&lt;h2 id=&#34;code-sample&#34;&gt;Code Sample&lt;/h2&gt;
+&lt;p&gt;The following form has two fields, one for the patient ID, another for notes.&lt;/p&gt;
+&lt;h3 id=&#34;app_settingsjson&#34;&gt;&lt;code&gt;app_settings.json&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;  &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;forms&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;F&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;meta&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;code&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;F&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;icon&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;risk&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;translation_key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;form.flag.title&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;displayed&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;the&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;webapp&lt;/span&gt;
+        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;fields&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;patient_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;this&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;is&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;used&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;the&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;property&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;name&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;when&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;the&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;report&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;doc&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;is&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;created&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+              &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;short&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;translation_key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;form.flag.patient_id.short&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;displayed&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;the&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;webapp&lt;/span&gt;
+              &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;tiny&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;pid&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;used&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;form&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;submission&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;to&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;bind&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;values&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;to&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;fields&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;not&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;required&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;all&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;submission&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;formats&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;position&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;specifies&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;where&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;the&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;SMS&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;this&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;value&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;should&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;be&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;string&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;13&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;required&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;
+          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;notes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;labels&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+              &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;short&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;translation_key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;form.flag.notes.short&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+              &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;tiny&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;form.flag.notes.tiny&amp;#34;&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;position&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;string&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;100&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;required&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;
+          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;public_form&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
       </description>
     </item>
     
@@ -2852,6 +3099,37 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 ## Case Reports
 ### `app_settings.json .case_reports[]`
 --&gt;
+&lt;h2 id=&#34;variables-in-outgoing-sms&#34;&gt;Variables in outgoing SMS&lt;/h2&gt;
+&lt;p&gt;Outgoing messages can use &lt;a href=&#34;https://mustache.github.io/mustache.5.html&#34;&gt;Mustache templating&lt;/a&gt; to insert variables and specify data formats.&lt;/p&gt;
+&lt;p&gt;All the fields on the report doc are available as variables. Additionally, the &lt;code&gt;contact&lt;/code&gt; variable is the sender of the report.&lt;/p&gt;
+&lt;h3 id=&#34;code-sample&#34;&gt;Code sample&lt;/h3&gt;
+&lt;p&gt;The following translation label includes the &lt;code&gt;name&lt;/code&gt; field of &lt;code&gt;contact&lt;/code&gt;, along with the submitted &lt;code&gt;patient_name&lt;/code&gt; field, and the generated &lt;code&gt;patient_id&lt;/code&gt; field.&lt;/p&gt;
+&lt;h4 id=&#34;translationsmessages-enproperties&#34;&gt;&lt;code&gt;translations/messages-en.properties&lt;/code&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;messages.registration.report_accepted = Thank you {{contact.name}} for registering {{patient_name}}. Their ID is {{patient_id}}.
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;date-format-filters&#34;&gt;Date Format Filters&lt;/h3&gt;
+&lt;p&gt;The following filter functions are available for formating dates.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;filter&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;datetime&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates according to the &lt;code&gt;reported_date_format&lt;/code&gt; specified in app_settings. See &lt;a href=&#34;https://momentjs.com/docs/#/parsing/string-format/&#34;&gt;doc for Moment.js format&lt;/a&gt; for details.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;bikram_sambat_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Displays dates in Bikram Sambat calendar (most commonly used calendar in Nepal). Currently display format is hardcoded to e.g. &amp;ldquo;१५ चैत २०७३&amp;rdquo;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
       </description>
     </item>
@@ -3004,6 +3282,12 @@ Please open &lt;a href=&#34;https://github.com/medic/cht-core/issues/new&#34;&gt
 &lt;td&gt;&lt;code&gt;visible&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;Whether the target is visible in the targets page. &lt;strong&gt;Default: true&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;aggregate&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;As of 3.9, defines whether the target will be displayed on the TargetAggregates page&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -4152,6 +4436,208 @@ The Admin level operates outside of the hierarchy structure and enables access t
     </item>
     
     <item>
+      <title>Apps: Prerequisites for App Development</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/concepts/prerequisites/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/concepts/prerequisites/</guid>
+      <description>
+        
+        
+        &lt;p&gt;There are no set prerequisites for users of CHT apps, yet the following are helpful for developing CHT applications.&lt;/p&gt;
+&lt;h2 id=&#34;test-instance&#34;&gt;Test Instance&lt;/h2&gt;
+&lt;p&gt;To build your own application using the Core Framework you will need an instance set up for testing. You can set up a local instance by &lt;a href=&#34;https://github.com/medic/cht-core/blob/master/INSTALL.md&#34;&gt;following these instructions&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&#34;build-tool&#34;&gt;Build tool&lt;/h2&gt;
+&lt;p&gt;The build tool for applications using the Core Framework is &lt;code&gt;medic-conf&lt;/code&gt;. To set it up, follow the &lt;a href=&#34;https://github.com/medic/medic-conf/blob/master/README.md#installation&#34;&gt;installation instructions&lt;/a&gt;. To properly use the tool you will need your application files in set locations within a folder. Once you are set up with the basic file structure you can edit the files, and rebuild the application by compiling or converting components as needed, and uploading them to your test instance.&lt;/p&gt;
+&lt;h2 id=&#34;background-skills&#34;&gt;Background skills&lt;/h2&gt;
+&lt;p&gt;To build applications with the Core Framework the follow skills are helpful, ordered by importance:&lt;/p&gt;
+&lt;h3 id=&#34;xlsforms-and-xforms&#34;&gt;XLSForms and XForms&lt;/h3&gt;
+&lt;p&gt;Many workflows in your application, including completing tasks and creating contacts, will be generated using &lt;a href=&#34;https://opendatakit.github.io/xforms-spec/&#34;&gt;ODK XForms&lt;/a&gt;. Many app developers use XLSForms as an easier way to generate XForms. A strong knowledge of &lt;a href=&#34;http://xlsform.org/&#34;&gt;XLSForm standard&lt;/a&gt; is very useful in building your own application.&lt;/p&gt;
+&lt;h3 id=&#34;json&#34;&gt;JSON&lt;/h3&gt;
+&lt;p&gt;JSON (JavaScript Object Notation) is a format for storing structured text. Understanding JSON will help with minor modification of existing applications.&lt;/p&gt;
+&lt;h3 id=&#34;javascript&#34;&gt;Javascript&lt;/h3&gt;
+&lt;p&gt;Many key aspects are defined with JavaScript code and expressions. This includes managing profile pages, creating tasks and targets, and setting the condition for when to show forms. Unless you are only doing minor modification to an existing application, a good understanding of JavaScript is required.&lt;/p&gt;
+&lt;h3 id=&#34;couchdb&#34;&gt;CouchDB&lt;/h3&gt;
+&lt;p&gt;A free and open source NoSQL database we use to store all our data, configuration, and even the application code. CouchDB is really good at replication which is the process of sending the data to another database, such as PouchDB in the client application, and back again. Although building your own app using the Core Framework does not require knowledge or experience with CouchDB it can be useful to be familiar with general concepts as a document store.&lt;/p&gt;
+&lt;h3 id=&#34;sql&#34;&gt;SQL&lt;/h3&gt;
+&lt;p&gt;Although the application you build uses a NoSQL database, a parallel PostgreSQL database is available in the Core Framework to make querying data easier. Familiarity with SQL is needed to set up and query the database.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Creating Additional Docs from App Forms</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/additional-docs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/additional-docs/</guid>
+      <description>
+        
+        
+        &lt;p&gt;In version 2.13.0 and higher, you can configure app forms to generate additional docs upon submission. You can create one or more docs using variations on the configuration described below. One case where this can be used is to register a newborn from a delivery report, as shown below. First, here is an overview of what you can do and how the configuration should look in XML:&lt;/p&gt;
+&lt;h2 id=&#34;extra-docs&#34;&gt;Extra Docs&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Extra docs can be added by defining structures in the model with the attribute db-doc=&amp;quot;true&amp;rdquo;. &lt;strong&gt;Note that you must have lower-case &lt;code&gt;true&lt;/code&gt; in your XLSform, even though Excel will default to &lt;code&gt;TRUE&lt;/code&gt;.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;example-form-model&#34;&gt;Example Form Model&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;data&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;root_prop_1&amp;gt;&lt;/span&gt;val A&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/root_prop_1&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;other_doc&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;whatever&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;other_prop&amp;gt;&lt;/span&gt;val B&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/other_prop&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/other_doc&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/data&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;resulting-docs&#34;&gt;Resulting Docs&lt;/h3&gt;
+&lt;p&gt;Report (as before):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  _id: &#39;...&#39;,
+  _rev: &#39;...&#39;,
+  type: &#39;report&#39;,
+  _attachments: { xml: ... ],
+  fields: {
+    root_prop_1: &#39;val A&#39;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Other doc:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;whatever&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;other_prop&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;val B&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;linked-docs&#34;&gt;Linked Docs&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Linked docs can be referred to using the doc-ref attribute, with an xpath. This can be done at any point in the model, e.g.:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;example-form-model-1&#34;&gt;Example Form Model&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;sickness&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;sufferer&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/sickness/new&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;new&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;person&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Gómez&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;original_report&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/sickness&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/new&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/sickness&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;resulting-docs-1&#34;&gt;Resulting Docs&lt;/h3&gt;
+&lt;p&gt;Report:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;abc-123&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;report&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;fields&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sufferer&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;def-456&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Other doc:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;_id&amp;quot;: &amp;quot;def-456&amp;quot;,
+  &amp;quot;_rev&amp;quot;: &amp;quot;...&amp;quot;,
+  &amp;quot;type&amp;quot;: &amp;quot;person&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;Gómez&amp;quot;,
+  &amp;quot;original_report&amp;quot;: &amp;quot;abc-123&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;repeated-docs&#34;&gt;Repeated Docs&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Can have references to other docs, including the parent&lt;/li&gt;
+&lt;li&gt;These currently cannot be linked from other docs, as no provision is made for indexing these docs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;example-form&#34;&gt;Example Form&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;thing&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Ab&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;related&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;relative&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Bo&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/thing&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/related&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;related&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;relative&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Ca&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/thing&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/related&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/artist&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;resulting-docs-2&#34;&gt;Resulting Docs&lt;/h3&gt;
+&lt;p&gt;Report:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;abc-123&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;report&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;fields&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Ab&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Other docs:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;relative&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Bo&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;abc-123&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;...&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;relative&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Ch&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parent&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;abc-123&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;linked-docs-example&#34;&gt;Linked Docs Example&lt;/h2&gt;
+&lt;p&gt;This example shows how you would register a single newborn from a delivery report.&lt;/p&gt;
+&lt;p&gt;First, the relevant section of the delivery report XLSForm file:
+&lt;img src=&#34;linked_docs_xlsform.png&#34; alt=&#34;Delivery report&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Here is the corresponding portion of XML generated after converting the form:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;repeat&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_repeat&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;jr:template=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_name/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_gender/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_doc&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34; /delivery/repeat/child_repeat &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;created_by_doc&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/delivery&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;sex/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;date_of_birth/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;person&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/child_repeat&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/repeat&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If you&amp;rsquo;ve done your configuration correctly, all you should see when you click on the submitted report from the Reports tab is the &lt;code&gt;child_doc&lt;/code&gt; field with an &lt;code&gt;_id&lt;/code&gt; that corresponds to the linked doc. In this case, you could look for that &lt;code&gt;_id&lt;/code&gt; on the People tab or in the DB itself to confirm that the resulting doc looks correct.&lt;/p&gt;
+&lt;h2 id=&#34;repeated-docs-example&#34;&gt;Repeated Docs Example&lt;/h2&gt;
+&lt;p&gt;This example extends the above example to show how you would register one or multiple newborns from a delivery report. This allows you to handle multiple births.&lt;/p&gt;
+&lt;p&gt;First, the relevant section of the delivery report XLSForm file:
+&lt;img src=&#34;repeated_docs_xlsform.png&#34; alt=&#34;Delivery report&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Here is the corresponding portion of XML generated after converting the form:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;repeat&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_repeat&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-doc=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;jr:template=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_name/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;child_gender/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;created_by_doc&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;db-docs-ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/delivery&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;name/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;sex/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;date_of_birth/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;_id/&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;type&amp;gt;&lt;/span&gt;person&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/type&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/child_repeat&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/repeat&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If you&amp;rsquo;ve done your configuration correctly, all you should see when you click on the submitted report from the Reports tab is that there will be no information on the children created. You will find the created docs as siblings to the subject of the previously submitted report. Each of these child docs will have a field &lt;code&gt;created_by_doc&lt;/code&gt; whose value is the &lt;code&gt;_id&lt;/code&gt; of the report that created them. You can also look in the DB itself to confirm that the resulting docs look correct.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Africa&#39;s Talking SMS Aggregator</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/africas-talking/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -4198,6 +4684,152 @@ curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp
 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testing&#34;&gt;Testing&lt;/h2&gt;
 &lt;p&gt;To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;, and go to the Sandbox app.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Making Calls and Sending SMS from App Forms</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/app-form-sms/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/app-form-sms/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;triggering-calls-and-sms&#34;&gt;Triggering Calls and SMS&lt;/h2&gt;
+&lt;p&gt;When a XForm is loaded on a phone you can start a phone call or trigger the sending of an SMS within the form itself. This can be useful if within a task or assessment you want to tell the user to contact a patient, or perhaps a health worker at a facility.&lt;/p&gt;
+&lt;p&gt;To set up the call or SMS you&amp;rsquo;ll need to create a link with &lt;code&gt;tel:&lt;/code&gt; or &lt;code&gt;sms:&lt;/code&gt; within a &lt;code&gt;note&lt;/code&gt; field. To create the link, use the markdown link format, eg &lt;code&gt;[Call Patient](tel:+2547009875000)&lt;/code&gt;. You can specify the content of the SMS by using the body parameter, eg &lt;code&gt;[Send SMS](sms://+25470098765000?body=Hello World!)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The phone number and message can be generated from fields within the XForm. For instance, if you have &lt;code&gt;patient_name&lt;/code&gt;, &lt;code&gt;patient_phone&lt;/code&gt; and &lt;code&gt;message&lt;/code&gt; fields, you can generate the SMS as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;XLSForm&lt;/strong&gt;
+&lt;code&gt;[Send SMS to ${patient_name}](sms://${patient_phone}?body=${message})&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;XForm&lt;/strong&gt;
+&lt;code&gt;[Send SMS to &amp;lt;output value=&amp;quot; /data/patient_name &amp;quot;/&amp;gt;](sms://&amp;lt;output value=&amp;quot; /data/patient_phone &amp;quot;/&amp;gt;?body=&amp;lt;output value=&amp;quot; /data/message &amp;quot;/&amp;gt;)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you want to use a button to make the action more obvious, this can be done using HTML and CSS within the note:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[&amp;lt;span style=&#39;background-color: #CC0000; color:white; padding: 1em; text-decoration: none; &#39;&amp;gt;Call the patient&amp;lt;/span&amp;gt;](tel:${patient_phone})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note that the SMS link notation can be interpreted differently from one phone to another. Some devices work well with &lt;code&gt;sms:${phone}?body=${message}&lt;/code&gt;, others with &lt;code&gt;sms://${phone}?body=${message}&lt;/code&gt;. You may find &lt;a href=&#34;https://bradorego.com/test/sms.html&#34;&gt;these SMS link tests&lt;/a&gt; helpful in determining what works on devices for your deployment.&lt;/p&gt;
+&lt;h2 id=&#34;sending-reports-as-sms&#34;&gt;Sending reports as SMS&lt;/h2&gt;
+&lt;p&gt;To define that an XForm should be converted to an SMS, add the field &lt;code&gt;xml2sms&lt;/code&gt; to the form&amp;rsquo;s CouchDB doc and assign it a truthy value (either a boolean or a string).&lt;br&gt;
+When submitting such a form, along with creating the report document, the app will try to compact the report&amp;rsquo;s content into an SMS that would be sent to the configured Gateway phone number.&lt;/p&gt;
+&lt;p&gt;There are two formats available - either using the &lt;a href=&#34;https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)&#34;&gt;ODK&amp;rsquo;s compact record representation for SMS&lt;/a&gt;, or Medic&amp;rsquo;s custom format.
+When the form compaction fails or returns no content, no SMS will be sent.&lt;/p&gt;
+&lt;h3 id=&#34;odk-compact-record-representation-for-sms&#34;&gt;ODK compact record representation for SMS&lt;/h3&gt;
+&lt;p&gt;When &lt;code&gt;xml2sms&lt;/code&gt; field value is Boolean &lt;code&gt;true&lt;/code&gt;, the app will try to compact the form using this format.
+To get forms sent in this format, follow the &lt;a href=&#34;https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)&#34;&gt;ODK documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;medic-custom-sms-representation&#34;&gt;Medic Custom SMS representation&lt;/h3&gt;
+&lt;p&gt;To configure a form to send using Medic&amp;rsquo;s custom SMS definition, the value of &lt;code&gt;xml2sms&lt;/code&gt; from the form&amp;rsquo;s CouchDB doc should be an string containing an &lt;a href=&#34;https://docs.angularjs.org/guide/expression&#34;&gt;Angular expression&lt;/a&gt;.
+This allows access to the &lt;code&gt;fields&lt;/code&gt; property of the &lt;code&gt;data_record&lt;/code&gt; doc created when saving the form submission to the database.  Extra functions are also provided to make compiling a form submission more simple.&lt;/p&gt;
+&lt;h4 id=&#34;special-functions&#34;&gt;Special Functions&lt;/h4&gt;
+&lt;h5 id=&#34;concatargs&#34;&gt;&lt;code&gt;concat(...args)&lt;/code&gt;&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;...args&lt;/code&gt;: 0 or more values to be concatenated.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  concat(&#39;A&#39;, &#39;bee&#39;, &#39;Sea&#39;) =&amp;gt; &#39;AbeeSea&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;spacedargs&#34;&gt;&lt;code&gt;spaced(...args)&lt;/code&gt;&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;...args&lt;/code&gt;: 0 or more values to be concatenated with spaces between them.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  spaced(&#39;A&#39;, &#39;bee&#39;, &#39;Sea&#39;) =&amp;gt; &#39;A bee Sea&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;matchval-matchers&#34;&gt;&lt;code&gt;match(val, matchers)&lt;/code&gt;&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;val&lt;/code&gt;: the value to run matches against&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;matchers&lt;/code&gt;: a string representing values to match and their corresponding outputs&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  match(&#39;a&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;Hay&#39;
+  match(&#39;b&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;bzz&#39;
+  match(&#39;c&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;c&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;examples&#34;&gt;Examples&lt;/h4&gt;
+&lt;h5 id=&#34;form-submission-json&#34;&gt;Form Submission JSON&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;doc.fields = {
+  s_acc_danger_signs: {
+    s_acc_danger_sign_seizure: &#39;no&#39;,
+    s_acc_danger_sign_loss_consiousness: &#39;yes&#39;,
+    s_acc_danger_sign_unable_drink: &#39;no&#39;,
+    s_acc_danger_sign_confusion: &#39;yes&#39;,
+    s_acc_danger_sign_vomit: &#39;no&#39;,
+    s_acc_danger_sign_chest_indrawing: &#39;yes&#39;,
+    s_acc_danger_sign_wheezing: &#39;no&#39;,
+    s_acc_danger_sign_bleeding: &#39;yes&#39;,
+    s_acc_danger_sign_lathargy: &#39;no&#39;,
+    has_danger_sign: &#39;true&#39;,
+  },
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;formdocreport2sms&#34;&gt;&lt;code&gt;formDoc.report2sms&lt;/code&gt;&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;concat(
+    &amp;quot;U5 &amp;quot;,
+    match(doc.s_acc_danger_signs.has_danger_sign, &amp;quot;true:DANGER, false:NO_DANGER&amp;quot;),
+    &amp;quot; &amp;quot;,
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_seizure, &amp;quot;yes:S&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_loss_consiousness, &amp;quot;yes:L&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_unable_drink, &amp;quot;yes:D&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_confusion, &amp;quot;yes:C&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_vomit, &amp;quot;yes:V&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_chest_indrawing, &amp;quot;yes:I&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_wheezing, &amp;quot;yes:W&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_bleeding, &amp;quot;yes:B&amp;quot;),
+    match(doc.s_acc_danger_signs.s_acc_danger_sign_lathargy, &amp;quot;yes:Y&amp;quot;)
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;sms-content&#34;&gt;SMS content&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;U5 DANGER LCIB&lt;/code&gt;&lt;/pre&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Contact Forms</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/contact-forms/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/contact-forms/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Contact forms are used to create person or place types. Prior to version 3.7, CHT Core supported 4 contact types - 3 place types (clinic, health_center, district_hospital) and one person type (person). From version 3.7, an unlimited number of place and person types are supported. Each contact-type should ideally have two forms; one for creation, and another for editing.&lt;/p&gt;
+&lt;p&gt;These forms are stored in the &lt;code&gt;forms/contact&lt;/code&gt; subfolder of the project config directory. The naming convention used sould be &lt;code&gt;&amp;lt;contact_type_id-{create|edit}&amp;gt;.xlsx&lt;/code&gt;. The &lt;code&gt;contact_type_id&lt;/code&gt; prefix should match what&amp;rsquo;s specified in the contact form settings page.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;See Also:&lt;/em&gt; &lt;a href=https://docs.communityhealthtoolkit.org/beta/apps/reference/contact-forms/#&gt;Reference Documentation for Contact Forms&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;person-type-forms&#34;&gt;Person-type forms&lt;/h2&gt;
+&lt;p&gt;These have the simplest structure since we are only creating one thing - the actual contact. Below, we&amp;rsquo;ll look at the structure of the survey and settings sheets since these are critical to ensuring the contact is created correctly at the appropriate part of the hierarchy.&lt;/p&gt;
+&lt;h3 id=&#34;survey-sheet&#34;&gt;Survey sheet&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;person-contact-form-survey.png&#34; alt=&#34;Person forms survey sheet&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Section 1 and 3 are optional. We can pull in details of the logged in user as shown in section 1 and use that to log some metadata on the created documents as shown in section 3.&lt;/p&gt;
+&lt;p&gt;Section 2 contains the core components of what will be saved in couchdb. The group name needs to match the contact type id specified in app_settings.json (if using the configurable hierarchy) or &lt;code&gt;person&lt;/code&gt; if using the old-style hierarchy. To learn more about setting up configurable hieararchy, review the &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/reference/hierarchy/&#34;&gt;Hierarchy&lt;/a&gt; page. &lt;code&gt;parent&lt;/code&gt;, &lt;code&gt;type&lt;/code&gt;, &lt;code&gt;contact_type&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt; attributes are mandatory for things to work correctly.&lt;/p&gt;
+&lt;h2 id=&#34;settings-sheet&#34;&gt;Settings sheet&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;person-contact-form-settings.png&#34; alt=&#34;Person forms settings sheet&#34;&gt;&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll need to replace &lt;code&gt;PLACE_NAME&lt;/code&gt; with a name that corresponds to the created contact type. We&amp;rsquo;ll also need to replace &lt;code&gt;PLACE_TYPE&lt;/code&gt; with the contact-type id specified in app_settings.json (for configurable ones) or &lt;code&gt;person&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;place-type-forms&#34;&gt;Place-type forms&lt;/h2&gt;
+&lt;p&gt;The main difference between place type and person type forms is that we can optionally create one or more person-type documents one of which can be linked to the created place as a contact.&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll look at a simple structure of a place forms showing all the necessary components&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;place-contact-form-survey.png&#34; alt=&#34;Place forms survey sheet&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Section 1 is similar to what has been described earlier for person forms.&lt;/p&gt;
+&lt;p&gt;Section 2 specifies the contact that will be linked to the place being created. &lt;code&gt;parent&lt;/code&gt;, &lt;code&gt;type&lt;/code&gt; and &lt;code&gt;contact_type&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt; are mandatory. This also applies to the place-type definition in section 4. &lt;code&gt;contact&lt;/code&gt; on the other hand is not mandatory for the successful creation of a place. It usually more conventient to create a place and it&amp;rsquo;s primary contact at the same time.&lt;/p&gt;
+&lt;p&gt;You can also create additional contacts linked to the place being created when you have a structure similar to that shown in section 3.&lt;/p&gt;
+&lt;h2 id=&#34;contact-edit-forms&#34;&gt;Contact-edit forms&lt;/h2&gt;
+&lt;p&gt;The edit forms are much simpler in structure and one can specify only the relevant fields that need editing. The name of the group should match the contact-type being edited and the field names should correspond to what is saved in Couchdb.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;contact-edit-form.png&#34; alt=&#34;Contact edit form survey sheet&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;generic-contact-forms&#34;&gt;Generic contact forms&lt;/h2&gt;
+&lt;p&gt;If your place forms are similar across all levels of your specified project hiearachy, you can templatise the form creation process. You&amp;rsquo;ll need to create the following files: &lt;code&gt;place-type.json&lt;/code&gt;, &lt;code&gt;PLACE_TYPE-create.xlsx&lt;/code&gt; and &lt;code&gt;PLACE_TYPE-edit.xlsx&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;place-type.json&lt;/code&gt; maps the place contact-type to a human readable description that will be shown on the app&amp;rsquo;s user interface.&lt;/p&gt;
+&lt;p&gt;Both &lt;code&gt;PLACE_TYPE-create.xlsx&lt;/code&gt; and &lt;code&gt;PLACE_TYPE-edit.xlsx&lt;/code&gt; will contain two placeholder values &lt;code&gt;PLACE_TYPE&lt;/code&gt; and &lt;code&gt;PLACE_NAME&lt;/code&gt; which will be replaced by the keys and values specified in &lt;code&gt;place-type.json&lt;/code&gt; respectively during form conversion. Also, copies of the different place-type forms will be created (if they don&amp;rsquo;t exist) during the form conversion process with &lt;code&gt;PLACE_TYPE&lt;/code&gt; being replaced with the keys specified in &lt;code&gt;place-type.json&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For examples on how to structure the above files you can have a look at the sample configurations in CHT-core: &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/config/default/forms/contact&#34;&gt;default&lt;/a&gt; and &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/config/standard/forms/contact&#34;&gt;standard&lt;/a&gt;.&lt;/p&gt;
 
       </description>
     </item>
@@ -4961,205 +5593,6 @@ medic-conf --local upload-docs -- --docDirectoryPath=my_folder
 &lt;p&gt;Move the contact with the id &lt;code&gt;contact_1&lt;/code&gt; to the top of the hierarchy (no parent).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;medic-conf --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
 &lt;/code&gt;&lt;/pre&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Obtaining Logs</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/obtaining-logs/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/obtaining-logs/</guid>
-      <description>
-        
-        
-        &lt;p&gt;There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p&gt;
-&lt;h2 id=&#34;browser-logs&#34;&gt;Browser logs&lt;/h2&gt;
-&lt;p&gt;To check if there are relevant logs open up the developer console. The shortcut is probably COMMAND+ALT+I on MacOS, or CTRL+ALT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p&gt;
-&lt;h2 id=&#34;server-logs&#34;&gt;Server logs&lt;/h2&gt;
-&lt;p&gt;The easiest way is to use &lt;code&gt;medic-logs&lt;/code&gt;, a tool that comes with &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;&lt;code&gt;medic-conf&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;medic-logs anInstance gardener
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See &lt;a href=&#34;https://github.com/medic/medic-conf#medic-logs&#34;&gt;medic-logs documentation&lt;/a&gt; for more details.&lt;/p&gt;
-&lt;p&gt;This will download logs to your current directory. You will need to look through these logs to work out what is relevant.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Replicating Production Data Locally</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/replicating-production-data-locally/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/replicating-production-data-locally/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Copy the data from an instance to a local CouchDB database&lt;/li&gt;
-&lt;li&gt;Run a local webapp instance with that data&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;first-a-note-about-data-safety&#34;&gt;First, a note about data safety&lt;/h2&gt;
-&lt;p&gt;Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an &lt;a href=&#34;../support/securing-computers.md&#34;&gt;encrypted drive&lt;/a&gt; and delete it once you&amp;rsquo;re done with it.&lt;/p&gt;
-&lt;h2 id=&#34;step-1-get-the-data&#34;&gt;Step 1: Get the data&lt;/h2&gt;
-&lt;p&gt;First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p&gt;
-&lt;h3 id=&#34;small-production-instances&#34;&gt;Small production instances&lt;/h3&gt;
-&lt;p&gt;If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p&gt;
-&lt;p&gt;For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
-For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&#34;&gt;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code&gt;login&lt;/code&gt; (ie &lt;code&gt;https://url/login&lt;/code&gt;) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p&gt;
-&lt;h3 id=&#34;large-production-instances&#34;&gt;Large production instances&lt;/h3&gt;
-&lt;p&gt;If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Open Firefox and navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt; to disable Content Security Policies.&lt;/li&gt;
-&lt;li&gt;Navigate to the instance and login as the user with the data you want. &lt;em&gt;(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em&gt;(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;Make sure your local CouchDB has CORS enabled: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&#34;&gt;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&lt;/a&gt;. Consider using &lt;a href=&#34;https://github.com/pouchdb/add-cors-to-couchdb#what-it-does&#34;&gt;add-cors-to-couchdb&lt;/a&gt; or its recommended settings.&lt;/li&gt;
-&lt;li&gt;Allow your CouchDB to be accessible via &lt;code&gt;https&lt;/code&gt;. One way is to run &lt;code&gt;ngrok http 5984&lt;/code&gt; to make your CouchDB accessible via a url like &lt;a href=&#34;https://abcd1234.ngrok.io&#34;&gt;https://abcd1234.ngrok.io&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;Open the console in Firefox and run &lt;code&gt;await PouchDB.replicate(&#39;medic-user-XXX&#39;, &#39;https://your:admin@abcd1234.ngrok.io/YYY&#39;);&lt;/code&gt;. Here &lt;code&gt;XXX&lt;/code&gt; is the name you logged in as, and &lt;code&gt;YYY&lt;/code&gt; is the name of a database in which to store the data.
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt;: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth);  and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code&gt;5984&lt;/code&gt; and &lt;code&gt;5986&lt;/code&gt; to localhost.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li&gt;
-&lt;li&gt;Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li&gt;
-&lt;li&gt;Navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt; to re-enable Content Security Policies.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;regardless-do-this-too&#34;&gt;Regardless, do this too&lt;/h3&gt;
-&lt;p&gt;To log in as a specific prod user you need to also copy them from the prod &lt;code&gt;_users&lt;/code&gt; database into your own local &lt;code&gt;_users&lt;/code&gt; database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code&gt;_users&lt;/code&gt; DB and paste it in, deleting the &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
-&lt;p&gt;You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code&gt;password&lt;/code&gt; property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p&gt;
-&lt;h2 id=&#34;step-2-run-it-locally&#34;&gt;Step 2, run it locally&lt;/h2&gt;
-&lt;p&gt;First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;Horticulturalist&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;A local development environment will be useful to you if:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;You want to change code locally&lt;/li&gt;
-&lt;li&gt;You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li&gt;
-&lt;li&gt;You want to deploy a version of the code older than &lt;code&gt;2.14.0&lt;/code&gt;, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;option-1-local-development-environment&#34;&gt;Option 1, local development environment&lt;/h3&gt;
-&lt;p&gt;If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href=&#34;https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md&#34;&gt;development setup instructions&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Then you need to:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Push the code you want to run via &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY grunt deploy&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Start API and Sentinel by running &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p&gt;
-&lt;h3 id=&#34;option-2-horticulturalist&#34;&gt;Option 2, horticulturalist&lt;/h3&gt;
-&lt;p&gt;Follow the instructions on the &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;horticulturalist repo&lt;/a&gt; to get it installed. Then:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Make sure that the &lt;code&gt;medic&lt;/code&gt; DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li&gt;
-&lt;li&gt;Replicate your local PROD DB into a new &lt;code&gt;medic&lt;/code&gt; database using the Fauxton console.&lt;/li&gt;
-&lt;li&gt;Run &lt;code&gt;horti --local --bootstrap=XXX&lt;/code&gt;, where &lt;code&gt;XXX&lt;/code&gt; is the version you want to use (maybe the same one as production?)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;You should now be able to log in as that user locally!&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Securing Android Devices</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/securing-android/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/securing-android/</guid>
-      <description>
-        
-        
-        &lt;p&gt;To secure an android device you should enable at least a pin code lock on the device, enable FDE (full disc encryption) and setup remote wiping capabilities by enabling mobile device management.&lt;/p&gt;
-&lt;h2 id=&#34;pin-setup-and-fde&#34;&gt;PIN Setup and FDE&lt;/h2&gt;
-&lt;p&gt;Instructions are slightly different per device. Enabling FDE has the added benefit that you must also lock the device with a pin code or password.&lt;/p&gt;
-&lt;h3 id=&#34;android-50-or-later&#34;&gt;Android 5.0 or later&lt;/h3&gt;
-&lt;p&gt;Open the &lt;code&gt;Security&lt;/code&gt; menu under settings. On unmodified versions of Android, this
-can be found under &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Personal&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt;. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt;, &lt;code&gt;Encrypt Tablet&lt;/code&gt;, or &lt;code&gt;Encrypt Device&lt;/code&gt;. If you haven&amp;rsquo;t already set a PIN
-or passcode for the lock screen, you will be prompted to do so. Remember this
-PIN and do not write it down.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;encrypt-50.jpg&#34; alt=&#34;Screenshot for Android 5.0&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;android-44-or-earlier&#34;&gt;Android 4.4 or earlier&lt;/h3&gt;
-&lt;p&gt;First, you&amp;rsquo;ll need to set up a PIN. Navigate to &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt;
-&lt;code&gt;Screen Lock&lt;/code&gt;, and set a numeric PIN for the device of &lt;em&gt;at least&lt;/em&gt; four digits.
-Remember this PIN and do not write it down.&lt;/p&gt;
-&lt;p&gt;Then, open the &lt;code&gt;Security&lt;/code&gt; menu under settings. On unmodified versions of
-Android, this can be found under &lt;code&gt;Settings&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Personal&lt;/code&gt; &lt;code&gt;&amp;gt;&lt;/code&gt; &lt;code&gt;Security&lt;/code&gt;.
-On some devices, the exact menu layout may have been modified by the hardware
-manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encrypt Tablet&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;encrypt-44.jpg&#34; alt=&#34;Screenshot for Android 4.4&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;android-versions-before-30&#34;&gt;Android Versions before 3.0&lt;/h3&gt;
-&lt;p&gt;Android does not support disk encryption in versions earlier than 3.0
-(Honeycomb). If you have one of these devices, we recommend that you do not use it.&lt;/p&gt;
-&lt;h2 id=&#34;mobile-device-management&#34;&gt;Mobile device management&lt;/h2&gt;
-&lt;p&gt;Setting up mobile device management that if a phone gets lost or stolen you can ensure the data on it is deleted safely.&lt;/p&gt;
-&lt;p&gt;You can enable this if the Google accounts used on the phones are part of a paid-for plan of Google&amp;rsquo;s G Suite.&lt;/p&gt;
-&lt;p&gt;Up to date instructions for enabling mobile device management can be found here: &lt;a href=&#34;https://support.google.com/a/answer/7400753&#34;&gt;https://support.google.com/a/answer/7400753&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;If you need to remotely wipe a device, see instructions here: &lt;a href=&#34;https://support.google.com/a/answer/173390&#34;&gt;https://support.google.com/a/answer/173390&lt;/a&gt;&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Self Hosting</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;self-hosting&#34;&gt;Self Hosting&lt;/h2&gt;
-&lt;h3 id=&#34;how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;How to access container, retrieve logs, isolate security groups&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;How to restart services: Link to medic-os documentation
-&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;
-&lt;code&gt;/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;aws-docs-for-increasing-disk-size&#34;&gt;AWS docs for increasing disk size:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;Stop medic: &lt;code&gt;sudo supervisorctl stop medic&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Go to EBS in AWS and take a snapshot of the volume.&lt;/li&gt;
-&lt;li&gt;Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li&gt;
-&lt;li&gt;Follow the following link to make the instance recognize the additional space: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Turn medic back on: &lt;code&gt;sudo supervisorctl start medic&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;Links to medic documentation for horticulturalist for upgrades:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;log into container &amp;amp; run: &lt;code&gt;COUCH_NODE_NAME=couchdb@127.0.0.1 COUCH_URL=http://medic:&amp;lt;pw&amp;gt;@localhost:5984/medic /srv/software/horticulturalist/node_modules/.bin/horti --medic-os --install=&amp;lt;version&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;monitoring--backup&#34;&gt;Monitoring &amp;amp; Backup&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li&gt;
-&lt;li&gt;Set up Lifecycle Management for EBS snapshots:
-&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li&gt;
-&lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
-&lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: SSH into a Docker image</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</guid>
-      <description>
-        
-        
-        &lt;ol&gt;
-&lt;li&gt;Work out the name of the AWS instance your Docker container is running in, eg: &amp;ldquo;development-2a-1&amp;rdquo;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;ul&gt;
-&lt;li&gt;Log in to AWS&lt;/li&gt;
-&lt;li&gt;Select the availability zone (likely to be London)&lt;/li&gt;
-&lt;li&gt;Go to EC2 instances and select the instance&lt;/li&gt;
-&lt;li&gt;Check the tags for the name&lt;/li&gt;
-&lt;/ul&gt;
-&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;ssh in to the Docker instance: &lt;code&gt;ssh -J admin@gateway.dev.medicmobile.org admin@&amp;lt;instance_name&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Work out the name of the Docker container you want to connect to, eg: &amp;ldquo;alpha-dev&amp;rdquo;. Get a list of available containers with: &lt;code&gt;sudo docker ps&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
 
       </description>
     </item>
