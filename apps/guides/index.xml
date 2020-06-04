@@ -237,151 +237,6 @@ curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp
     </item>
     
     <item>
-      <title>Apps: Making Calls and Sending SMS from App Forms</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/app-form-sms/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/app-form-sms/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;triggering-calls-and-sms&#34;&gt;Triggering Calls and SMS&lt;/h2&gt;
-&lt;p&gt;When a XForm is loaded on a phone you can start a phone call or trigger the sending of an SMS within the form itself. This can be useful if within a task or assessment you want to tell the user to contact a patient, or perhaps a health worker at a facility.&lt;/p&gt;
-&lt;p&gt;To set up the call or SMS you&amp;rsquo;ll need to create a link with &lt;code&gt;tel:&lt;/code&gt; or &lt;code&gt;sms:&lt;/code&gt; within a &lt;code&gt;note&lt;/code&gt; field. To create the link, use the markdown link format, eg &lt;code&gt;[Call Patient](tel:+2547009875000)&lt;/code&gt;. You can specify the content of the SMS by using the body parameter, eg &lt;code&gt;[Send SMS](sms://+25470098765000?body=Hello World!)&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;The phone number and message can be generated from fields within the XForm. For instance, if you have &lt;code&gt;patient_name&lt;/code&gt;, &lt;code&gt;patient_phone&lt;/code&gt; and &lt;code&gt;message&lt;/code&gt; fields, you can generate the SMS as follows:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;XLSForm&lt;/strong&gt;
-&lt;code&gt;[Send SMS to ${patient_name}](sms://${patient_phone}?body=${message})&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;XForm&lt;/strong&gt;
-&lt;code&gt;[Send SMS to &amp;lt;output value=&amp;quot; /data/patient_name &amp;quot;/&amp;gt;](sms://&amp;lt;output value=&amp;quot; /data/patient_phone &amp;quot;/&amp;gt;?body=&amp;lt;output value=&amp;quot; /data/message &amp;quot;/&amp;gt;)&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;If you want to use a button to make the action more obvious, this can be done using HTML and CSS within the note:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;[&amp;lt;span style=&#39;background-color: #CC0000; color:white; padding: 1em; text-decoration: none; &#39;&amp;gt;Call the patient&amp;lt;/span&amp;gt;](tel:${patient_phone})
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note that the SMS link notation can be interpreted differently from one phone to another. Some devices work well with &lt;code&gt;sms:${phone}?body=${message}&lt;/code&gt;, others with &lt;code&gt;sms://${phone}?body=${message}&lt;/code&gt;. You may find &lt;a href=&#34;https://bradorego.com/test/sms.html&#34;&gt;these SMS link tests&lt;/a&gt; helpful in determining what works on devices for your deployment.&lt;/p&gt;
-&lt;h2 id=&#34;sending-reports-as-sms&#34;&gt;Sending reports as SMS&lt;/h2&gt;
-&lt;p&gt;To define that an XForm should be converted to an SMS, add the field &lt;code&gt;xml2sms&lt;/code&gt; to the form&amp;rsquo;s CouchDB doc and assign it a truthy value (either a boolean or a string).&lt;br&gt;
-When submitting such a form, along with creating the report document, the app will try to compact the report&amp;rsquo;s content into an SMS that would be sent to the configured Gateway phone number.&lt;/p&gt;
-&lt;p&gt;There are two formats available - either using the &lt;a href=&#34;https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)&#34;&gt;ODK&amp;rsquo;s compact record representation for SMS&lt;/a&gt;, or Medic&amp;rsquo;s custom format.
-When the form compaction fails or returns no content, no SMS will be sent.&lt;/p&gt;
-&lt;h3 id=&#34;odk-compact-record-representation-for-sms&#34;&gt;ODK compact record representation for SMS&lt;/h3&gt;
-&lt;p&gt;When &lt;code&gt;xml2sms&lt;/code&gt; field value is Boolean &lt;code&gt;true&lt;/code&gt;, the app will try to compact the form using this format.
-To get forms sent in this format, follow the &lt;a href=&#34;https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)&#34;&gt;ODK documentation&lt;/a&gt;.&lt;/p&gt;
-&lt;h3 id=&#34;medic-custom-sms-representation&#34;&gt;Medic Custom SMS representation&lt;/h3&gt;
-&lt;p&gt;To configure a form to send using Medic&amp;rsquo;s custom SMS definition, the value of &lt;code&gt;xml2sms&lt;/code&gt; from the form&amp;rsquo;s CouchDB doc should be an string containing an &lt;a href=&#34;https://docs.angularjs.org/guide/expression&#34;&gt;Angular expression&lt;/a&gt;.
-This allows access to the &lt;code&gt;fields&lt;/code&gt; property of the &lt;code&gt;data_record&lt;/code&gt; doc created when saving the form submission to the database.  Extra functions are also provided to make compiling a form submission more simple.&lt;/p&gt;
-&lt;h4 id=&#34;special-functions&#34;&gt;Special Functions&lt;/h4&gt;
-&lt;h5 id=&#34;concatargs&#34;&gt;&lt;code&gt;concat(...args)&lt;/code&gt;&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;...args&lt;/code&gt;: 0 or more values to be concatenated.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  concat(&#39;A&#39;, &#39;bee&#39;, &#39;Sea&#39;) =&amp;gt; &#39;AbeeSea&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h5 id=&#34;spacedargs&#34;&gt;&lt;code&gt;spaced(...args)&lt;/code&gt;&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;...args&lt;/code&gt;: 0 or more values to be concatenated with spaces between them.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  spaced(&#39;A&#39;, &#39;bee&#39;, &#39;Sea&#39;) =&amp;gt; &#39;A bee Sea&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h5 id=&#34;matchval-matchers&#34;&gt;&lt;code&gt;match(val, matchers)&lt;/code&gt;&lt;/h5&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;val&lt;/code&gt;: the value to run matches against&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;matchers&lt;/code&gt;: a string representing values to match and their corresponding outputs&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  match(&#39;a&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;Hay&#39;
-  match(&#39;b&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;bzz&#39;
-  match(&#39;c&#39;, &#39;a:Hay,b:bzz,c:see&#39;) =&amp;gt; &#39;c&#39;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;examples&#34;&gt;Examples&lt;/h4&gt;
-&lt;h5 id=&#34;form-submission-json&#34;&gt;Form Submission JSON&lt;/h5&gt;
-&lt;pre&gt;&lt;code&gt;doc.fields = {
-  s_acc_danger_signs: {
-    s_acc_danger_sign_seizure: &#39;no&#39;,
-    s_acc_danger_sign_loss_consiousness: &#39;yes&#39;,
-    s_acc_danger_sign_unable_drink: &#39;no&#39;,
-    s_acc_danger_sign_confusion: &#39;yes&#39;,
-    s_acc_danger_sign_vomit: &#39;no&#39;,
-    s_acc_danger_sign_chest_indrawing: &#39;yes&#39;,
-    s_acc_danger_sign_wheezing: &#39;no&#39;,
-    s_acc_danger_sign_bleeding: &#39;yes&#39;,
-    s_acc_danger_sign_lathargy: &#39;no&#39;,
-    has_danger_sign: &#39;true&#39;,
-  },
-};
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h5 id=&#34;formdocreport2sms&#34;&gt;&lt;code&gt;formDoc.report2sms&lt;/code&gt;&lt;/h5&gt;
-&lt;pre&gt;&lt;code&gt;concat(
-    &amp;quot;U5 &amp;quot;,
-    match(doc.s_acc_danger_signs.has_danger_sign, &amp;quot;true:DANGER, false:NO_DANGER&amp;quot;),
-    &amp;quot; &amp;quot;,
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_seizure, &amp;quot;yes:S&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_loss_consiousness, &amp;quot;yes:L&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_unable_drink, &amp;quot;yes:D&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_confusion, &amp;quot;yes:C&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_vomit, &amp;quot;yes:V&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_chest_indrawing, &amp;quot;yes:I&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_wheezing, &amp;quot;yes:W&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_bleeding, &amp;quot;yes:B&amp;quot;),
-    match(doc.s_acc_danger_signs.s_acc_danger_sign_lathargy, &amp;quot;yes:Y&amp;quot;)
-)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h5 id=&#34;sms-content&#34;&gt;SMS content&lt;/h5&gt;
-&lt;pre&gt;&lt;code&gt;U5 DANGER LCIB&lt;/code&gt;&lt;/pre&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Contact Forms</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/contact-forms/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/contact-forms/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Contact forms are used to create person or place types. Prior to version 3.7, CHT Core supported 4 contact types - 3 place types (clinic, health_center, district_hospital) and one person type (person). From version 3.7, an unlimited number of place and person types are supported. Each contact-type should ideally have two forms; one for creation, and another for editing.&lt;/p&gt;
-&lt;p&gt;These forms are stored in the &lt;code&gt;forms/contact&lt;/code&gt; subfolder of the project config directory. The naming convention used sould be &lt;code&gt;&amp;lt;contact_type_id-{create|edit}&amp;gt;.xlsx&lt;/code&gt;. The &lt;code&gt;contact_type_id&lt;/code&gt; prefix should match what&amp;rsquo;s specified in the contact form settings page.&lt;/p&gt;
-&lt;h2 id=&#34;person-type-forms&#34;&gt;Person-type forms&lt;/h2&gt;
-&lt;p&gt;These have the simplest structure since we are only creating one thing - the actual contact. Below, we&amp;rsquo;ll look at the structure of the survey and settings sheets since these are critical to ensuring the contact is created correctly at the appropriate part of the hierarchy.&lt;/p&gt;
-&lt;h3 id=&#34;survey-sheet&#34;&gt;Survey sheet&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;person-contact-form-survey.png&#34; alt=&#34;Person forms survey sheet&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Section 1 and 3 are optional. We can pull in details of the logged in user as shown in section 1 and use that to log some metadata on the created documents as shown in section 3.&lt;/p&gt;
-&lt;p&gt;Section 2 contains the core components of what will be saved in couchdb. The group name needs to match the contact type id specified in app_settings.json (if using the configurable hierarchy) or &lt;code&gt;person&lt;/code&gt; if using the old-style hierarchy. To learn more about setting up configurable hieararchy, review the &lt;a href=&#34;&#34;&gt;Hierarchy&lt;/a&gt; page. &lt;code&gt;parent&lt;/code&gt;, &lt;code&gt;type&lt;/code&gt;, &lt;code&gt;contact_type&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt; attributes are mandatory for things to work correctly.&lt;/p&gt;
-&lt;h2 id=&#34;settings-sheet&#34;&gt;Settings sheet&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&#34;person-contact-form-settings.png&#34; alt=&#34;Person forms settings sheet&#34;&gt;&lt;/p&gt;
-&lt;p&gt;We&amp;rsquo;ll need to replace &lt;code&gt;PLACE_NAME&lt;/code&gt; with a name that corresponds to the created contact type. We&amp;rsquo;ll also need to replace &lt;code&gt;PLACE_TYPE&lt;/code&gt; with the contact-type id specified in app_settings.json (for configurable ones) or &lt;code&gt;person&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;place-type-forms&#34;&gt;Place-type forms&lt;/h2&gt;
-&lt;p&gt;The main difference between place type and person type forms is that we can optionally create one or more person-type documents one of which can be linked to the created place as a contact.&lt;/p&gt;
-&lt;p&gt;We&amp;rsquo;ll look at a simple structure of a place forms showing all the necessary components&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;place-contact-form-survey.png&#34; alt=&#34;Place forms survey sheet&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Section 1 is similar to what has been described earlier for person forms.&lt;/p&gt;
-&lt;p&gt;Section 2 specifies the contact that will be linked to the place being created. &lt;code&gt;parent&lt;/code&gt;, &lt;code&gt;type&lt;/code&gt; and &lt;code&gt;contact_type&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt; are mandatory. This also applies to the place-type definition in section 4. &lt;code&gt;contact&lt;/code&gt; on the other hand is not mandatory for the successful creation of a place. It usually more conventient to create a place and it&amp;rsquo;s primary contact at the same time.&lt;/p&gt;
-&lt;p&gt;You can also create additional contacts linked to the place being created when you have a structure similar to that shown in section 3.&lt;/p&gt;
-&lt;h2 id=&#34;contact-edit-forms&#34;&gt;Contact-edit forms&lt;/h2&gt;
-&lt;p&gt;The edit forms are much simpler in structure and one can specify only the relevant fields that need editing. The name of the group should match the contact-type being edited and the field names should correspond to what is saved in Couchdb.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;contact-edit-form.png&#34; alt=&#34;Contact edit form survey sheet&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;generic-contact-forms&#34;&gt;Generic contact forms&lt;/h2&gt;
-&lt;p&gt;If your place forms are similar across all levels of your specified project hiearachy, you can templatise the form creation process. You&amp;rsquo;ll need to create the following files: &lt;code&gt;place-type.json&lt;/code&gt;, &lt;code&gt;PLACE_TYPE-create.xlsx&lt;/code&gt; and &lt;code&gt;PLACE_TYPE-edit.xlsx&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;place-type.json&lt;/code&gt; maps the place contact-type to a human readable description that will be shown on the app&amp;rsquo;s user interface.&lt;/p&gt;
-&lt;p&gt;Both &lt;code&gt;PLACE_TYPE-create.xlsx&lt;/code&gt; and &lt;code&gt;PLACE_TYPE-edit.xlsx&lt;/code&gt; will contain two placeholder values &lt;code&gt;PLACE_TYPE&lt;/code&gt; and &lt;code&gt;PLACE_NAME&lt;/code&gt; which will be replaced by the keys and values specified in &lt;code&gt;place-type.json&lt;/code&gt; respectively during form conversion. Also, copies of the different place-type forms will be created (if they don&amp;rsquo;t exist) during the form conversion process with &lt;code&gt;PLACE_TYPE&lt;/code&gt; being replaced with the keys specified in &lt;code&gt;place-type.json&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;For examples on how to structure the above files you can have a look at the sample configurations in CHT-core: &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/config/default/forms/contact&#34;&gt;default&lt;/a&gt; and &lt;a href=&#34;https://github.com/medic/cht-core/tree/master/config/standard/forms/contact&#34;&gt;standard&lt;/a&gt;.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: Fixing couch2pg Memory Errors</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couch2pg-oom-errors/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1170,6 +1025,19 @@ sudo chmod 0600 ~/Downloads/name_of_file.pem
     </item>
     
     <item>
+      <title>Apps: Forms</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/forms/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/forms/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Gateway</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/gateway/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1285,96 +1153,6 @@ medic-conf --local upload-docs -- --docDirectoryPath=my_folder
 &lt;p&gt;Move the contact with the id &lt;code&gt;contact_1&lt;/code&gt; to the top of the hierarchy (no parent).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;medic-conf --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
 &lt;/code&gt;&lt;/pre&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Including Multimedia in Forms</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/multimedia/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/multimedia/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;multimedia-formats&#34;&gt;Multimedia Formats&lt;/h2&gt;
-&lt;p&gt;There are many supported formats for video, audio, and images. We recommend using h.264(mpeg) for video, jpeg for images, and mp3 for audio. When creating videos or images keep in mind the dimensions and storage capabilities on phones that may be used. Lower end phones have smaller storage and screen sizes. When rendering images, video, and audio the CHT uses the browser&amp;rsquo;s built in rendering tools. This means you can render any media format that is supported by the &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/supported-software.md#dependencies&#34;&gt;minimum version of Chrome&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;List of Supported formats&lt;/strong&gt; &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats#Browser_compatibility&#34;&gt;video/audio&lt;/a&gt;
-&lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types&#34;&gt;images&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&#34;configuration&#34;&gt;Configuration&lt;/h2&gt;
-&lt;p&gt;To play multimedia from forms you need to add elements to your xml and upload the corresponding multimedia to couchdb as an attachment to your form.&lt;/p&gt;
-&lt;h3 id=&#34;form-config&#34;&gt;Form Config&lt;/h3&gt;
-&lt;p&gt;Add an xml element of text and another element of value. Set form equal to the type of multimedia being used(video, audio, image). The value element must contain &lt;code&gt;jr://file_name.suffix&lt;/code&gt; where &lt;code&gt;file_name.suffix&lt;/code&gt; is the name of your multimedia file uploaded to couchdb.&lt;/p&gt;
-&lt;p&gt;Example:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;text id=&amp;quot;somevideo&amp;quot;&amp;gt;
-    &amp;lt;value form=&amp;quot;video&amp;quot;&amp;gt;jr://video.mp4&amp;lt;/value&amp;gt;
-&amp;lt;/text&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Display Example:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;input ref=&amp;quot;q2&amp;quot;&amp;gt;
-    &amp;lt;label ref=&amp;quot;jr:itext(&#39;somevideo&#39;)&amp;quot;/&amp;gt;
-&amp;lt;/input&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here is a sample form that will display a video and/or image. When this form is opened a video player will be displayed so the user can watch the video. Forms support displaying of images and playing of audio files.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;h:html&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://www.w3.org/2002/xforms&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns:h=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://www.w3.org/1999/xhtml&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns:ev=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://www.w3.org/2001/xml-events&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns:xsd=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://www.w3.org/2001/XMLSchema&amp;#34;&lt;/span&gt;
-  &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns:jr=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://openrosa.org/javarosa&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;h:head&amp;gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;h:title&amp;gt;&lt;/span&gt;Multimedia - Demo Form&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/h:title&amp;gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;model&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;itext&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;translation&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;lang=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;en&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;!-- Attach sample media files to form doc --&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;!-- https://sample-videos.com --&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;text&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;somevideo&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;value&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;form=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;video&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;jr://video.mp4&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/text&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;text&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;someimage&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;value&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;form=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;image&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;jr://image.jpg&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/text&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;text&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;someaudio&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;value&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;form=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;audio&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;jr://audio.mp3&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/text&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/translation&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/itext&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;instance&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;media&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;id=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;multimedia&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;meta&amp;gt;&lt;/span&gt;
-            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;instanceID/&amp;gt;&lt;/span&gt;
-          &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/meta&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/media&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/instance&amp;gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/model&amp;gt;&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/h:head&amp;gt;&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;h:body&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;class=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;pages&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;group&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;appearance=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;field-list&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;g&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;input&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;q2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;label&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;jr:itext(&amp;#39;somevideo&amp;#39;)&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/input&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;input&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;q3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;label&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;jr:itext(&amp;#39;someimage&amp;#39;)&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/input&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;input&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;q3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;label&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;ref=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;jr:itext(&amp;#39;someaudio&amp;#39;)&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/input&amp;gt;&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/group&amp;gt;&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/h:body&amp;gt;&lt;/span&gt;
-&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/h:html&amp;gt;&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;couchdb-config&#34;&gt;Couchdb Config&lt;/h3&gt;
-&lt;p&gt;The file needs to be added as an attachment with a name that matches what is defined in the form. This can be added by using curl or fauxton. Here is the structure of the curl command.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;curl -vX PUT https://user:pass@server_name/medic/&amp;lt;form_doc_id&amp;gt;/&amp;lt;attachment_name.suffix&amp;gt;?rev=&amp;lt;latest_form_revision&amp;gt; --data-binary @&amp;lt;local_file_name&amp;gt; -H &amp;quot;Content-Type: &amp;lt;expected_mime_type&amp;gt;&amp;quot;&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Here is an example of how it would look uploading a sample video for the form above.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;curl -vX PUT https://user:pass@localhost/medic/form:multimedia/video.mp4?rev=11-a2ebf09cb9678c031859cd2c1da4b603 -k --data-binary @sample.mp4 -H &amp;quot;Content-Type: video/mp4&amp;quot;&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;To use fauxton.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Navigate to fauxton. https://&amp;lt;server_name&amp;gt;/_utils&lt;/li&gt;
-&lt;li&gt;Click on the medic database.&lt;/li&gt;
-&lt;li&gt;Locate the form document.&lt;/li&gt;
-&lt;li&gt;Click add attachment&lt;/li&gt;
-&lt;li&gt;Upload the multimedia file and ensure the name matches what has been defined in the form.&lt;/li&gt;
-&lt;/ol&gt;
 
       </description>
     </item>
