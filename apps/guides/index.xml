@@ -14,6 +14,32 @@
     
     
     <item>
+      <title>Apps: Database Management</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-management/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-management/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Hosting</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
       <title>Apps: Creating Additional Docs from App Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/additional-docs/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -181,118 +207,6 @@
   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/child_repeat&amp;gt;&lt;/span&gt;
 &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/repeat&amp;gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If you&amp;rsquo;ve done your configuration correctly, all you should see when you click on the submitted report from the Reports tab is that there will be no information on the children created. You will find the created docs as siblings to the subject of the previously submitted report. Each of these child docs will have a field &lt;code&gt;created_by_doc&lt;/code&gt; whose value is the &lt;code&gt;_id&lt;/code&gt; of the report that created them. You can also look in the DB itself to confirm that the resulting docs look correct.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Africa&#39;s Talking SMS Aggregator</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/africas-talking/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/africas-talking/</guid>
-      <description>
-        
-        
-        &lt;p&gt;As of v3.6.0, SMS messages can be sent and received using the &lt;a href=&#34;https://africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt; service.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;sms-aggregator-workflow.svg&#34; alt=&#34;SMS Aggregator Workflow&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;africas-talking-configuration&#34;&gt;Africa&amp;rsquo;s Talking configuration&lt;/h2&gt;
-&lt;p&gt;First generate a long unique key to use as the &lt;code&gt;medic-api-key&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Log on to the &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking Dashboard&lt;/a&gt; and configure your callback URLs as follows.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Delivery Reports: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/delivery-reports?key=&amp;lt;medic-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Incoming Messages: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/incoming-messages?key=&amp;lt;medic-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Then generate an &amp;ldquo;API Key&amp;rdquo; (we&amp;rsquo;ll refer to this as the &lt;code&gt;at-api-key&lt;/code&gt;) and save this in your Medic configuration covered below.&lt;/p&gt;
-&lt;h2 id=&#34;medic-configuration&#34;&gt;Medic configuration&lt;/h2&gt;
-&lt;h3 id=&#34;api-keys&#34;&gt;API keys&lt;/h3&gt;
-&lt;p&gt;The API keys should be treated as securely as a password as anyone with access to them will be able to send messages using your account. Therefore we store them in the CouchDB configuration.&lt;/p&gt;
-&lt;p&gt;To add the credentials to the admin config you need to either &lt;a href=&#34;https://docs.couchdb.org/en/stable/api/server/configuration.html#put--_node-node-name-_config-section-key&#34;&gt;PUT the value using curl&lt;/a&gt; or similar:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/couchdb@127.0.0.1/_config/medic-credentials/africastalking.com:incoming -d &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#34;&amp;lt;medic-api-key&amp;gt;&amp;#34;&amp;#39;&lt;/span&gt;
-curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/couchdb@127.0.0.1/_config/medic-credentials/africastalking.com:outgoing -d &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#34;&amp;lt;at-api-key&amp;gt;&amp;#34;&amp;#39;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;(Note that &lt;code&gt;couchdb@127.0.0.1&lt;/code&gt; is the local node name, and may be different for you depending on your setup.)&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;You can also add it via Fauxton:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Navigate to &lt;a href=&#34;http://localhost:5984/_utils/#/_config&#34;&gt;the Config screen&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Click &lt;code&gt;Add Option&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;The &lt;code&gt;Section&lt;/code&gt; should be &lt;code&gt;medic-credentials&lt;/code&gt;, the &lt;code&gt;Name&lt;/code&gt; should be &lt;code&gt;africastalking.com:incoming&lt;/code&gt; or &lt;code&gt;africastalking.com:outgoing&lt;/code&gt;, and the value should be the relevant API key.&lt;/li&gt;
-&lt;li&gt;Click &lt;code&gt;Create&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;You should then be able to see your credential in the list of configuration shown&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;app-settings&#34;&gt;App settings&lt;/h3&gt;
-&lt;p&gt;Update your app settings as follows.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sms&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;outgoing_service&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;africas-talking&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reply_to&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking shortcode&amp;gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;africas_talking&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;username&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking username&amp;gt;&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testing&#34;&gt;Testing&lt;/h2&gt;
-&lt;p&gt;To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;, and go to the Sandbox app.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Fixing couch2pg Memory Errors</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couch2pg-oom-errors/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/couch2pg-oom-errors/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors.
-To fix this, we need to delete this document so that couch2pg can proceed.  Below are steps to follow to achieve this.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Reduce the size of the replicated docs to a value of say 4 in the couch2pg.conf file so that you can get within the range of the failing document.&lt;/li&gt;
-&lt;li&gt;Clone the existing &lt;a href=&#34;https://github.com/medic/couch2pg&#34;&gt;couch2pg&lt;/a&gt; repo so that you can run couch2pg locally&lt;/li&gt;
-&lt;li&gt;Edit the file &lt;code&gt;lib/importer.js&lt;/code&gt; in the couch2pg source code to be able to log the doc-id of the problem doc&lt;/li&gt;
-&lt;li&gt;Edit just logs doc_ids to the console, around line 100 of importer.js &lt;code&gt;console.log(row.doc._id);&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Get the remote couch2pg environment variable settings and export them into your profile terminal&lt;/li&gt;
-&lt;li&gt;Create an ssh reverse tunnel from the postgres server to your laptop&lt;/li&gt;
-&lt;li&gt;Run couch2pg locally so that you can see the doc-ids on console till it fails&lt;/li&gt;
-&lt;li&gt;From the ids printed on console try loading the docs in the couchdb web access(Futon or Fauxton), the problem doc is usually big and won&amp;rsquo;t load&lt;/li&gt;
-&lt;li&gt;This will help you identify the problem doc&lt;/li&gt;
-&lt;li&gt;Curl the document to your pc and back it up&lt;/li&gt;
-&lt;li&gt;Back up the document for further analysis&lt;/li&gt;
-&lt;li&gt;Delete the document using curl
-&lt;code&gt;curl --head &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;&amp;quot;&lt;/code&gt;
-This returns something like&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code&gt;HTTP/1.1 200 OK
-Cache-Control: must-revalidate
-Content-Length: 307
-Content-Type: application/json
-Date: Tue, 25 Jun 2019 11:58:29 GMT
-ETag: &amp;quot;2-6beeb38da9b096bacfe2fa769e5171be&amp;quot;
-Server: CouchDB/2.3.1 (Erlang OTP/21)
-X-Couch-Request-ID: e4aa7a8696
-X-CouchDB-Body-Time: 0
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The ETag is the rev. Delete document with curl: &lt;code&gt;curl -X DELETE &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;?rev=&amp;lt;THE_REV&amp;gt;&amp;quot;&lt;/code&gt;&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: CouchDB Authentication</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/couchdb-authentication/</guid>
-      <description>
-        
-        
-        &lt;h3 id=&#34;to-invalidate-a-session-in-couchdb-there-are-two-options&#34;&gt;To invalidate a session in couchdb, there are two options:&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;Change the session signing certificate on the server&lt;/li&gt;
-&lt;li&gt;Change the password and/or salt for the user whose session should be invalidated&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;There are drawbacks to note with each.  Option &lt;strong&gt;1&lt;/strong&gt; will invalidate &lt;em&gt;all&lt;/em&gt; sessions; option &lt;strong&gt;2&lt;/strong&gt; will invalidate all sessions &lt;em&gt;for that user&lt;/em&gt;, and also their password.&lt;/p&gt;
-&lt;p&gt;Because of the nature of couch&amp;rsquo;s session management, there is no way to see a list of active/open sessions.  Invalidating a specific session key could be achieved by blacklisting a cookie value in e.g. nginx or API, but this is unlikely to be of practical value.&lt;/p&gt;
 
       </description>
     </item>
@@ -636,161 +550,6 @@ ac4,Secret_1,district_admin,+123456789,p_hc4,health_center_1
     </item>
     
     <item>
-      <title>Apps: Database Conflicts</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database-conflicts/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Conflicts are a natural and unavoidable part of working in a distributed system.&lt;/p&gt;
-&lt;p&gt;Conflicts occur when one client (eg PouchDB) attempts to replicate to another (eg CouchDB), and the document that the first has does not have the same tree of changes that the second one has.&lt;/p&gt;
-&lt;h2 id=&#34;an-example&#34;&gt;An example&lt;/h2&gt;
-&lt;p&gt;To make it clear what&amp;rsquo;s happening, let&amp;rsquo;s walk through an example. If you already understand conflicts feel free to skip this section.&lt;/p&gt;
-&lt;p&gt;Let&amp;rsquo;s say you register a pregnancy in the UI. And then you notice that you got the LMP wrong, so you hit edit and quickly make the change.&lt;/p&gt;
-&lt;p&gt;Meanwhile, sentinel notices that you registers a pregnancy, and before you have a chance to change the LMP, sets up a bunch of recurring messages, editing the document.&lt;/p&gt;
-&lt;p&gt;Sentinel has now made a change to the first version of your document, and you&amp;rsquo;re trying to also make a change to the first version. These conflict.&lt;/p&gt;
-&lt;h2 id=&#34;how-to-manage-conflicts&#34;&gt;How to manage conflicts&lt;/h2&gt;
-&lt;p&gt;Conflicts will appear on the #downtime Slack channel, along with the other alerts. If a server you manage has a conflict, you should do the following:&lt;/p&gt;
-&lt;h3 id=&#34;identify-why-conflicts-are-occuring&#34;&gt;Identify why conflicts are occuring&lt;/h3&gt;
-&lt;p&gt;Take a look at the conflicts view, at &lt;code&gt;https://yourserver/medic/_design/medic-conflicts/_view/conflicts&lt;/code&gt;. Each entry in that view looks like this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1-82d9a42305a79e403d9eca6a9a9daae9&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;,&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The &lt;code&gt;id&lt;/code&gt; is the &lt;code&gt;_id&lt;/code&gt; of the conflicting document, and the &lt;code&gt;key&lt;/code&gt; is a list of conflicting &lt;code&gt;_rev&lt;/code&gt;s.&lt;/p&gt;
-&lt;p&gt;For each conflicting document, download that document, as well as all the &lt;code&gt;_rev&lt;/code&gt;s indicated in the &lt;code&gt;key&lt;/code&gt; above. To download a document with a specific &lt;code&gt;_rev&lt;/code&gt;, pass the &lt;code&gt;rev&lt;/code&gt; parameter.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#39;&lt;/span&gt; &amp;gt; doc.json
-curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8?rev=1-82d9a42305a79e403d9eca6a9a9daae9&amp;#39;&lt;/span&gt; &amp;gt; doc-conflict1.json
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now you have all versions of the document, you can diff them and try to determine what went wrong.&lt;/p&gt;
-&lt;p&gt;A common problem, for example, might be sentinel hitting a document really quickly between you creating it and editing it.&lt;/p&gt;
-&lt;p&gt;A less common problem that requires some special attention, is UUID collisions (see below).&lt;/p&gt;
-&lt;p&gt;If you get stuck feel free to escalate to a developer, who can take a look.&lt;/p&gt;
-&lt;h3 id=&#34;if-appropriate-raise-a-bug&#34;&gt;If appropriate, raise a bug&lt;/h3&gt;
-&lt;p&gt;If you determine (or just suspect) that the problem could be in our code or data structures, feel free to raise a bug to development. For example, historically read status has been stored against the document, which can easily cause conflicts if you create a document and then instantly view it with sentinel processing in the background.&lt;/p&gt;
-&lt;p&gt;While some conflicts are inevitable, we want to architect away from them as much as possible. Ideally tech leads would never have to resolve conflicts.&lt;/p&gt;
-&lt;h3 id=&#34;regardless-resolve-the-conflicts&#34;&gt;Regardless, resolve the conflicts&lt;/h3&gt;
-&lt;p&gt;Now that you&amp;rsquo;ve diagnosed the problem, and perhaps reported a bug, you should resolve the conflict.&lt;/p&gt;
-&lt;p&gt;This is &lt;strong&gt;extremely&lt;/strong&gt; important. Conflicts cause saved changes to not appear against documents silently, and could cause important document changes (eg fixing someone&amp;rsquo;s EDD) to not occur.&lt;/p&gt;
-&lt;p&gt;For a document to no longer be conflicted, there must only be one active &lt;code&gt;_rev&lt;/code&gt;. You would do this by picking one rev and updating it with the changes you want to make, and then updating the others with the &lt;code&gt;_deleted: true&lt;/code&gt; property.&lt;/p&gt;
-&lt;p&gt;You can tell that a document is no longer conflicted if they don&amp;rsquo;t appear in the view, or if when you request the document with &lt;code&gt;?conflicts=true&lt;/code&gt; the &lt;code&gt;_conflicts&lt;/code&gt; property either doesn&amp;rsquo;t appear or is empty:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
-
-{
-  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
-  &amp;quot;_rev&amp;quot;: &amp;quot;2-the-current-rev&amp;quot;
-  &amp;quot;_conflicts&amp;quot;: [
-    &amp;quot;2-a-conflicting-rev&amp;quot;
-  ]
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In the above example, &lt;code&gt;yourdocid&lt;/code&gt; has two revisions that conflict with each other. Here you would need to update one of the revs (it doesn&amp;rsquo;t matter which) with the other&amp;rsquo;s changes, then delete the other rev. You would then see:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
-
-{
-  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
-  &amp;quot;_rev&amp;quot;: &amp;quot;3-the-new-rev&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;a-trivial-example&#34;&gt;A trivial example&lt;/h4&gt;
-&lt;p&gt;Let&amp;rsquo;s say that you have two documents, and the diff between them looks something like this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;===================================================================
-&lt;/span&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;--- 277533E3-A41B-3C46-909F-BCA038197C1E___2-2fff60be1557fdfef9915aa09e1b5119.json
-&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+++ 277533E3-A41B-3C46-909F-BCA038197C1E___2-d2a7186380b72306d75cd64b64402575.json
-&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;@@ -1,7 +1,7 @@
-&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;&lt;/span&gt; {
-   &amp;#34;_id&amp;#34;: &amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;,
-&lt;span style=&#34;color:#a40000&#34;&gt;-  &amp;#34;_rev&amp;#34;: &amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;,
-&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+  &amp;#34;_rev&amp;#34;: &amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;,
-&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   &amp;#34;data&amp;#34;: &amp;#34;some shared data&amp;#34;,
-   &amp;#34;read&amp;#34;: [
-&lt;span style=&#34;color:#a40000&#34;&gt;-    &amp;#34;some_user&amp;#34;
-&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+    &amp;#34;admin&amp;#34;
-&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   ]
- }
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The problem here is clear: &lt;code&gt;some_user&lt;/code&gt; and &lt;code&gt;admin&lt;/code&gt; read the document at the same time. To solve this, we could add &lt;code&gt;some_user&lt;/code&gt; to the revision with &lt;code&gt;admin&lt;/code&gt; already in it, and then delete the &lt;code&gt;some_user&lt;/code&gt; revision:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
-   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
- &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_deleted&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
-   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
- &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;resolving-uuid-collisions&#34;&gt;Resolving UUID collisions&lt;/h4&gt;
-&lt;p&gt;A UUID collision is a rare event where two clients (eg two android phones running our application) generate the same UUID ID for two completely different documents.&lt;/p&gt;
-&lt;p&gt;You can tell when your conflict is a UUID collision as there is no common root between the two conflicting versions. For example, one might be of type person and one might of type data_record.&lt;/p&gt;
-&lt;p&gt;These situations are more complicated, and require that you essentially recreate all conflicting versions as new documents, and fix any linkages that exist in the database.&lt;/p&gt;
-&lt;p&gt;Let&amp;rsquo;s say you find the following situation:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;{
-  &amp;#34;_id&amp;#34;: &amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;
-&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;_rev&amp;#34;: &amp;#34;1-e4da228c29dc4ebc8b156967bbf48bd1&amp;#34;,
-&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;_rev&amp;#34;: &amp;#34;1-ce40d1dc470643e2b9be9368ea9ff240&amp;#34;,
-&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;
-&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;type&amp;#34;: &amp;#34;data_record&amp;#34;
-&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&amp;lt;snip a bunch more stuff that doesn&amp;#39;t relate to each other&amp;gt;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You will want to do four things:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Download the &lt;code&gt;_rev&lt;/code&gt; for the &lt;code&gt;person&lt;/code&gt; and create a new document, with a new uuid, for that document (you can do this by uploadig the document without an &lt;code&gt;_id&lt;/code&gt; or &lt;code&gt;_rev&lt;/code&gt; parameter and let CouchDB generate them for you)&lt;/li&gt;
-&lt;li&gt;Do the same for the &lt;code&gt;data_record&lt;/code&gt; version&lt;/li&gt;
-&lt;li&gt;Delete the main conflicting document &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;And finally, find any references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, work out which doc they were &lt;em&gt;supposed&lt;/em&gt; to point to, and then edit those UUIDs to be the correct UUID &lt;code&gt;_id&lt;/code&gt; from the docs you created above.&lt;/p&gt;
-&lt;p&gt;Because this should be a rare event and a generic view would be enormous, we do not ship a view that helps you find this out.&lt;/p&gt;
-&lt;p&gt;However, you can create your own view! You&amp;rsquo;re going to want to create a DDOC specifically for this view. You can follow the following template to create what you want:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_design/docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;views&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;map&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;function(doc) {\n  var KEYS = [];\n\n  // TODO: consider switching this around to whitelist doc types\n  if (doc._id.match(/-info$/) ||\n      doc._id.match(/^_local/)) {\n    return;\n  }\n\n  var goDeeper = function(obj, path) {\n    Object.keys(obj).forEach(function(key) {\n      if (typeof obj[key] === &amp;#39;string&amp;#39; &amp;amp;&amp;amp;\n          KEYS.indexOf(obj[key]) !== -1) {\n        emit(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n\n      if (obj[key] &amp;amp;&amp;amp; typeof obj[key] === &amp;#39;object&amp;#39;) {\n        goDeeper(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n    });\n  };\n\n  goDeeper(doc, doc._id);\n}&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this, add any IDs you want to be found in the &lt;code&gt;KEYS&lt;/code&gt; variable at the top of the function. So in our case, we would change &lt;code&gt;KEYS&lt;/code&gt; to look like this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;KEYS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Upload this document to CouchDB (do not just add the view to an existing DDOC, as you will force all views on that DDOC to regenerate) and then warm up the views by querying it once (it may take a long time to run).&lt;/p&gt;
-&lt;p&gt;Once it is complete you can query the view again to return a list of documents that reference the ids you hard-coded above.&lt;/p&gt;
-&lt;p&gt;This will help you to identify which documents are affected by this change. Usually the only change needed is to change the ID located to the new ones you generated.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;total_rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;offset&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
-      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.inputs.contact._id&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
-      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.patient_id&amp;#34;&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this example, there are two references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, both in the &lt;code&gt;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code&gt; document, one at &lt;code&gt;fields.inputs.contact._id&lt;/code&gt; and one at &lt;code&gt;fields.patient_id&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code&gt;#development&lt;/code&gt;) and they can help you out.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: DHIS2 Aggregate</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/dhis2-aggregate/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -893,138 +652,6 @@ curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic
     </item>
     
     <item>
-      <title>Apps: EC2 Setup</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ec2-setup-guide/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;configure-self-hosting&#34;&gt;Configure self-hosting&lt;/h2&gt;
-&lt;h4 id=&#34;1-create-ec2-use-security-best-practices&#34;&gt;1. Create EC2 (use security best practices)&lt;/h4&gt;
-&lt;pre&gt;&lt;code&gt;Be sure to change the file permissions to 0600 or lower
-for the .pem file:
-sudo chmod 0600 ~/Downloads/name_of_file.pem
-&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html&#34;&gt;Create Elastic IP and Associate EIP to EC2&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: SSH into instance&lt;/p&gt;
-&lt;h4 id=&#34;2-create-or-restore-ebs-volume&#34;&gt;2. Create or Restore EBS Volume&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Create EBS Volume&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Be sure to tag appropriately&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html&#34;&gt;Restore EBS Volume&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Attach volume to EC2 instance&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;(Optional): &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;Increase disk size&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If you are using a newly created EBS Volume, you will have to format the disk approriately:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;SSH into instance&lt;/li&gt;
-&lt;li&gt;Follow the instructions here: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html&#34;&gt;Using EBS Volumes&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Use &lt;code&gt;sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code&gt; in step 4&lt;/li&gt;
-&lt;li&gt;Mount disk to /srv&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: Mount EBS volume to /srv&lt;/p&gt;
-&lt;h4 id=&#34;3-provision-docker-server&#34;&gt;3. Provision Docker server&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Follow README &amp;amp; Run scripts: &lt;a href=&#34;https://github.com/medic/medic-infrastructure/tree/master/self-hosting/prepare-system&#34;&gt;Prepare Self-Hosting System&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;A zip will be shared via Slack until the scripts are moved to a public repo&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: CHT Application bootstraps and comes online&lt;/p&gt;
-&lt;h4 id=&#34;4-dns-configuration&#34;&gt;4. DNS configuration&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Point A records to Elastic IP given to Docker server&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;5-review-ssl-certs&#34;&gt;5. Review SSL certs&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Location of certs is &lt;code&gt;/srv/settings/medic-core/nginx/private/&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Name the key file as &lt;code&gt;default.key&lt;/code&gt; and the certificate file as &lt;code&gt;default.crt&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Restarting nginx with new certs: &lt;code&gt;svc-restart medic-core nginx&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;6-configure-couch2pg&#34;&gt;6. Configure couch2pg&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Basic configuration: &lt;a href=&#34;https://github.com/medic/medic-couch2pg/blob/master/README.md&#34;&gt;https://github.com/medic/medic-couch2pg/blob/master/README.md&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Supervision/monitoring/notification&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;7-setup-postgres-to-work-with-couch2pg&#34;&gt;7. Setup postgres to work with couch2pg&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Creating the database, setting up permissions, exploring the tables and what they store&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;8debugging-couch2pgpostgres&#34;&gt;8.Debugging couch2pg/postgres&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Understanding the log and what the entries mean&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h2&gt;
-&lt;h4 id=&#34;1-restarting-processes&#34;&gt;1. Restarting processes&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;2-investigating-logs&#34;&gt;2. Investigating logs&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Log into container: &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/exec/&#34;&gt;https://docs.docker.com/engine/reference/commandline/exec/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Helpful docker commands: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Inside container, all appropriate logs can be found in: &lt;code&gt;/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;3upgrading-the-container&#34;&gt;3.Upgrading the container&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Backup all data (EBS)&lt;/li&gt;
-&lt;li&gt;Log into container and stop all services&lt;/li&gt;
-&lt;li&gt;DO NOT REMOVE &lt;code&gt;/srv/storage/medic-core/&lt;/code&gt;, &lt;code&gt;/srv/settings/medic-core/couchdb/local.ini&lt;/code&gt;, wipe all other files in /srv [Note: Make script publicly accessibile]&lt;/li&gt;
-&lt;li&gt;Change the image tag to the newest image release version:
-&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Change image tag in docker-compose file: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Launch new containers with appropriate COUCHDB_ADMIN_PASSWORD &amp;amp; HA_PASSWORD environment variables&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4upgrading-the-webapp&#34;&gt;4.Upgrading the webapp&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Use Admin GUI page&lt;/li&gt;
-&lt;li&gt;CLI via horticulturalist: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4a-rds-help&#34;&gt;4a. RDS help&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&#34;&gt;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;restore-from-backup-and-monitoring&#34;&gt;Restore from backup and monitoring&lt;/h2&gt;
-&lt;h4 id=&#34;1-configure-backups&#34;&gt;1. Configure backups&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;EBS Snapshot Lifecycle Manager: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;2-restoring-from-backup&#34;&gt;2. Restoring from backup&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;Create volume from snapshot&lt;/li&gt;
-&lt;li&gt;Tag appropriately for backups&lt;/li&gt;
-&lt;li&gt;Mount volume to docker server&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;3-process-supervison&#34;&gt;3. Process supervison&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;supvisorctl&lt;/li&gt;
-&lt;li&gt;/boot/supervisor-inspect&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;4-monitoring&#34;&gt;4. Monitoring&lt;/h4&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;own-infrastructure-setup&#34;&gt;Own Infrastructure Setup&lt;/h2&gt;
-&lt;h4 id=&#34;1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above&#34;&gt;1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: Forms</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/forms/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1076,26 +703,6 @@ sudo chmod 0600 ~/Downloads/name_of_file.pem
 &lt;p&gt;Update &lt;code&gt;filename.json&lt;/code&gt;: Set &amp;ldquo;errors&amp;rdquo; to [] and remove &amp;ldquo;accept_patient_reports&amp;rdquo; transition so that sentinel can revalidate the report.&lt;/p&gt;
 &lt;p&gt;Upload &lt;code&gt;filename.json&lt;/code&gt; with:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;curl -X PUT hhttps://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt; -d @filename.json --header &amp;quot;Content-Type: application/json&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Message Loops</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/message-loops/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/message-loops/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Endless messaging loops can between the webapp and a mobile number via the gateway due to autoreplies from the webapp.&lt;/p&gt;
-&lt;p&gt;See the &lt;a href=&#34;https://github.com/medic/medic/issues/750#issuecomment-146254467&#34;&gt;Github Issue&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; Add the offending number(e.g &lt;code&gt;800&lt;/code&gt; or &lt;code&gt;SAFARICOM&lt;/code&gt;) to the &lt;code&gt;Outgoing Deny List&lt;/code&gt; in the webapp&amp;rsquo;s &lt;code&gt;app_settings&lt;/code&gt; configuration file.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;  &amp;quot;multipart_sms_limit&amp;quot;: 10,
-  &amp;quot;outgoing_deny_list&amp;quot;: &amp;quot;800, SAFARICOM&amp;quot;,
-  &amp;quot;contact_summary&amp;quot;: &amp;quot;&amp;quot;
-
 &lt;/code&gt;&lt;/pre&gt;
       </description>
     </item>
@@ -1451,66 +1058,6 @@ for them.&lt;/p&gt;
     </item>
     
     <item>
-      <title>Apps: Conncting to RDBMS in Windows</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/rdbms-in-windows/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p&gt;
-&lt;h2 id=&#34;ssh-key-generation-and-importing&#34;&gt;SSH Key Generation and Importing&lt;/h2&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Download Puttygen from &lt;a href=&#34;https://www.ssh.com/ssh/putty/download&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Create a new key pair for your computer.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;puttygen-run-key-generate.png&#34; alt=&#34;Putty-gen-key-pair&#34;&gt;&lt;/p&gt;
-&lt;ol start=&#34;4&#34;&gt;
-&lt;li&gt;Convert the key generated from ssh2 format to openssh. Puttygen supports this. Guide &lt;a href=&#34;https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygenwindows-into-key-pairs-use?answertab=votes#tab-top&#34;&gt;here&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code&gt;1. Open PuttyGen
-2. Click Load
-3. Load your private key
-4. Go to Conversions-&amp;gt;Export OpenSSH and export your private key
-5. Copy your private key to ~/.ssh/id_dsa (or id_rsa).
-6. Create the RFC 4716 version of the public key using ssh-keygen
-    ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
-6. Convert the RFC 4716 version of the public key to the OpenSSH format:
-    ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub
-    
-&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;5&#34;&gt;
-&lt;li&gt;Import the file using PuTTYgen:&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;putty-gen-import.png&#34; alt=&#34;puttty-import-key&#34;&gt;&lt;/p&gt;
-&lt;ol start=&#34;6&#34;&gt;
-&lt;li&gt;Save it as PuTTY Private Key File .ppk:&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;putty-save-key.png&#34; alt=&#34;puttty-save-key&#34;&gt;&lt;/p&gt;
-&lt;ol start=&#34;7&#34;&gt;
-&lt;li&gt;Add the key (.ppk) to Pageant (PuTTY authentication agent):&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;putty-add-key.png&#34; alt=&#34;puttty-add-key&#34;&gt;&lt;/p&gt;
-&lt;ol start=&#34;8&#34;&gt;
-&lt;li&gt;Now you can connect to RDBMS using PuTTY:&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;puttty-connect.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;putty-connect-final.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
-&lt;p&gt;If you are connecting to rdbms in order to use a posgres client. You may not need to tunnel the connection. The client can do it for you.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;rdbms_connect_1.png&#34; alt=&#34;rdbms_1&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;rdbms_connect_2.png&#34; alt=&#34;rdbms_2&#34;&gt;&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Apps: Update Collect Forms Remotely</title>
       <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/collect-forms-update/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1639,137 +1186,15 @@ manufacturer. Choose &lt;code&gt;Encrypt Phone&lt;/code&gt; or &lt;code&gt;Encry
     </item>
     
     <item>
-      <title>Apps: Self Hosting</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</link>
+      <title>Apps: SMS</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/sms/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/self-hosting/</guid>
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/sms/</guid>
       <description>
         
         
-        &lt;h2 id=&#34;self-hosting&#34;&gt;Self Hosting&lt;/h2&gt;
-&lt;h3 id=&#34;how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;How to access container, retrieve logs, isolate security groups&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;How to restart services: Link to medic-os documentation
-&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;
-&lt;code&gt;/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;aws-docs-for-increasing-disk-size&#34;&gt;AWS docs for increasing disk size:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;Stop medic: &lt;code&gt;sudo supervisorctl stop medic&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Go to EBS in AWS and take a snapshot of the volume.&lt;/li&gt;
-&lt;li&gt;Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li&gt;
-&lt;li&gt;Follow the following link to make the instance recognize the additional space: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Turn medic back on: &lt;code&gt;sudo supervisorctl start medic&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;Links to medic documentation for horticulturalist for upgrades:&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;log into container &amp;amp; run: &lt;code&gt;COUCH_NODE_NAME=couchdb@127.0.0.1 COUCH_URL=http://medic:&amp;lt;pw&amp;gt;@localhost:5984/medic /srv/software/horticulturalist/node_modules/.bin/horti --medic-os --install=&amp;lt;version&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;monitoring--backup&#34;&gt;Monitoring &amp;amp; Backup&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li&gt;
-&lt;li&gt;Set up Lifecycle Management for EBS snapshots:
-&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li&gt;
-&lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
-&lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Shortcode identifiers</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/shortcodes/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/shortcodes/</guid>
-      <description>
         
-        
-        &lt;p&gt;Shortcodes used for SMS messaging are generated on &lt;code&gt;doc.patient_id&lt;/code&gt; against any document of &lt;code&gt;type&lt;/code&gt; &lt;code&gt;person&lt;/code&gt;. By default, these shortcodes start at 5 numeric digits long, and will increase in length as deemed necessary by the generation algorithm.&lt;/p&gt;
-&lt;p&gt;If the length is increased, this increase is stored in a CouchDB documented called &lt;code&gt;shortcode-id-length&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;configuring-a-minimum-length&#34;&gt;Configuring a minimum length&lt;/h2&gt;
-&lt;p&gt;If you wish to change the minimum length to of ids to generate, create or edit the &lt;code&gt;shortcode-id-length&lt;/code&gt; document in CouchDB. For example, if you wish for the minimum length to be 7:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;NB: If this file already exists be sure to include the existing &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
-&lt;p&gt;NB: If you are changing this document and want to make it relevant straight away, &lt;strong&gt;you must restart Sentinel.&lt;/strong&gt; Otherwise there may be a collection of cached already accepted ids of the previous length that Sentinel will work through first.&lt;/p&gt;
-&lt;h2 id=&#34;configuring-a-maximum-length-locking-down-an-exact-length-etc&#34;&gt;Configuring a maximum length, locking down an exact length etc&lt;/h2&gt;
-&lt;p&gt;It is not possible to either alter the maximum length of ids, to stop it automatically increasing or to tweak when it decides to automatically increase. IDs automatically increasing in length when required is important to the continual correct functioning of Sentinel.&lt;/p&gt;
-&lt;h2 id=&#34;valid-sizes&#34;&gt;Valid sizes&lt;/h2&gt;
-&lt;p&gt;Shortcodes can be between 5 and 13 digits long. Due to the last digit being a checksum digit, there are at most 10,000 5 digit ids, and at most 1,000,000,000,000 13 digit ids.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: SSH into a Docker image</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssh-into-docker/</guid>
-      <description>
-        
-        
-        &lt;ol&gt;
-&lt;li&gt;Work out the name of the AWS instance your Docker container is running in, eg: &amp;ldquo;development-2a-1&amp;rdquo;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;ul&gt;
-&lt;li&gt;Log in to AWS&lt;/li&gt;
-&lt;li&gt;Select the availability zone (likely to be London)&lt;/li&gt;
-&lt;li&gt;Go to EC2 instances and select the instance&lt;/li&gt;
-&lt;li&gt;Check the tags for the name&lt;/li&gt;
-&lt;/ul&gt;
-&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;ssh in to the Docker instance: &lt;code&gt;ssh -J admin@gateway.dev.medicmobile.org admin@&amp;lt;instance_name&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Work out the name of the Docker container you want to connect to, eg: &amp;ldquo;alpha-dev&amp;rdquo;. Get a list of available containers with: &lt;code&gt;sudo docker ps&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: SSL Cert Install</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssl-cert-install/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/ssl-cert-install/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;requirements&#34;&gt;Requirements&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Installed CHT-Core 3.x via docker-compose&lt;/li&gt;
-&lt;li&gt;Your own SSL certifications (Let&amp;rsquo;s Encrypt)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;copy-certs-into-medic-os-container&#34;&gt;Copy certs into medic-os container&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;Inside your server (you may need to use sudo before each command):
-$ docker ps
-$ docker cp /path/to/ssl.cert medic-os:/srv/settings/medic-core/nginx/private/ssl.crt
-$ docker cp /path/to/ssl.key medic-os:/srv/settings/medic-core/nginx/private/ssl.key
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;edit-nginx-configuration-file&#34;&gt;Edit nginx configuration file&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;Inside the medic-os docker container:
-$ docker exec -it medic-os /bin/bash
-# sed -i &amp;quot;s|default.crt|ssl.crt|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
-# sed -i &amp;quot;s|default.key|ssl.key|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;restart-services&#34;&gt;Restart services&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;Inside medic-os container:
-$ docker exec -it medic-os /bin/bash
-# /boot/svc-restart medic-core nginx
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;view-nginx-logs&#34;&gt;View Nginx Logs&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;Inside container:
-# cd /srv/storage/medic-core/nginx/logs/ 
-access.log error-ssl.log error.log startup.og
-&lt;/code&gt;&lt;/pre&gt;
       </description>
     </item>
     

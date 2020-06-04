@@ -1,0 +1,253 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Community Health Toolkit – Hosting</title>
+    <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/</link>
+    <description>Recent content in Hosting on Community Health Toolkit</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Apps: EC2 Setup</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ec2-setup-guide/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ec2-setup-guide/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;configure-self-hosting&#34;&gt;Configure self-hosting&lt;/h2&gt;
+&lt;h4 id=&#34;1-create-ec2-use-security-best-practices&#34;&gt;1. Create EC2 (use security best practices)&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;Be sure to change the file permissions to 0600 or lower
+for the .pem file:
+sudo chmod 0600 ~/Downloads/name_of_file.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html&#34;&gt;Create Elastic IP and Associate EIP to EC2&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: SSH into instance&lt;/p&gt;
+&lt;h4 id=&#34;2-create-or-restore-ebs-volume&#34;&gt;2. Create or Restore EBS Volume&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Create EBS Volume&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be sure to tag appropriately&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html&#34;&gt;Restore EBS Volume&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Attach volume to EC2 instance&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Optional): &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;Increase disk size&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you are using a newly created EBS Volume, you will have to format the disk approriately:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;SSH into instance&lt;/li&gt;
+&lt;li&gt;Follow the instructions here: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html&#34;&gt;Using EBS Volumes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code&gt; in step 4&lt;/li&gt;
+&lt;li&gt;Mount disk to /srv&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: Mount EBS volume to /srv&lt;/p&gt;
+&lt;h4 id=&#34;3-provision-docker-server&#34;&gt;3. Provision Docker server&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Follow README &amp;amp; Run scripts: &lt;a href=&#34;https://github.com/medic/medic-infrastructure/tree/master/self-hosting/prepare-system&#34;&gt;Prepare Self-Hosting System&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;A zip will be shared via Slack until the scripts are moved to a public repo&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Goal&lt;/code&gt;: CHT Application bootstraps and comes online&lt;/p&gt;
+&lt;h4 id=&#34;4-dns-configuration&#34;&gt;4. DNS configuration&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Point A records to Elastic IP given to Docker server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;5-review-ssl-certs&#34;&gt;5. Review SSL certs&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Location of certs is &lt;code&gt;/srv/settings/medic-core/nginx/private/&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Name the key file as &lt;code&gt;default.key&lt;/code&gt; and the certificate file as &lt;code&gt;default.crt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Restarting nginx with new certs: &lt;code&gt;svc-restart medic-core nginx&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;6-configure-couch2pg&#34;&gt;6. Configure couch2pg&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic configuration: &lt;a href=&#34;https://github.com/medic/medic-couch2pg/blob/master/README.md&#34;&gt;https://github.com/medic/medic-couch2pg/blob/master/README.md&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Supervision/monitoring/notification&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;7-setup-postgres-to-work-with-couch2pg&#34;&gt;7. Setup postgres to work with couch2pg&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Creating the database, setting up permissions, exploring the tables and what they store&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;8debugging-couch2pgpostgres&#34;&gt;8.Debugging couch2pg/postgres&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Understanding the log and what the entries mean&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h2&gt;
+&lt;h4 id=&#34;1-restarting-processes&#34;&gt;1. Restarting processes&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#how-to-access-container-retrieve-logs-isolate-security-groups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-investigating-logs&#34;&gt;2. Investigating logs&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Log into container: &lt;a href=&#34;https://docs.docker.com/engine/reference/commandline/exec/&#34;&gt;https://docs.docker.com/engine/reference/commandline/exec/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Helpful docker commands: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#helpful-docker-commands&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Inside container, all appropriate logs can be found in: &lt;code&gt;/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;3upgrading-the-container&#34;&gt;3.Upgrading the container&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Backup all data (EBS)&lt;/li&gt;
+&lt;li&gt;Log into container and stop all services&lt;/li&gt;
+&lt;li&gt;DO NOT REMOVE &lt;code&gt;/srv/storage/medic-core/&lt;/code&gt;, &lt;code&gt;/srv/settings/medic-core/couchdb/local.ini&lt;/code&gt;, wipe all other files in /srv [Note: Make script publicly accessibile]&lt;/li&gt;
+&lt;li&gt;Change the image tag to the newest image release version:
+&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#download-medic-mobile-image--setup-custom-docker-network&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Change image tag in docker-compose file: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/public-docker-image-setup.md#use-docker-compose&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Launch new containers with appropriate COUCHDB_ADMIN_PASSWORD &amp;amp; HA_PASSWORD environment variables&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4upgrading-the-webapp&#34;&gt;4.Upgrading the webapp&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Use Admin GUI page&lt;/li&gt;
+&lt;li&gt;CLI via horticulturalist: &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;https://github.com/medic/medic-docs/blob/master/installation/self-hosting.md#links-to-medic-documentation-for-horticulturalist-for-upgrades&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4a-rds-help&#34;&gt;4a. RDS help&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&#34;&gt;https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;restore-from-backup-and-monitoring&#34;&gt;Restore from backup and monitoring&lt;/h2&gt;
+&lt;h4 id=&#34;1-configure-backups&#34;&gt;1. Configure backups&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;EBS Snapshot Lifecycle Manager: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-restoring-from-backup&#34;&gt;2. Restoring from backup&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Create volume from snapshot&lt;/li&gt;
+&lt;li&gt;Tag appropriately for backups&lt;/li&gt;
+&lt;li&gt;Mount volume to docker server&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;3-process-supervison&#34;&gt;3. Process supervison&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;supvisorctl&lt;/li&gt;
+&lt;li&gt;/boot/supervisor-inspect&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4-monitoring&#34;&gt;4. Monitoring&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;own-infrastructure-setup&#34;&gt;Own Infrastructure Setup&lt;/h2&gt;
+&lt;h4 id=&#34;1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above&#34;&gt;1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Self Hosting</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/self-hosting/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/self-hosting/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;self-hosting&#34;&gt;Self Hosting&lt;/h2&gt;
+&lt;h3 id=&#34;how-to-access-container-retrieve-logs-isolate-security-groups&#34;&gt;How to access container, retrieve logs, isolate security groups&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;How to restart services: Link to medic-os documentation
+&lt;a href=&#34;https://github.com/medic/medic-os#service-management-scripts&#34;&gt;https://github.com/medic/medic-os#service-management-scripts&lt;/a&gt;
+&lt;code&gt;/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;aws-docs-for-increasing-disk-size&#34;&gt;AWS docs for increasing disk size:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Stop medic: &lt;code&gt;sudo supervisorctl stop medic&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Go to EBS in AWS and take a snapshot of the volume.&lt;/li&gt;
+&lt;li&gt;Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li&gt;
+&lt;li&gt;Follow the following link to make the instance recognize the additional space: &lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Turn medic back on: &lt;code&gt;sudo supervisorctl start medic&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;links-to-medic-documentation-for-horticulturalist-for-upgrades&#34;&gt;Links to medic documentation for horticulturalist for upgrades:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;log into container &amp;amp; run: &lt;code&gt;COUCH_NODE_NAME=couchdb@127.0.0.1 COUCH_URL=http://medic:&amp;lt;pw&amp;gt;@localhost:5984/medic /srv/software/horticulturalist/node_modules/.bin/horti --medic-os --install=&amp;lt;version&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;monitoring--backup&#34;&gt;Monitoring &amp;amp; Backup&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li&gt;
+&lt;li&gt;Set up Lifecycle Management for EBS snapshots:
+&lt;a href=&#34;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&#34;&gt;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li&gt;
+&lt;li&gt;Please see the second-half of “Increasing disk size” reference above&lt;/li&gt;
+&lt;li&gt;Setup a TLS cert &amp;amp; DNS registration&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: SSH into a Docker image</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ssh-into-docker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ssh-into-docker/</guid>
+      <description>
+        
+        
+        &lt;ol&gt;
+&lt;li&gt;Work out the name of the AWS instance your Docker container is running in, eg: &amp;ldquo;development-2a-1&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Log in to AWS&lt;/li&gt;
+&lt;li&gt;Select the availability zone (likely to be London)&lt;/li&gt;
+&lt;li&gt;Go to EC2 instances and select the instance&lt;/li&gt;
+&lt;li&gt;Check the tags for the name&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;ssh in to the Docker instance: &lt;code&gt;ssh -J admin@gateway.dev.medicmobile.org admin@&amp;lt;instance_name&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Work out the name of the Docker container you want to connect to, eg: &amp;ldquo;alpha-dev&amp;rdquo;. Get a list of available containers with: &lt;code&gt;sudo docker ps&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Connect to the container: &lt;code&gt;sudo docker exec -it &amp;lt;container-name&amp;gt; /bin/bash&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: SSL Cert Install</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ssl-cert-install/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/hosting/ssl-cert-install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;requirements&#34;&gt;Requirements&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Installed CHT-Core 3.x via docker-compose&lt;/li&gt;
+&lt;li&gt;Your own SSL certifications (Let&amp;rsquo;s Encrypt)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;copy-certs-into-medic-os-container&#34;&gt;Copy certs into medic-os container&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside your server (you may need to use sudo before each command):
+$ docker ps
+$ docker cp /path/to/ssl.cert medic-os:/srv/settings/medic-core/nginx/private/ssl.crt
+$ docker cp /path/to/ssl.key medic-os:/srv/settings/medic-core/nginx/private/ssl.key
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;edit-nginx-configuration-file&#34;&gt;Edit nginx configuration file&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside the medic-os docker container:
+$ docker exec -it medic-os /bin/bash
+# sed -i &amp;quot;s|default.crt|ssl.crt|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
+# sed -i &amp;quot;s|default.key|ssl.key|&amp;quot; /srv/settings/medic-core/nginx/nginx.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;restart-services&#34;&gt;Restart services&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside medic-os container:
+$ docker exec -it medic-os /bin/bash
+# /boot/svc-restart medic-core nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;view-nginx-logs&#34;&gt;View Nginx Logs&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;Inside container:
+# cd /srv/storage/medic-core/nginx/logs/ 
+access.log error-ssl.log error.log startup.og
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+    </item>
+    
+  </channel>
+</rss>
