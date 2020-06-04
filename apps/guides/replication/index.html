@@ -26,12 +26,12 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://docs.communityhealthtoolkit.org/beta/apps/guides/replication/" />
-<meta property="article:modified_time" content="2020-06-04T11:43:48+03:00" /><meta property="og:site_name" content="Community Health Toolkit" />
+<meta property="article:modified_time" content="2020-06-04T14:37:53+03:00" /><meta property="og:site_name" content="Community Health Toolkit" />
 <meta itemprop="name" content="CouchDB replication">
 <meta itemprop="description" content="Settings for downloading copies of data onto a user&#39;s device.
 ">
-<meta itemprop="dateModified" content="2020-06-04T11:43:48&#43;03:00" />
-<meta itemprop="wordCount" content="284">
+<meta itemprop="dateModified" content="2020-06-04T14:37:53&#43;03:00" />
+<meta itemprop="wordCount" content="853">
 
 
 
@@ -95,7 +95,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/beta/offline-search-index.51d3036db098e3614f75492433595c3859283656ccc7c0d817e79a54bf3a5df9ce75c07b47355276d767987115d11ab6a7d969397b7cbef1ae291ce7c4a9b123.json"
+  data-offline-search-index-json-src="/beta/offline-search-index.397e6b989e0d495a02c8955e26d64485e651cf6c1aa722f21f797f54f72fc92f13df81bf70a1080decda5241b1d0296d605f85e1c3090c20be005730e2bcc16b.json"
   data-offline-search-base-href="/"
 >
 
@@ -126,7 +126,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/beta/offline-search-index.51d3036db098e3614f75492433595c3859283656ccc7c0d817e79a54bf3a5df9ce75c07b47355276d767987115d11ab6a7d969397b7cbef1ae291ce7c4a9b123.json"
+  data-offline-search-index-json-src="/beta/offline-search-index.397e6b989e0d495a02c8955e26d64485e651cf6c1aa722f21f797f54f72fc92f13df81bf70a1080decda5241b1d0296d605f85e1c3090c20be005730e2bcc16b.json"
   data-offline-search-base-href="/"
 >
 
@@ -1618,14 +1618,88 @@
 <p>For example, if a CHP&rsquo;s <code>facility_id</code> property is set to the ID of the Maori Hill clinic, then they will be able to see all patients and all reports about patients at that clinic.</p>
 <h3 id="depth">Depth</h3>
 <p>Sometimes though you want to only access contacts near the top of the hierarchy. This may be because returning all contacts would be too much data to be practical, or for patient privacy, or because it&rsquo;s just not part of your workflow. In this case you can configure a replication depth for a specific role under <code>replication_depth</code> in the app settings.</p>
-<p>For example:</p>
+<p>In 3.10, we add the ability to limit replication depth for reports, in conjunction with replication depth for contacts.</p>
+<h5 id="code-sample-39-and-earlier">Code sample 3.9 and earlier:</h5>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span>
   <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span>
     <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;district_manager&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">},</span>
     <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;national_manager&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000;font-weight:bold">}</span>
   <span style="color:#000;font-weight:bold">]</span>
 <span style="color:#000;font-weight:bold">}</span>
-</code></pre></div><h3 id="supervisor-signoff">Supervisor signoff</h3>
+</code></pre></div><h5 id="code-sample-310-and-later">Code sample 3.10 and later:</h5>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span>
+  <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;district_manager&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">},</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;national_manager&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000;font-weight:bold">}</span>
+  <span style="color:#000;font-weight:bold">]</span>
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></div><h5 id="contact-depth">Contact Depth</h5>
+<p>Depth is calculated relative to the user&rsquo;s home place, having the user&rsquo;s facility at depth = 0. Places and contacts that are parented by the facility are on depth = 1, and so on.</p>
+<p>For example, considering the following contact hierarchy:</p>
+<pre><code>district &gt; health_center &gt; clinic &gt; area &gt; family &gt; patient
+</code></pre><p>and a <code>supervisor</code> at <code>health_center</code> level and the following configuration:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;supervisor_role&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000;font-weight:bold">}]}</span>
+</code></pre></div><p>The <code>supervisor</code> would download the following contacts and reports:</p>
+<ul>
+<li>(level 0) <code>health_center</code> + all reports about <code>health_center</code></li>
+<li>(level 1) contacts whose parent is <code>health_center</code> +  all reports about these contacts</li>
+<li>(level 1) <code>clinic</code> + all reports about <code>clinic</code></li>
+<li>(level 2) contacts whose parent is <code>clinic</code> + all reports about these contacts</li>
+<li>(level 2) <code>family</code> + all reports about <code>family</code></li>
+</ul>
+<p>With the following configuration:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;supervisor_role&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">}]}</span>
+</code></pre></div><p>the <code>supervisor</code>'s docs change to:</p>
+<ul>
+<li>(level 0) <code>health_center</code> + all reports about <code>health_center</code></li>
+<li>(level 1) contacts whose parent is <code>health_center</code> + all reports about these contacts</li>
+<li>(level 1) <code>clinic</code> + all reports about <code>clinic</code></li>
+</ul>
+<p>If a user&rsquo;s roles match multiple <code>replication_depth</code> configs, the one with the highest <code>depth</code> is selected.</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> 
+  <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role1&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">},</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role2&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000;font-weight:bold">},</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role3&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span> <span style="color:#000;font-weight:bold">}</span>
+  <span style="color:#000;font-weight:bold">]</span>
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></div><p>A user with <code>roles: [&quot;role1&quot;, &quot;role2&quot;, &quot;role3&quot;]</code> will have a replication depth of 3.</p>
+<h5 id="report-depth">Report Depth</h5>
+<p>As of 3.10, <code>report_depth</code> works similarly to <code>depth</code>, but it&rsquo;s applied to reports (documents with <code>&quot;type&quot;: &quot;data_record&quot;</code>) alone, excepting reports that are submitted by the authenticated user.
+It only works in conjunction with <code>depth</code>.</p>
+<p>Following the examples above:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;supervisor_role&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">}]}</span>
+</code></pre></div><p>The <code>supervisor</code> would download the following contacts and reports:</p>
+<ul>
+<li>(level 0) <code>health_center</code> + all reports about <code>health_center</code></li>
+<li>(level 1) contacts whose parent is <code>health_center</code> + all reports about these contacts</li>
+<li>(level 1) <code>clinic</code> + all reports about <code>clinic</code></li>
+<li>(level 2) contacts whose parent is <code>clinic</code> + reports about <code>clinic</code> submitted by <code>supervisor</code></li>
+<li>(level 2) <code>family</code> +  reports about <code>family</code> submitted by the <code>supervisor</code></li>
+</ul>
+<p>Similarly, with:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;supervisor_role&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">0</span> <span style="color:#000;font-weight:bold">}]}</span>
+</code></pre></div><p>the <code>supervisor</code>'s docs change to:</p>
+<ul>
+<li>(level 0) <code>health_center</code> + all reports about <code>health_center</code></li>
+<li>(level 1) contacts whose parent is <code>health_center</code> + reports about these contacts submitted by <code>supervisor</code></li>
+<li>(level 1) <code>clinic</code> + reports about <code>clinic</code> submitted by the <code>supervisor</code></li>
+<li>(level 2) contacts whose parent is <code>clinic</code> + reports about these contacts submitted by <code>supervisor</code></li>
+<li>(level 2) <code>family</code> + reports about <code>family</code> submitted by the <code>supervisor</code></li>
+</ul>
+<p>If a user&rsquo;s roles match multiple <code>replication_depth</code> configs, the one with the highest <code>depth</code> is selected.</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#000;font-weight:bold">{</span> 
+  <span style="color:#204a87;font-weight:bold">&#34;replication_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role1&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1</span> <span style="color:#000;font-weight:bold">},</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role2&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#000;font-weight:bold">},</span>
+    <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">&#34;role&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;role3&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">&#34;report_depth&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">3</span> <span style="color:#000;font-weight:bold">}</span>
+  <span style="color:#000;font-weight:bold">]</span>
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></div><p>A user with <code>roles: [&quot;role1&quot;, &quot;role2&quot;, &quot;role3&quot;]</code> will have a replication depth of 5 and report replication depth of 2.</p>
+<p>If <code>report_depth</code> is omitted, the user will have access to all reports about contacts they see.</p>
+<p>If <code>report_depth</code> is higher than <code>depth</code>, it has no effect.</p>
+<p>If <code>depth</code> is omitted, the rule is invalid and will be ignored.</p>
+<h3 id="supervisor-signoff">Supervisor signoff</h3>
 <p>Some reports need to be signed off by a supervisor even though that supervisor doesn&rsquo;t have the depth to see the patient the report is about. To achieve this the report needs a field named <code>needs_signoff</code> with a value of <code>true</code>.</p>
 <h3 id="sensitive-documents">Sensitive documents</h3>
 <p>We won&rsquo;t replicate documents that are about the user when the sender is someone the user can&rsquo;t access. For example, if a supervisor submits a report about one of their CHPs, that CHP won&rsquo;t be able to see it.</p>
@@ -1695,7 +1769,7 @@
 		<br />
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified 04.06.2020: <a  href="https://github.com/medic/cht-docs/commit/1bf1b6d243fe6c28fa80ca6d8139ad57bdb124f5">Only build master and use node 12.x (1bf1b6d)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified 04.06.2020: <a  href="https://github.com/medic/cht-docs/commit/98bf9045d3f2669f1249503b54e4dff3dba2ea25">Adds documentation about replication depth. (98bf904)</a>
 </div>
 </div>
 
