@@ -26,12 +26,12 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://docs.communityhealthtoolkit.org/beta/core/guides/docker-setup/" />
-<meta property="article:modified_time" content="2020-06-04T23:45:16-04:00" /><meta property="og:site_name" content="Community Health Toolkit" />
+<meta property="article:modified_time" content="2020-06-04T15:09:34-07:00" /><meta property="og:site_name" content="Community Health Toolkit" />
 <meta itemprop="name" content="Docker Image Setup">
 <meta itemprop="description" content="Install tools to download and run the publicly available Docker image for CHT applications
 ">
-<meta itemprop="dateModified" content="2020-06-04T23:45:16-04:00" />
-<meta itemprop="wordCount" content="726">
+<meta itemprop="dateModified" content="2020-06-04T15:09:34-07:00" />
+<meta itemprop="wordCount" content="723">
 
 
 
@@ -95,7 +95,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/beta/offline-search-index.741671a470fe92fd9ca1f705fd171e1d59085a15e7f89c314e7ecc29103447fb0346a670c348b186d7e6f1ee967a24f2354ecaa0a81f8d25f2ba507812368929.json"
+  data-offline-search-index-json-src="/beta/offline-search-index.5e9b3ab51c88364ab62ee553dc2f26b634a1974355d6fbb683fe6442ede3ff476c0314e54a567ff0fd62c1703959bdff8781f5b517a3cf48e6c34d17079969f0.json"
   data-offline-search-base-href="/"
 >
 
@@ -126,7 +126,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/beta/offline-search-index.741671a470fe92fd9ca1f705fd171e1d59085a15e7f89c314e7ecc29103447fb0346a670c348b186d7e6f1ee967a24f2354ecaa0a81f8d25f2ba507812368929.json"
+  data-offline-search-index-json-src="/beta/offline-search-index.5e9b3ab51c88364ab62ee553dc2f26b634a1974355d6fbb683fe6442ede3ff476c0314e54a567ff0fd62c1703959bdff8781f5b517a3cf48e6c34d17079969f0.json"
   data-offline-search-base-href="/"
 >
 
@@ -1885,7 +1885,7 @@
 <h2 id="download-docker">Download Docker</h2>
 <p>Ubuntu:</p>
 <ul>
-<li><em>Note</em>: Install both below</li>
+<li>Install both below</li>
 <li><a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/">Docker CE</a></li>
 <li><a href="https://docs.docker.com/compose/install/">Docker-Compose</a></li>
 </ul>
@@ -1895,9 +1895,9 @@
 </ul>
 <p>Windows:</p>
 <ul>
-<li><em>Note</em>: If you have Hyper-V Capability, please ensure it is enabled in order to run Linux Containers on Windows. If you are running your Windows Server in cloud services, please ensure it is running on <a href="https://en.wikipedia.org/wiki/Bare_machine">bare-metal</a>. You will not be able to run Linux Containers in Windows if the previous comments are not adhered due to nested virtualization.</li>
+<li>If you have Hyper-V Capability, please ensure it is enabled in order to run Linux Containers on Windows. If you are running your Windows Server in cloud services, please ensure it is running on <a href="https://en.wikipedia.org/wiki/Bare_machine">bare-metal</a>. You will not be able to run Linux Containers in Windows if the previous comments are not adhered due to nested virtualization.</li>
 <li><a href="https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe">Docker for Windows</a></li>
-<li><em>Note</em>: If you do not have Hyper-V capability, but your server still supports virtualization, ensure that is enabled in your BiOS, and install the following package:</li>
+<li>If you do not have Hyper-V capability, but your server still supports virtualization, ensure that is enabled in your BiOS, and install the following package:</li>
 <li><a href="https://github.com/docker/toolbox/releases">Docker Toolbox using VirtualBox</a></li>
 </ul>
 <p>Run the installation and follow the instructions.</p>
@@ -1950,7 +1950,13 @@ networks:
 </code></pre><h3 id="launch-docker-compose-containers">Launch docker-compose containers</h3>
 <p>Inside the directory that you saved the above &lt;project_name&gt;-medic-os-compose.yml, run:</p>
 <pre><code>$ docker-compose -f &lt;project_name&gt;-medic-os-compose.yml up
-</code></pre><p><em>Note</em> In certain shells, docker-compose may not interpolate the admin password that was exported above. In that case, your admin user had a password automatically generated. Note the <code>New CouchDB Administrative User</code> and <code>New CouchDB Administrative Password</code> in the output terminal. You can retrieve these via running <code>docker logs medic-os</code> and searching the terminal.</p>
+</code></pre>
+
+<div class="alert alert-primary" role="alert">
+<h4 class="alert-heading">Note</h4>
+In certain shells, docker-compose may not interpolate the admin password that was exported above. In that case, your admin user had a password automatically generated. Note the <code>New CouchDB Administrative User</code> and <code>New CouchDB Administrative Password</code> in the output terminal. You can retrieve these via running <code>docker logs medic-os</code> and searching the terminal.
+</div>
+
 <p>Once containers are setup, please run the following command from your host terminal:</p>
 <pre><code>$ docker exec -it medic-os /bin/bash -c &quot;sed -i 's/--install=3.7.0/--complete-install/g' /srv/scripts/horticulturalist/postrun/horticulturalist&quot;
 $ docker exec -it medic-os /bin/bash -c &quot;/boot/svc-stop medic-core openssh &amp;&amp; /boot/svc-stop medic-rdbms &amp;&amp; /boot/svc-stop medic-couch2pg&quot;
@@ -1996,7 +2002,13 @@ In your compose file, change the ports under medic-os:</p>
     ports:
      - 8080:80
      - 444:443
-</code></pre><p><em>Note</em>: You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.</p>
+</code></pre>
+
+<div class="alert alert-primary" role="alert">
+<h4 class="alert-heading">Note</h4>
+You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.
+</div>
+
 <h2 id="helpful-docker-commands">Helpful Docker commands</h2>
 <h4 id="ssh-into-containerapplication--view-specific-service-logs">ssh into container/application &amp; view specific service logs</h4>
 <ul>
@@ -2110,7 +2122,7 @@ docker ps -f &quot;status=exited&quot;
 		<br />
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified 04.06.2020: <a  href="https://github.com/medic/cht-docs/commit/a81ee68263a7beb455d68cb348ec2825333953d6">Use explicit relatedContent in front matter, not keywords (a81ee68)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified 04.06.2020: <a  href="https://github.com/medic/cht-docs/commit/ea7cd8bbf3b0bcd68a2615c2b5c9cc849ab3d9e6">batch-1 (ea7cd8b)</a>
 </div>
 </div>
 
