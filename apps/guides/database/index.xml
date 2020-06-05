@@ -1,0 +1,293 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Community Health Toolkit – Managing Databases</title>
+    <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/</link>
+    <description>Recent content in Managing Databases on Community Health Toolkit</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/database/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Apps: Fixing couch2pg Memory Errors</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/couch2pg-oom-errors/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/couch2pg-oom-errors/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors.
+To fix this, we need to delete this document so that couch2pg can proceed.  Below are steps to follow to achieve this.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Reduce the size of the replicated docs to a value of say 4 in the couch2pg.conf file so that you can get within the range of the failing document.&lt;/li&gt;
+&lt;li&gt;Clone the existing &lt;a href=&#34;https://github.com/medic/couch2pg&#34;&gt;couch2pg&lt;/a&gt; repo so that you can run couch2pg locally&lt;/li&gt;
+&lt;li&gt;Edit the file &lt;code&gt;lib/importer.js&lt;/code&gt; in the couch2pg source code to be able to log the doc-id of the problem doc&lt;/li&gt;
+&lt;li&gt;Edit just logs doc_ids to the console, around line 100 of importer.js &lt;code&gt;console.log(row.doc._id);&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Get the remote couch2pg environment variable settings and export them into your profile terminal&lt;/li&gt;
+&lt;li&gt;Create an ssh reverse tunnel from the postgres server to your laptop&lt;/li&gt;
+&lt;li&gt;Run couch2pg locally so that you can see the doc-ids on console till it fails&lt;/li&gt;
+&lt;li&gt;From the ids printed on console try loading the docs in the couchdb web access(Futon or Fauxton), the problem doc is usually big and won&amp;rsquo;t load&lt;/li&gt;
+&lt;li&gt;This will help you identify the problem doc&lt;/li&gt;
+&lt;li&gt;Curl the document to your pc and back it up&lt;/li&gt;
+&lt;li&gt;Back up the document for further analysis&lt;/li&gt;
+&lt;li&gt;Delete the document using curl
+&lt;code&gt;curl --head &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;&amp;quot;&lt;/code&gt;
+This returns something like&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Content-Length: 307
+Content-Type: application/json
+Date: Tue, 25 Jun 2019 11:58:29 GMT
+ETag: &amp;quot;2-6beeb38da9b096bacfe2fa769e5171be&amp;quot;
+Server: CouchDB/2.3.1 (Erlang OTP/21)
+X-Couch-Request-ID: e4aa7a8696
+X-CouchDB-Body-Time: 0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The ETag is the rev. Delete document with curl: &lt;code&gt;curl -X DELETE &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;?rev=&amp;lt;THE_REV&amp;gt;&amp;quot;&lt;/code&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: CouchDB Authentication</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/couchdb-authentication/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/couchdb-authentication/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;to-invalidate-a-session-in-couchdb-there-are-two-options&#34;&gt;To invalidate a session in couchdb, there are two options:&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Change the session signing certificate on the server&lt;/li&gt;
+&lt;li&gt;Change the password and/or salt for the user whose session should be invalidated&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are drawbacks to note with each.  Option &lt;strong&gt;1&lt;/strong&gt; will invalidate &lt;em&gt;all&lt;/em&gt; sessions; option &lt;strong&gt;2&lt;/strong&gt; will invalidate all sessions &lt;em&gt;for that user&lt;/em&gt;, and also their password.&lt;/p&gt;
+&lt;p&gt;Because of the nature of couch&amp;rsquo;s session management, there is no way to see a list of active/open sessions.  Invalidating a specific session key could be achieved by blacklisting a cookie value in e.g. nginx or API, but this is unlikely to be of practical value.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Database Conflicts</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/database-conflicts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/database-conflicts/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Conflicts are a natural and unavoidable part of working in a distributed system.&lt;/p&gt;
+&lt;p&gt;Conflicts occur when one client (eg PouchDB) attempts to replicate to another (eg CouchDB), and the document that the first has does not have the same tree of changes that the second one has.&lt;/p&gt;
+&lt;h2 id=&#34;an-example&#34;&gt;An example&lt;/h2&gt;
+&lt;p&gt;To make it clear what&amp;rsquo;s happening, let&amp;rsquo;s walk through an example. If you already understand conflicts feel free to skip this section.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say you register a pregnancy in the UI. And then you notice that you got the LMP wrong, so you hit edit and quickly make the change.&lt;/p&gt;
+&lt;p&gt;Meanwhile, sentinel notices that you registers a pregnancy, and before you have a chance to change the LMP, sets up a bunch of recurring messages, editing the document.&lt;/p&gt;
+&lt;p&gt;Sentinel has now made a change to the first version of your document, and you&amp;rsquo;re trying to also make a change to the first version. These conflict.&lt;/p&gt;
+&lt;h2 id=&#34;how-to-manage-conflicts&#34;&gt;How to manage conflicts&lt;/h2&gt;
+&lt;p&gt;Conflicts will appear on the #downtime Slack channel, along with the other alerts. If a server you manage has a conflict, you should do the following:&lt;/p&gt;
+&lt;h3 id=&#34;identify-why-conflicts-are-occuring&#34;&gt;Identify why conflicts are occuring&lt;/h3&gt;
+&lt;p&gt;Take a look at the conflicts view, at &lt;code&gt;https://yourserver/medic/_design/medic-conflicts/_view/conflicts&lt;/code&gt;. Each entry in that view looks like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1-82d9a42305a79e403d9eca6a9a9daae9&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;,&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The &lt;code&gt;id&lt;/code&gt; is the &lt;code&gt;_id&lt;/code&gt; of the conflicting document, and the &lt;code&gt;key&lt;/code&gt; is a list of conflicting &lt;code&gt;_rev&lt;/code&gt;s.&lt;/p&gt;
+&lt;p&gt;For each conflicting document, download that document, as well as all the &lt;code&gt;_rev&lt;/code&gt;s indicated in the &lt;code&gt;key&lt;/code&gt; above. To download a document with a specific &lt;code&gt;_rev&lt;/code&gt;, pass the &lt;code&gt;rev&lt;/code&gt; parameter.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#39;&lt;/span&gt; &amp;gt; doc.json
+curl &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8?rev=1-82d9a42305a79e403d9eca6a9a9daae9&amp;#39;&lt;/span&gt; &amp;gt; doc-conflict1.json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now you have all versions of the document, you can diff them and try to determine what went wrong.&lt;/p&gt;
+&lt;p&gt;A common problem, for example, might be sentinel hitting a document really quickly between you creating it and editing it.&lt;/p&gt;
+&lt;p&gt;A less common problem that requires some special attention, is UUID collisions (see below).&lt;/p&gt;
+&lt;p&gt;If you get stuck feel free to escalate to a developer, who can take a look.&lt;/p&gt;
+&lt;h3 id=&#34;if-appropriate-raise-a-bug&#34;&gt;If appropriate, raise a bug&lt;/h3&gt;
+&lt;p&gt;If you determine (or just suspect) that the problem could be in our code or data structures, feel free to raise a bug to development. For example, historically read status has been stored against the document, which can easily cause conflicts if you create a document and then instantly view it with sentinel processing in the background.&lt;/p&gt;
+&lt;p&gt;While some conflicts are inevitable, we want to architect away from them as much as possible. Ideally tech leads would never have to resolve conflicts.&lt;/p&gt;
+&lt;h3 id=&#34;regardless-resolve-the-conflicts&#34;&gt;Regardless, resolve the conflicts&lt;/h3&gt;
+&lt;p&gt;Now that you&amp;rsquo;ve diagnosed the problem, and perhaps reported a bug, you should resolve the conflict.&lt;/p&gt;
+&lt;p&gt;This is &lt;strong&gt;extremely&lt;/strong&gt; important. Conflicts cause saved changes to not appear against documents silently, and could cause important document changes (eg fixing someone&amp;rsquo;s EDD) to not occur.&lt;/p&gt;
+&lt;p&gt;For a document to no longer be conflicted, there must only be one active &lt;code&gt;_rev&lt;/code&gt;. You would do this by picking one rev and updating it with the changes you want to make, and then updating the others with the &lt;code&gt;_deleted: true&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;You can tell that a document is no longer conflicted if they don&amp;rsquo;t appear in the view, or if when you request the document with &lt;code&gt;?conflicts=true&lt;/code&gt; the &lt;code&gt;_conflicts&lt;/code&gt; property either doesn&amp;rsquo;t appear or is empty:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
+
+{
+  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
+  &amp;quot;_rev&amp;quot;: &amp;quot;2-the-current-rev&amp;quot;
+  &amp;quot;_conflicts&amp;quot;: [
+    &amp;quot;2-a-conflicting-rev&amp;quot;
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In the above example, &lt;code&gt;yourdocid&lt;/code&gt; has two revisions that conflict with each other. Here you would need to update one of the revs (it doesn&amp;rsquo;t matter which) with the other&amp;rsquo;s changes, then delete the other rev. You would then see:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;https://yourserver/medic/yourdocid?conflicts=true
+
+{
+  &amp;quot;_id&amp;quot;: &amp;quot;yourdocid&amp;quot;,
+  &amp;quot;_rev&amp;quot;: &amp;quot;3-the-new-rev&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;a-trivial-example&#34;&gt;A trivial example&lt;/h4&gt;
+&lt;p&gt;Let&amp;rsquo;s say that you have two documents, and the diff between them looks something like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;===================================================================
+&lt;/span&gt;&lt;span style=&#34;color:#000080;font-weight:bold&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;--- 277533E3-A41B-3C46-909F-BCA038197C1E___2-2fff60be1557fdfef9915aa09e1b5119.json
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+++ 277533E3-A41B-3C46-909F-BCA038197C1E___2-d2a7186380b72306d75cd64b64402575.json
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;@@ -1,7 +1,7 @@
+&lt;/span&gt;&lt;span style=&#34;color:#800080;font-weight:bold&#34;&gt;&lt;/span&gt; {
+   &amp;#34;_id&amp;#34;: &amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;,
+&lt;span style=&#34;color:#a40000&#34;&gt;-  &amp;#34;_rev&amp;#34;: &amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+  &amp;#34;_rev&amp;#34;: &amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   &amp;#34;data&amp;#34;: &amp;#34;some shared data&amp;#34;,
+   &amp;#34;read&amp;#34;: [
+&lt;span style=&#34;color:#a40000&#34;&gt;-    &amp;#34;some_user&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+    &amp;#34;admin&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;   ]
+ }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The problem here is clear: &lt;code&gt;some_user&lt;/code&gt; and &lt;code&gt;admin&lt;/code&gt; read the document at the same time. To solve this, we could add &lt;code&gt;some_user&lt;/code&gt; to the revision with &lt;code&gt;admin&lt;/code&gt; already in it, and then delete the &lt;code&gt;some_user&lt;/code&gt; revision:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
+   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+ &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_deleted&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some shared data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;some_user&amp;#34;&lt;/span&gt;
+   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+ &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;resolving-uuid-collisions&#34;&gt;Resolving UUID collisions&lt;/h4&gt;
+&lt;p&gt;A UUID collision is a rare event where two clients (eg two android phones running our application) generate the same UUID ID for two completely different documents.&lt;/p&gt;
+&lt;p&gt;You can tell when your conflict is a UUID collision as there is no common root between the two conflicting versions. For example, one might be of type person and one might of type data_record.&lt;/p&gt;
+&lt;p&gt;These situations are more complicated, and require that you essentially recreate all conflicting versions as new documents, and fix any linkages that exist in the database.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say you find the following situation:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;{
+  &amp;#34;_id&amp;#34;: &amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;
+&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;_rev&amp;#34;: &amp;#34;1-e4da228c29dc4ebc8b156967bbf48bd1&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;_rev&amp;#34;: &amp;#34;1-ce40d1dc470643e2b9be9368ea9ff240&amp;#34;,
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;- &amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;+ &amp;#34;type&amp;#34;: &amp;#34;data_record&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#00a000&#34;&gt;&lt;/span&gt;&amp;lt;snip a bunch more stuff that doesn&amp;#39;t relate to each other&amp;gt;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You will want to do four things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Download the &lt;code&gt;_rev&lt;/code&gt; for the &lt;code&gt;person&lt;/code&gt; and create a new document, with a new uuid, for that document (you can do this by uploadig the document without an &lt;code&gt;_id&lt;/code&gt; or &lt;code&gt;_rev&lt;/code&gt; parameter and let CouchDB generate them for you)&lt;/li&gt;
+&lt;li&gt;Do the same for the &lt;code&gt;data_record&lt;/code&gt; version&lt;/li&gt;
+&lt;li&gt;Delete the main conflicting document &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And finally, find any references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, work out which doc they were &lt;em&gt;supposed&lt;/em&gt; to point to, and then edit those UUIDs to be the correct UUID &lt;code&gt;_id&lt;/code&gt; from the docs you created above.&lt;/p&gt;
+&lt;p&gt;Because this should be a rare event and a generic view would be enormous, we do not ship a view that helps you find this out.&lt;/p&gt;
+&lt;p&gt;However, you can create your own view! You&amp;rsquo;re going to want to create a DDOC specifically for this view. You can follow the following template to create what you want:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_design/docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;views&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;docs-by-reference&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;map&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;function(doc) {\n  var KEYS = [];\n\n  // TODO: consider switching this around to whitelist doc types\n  if (doc._id.match(/-info$/) ||\n      doc._id.match(/^_local/)) {\n    return;\n  }\n\n  var goDeeper = function(obj, path) {\n    Object.keys(obj).forEach(function(key) {\n      if (typeof obj[key] === &amp;#39;string&amp;#39; &amp;amp;&amp;amp;\n          KEYS.indexOf(obj[key]) !== -1) {\n        emit(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n\n      if (obj[key] &amp;amp;&amp;amp; typeof obj[key] === &amp;#39;object&amp;#39;) {\n        goDeeper(obj[key], path + &amp;#39;.&amp;#39; + key);\n      }\n    });\n  };\n\n  goDeeper(doc, doc._id);\n}&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this, add any IDs you want to be found in the &lt;code&gt;KEYS&lt;/code&gt; variable at the top of the function. So in our case, we would change &lt;code&gt;KEYS&lt;/code&gt; to look like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;KEYS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Upload this document to CouchDB (do not just add the view to an existing DDOC, as you will force all views on that DDOC to regenerate) and then warm up the views by querying it once (it may take a long time to run).&lt;/p&gt;
+&lt;p&gt;Once it is complete you can query the view again to return a list of documents that reference the ids you hard-coded above.&lt;/p&gt;
+&lt;p&gt;This will help you to identify which documents are affected by this change. Usually the only change needed is to change the ID located to the new ones you generated.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;total_rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;offset&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;rows&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.inputs.contact._id&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;key&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
+        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;],&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.patient_id&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this example, there are two references to &lt;code&gt;7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code&gt;, both in the &lt;code&gt;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code&gt; document, one at &lt;code&gt;fields.inputs.contact._id&lt;/code&gt; and one at &lt;code&gt;fields.patient_id&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code&gt;#development&lt;/code&gt;) and they can help you out.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Conncting to RDBMS from Windows</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/rdbms-in-windows/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/database/rdbms-in-windows/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p&gt;
+&lt;h2 id=&#34;ssh-key-generation-and-importing&#34;&gt;SSH Key Generation and Importing&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Download Puttygen from &lt;a href=&#34;https://www.ssh.com/ssh/putty/download&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new key pair for your computer.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttygen-run-key-generate.png&#34; alt=&#34;Putty-gen-key-pair&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;Convert the key generated from ssh2 format to openssh. Puttygen supports this. Guide &lt;a href=&#34;https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygenwindows-into-key-pairs-use?answertab=votes#tab-top&#34;&gt;here&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;1. Open PuttyGen
+2. Click Load
+3. Load your private key
+4. Go to Conversions-&amp;gt;Export OpenSSH and export your private key
+5. Copy your private key to ~/.ssh/id_dsa (or id_rsa).
+6. Create the RFC 4716 version of the public key using ssh-keygen
+    ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
+6. Convert the RFC 4716 version of the public key to the OpenSSH format:
+    ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub
+    
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;Import the file using PuTTYgen:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-gen-import.png&#34; alt=&#34;puttty-import-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;Save it as PuTTY Private Key File .ppk:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-save-key.png&#34; alt=&#34;puttty-save-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;Add the key (.ppk) to Pageant (PuTTY authentication agent):&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;putty-add-key.png&#34; alt=&#34;puttty-add-key&#34;&gt;&lt;/p&gt;
+&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;Now you can connect to RDBMS using PuTTY:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;puttty-connect.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;putty-connect-final.png&#34; alt=&#34;puttty-connect&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If you are connecting to rdbms in order to use a PostgreSQL client. You may not need to tunnel the connection. The client can do it for you.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_1.png&#34; alt=&#34;rdbms_1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;rdbms_connect_2.png&#34; alt=&#34;rdbms_2&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

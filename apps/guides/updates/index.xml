@@ -1,0 +1,111 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Community Health Toolkit – Managing Updates to Applications and Content</title>
+    <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/</link>
+    <description>Recent content in Managing Updates to Applications and Content on Community Health Toolkit</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Apps: Moving Contacts within the Hierarchy</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/moving-contacts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/moving-contacts/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Contacts are organized into a hierarchy. It is not straight-forward to move contacts from one position in the hierarchy to another because many copies of this hierarchy exist. Use the &lt;code&gt;move-contacts&lt;/code&gt; action in &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;&lt;code&gt;medic-conf&lt;/code&gt;&lt;/a&gt; to assign a new parent to contacts. This command will move the specified contact, all the contacts under that contact, and all reports created by any of those contacts. This action will download all documents that need to be updated, update the lineages within those documents, and then save the updated documents on your local disk. To commit those changes to the database, run the &lt;code&gt;upload-docs&lt;/code&gt; action.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Offline users who have contacts removed from their visible hierarchy will not automatically see those contacts disappear. The contact remains on the user&amp;rsquo;s device. Any updates made to the contact (or any reports created for that contact) will silently fail to sync (medic/medic/#5701). These users must be encouraged to clear cache and resync!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Also impactful, but less serious - this script can cause significant amounts of changes to the database and offline users who have contacts moved into their visible hierarchy may experience lengthy and bandwidth-intensive synchronizations.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Parameter&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Required&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;contacts&lt;/td&gt;
+&lt;td&gt;Comma delimited list of contact IDs which will be moved&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;parent&lt;/td&gt;
+&lt;td&gt;ID of the new parent which will be assigned to the provided contacts&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;docDirectoryPath&lt;/td&gt;
+&lt;td&gt;This action outputs files to local disk at this destination&lt;/td&gt;
+&lt;td&gt;No. Default &lt;code&gt;json-docs&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Some constraints when moving contacts:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Allowed Parents&lt;/strong&gt; - When moving contacts on WebApp &amp;gt;v3.7, your chosen parent must be listed as a valid parent for the contact as defined in the &lt;a href=&#34;https://docs.communityhealthtoolkit.org/beta/apps/reference/app-settings/hierarchy/&#34;&gt;configuration for place hierarchy&lt;/a&gt;. For WebApp &amp;lt;v3.7, the default hierarchy is enforced.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Circular Hierarchy&lt;/strong&gt; - Nobody&amp;rsquo;s parent can ever be themself or their child.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Primary Contacts&lt;/strong&gt; - Primary contacts must be a descendant of the place for which they are the primary contact. You may need to select a new primary contact for a place through the WebApp if you&amp;rsquo;d like to move a primary contact to a new place in the hierarchy.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Minification&lt;/strong&gt; - Due to contact &amp;ldquo;minification&amp;rdquo; (#2635) which was implemented in v2.13, this script should not be used for versions prior to v2.13.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;examples&#34;&gt;Examples&lt;/h3&gt;
+&lt;p&gt;Move the contacts with the id &lt;code&gt;contact_1&lt;/code&gt; and &lt;code&gt;contact_2&lt;/code&gt; to have the parent &lt;code&gt;parent_id&lt;/code&gt;. The changes will be in the local folder &lt;code&gt;my_folder&lt;/code&gt; only for review. Run the second command to upload the changes after review.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;medic-conf --instance= move-contacts -- --contacts=contact_1,contact_2 --parent=parent_id --docDirectoryPath=my_folder
+medic-conf --local upload-docs -- --docDirectoryPath=my_folder
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Move the contact with the id &lt;code&gt;contact_1&lt;/code&gt; to the top of the hierarchy (no parent).&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;medic-conf --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
+&lt;/code&gt;&lt;/pre&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Update Collect Forms Remotely</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/collect-forms-update/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/updates/collect-forms-update/</guid>
+      <description>
+        
+        
+        &lt;p&gt;To do over the air Medic Collect form updates via HTTP rather than sending APKs which have a long manual install process, follow the steps below:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Have your xls forms ready in the folder.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;They should use underscore as name separators. e.g form_name.xlsx&lt;/li&gt;
+&lt;li&gt;They should have &lt;code&gt;form_id&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt;  properties in the settings&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;xform_name_settings.png&#34; alt=&#34;Name property&#34;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Upload the forms to the instance using &lt;code&gt;Medic-Conf&lt;/code&gt; Using the &lt;code&gt;upload-collect-forms&lt;/code&gt; &lt;a href=&#34;https://github.com/medic/medic-conf/blob/master/src/cli/supported-actions.js&#34;&gt;action&lt;/a&gt; as shown below.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;medic-conf --instance=user:pass@instancename.app.medicmobile.org upload-collect-forms
+&lt;/code&gt;&lt;/pre&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Go to the Collect App. Delete All forms then go to &lt;code&gt;Get Blank Form&lt;/code&gt; and select all the forms you need.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;troubleshooting&#34;&gt;Troubleshooting&lt;/h1&gt;
+&lt;p&gt;When you go to &lt;code&gt;Get Blank Forms&lt;/code&gt; and instead of getting a list of the forms available, you get a pop-up error which has a portion of this message instead&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;...OpenRosa Version 1.0 standard: Forms list entry 1 is missing one or more tags: formId, name or downloadUrl
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This means you probably uploaded a XLS file without a &lt;code&gt;name&lt;/code&gt; or &lt;code&gt;form_id&lt;/code&gt; property. To find out which form is missing that, use this command:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -vvvv -H &amp;quot;x-openrosa-version: 1&amp;quot; http://user:pass@host:port/api/v1/forms
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Should bring a list like this one&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;xform_list.png&#34; alt=&#34;Xform List&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Go through the list and see which form has  a missing &lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;formID&amp;gt;&lt;/code&gt; property. Add it and reuploadthe forms using &lt;code&gt;medic-conf&lt;/code&gt; again.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

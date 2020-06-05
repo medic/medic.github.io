@@ -1,0 +1,304 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Community Health Toolkit – Messaging and SMS</title>
+    <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/</link>
+    <description>Recent content in Messaging and SMS on Community Health Toolkit</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Apps: SMS message states</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/sms-states/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/sms-states/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;interaction-with-sms-providers&#34;&gt;Interaction with SMS providers&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/medic/medic&#34;&gt;Medic&lt;/a&gt; can use &lt;a href=&#34;https://github.com/medic/medic-gateway&#34;&gt;medic-gateway&lt;/a&gt; and third party aggregators to send and receive SMS messages.&lt;/p&gt;
+&lt;p&gt;When an SMS report comes in from a user, &lt;a href=&#34;https://github.com/medic/medic-sentinel&#34;&gt;medic-sentinel&lt;/a&gt; adds the appropriate list of scheduled messages (to be sent at a future date) to the report doc.&lt;/p&gt;
+&lt;p&gt;Periodically, sentinel checks for messages that need to be sent, and &lt;a href=&#34;https://github.com/medic/medic-sentinel/blob/master/schedule/due_tasks.js&#34;&gt;sets their state to &lt;code&gt;pending&lt;/code&gt;&lt;/a&gt; if their scheduled sending time has been reached or passed.&lt;/p&gt;
+&lt;p&gt;Periodically, the aggregator checks for messages that need to be sent (i.e. that are in &lt;code&gt;pending&lt;/code&gt; state).&lt;/p&gt;
+&lt;p&gt;The aggregator also reports on the status of the messages it&amp;rsquo;s sending.&lt;/p&gt;
+&lt;h2 id=&#34;message-statusesstates&#34;&gt;Message statuses/states&lt;/h2&gt;
+&lt;p&gt;Both webapp and the aggregator store states/statuses of the messages to keep track of the exchange. They each have their set of statuses, which sometimes are called the same but do not mean the same thing. Watch out.&lt;/p&gt;
+&lt;h3 id=&#34;message-statuses-in-medic-gateway&#34;&gt;Message statuses in medic-gateway&lt;/h3&gt;
+&lt;p&gt;See &lt;a href=&#34;https://github.com/medic/medic-gateway#content&#34;&gt;https://github.com/medic/medic-gateway#content&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;message-states-in-medic&#34;&gt;Message states in medic&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;State&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;scheduled&lt;/td&gt;
+&lt;td&gt;Not yet due. Messages as part of a configured schedule start in this state and are changed to &lt;code&gt;pending&lt;/code&gt; when due.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;pending&lt;/td&gt;
+&lt;td&gt;Due to be sent. The SMS gateway should pick this up for sending. Auto replies and instant messages start in this state.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;forwarded-to-gateway&lt;/td&gt;
+&lt;td&gt;Message has been sent to gateway.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;received-by-gateway&lt;/td&gt;
+&lt;td&gt;Has been received by the gateway.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;forwarded-by-gateway&lt;/td&gt;
+&lt;td&gt;Gateway has tried sending the message.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;sent&lt;/td&gt;
+&lt;td&gt;Successfully delivered to the sms network.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;delivered&lt;/td&gt;
+&lt;td&gt;Successfully received by the recipient&amp;rsquo;s device.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;failed&lt;/td&gt;
+&lt;td&gt;The sending attempt failed. Sending will not be retried without user intervention.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;denied&lt;/td&gt;
+&lt;td&gt;This will not be sent. The recipient phone number is configured to be denied via &lt;code&gt;outgoing_deny_list&lt;/code&gt;, &lt;code&gt;outgoing_deny_with_alphas&lt;/code&gt;, or &lt;code&gt;outgoing_deny_shorter_than&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;cleared&lt;/td&gt;
+&lt;td&gt;This will not be sent as a report has triggered an event to stop it. This can happen if a patient visit has occurred before the visit reminder is sent.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;muted&lt;/td&gt;
+&lt;td&gt;This will not be sent as the task has been deliberately stopped. Messages in this state can be unmuted by user action.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;timeline-of-the-medic-gateway-protocol-for-webapp-originating-message&#34;&gt;Timeline of the medic-gateway protocol for webapp-originating message&lt;/h2&gt;
+&lt;p&gt;Read the table below like a vertical timeline : each time an event happens, the states/statuses corresponding to the message get updated.&lt;/p&gt;
+&lt;p&gt;Note 1 : Gateway only sends a status update for a message only if the &amp;ldquo;needs forwarding&amp;rdquo; flag for the message status is true, and then sets it back to false. So it only sends status updates once.&lt;/p&gt;
+&lt;p&gt;Note 2 : If api sends the same WO message again, then gateway sets its needs forwarding flag to true, and so sends the status at the next poll.&lt;/p&gt;
+&lt;p&gt;Note 3 : not all of the events below happen every time : this is assuming only one step of SMS-sending happens between each poll. If several steps happened, then some of the events below are skipped. If several status changes have happened between polls, Gateway will report the multiple new statuses at the next poll.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;number&lt;/th&gt;
+&lt;th&gt;Event&lt;/th&gt;
+&lt;th&gt;webapp state&lt;/th&gt;
+&lt;th&gt;gateway status&lt;/th&gt;
+&lt;th&gt;gateway &amp;ldquo;Needs forwarding&amp;rdquo; flag&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Due date to send the message passes&lt;/td&gt;
+&lt;td&gt;pending&lt;/td&gt;
+&lt;td&gt;&amp;mdash;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Gateway polls and gets a new WO message&lt;/td&gt;
+&lt;td&gt;forwarded-to-gateway&lt;/td&gt;
+&lt;td&gt;&amp;mdash;&lt;/td&gt;
+&lt;td&gt;&amp;mdash;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Gateway saves message in its DB&lt;/td&gt;
+&lt;td&gt;forwarded-to-gateway&lt;/td&gt;
+&lt;td&gt;UNSENT&lt;/td&gt;
+&lt;td&gt;true&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Gateway reports UNSENT status for the message&lt;/td&gt;
+&lt;td&gt;received-by-gateway&lt;/td&gt;
+&lt;td&gt;UNSENT&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;Gateway sends the message&lt;/td&gt;
+&lt;td&gt;received-by-gateway&lt;/td&gt;
+&lt;td&gt;PENDING&lt;/td&gt;
+&lt;td&gt;true&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;Gateway reports PENDING status for the message&lt;/td&gt;
+&lt;td&gt;forwarded-by-gateway&lt;/td&gt;
+&lt;td&gt;PENDING&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;Gateway gets confirmation the message left&lt;/td&gt;
+&lt;td&gt;forwarded-by-gateway&lt;/td&gt;
+&lt;td&gt;SENT&lt;/td&gt;
+&lt;td&gt;true&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;Gateway reports SENT status for the message&lt;/td&gt;
+&lt;td&gt;sent&lt;/td&gt;
+&lt;td&gt;SENT&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;Gateway gets confirmation the message arrived&lt;/td&gt;
+&lt;td&gt;sent&lt;/td&gt;
+&lt;td&gt;DELIVERED&lt;/td&gt;
+&lt;td&gt;true&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;Gateway reports DELIVERED status for the message&lt;/td&gt;
+&lt;td&gt;delivered&lt;/td&gt;
+&lt;td&gt;DELIVERED&lt;/td&gt;
+&lt;td&gt;false&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Managing Messaging Gateways</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/gateway/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/gateway/</guid>
+      <description>
+        
+        
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Africa&#39;s Talking SMS Aggregator</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/africas-talking/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/africas-talking/</guid>
+      <description>
+        
+        
+        &lt;p&gt;As of v3.6.0, SMS messages can be sent and received using the &lt;a href=&#34;https://africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt; service.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;sms-aggregator-workflow.svg&#34; alt=&#34;SMS Aggregator Workflow&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;africas-talking-configuration&#34;&gt;Africa&amp;rsquo;s Talking configuration&lt;/h2&gt;
+&lt;p&gt;First generate a long unique key to use as the &lt;code&gt;medic-api-key&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Log on to the &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking Dashboard&lt;/a&gt; and configure your callback URLs as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Delivery Reports: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/delivery-reports?key=&amp;lt;medic-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Incoming Messages: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/incoming-messages?key=&amp;lt;medic-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Then generate an &amp;ldquo;API Key&amp;rdquo; (we&amp;rsquo;ll refer to this as the &lt;code&gt;at-api-key&lt;/code&gt;) and save this in your Medic configuration covered below.&lt;/p&gt;
+&lt;h2 id=&#34;medic-configuration&#34;&gt;Medic configuration&lt;/h2&gt;
+&lt;h3 id=&#34;api-keys&#34;&gt;API keys&lt;/h3&gt;
+&lt;p&gt;The API keys should be treated as securely as a password as anyone with access to them will be able to send messages using your account. Therefore we store them in the CouchDB configuration.&lt;/p&gt;
+&lt;p&gt;To add the credentials to the admin config you need to either &lt;a href=&#34;https://docs.couchdb.org/en/stable/api/server/configuration.html#put--_node-node-name-_config-section-key&#34;&gt;PUT the value using curl&lt;/a&gt; or similar:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/couchdb@127.0.0.1/_config/medic-credentials/africastalking.com:incoming -d &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#34;&amp;lt;medic-api-key&amp;gt;&amp;#34;&amp;#39;&lt;/span&gt;
+curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/couchdb@127.0.0.1/_config/medic-credentials/africastalking.com:outgoing -d &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;&amp;#34;&amp;lt;at-api-key&amp;gt;&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
+&lt;h4 class=&#34;alert-heading&#34;&gt;Note&lt;/h4&gt;
+&lt;code&gt;couchdb@127.0.0.1&lt;/code&gt; is the local node name, and may be different for you depending on your setup.
+&lt;/div&gt;
+
+&lt;p&gt;You can also add it via Fauxton:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Navigate to &lt;a href=&#34;http://localhost:5984/_utils/#/_config&#34;&gt;the Config screen&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Click &lt;code&gt;Add Option&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;Section&lt;/code&gt; should be &lt;code&gt;medic-credentials&lt;/code&gt;, the &lt;code&gt;Name&lt;/code&gt; should be &lt;code&gt;africastalking.com:incoming&lt;/code&gt; or &lt;code&gt;africastalking.com:outgoing&lt;/code&gt;, and the value should be the relevant API key.&lt;/li&gt;
+&lt;li&gt;Click &lt;code&gt;Create&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;You should then be able to see your credential in the list of configuration shown&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;app-settings&#34;&gt;App settings&lt;/h3&gt;
+&lt;p&gt;Update your app settings as follows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;sms&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;outgoing_service&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;africas-talking&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;reply_to&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking shortcode&amp;gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;africas_talking&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;username&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking username&amp;gt;&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testing&#34;&gt;Testing&lt;/h2&gt;
+&lt;p&gt;To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href=&#34;https://account.africastalking.com&#34;&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;, and go to the Sandbox app.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Message Loops</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/message-loops/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/message-loops/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Endless messaging loops can between the webapp and a mobile number via the gateway due to autoreplies from the webapp.&lt;/p&gt;
+&lt;p&gt;See the &lt;a href=&#34;https://github.com/medic/medic/issues/750#issuecomment-146254467&#34;&gt;Github Issue&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; Add the offending number(e.g &lt;code&gt;800&lt;/code&gt; or &lt;code&gt;SAFARICOM&lt;/code&gt;) to the &lt;code&gt;Outgoing Deny List&lt;/code&gt; in the webapp&amp;rsquo;s &lt;code&gt;app_settings&lt;/code&gt; configuration file.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  &amp;quot;multipart_sms_limit&amp;quot;: 10,
+  &amp;quot;outgoing_deny_list&amp;quot;: &amp;quot;800, SAFARICOM&amp;quot;,
+  &amp;quot;contact_summary&amp;quot;: &amp;quot;&amp;quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Apps: Shortcode identifiers</title>
+      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/shortcodes/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/messaging/shortcodes/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Shortcodes used for SMS messaging are generated on &lt;code&gt;doc.patient_id&lt;/code&gt; against any document of &lt;code&gt;type&lt;/code&gt; &lt;code&gt;person&lt;/code&gt;. By default, these shortcodes start at 5 numeric digits long, and will increase in length as deemed necessary by the generation algorithm.&lt;/p&gt;
+&lt;p&gt;If the length is increased, this increase is stored in a CouchDB documented called &lt;code&gt;shortcode-id-length&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;configuring-a-minimum-length&#34;&gt;Configuring a minimum length&lt;/h2&gt;
+&lt;p&gt;If you wish to change the minimum length to of ids to generate, create or edit the &lt;code&gt;shortcode-id-length&lt;/code&gt; document in CouchDB. For example, if you wish for the minimum length to be 7:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;shortcode-id-length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;current_length&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;NB: If this file already exists be sure to include the existing &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;NB: If you are changing this document and want to make it relevant straight away, &lt;strong&gt;you must restart Sentinel.&lt;/strong&gt; Otherwise there may be a collection of cached already accepted ids of the previous length that Sentinel will work through first.&lt;/p&gt;
+&lt;h2 id=&#34;configuring-a-maximum-length-locking-down-an-exact-length-etc&#34;&gt;Configuring a maximum length, locking down an exact length etc&lt;/h2&gt;
+&lt;p&gt;It is not possible to either alter the maximum length of ids, to stop it automatically increasing or to tweak when it decides to automatically increase. IDs automatically increasing in length when required is important to the continual correct functioning of Sentinel.&lt;/p&gt;
+&lt;h2 id=&#34;valid-sizes&#34;&gt;Valid sizes&lt;/h2&gt;
+&lt;p&gt;Shortcodes can be between 5 and 13 digits long. Due to the last digit being a checksum digit, there are at most 10,000 5 digit ids, and at most 1,000,000,000,000 13 digit ids.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
