@@ -1,109 +1,67 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Community Health Toolkit – Debugging Applications</title>
-    <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/</link>
-    <description>Recent content in Debugging Applications on Community Health Toolkit</description>
-    <generator>Hugo -- gohugo.io</generator>
-    
-	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-        
-      
-    
-    
-    <item>
-      <title>Apps: Obtaining Logs</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/obtaining-logs/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/obtaining-logs/</guid>
-      <description>
-        
-        
-        &lt;p&gt;There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p&gt;
-&lt;h2 id=&#34;browser-logs&#34;&gt;Browser logs&lt;/h2&gt;
-&lt;p&gt;To check if there are relevant logs open up the developer console. The shortcut is probably COMMAND+ALT+I on MacOS, or CTRL+ALT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p&gt;
-&lt;h2 id=&#34;server-logs&#34;&gt;Server logs&lt;/h2&gt;
-&lt;p&gt;The easiest way is to use &lt;code&gt;medic-logs&lt;/code&gt;, a tool that comes with &lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;&lt;code&gt;medic-conf&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;medic-logs anInstance gardener
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;See &lt;a href=&#34;https://github.com/medic/medic-conf#medic-logs&#34;&gt;medic-logs documentation&lt;/a&gt; for more details.&lt;/p&gt;
-&lt;p&gt;This will download logs to your current directory. You will need to look through these logs to work out what is relevant.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Apps: Replicating Production Data Locally</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/replicating-production-data-locally/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/replicating-production-data-locally/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Copy the data from an instance to a local CouchDB database&lt;/li&gt;
-&lt;li&gt;Run a local webapp instance with that data&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;first-a-note-about-data-safety&#34;&gt;First, a note about data safety&lt;/h2&gt;
-&lt;p&gt;Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an encrypted drive and delete it once you&amp;rsquo;re done with it.&lt;/p&gt;
-&lt;h2 id=&#34;step-1-get-the-data&#34;&gt;Step 1: Get the data&lt;/h2&gt;
-&lt;p&gt;First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p&gt;
-&lt;h3 id=&#34;small-production-instances&#34;&gt;Small production instances&lt;/h3&gt;
-&lt;p&gt;If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p&gt;
-&lt;p&gt;For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
-For command line, see: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&#34;&gt;http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code&gt;login&lt;/code&gt; (ie &lt;code&gt;https://url/login&lt;/code&gt;) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p&gt;
-&lt;h3 id=&#34;large-production-instances&#34;&gt;Large production instances&lt;/h3&gt;
-&lt;p&gt;If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Open Firefox and navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt; to disable Content Security Policies.&lt;/li&gt;
-&lt;li&gt;Navigate to the instance and login as the user with the data you want. &lt;em&gt;(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em&gt;(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;Make sure your local CouchDB has CORS enabled: &lt;a href=&#34;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&#34;&gt;http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&lt;/a&gt;. Consider using &lt;a href=&#34;https://github.com/pouchdb/add-cors-to-couchdb#what-it-does&#34;&gt;add-cors-to-couchdb&lt;/a&gt; or its recommended settings.&lt;/li&gt;
-&lt;li&gt;Allow your CouchDB to be accessible via &lt;code&gt;https&lt;/code&gt;. One way is to run &lt;code&gt;ngrok http 5984&lt;/code&gt; to make your CouchDB accessible via a url like &lt;a href=&#34;https://abcd1234.ngrok.io&#34;&gt;https://abcd1234.ngrok.io&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;Open the console in Firefox and run &lt;code&gt;await PouchDB.replicate(&#39;medic-user-XXX&#39;, &#39;https://your:admin@abcd1234.ngrok.io/YYY&#39;);&lt;/code&gt;. Here &lt;code&gt;XXX&lt;/code&gt; is the name you logged in as, and &lt;code&gt;YYY&lt;/code&gt; is the name of a database in which to store the data.
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt;: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth);  and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code&gt;5984&lt;/code&gt; and &lt;code&gt;5986&lt;/code&gt; to localhost.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li&gt;
-&lt;li&gt;Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li&gt;
-&lt;li&gt;Navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt; to re-enable Content Security Policies.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;regardless-do-this-too&#34;&gt;Regardless, do this too&lt;/h3&gt;
-&lt;p&gt;To log in as a specific prod user you need to also copy them from the prod &lt;code&gt;_users&lt;/code&gt; database into your own local &lt;code&gt;_users&lt;/code&gt; database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code&gt;_users&lt;/code&gt; DB and paste it in, deleting the &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
-&lt;p&gt;You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code&gt;password&lt;/code&gt; property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p&gt;
-&lt;h2 id=&#34;step-2-run-it-locally&#34;&gt;Step 2, run it locally&lt;/h2&gt;
-&lt;p&gt;First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;Horticulturalist&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;A local development environment will be useful to you if:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;You want to change code locally&lt;/li&gt;
-&lt;li&gt;You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li&gt;
-&lt;li&gt;You want to deploy a version of the code older than &lt;code&gt;2.14.0&lt;/code&gt;, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;option-1-local-development-environment&#34;&gt;Option 1, local development environment&lt;/h3&gt;
-&lt;p&gt;If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href=&#34;https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md&#34;&gt;development setup instructions&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Then you need to:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Push the code you want to run via &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY grunt deploy&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Start API and Sentinel by running &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p&gt;
-&lt;h3 id=&#34;option-2-horticulturalist&#34;&gt;Option 2, horticulturalist&lt;/h3&gt;
-&lt;p&gt;Follow the instructions on the &lt;a href=&#34;https://github.com/medic/horticulturalist&#34;&gt;horticulturalist repo&lt;/a&gt; to get it installed. Then:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Make sure that the &lt;code&gt;medic&lt;/code&gt; DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li&gt;
-&lt;li&gt;Replicate your local PROD DB into a new &lt;code&gt;medic&lt;/code&gt; database using the Fauxton console.&lt;/li&gt;
-&lt;li&gt;Run &lt;code&gt;horti --local --bootstrap=XXX&lt;/code&gt;, where &lt;code&gt;XXX&lt;/code&gt; is the version you want to use (maybe the same one as production?)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;You should now be able to log in as that user locally!&lt;/p&gt;
-
-      </description>
-    </item>
-    
-  </channel>
-</rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Debugging Applications</title><link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/</link><description>Recent content in Debugging Applications on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Obtaining Logs</title><link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/obtaining-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/obtaining-logs/</guid><description>
+&lt;p>There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p>
+&lt;h2 id="browser-logs">Browser logs&lt;/h2>
+&lt;p>To check if there are relevant logs open up the developer console. The shortcut is probably COMMAND+ALT+I on MacOS, or CTRL+ALT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p>
+&lt;h2 id="server-logs">Server logs&lt;/h2>
+&lt;p>The easiest way is to use &lt;code>medic-logs&lt;/code>, a tool that comes with &lt;a href="https://github.com/medic/medic-conf">&lt;code>medic-conf&lt;/code>&lt;/a>:&lt;/p>
+&lt;pre>&lt;code>medic-logs anInstance gardener
+&lt;/code>&lt;/pre>&lt;p>See &lt;a href="https://github.com/medic/medic-conf#medic-logs">medic-logs documentation&lt;/a> for more details.&lt;/p>
+&lt;p>This will download logs to your current directory. You will need to look through these logs to work out what is relevant.&lt;/p></description></item><item><title>Apps: Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/apps/guides/debugging/replicating-production-data-locally/</guid><description>
+&lt;p>Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p>
+&lt;ul>
+&lt;li>Copy the data from an instance to a local CouchDB database&lt;/li>
+&lt;li>Run a local webapp instance with that data&lt;/li>
+&lt;/ul>
+&lt;h2 id="first-a-note-about-data-safety">First, a note about data safety&lt;/h2>
+&lt;p>Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an encrypted drive and delete it once you&amp;rsquo;re done with it.&lt;/p>
+&lt;h2 id="step-1-get-the-data">Step 1: Get the data&lt;/h2>
+&lt;p>First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p>
+&lt;h3 id="small-production-instances">Small production instances&lt;/h3>
+&lt;p>If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p>
+&lt;p>For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
+For command line, see: &lt;a href="http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate">http://docs.couchdb.org/en/2.1.1/api/server/common.html#post--_replicate&lt;/a>&lt;/p>
+&lt;p>Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code>login&lt;/code> (ie &lt;code>https://url/login&lt;/code>) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p>
+&lt;h3 id="large-production-instances">Large production instances&lt;/h3>
+&lt;p>If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p>
+&lt;ol>
+&lt;li>Open Firefox and navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>false&lt;/code> to disable Content Security Policies.&lt;/li>
+&lt;li>Navigate to the instance and login as the user with the data you want. &lt;em>(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em>&lt;/li>
+&lt;li>Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em>(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em>&lt;/li>
+&lt;li>Make sure your local CouchDB has CORS enabled: &lt;a href="http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs">http://docs.couchdb.org/en/2.1.1/config/http.html?highlight=CORs&lt;/a>. Consider using &lt;a href="https://github.com/pouchdb/add-cors-to-couchdb#what-it-does">add-cors-to-couchdb&lt;/a> or its recommended settings.&lt;/li>
+&lt;li>Allow your CouchDB to be accessible via &lt;code>https&lt;/code>. One way is to run &lt;code>ngrok http 5984&lt;/code> to make your CouchDB accessible via a url like &lt;a href="https://abcd1234.ngrok.io">https://abcd1234.ngrok.io&lt;/a>.&lt;/li>
+&lt;li>Open the console in Firefox and run &lt;code>await PouchDB.replicate('medic-user-XXX', 'https://your:admin@abcd1234.ngrok.io/YYY');&lt;/code>. Here &lt;code>XXX&lt;/code> is the name you logged in as, and &lt;code>YYY&lt;/code> is the name of a database in which to store the data.
+&lt;ul>
+&lt;li>&lt;strong>Note&lt;/strong>: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth); and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code>5984&lt;/code> and &lt;code>5986&lt;/code> to localhost.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li>
+&lt;li>Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li>
+&lt;li>Navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>true&lt;/code> to re-enable Content Security Policies.&lt;/li>
+&lt;/ol>
+&lt;h3 id="regardless-do-this-too">Regardless, do this too&lt;/h3>
+&lt;p>To log in as a specific prod user you need to also copy them from the prod &lt;code>_users&lt;/code> database into your own local &lt;code>_users&lt;/code> database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code>_users&lt;/code> DB and paste it in, deleting the &lt;code>_rev&lt;/code> property.&lt;/p>
+&lt;p>You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code>password&lt;/code> property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p>
+&lt;h2 id="step-2-run-it-locally">Step 2, run it locally&lt;/h2>
+&lt;p>First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href="https://github.com/medic/horticulturalist">Horticulturalist&lt;/a>.&lt;/p>
+&lt;p>A local development environment will be useful to you if:&lt;/p>
+&lt;ul>
+&lt;li>You want to change code locally&lt;/li>
+&lt;li>You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li>
+&lt;li>You want to deploy a version of the code older than &lt;code>2.14.0&lt;/code>, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li>
+&lt;/ul>
+&lt;h3 id="option-1-local-development-environment">Option 1, local development environment&lt;/h3>
+&lt;p>If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href="https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md">development setup instructions&lt;/a>.&lt;/p>
+&lt;p>Then you need to:&lt;/p>
+&lt;ol>
+&lt;li>Push the code you want to run via &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY grunt deploy&lt;/code>.&lt;/li>
+&lt;li>Start API and Sentinel by running &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;p>Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p>
+&lt;h3 id="option-2-horticulturalist">Option 2, horticulturalist&lt;/h3>
+&lt;p>Follow the instructions on the &lt;a href="https://github.com/medic/horticulturalist">horticulturalist repo&lt;/a> to get it installed. Then:&lt;/p>
+&lt;ol>
+&lt;li>Make sure that the &lt;code>medic&lt;/code> DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li>
+&lt;li>Replicate your local PROD DB into a new &lt;code>medic&lt;/code> database using the Fauxton console.&lt;/li>
+&lt;li>Run &lt;code>horti --local --bootstrap=XXX&lt;/code>, where &lt;code>XXX&lt;/code> is the version you want to use (maybe the same one as production?)&lt;/li>
+&lt;/ol>
+&lt;p>You should now be able to log in as that user locally!&lt;/p></description></item></channel></rss>

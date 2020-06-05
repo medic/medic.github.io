@@ -1,766 +1,672 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Community Health Toolkit – Overview of CHT Components</title>
-    <link>https://docs.communityhealthtoolkit.org/beta/core/overview/</link>
-    <description>Recent content in Overview of CHT Components on Community Health Toolkit</description>
-    <generator>Hugo -- gohugo.io</generator>
-    
-	  <atom:link href="https://docs.communityhealthtoolkit.org/beta/core/overview/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-      
-        
-      
-    
-    
-    <item>
-      <title>Core: Architecture of CHT Instances</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/architecture/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/architecture/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&#34;../../img/architecture.png&#34; alt=&#34;Architecture of a CHT project&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;server-side&#34;&gt;Server side&lt;/h2&gt;
-&lt;h3 id=&#34;couchdbhttpcouchdbapacheorg&#34;&gt;&lt;a href=&#34;http://couchdb.apache.org&#34;&gt;CouchDB&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;A free and open source NoSQL database we use to store all our data, configuration, and even the application code. CouchDB is really good at replication which is the process of sending the data to another database and back again.&lt;/p&gt;
-&lt;h3 id=&#34;apihttpsgithubcommedicmedictreemasterapi&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic/tree/master/api&#34;&gt;api&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;A NodeJS service which runs on the server as a wrapper around CouchDB. It provides some security, auditing, and integration APIs. It also includes a custom implementation of filtered replication to allow it to support more concurrent users.&lt;/p&gt;
-&lt;h3 id=&#34;sentinelhttpsgithubcommedicmedictreemastersentinel&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic/tree/master/sentinel&#34;&gt;sentinel&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Another NodeJS service running on the server, sentinel performs actions called transitions every time a document in CouchDB is added or modified. Some examples are validations, generating scheduled messages, automatic responses, creating patients, and sending alerts.&lt;/p&gt;
-&lt;h3 id=&#34;postgresqlhttpswwwpostgresqlorg&#34;&gt;&lt;a href=&#34;https://www.postgresql.org&#34;&gt;PostgreSQL&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;A free and open source SQL database that we use for analytics queries for display in tools like klipfolio. We created a library called &lt;a href=&#34;https://github.com/medic/couch2pg&#34;&gt;couch2pg&lt;/a&gt; to replicate data from CouchDB into PostgreSQL.&lt;/p&gt;
-&lt;h2 id=&#34;client-side&#34;&gt;Client side&lt;/h2&gt;
-&lt;h3 id=&#34;cht-corehttpsgithubcommediccht-core&#34;&gt;&lt;a href=&#34;https://github.com/medic/cht-core&#34;&gt;cht-core&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;This is the application that most users interact with. It&amp;rsquo;s an &lt;a href=&#34;https://angularjs.org&#34;&gt;AngularJS&lt;/a&gt; single page responsive web application.&lt;/p&gt;
-&lt;p&gt;We use an offline first strategy which means the data is stored on the client and all pages can load immediately regardless of whether you have a fast connection, slow connection, or no connection at all. The data is stored in &lt;a href=&#34;https://pouchdb.com&#34;&gt;PouchDB&lt;/a&gt; which replicates changes back and forth in the background with the server CouchDB.&lt;/p&gt;
-&lt;p&gt;We use &lt;a href=&#34;https://enketo.org&#34;&gt;Enketo&lt;/a&gt; to render configured xforms and help with styling and dynamic elements such as show/hide and validation rules.&lt;/p&gt;
-&lt;p&gt;We use the &lt;a href=&#34;https://github.com/C2FO/nools&#34;&gt;nools&lt;/a&gt; rules engine to compute the upcoming tasks and monthly targets of the users.&lt;/p&gt;
-&lt;h3 id=&#34;medic-androidhttpsgithubcommedicmedic-android&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic-android&#34;&gt;medic-android&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;The application works in the browser or wrapped in the medic-android app which allows for project branding, sets the project URL, and hides browser elements like the URL bar.&lt;/p&gt;
-&lt;h2 id=&#34;other-applications&#34;&gt;Other applications&lt;/h2&gt;
-&lt;h3 id=&#34;medic-gatewayhttpsgithubcommedicmedic-gateway&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic-gateway&#34;&gt;medic-gateway&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;Medic Gateway is an android app for sending and receiving SMS messages. Each SMS enabled project has one gateway running. It polls an api endpoint to write incoming SMS into the CouchDB and retrieve outgoing SMS to send.&lt;/p&gt;
-&lt;h3 id=&#34;medic-collecthttpsgithubcommedicmedic-collect&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic-collect&#34;&gt;medic-collect&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;An android app based on &lt;a href=&#34;https://opendatakit.org&#34;&gt;Open Data Kit&lt;/a&gt; to render xforms on the phone and send reports in to medic-gateway over SMS or directly to api over mobile data.&lt;/p&gt;
-&lt;h3 id=&#34;medic-confhttpsgithubcommedicmedic-conf&#34;&gt;&lt;a href=&#34;https://github.com/medic/medic-conf&#34;&gt;medic-conf&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;A command line utility for uploading configuration and bulk importing of records.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Core: Database schema conventions</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/db-schema/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/db-schema/</guid>
-      <description>
-        
-        
-        &lt;p&gt;CouchDB (and PouchDB in the browser) is a JSON-based NoSQL datastore that we use to store our data. While unlike SQL databases there is no enforced schema, code still follows conventions, and this document aims to describe the schema as defined by how our code operates.&lt;/p&gt;
-&lt;p&gt;In this document &amp;ldquo;record&amp;rdquo; means a JSON object that resides in CouchDB or PouchDB.&lt;/p&gt;
-&lt;h2 id=&#34;general-record-data-structure&#34;&gt;General record data structure&lt;/h2&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Property&lt;/th&gt;
-&lt;th&gt;Description&lt;/th&gt;
-&lt;th&gt;Required by&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;_id&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;CouchDB&amp;rsquo;s unique identifier of the record&lt;/td&gt;
-&lt;td&gt;all records&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;_rev&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;CouchDB&amp;rsquo;s revision marker&lt;/td&gt;
-&lt;td&gt;all records&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;type&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;The general type of the document, see below&lt;/td&gt;
-&lt;td&gt;all user-created* documents&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;reported_date&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Numerical timestamp of when the document is first created&lt;/td&gt;
-&lt;td&gt;all user-created documents&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;ul&gt;
-&lt;li&gt;User-created documents here generally means contacts and reports, but may extend further.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;contacts-persons-and-places&#34;&gt;Contacts (Persons and Places)&lt;/h2&gt;
-&lt;p&gt;Contacts are either places (e.g. clinic), groupings (e.g. family) or people (e.g. a patient or CHW).&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;type&lt;/code&gt; property of contact records depends on the version of Medic you are running:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;If you are running 3.7 or later you get to &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/configuration/app-settings.md#configuring-the-contact-hierarchy&#34;&gt;configure your contact hierarchy&lt;/a&gt;, and the &lt;code&gt;type&lt;/code&gt; of contacts is &lt;code&gt;contact&lt;/code&gt;, and the configured type is in the &lt;code&gt;contact_type&lt;/code&gt; property.&lt;/li&gt;
-&lt;li&gt;In earlier versions the type depended on hierarchical location of the contact. There are 3 hard coded place types: &lt;code&gt;district_hospital&lt;/code&gt;, &lt;code&gt;health_centre&lt;/code&gt; and &lt;code&gt;clinic&lt;/code&gt; and one people type &lt;code&gt;person&lt;/code&gt;. These place names are often meaningless (hence the configurable contact hierarchy in later versions) to the configured project, and are textually (ie in the UI not in data structures) renamed to mean other things. For example, as &lt;code&gt;clinic&lt;/code&gt; is the lowest level it is often used to represent a family.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;places&#34;&gt;Places&lt;/h3&gt;
-&lt;p&gt;Represent either an actual physical location such as a clinic, or a grouping such as a family or region.&lt;/p&gt;
-&lt;p&gt;Unless a place is at the top of the hierarchy it has a &lt;code&gt;parent&lt;/code&gt; place.&lt;/p&gt;
-&lt;p&gt;Each location has a primary contact, which is a &lt;code&gt;person&lt;/code&gt; contact stored in the &lt;code&gt;contact&lt;/code&gt; property.&lt;/p&gt;
-&lt;h3 id=&#34;people&#34;&gt;People&lt;/h3&gt;
-&lt;p&gt;People are both patients in the system and users of the system, such as CHWs or Nurses. Users have additional records marking them as users of the system (see &lt;a href=&#34;#users&#34;&gt;User&lt;/a&gt; below).&lt;/p&gt;
-&lt;p&gt;People always have a &lt;code&gt;parent&lt;/code&gt; place.&lt;/p&gt;
-&lt;h3 id=&#34;parent-hierachy-representation&#34;&gt;Parent hierachy representation&lt;/h3&gt;
-&lt;p&gt;Contacts &lt;strong&gt;store&lt;/strong&gt; their parent hierarchy as a minified hierarchical structure, which records the &lt;code&gt;_id&lt;/code&gt; of each parent up until the top of the hierarchy:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;A patient&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;clinic-id&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;health_centre-id&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-        &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;district_hospital-id&amp;#39;&lt;/span&gt;
-      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Generally when contacts are &lt;strong&gt;used&lt;/strong&gt; in the app they are first &amp;ldquo;hydrated&amp;rdquo;, with the rest of the information filled in from their parent&amp;rsquo;s place documents:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;A patient&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;clinic-id&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;A clinic&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000&#34;&gt;reported_date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1234&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;...&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// etc
-&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;health_centre-id&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;A Health Centre&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#000&#34;&gt;reported_date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1134&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;...&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// etc
-&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;      &lt;span style=&#34;color:#000&#34;&gt;parent&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-        &lt;span style=&#34;color:#000&#34;&gt;_id&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;district_hospital-id&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-        &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;THE District Hospital&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-        &lt;span style=&#34;color:#000&#34;&gt;reported_date&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1034&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;...&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// etc
-&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;reports&#34;&gt;Reports&lt;/h2&gt;
-&lt;p&gt;Reports are created by users filling out and submitting forms, as well as sending in SMS.&lt;/p&gt;
-&lt;p&gt;All reports:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Use the &lt;code&gt;data_record&lt;/code&gt; type&lt;/li&gt;
-&lt;li&gt;Have their fields stored in the &lt;code&gt;fields&lt;/code&gt; property&lt;/li&gt;
-&lt;li&gt;Have the report author&amp;rsquo;s phone number (if it exists) stored in the &lt;code&gt;from&lt;/code&gt; field&lt;/li&gt;
-&lt;li&gt;Store the form&amp;rsquo;s identifier in the &lt;code&gt;form&lt;/code&gt; field&lt;/li&gt;
-&lt;li&gt;May have a &lt;code&gt;contact&lt;/code&gt; property, which is a minified version of the report author&amp;rsquo;s contact and its hierarchy (see above)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Reports can be about people or places.&lt;/p&gt;
-&lt;p&gt;Reports about people should have one or more of:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;A patient shortcode, found at &lt;code&gt;doc.patient_id&lt;/code&gt; or &lt;code&gt;doc.fields.patient_id&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;A patient record&amp;rsquo;s &lt;code&gt;_id&lt;/code&gt;, found at &lt;code&gt;doc.patient_uuid&lt;/code&gt; or &lt;code&gt;doc.fields.patient_uuid&lt;/code&gt;, as well as potientially in the same locations as the shortcode&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Reports about places should have a &lt;code&gt;doc.place_id&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Additionally, SMS reports:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Have an &lt;code&gt;sms_message&lt;/code&gt; property which contains, among other things, the raw SMS&lt;/li&gt;
-&lt;li&gt;May not have a &lt;code&gt;contact&lt;/code&gt; property if the SMS comes from a phone number that does not have an associated contact&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Additionally, XML reports:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Have the XML file that Enketo (the XForm renderer used) generates as an attachment&lt;/li&gt;
-&lt;li&gt;Have a &lt;code&gt;content_type&lt;/code&gt; property of &lt;code&gt;xml&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;forms&#34;&gt;Forms&lt;/h2&gt;
-&lt;p&gt;SMS forms are defined in &lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/configuration/app-settings.md#patient-reports&#34;&gt;application config&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;XML forms are stored in the database and have:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;An &lt;code&gt;_id&lt;/code&gt; of &lt;code&gt;form:&amp;lt;formname&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;The &lt;code&gt;type&lt;/code&gt; of &lt;code&gt;form&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;The actual XML Xforms definition attached&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;XML forms are defined as XForm XML files&lt;/p&gt;
-&lt;h2 id=&#34;users&#34;&gt;Users&lt;/h2&gt;
-&lt;p&gt;Users represent credentials and roles / permissions for accessing the application. This can either be:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;people who can log into the application, such as CHWs or Nurses&lt;/li&gt;
-&lt;li&gt;or credentials granting external software restricted permissions to perform certain tasks, such as allowing an external service permission to write reports via the api.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;User records have at least:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;An &lt;code&gt;_id&lt;/code&gt; of &lt;code&gt;org.couchdb.user:&amp;lt;username&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;A &lt;code&gt;name&lt;/code&gt; which is the same as &lt;code&gt;&amp;lt;username&amp;gt;&lt;/code&gt; above&lt;/li&gt;
-&lt;li&gt;A &lt;code&gt;roles&lt;/code&gt; array&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;There are two slightly different copies of this record stored.&lt;/p&gt;
-&lt;p&gt;The record in the &lt;code&gt;_users&lt;/code&gt; database includes:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The &lt;code&gt;type&lt;/code&gt; of &lt;code&gt;user&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;The password hash and associated data&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The &lt;code&gt;_users&lt;/code&gt; database is what CouchDB uses for authentication and is only editable by administrative users, so is authoritive when it comes to roles and the like.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;medic&lt;/code&gt; database stores a copy of roles and permissions along with:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The &lt;code&gt;type&lt;/code&gt; of &lt;code&gt;user-settings&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;They may have a &lt;code&gt;contact_id&lt;/code&gt; field that is the &lt;code&gt;_id&lt;/code&gt; of the &lt;em&gt;person&lt;/em&gt; that the user is attached to&lt;/li&gt;
-&lt;li&gt;They may also have a &lt;code&gt;facility_id&lt;/code&gt; field that is the &lt;code&gt;_id&lt;/code&gt; of the &lt;em&gt;place&lt;/em&gt; that the user is attached to&lt;/li&gt;
-&lt;li&gt;They may also have a &lt;code&gt;known&lt;/code&gt; field. If this field is &lt;code&gt;true&lt;/code&gt;, it means the user has logged in once and will no longer be shown the tour by default. Otherwise, it will be &lt;code&gt;undefined&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Note that SMS users do not have a users record: their phone number will be attached to a &lt;code&gt;person&lt;/code&gt; record, but they do not have a user because they do not access the application.&lt;/p&gt;
-&lt;p&gt;Users then, can be represented by up to 3 docs:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;a &lt;code&gt;person&lt;/code&gt; document that represents a physical human being in our hierarchy of places and people&lt;/li&gt;
-&lt;li&gt;a &lt;code&gt;users&lt;/code&gt; document that represents authorisation and authentication information for physical people or authenticated external services&lt;/li&gt;
-&lt;li&gt;a &lt;code&gt;user-settings&lt;/code&gt; document that ties the &lt;code&gt;user&lt;/code&gt; and &lt;code&gt;person&lt;/code&gt; documents together&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;tasks&#34;&gt;Tasks&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/configuration/developing-community-health-applications.md&#34;&gt;Partner configuration code&lt;/a&gt; running inside the Core Framework can cause tasks to appear within the Tasks tab. Each task in the tab is powered by a task document. Task documents are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;updated only after the data for their emitting contact changes or every 7 days&lt;/li&gt;
-&lt;li&gt;created in the database for any task due within the last 60 days&lt;/li&gt;
-&lt;li&gt;immutable once their state is &amp;ldquo;terminal&amp;rdquo; (Cancelled, Completed, Failed)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;State&lt;/th&gt;
-&lt;th&gt;Description&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Draft&lt;/td&gt;
-&lt;td&gt;Task has been calculated but it is scheduled in the future&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Ready&lt;/td&gt;
-&lt;td&gt;Task is currently showing to the user&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Cancelled&lt;/td&gt;
-&lt;td&gt;Task was not emitted when refreshing the requester&amp;rsquo;s data. Task has invalid partner emission.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Completed&lt;/td&gt;
-&lt;td&gt;Task was emitted with { resolved: true }&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Failed&lt;/td&gt;
-&lt;td&gt;Task was never terminated and the endDate has past&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Attribute&lt;/th&gt;
-&lt;th&gt;Description&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;user&lt;/td&gt;
-&lt;td&gt;The user settings id of the user who calculated and created the document. Used for controlling replication. (eg. &lt;code&gt;org.couchdb.user:agatha&lt;/code&gt;)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;requester&lt;/td&gt;
-&lt;td&gt;The guid of the contact whose data brought about the creation of the document. Used for controlling cancellation.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;owner&lt;/td&gt;
-&lt;td&gt;The guid of the contact whose profile this task will appear on in the contact&amp;rsquo;s tab.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;forId&lt;/td&gt;
-&lt;td&gt;If completing a task&amp;rsquo;s action opens a form. Completing the form creates a report. &lt;code&gt;forId&lt;/code&gt; is the guid of the contact information that will be passed into the form. For most forms, the resulting report will be associated with this contact.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;emission&lt;/td&gt;
-&lt;td&gt;Minified task data emitted from the partner code.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;stateHistory&lt;/td&gt;
-&lt;td&gt;Each time the state attribute changes, the time of the change is recorded in the state history.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;task~org.couchdb.user:agatha~pregReport~pregnancy-facility-visit-reminder~2~523435132468&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;task&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;authoredOn&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;523435132468&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;user&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;requester&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;requester-contact-guid&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;owner&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;owner-contact-guid&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;state&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Ready&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;emission&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;pregReport~pregnancy-facility-visit-reminder~2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;forId&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;for-contact-guid&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;dueDate&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2000-01-01&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;startDate&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1999-12-29&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;endDate&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2000-01-08&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#a40000&#34;&gt;...&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;stateHistory&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[{&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;state&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Ready&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;timestamp&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;523435132468&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}],&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;targets&#34;&gt;Targets&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&#34;https://github.com/medic/medic-docs/blob/master/configuration/developing-community-health-applications.md&#34;&gt;Partner configuration code&lt;/a&gt; can configure targets to appear within the Targets/Analytics tab. Target documents are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;one per analytics reporting period&lt;/li&gt;
-&lt;li&gt;updated when the user loads the application or when they view the targets tab&lt;/li&gt;
-&lt;li&gt;updated a maximum of once per day&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;target~2000-01~user-contact-guid~org.couchdb.user:agatha&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;target&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;user&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;owner&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;user-contact-guid&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;updated_date&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;523435132468&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;targets&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;deaths-this-month&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-      &lt;span style=&#34;color:#a40000&#34;&gt;...&lt;/span&gt;
-      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;value&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;pass&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
-        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;total&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;15&lt;/span&gt;
-      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
-    &lt;span style=&#34;color:#a40000&#34;&gt;...&lt;/span&gt;
-  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-      </description>
-    </item>
-    
-    <item>
-      <title>Core: Data Flows for Analytics</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/data-flows-for-analytics/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/data-flows-for-analytics/</guid>
-      <description>
-        
-        
-        &lt;p&gt;In this section we focus on how data flows through the various components of the Community Health Toolkit. The CHT is built to support the delivery of quality community health care in the hardest to reach areas. The CHT is designed to work in areas with low connectivity, which means it is an offline-first toolkit. The architectural and technology choices in the stack are mostly guided by this principle, which will be evident in the discussion of the data management pipeline.&lt;/p&gt;
-&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&#34;data-flows.png&#34; alt=&#34;Data Flows&#34;&gt;&lt;/p&gt;
-&lt;p&gt;At a high level:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Data are collected from the device of a health worker;&lt;/li&gt;
-&lt;li&gt;Data are pushed to an online instance from where data are available to other health workers, supervisors and decision makers;&lt;/li&gt;
-&lt;li&gt;Data are transferred to a relational database (PostgreSQL) using &lt;a href=&#34;https://github.com/medic/medic-couch2pg&#34;&gt;couch2pg&lt;/a&gt; and made available for impact monitoring, data science projects and visualizations;&lt;/li&gt;
-&lt;li&gt;Access to PostreSQL is given to relevant parties at this level, for example Research &amp;amp; Learning team members for impact monitoring and data science;&lt;/li&gt;
-&lt;li&gt;Visualization platforms, such as &lt;a href=&#34;https://www.klipfolio.com/&#34;&gt;Klipfolio&lt;/a&gt;, are then connected to PostgreSQL from where program managers and other partner representatives can access visualizations of their data for decision-making&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;details-of-the-data-flow&#34;&gt;Details of the data flow&lt;/h2&gt;
-&lt;p&gt;The layout detailed here is specific to how Medic Mobile supports its CHT partners at the moment. It is replicable and can be deployed as is or tweaked independent of Medic Mobile either by modifying or replacing pieces of it with other options.&lt;/p&gt;
-&lt;h3 id=&#34;current-infrastructure&#34;&gt;Current infrastructure&lt;/h3&gt;
-&lt;p&gt;We look at this in three general phases.&lt;/p&gt;
-&lt;h4 id=&#34;1-data-collection&#34;&gt;1. Data Collection&lt;/h4&gt;
-&lt;p&gt;Data is collected in the community at the point of care, i.e. the community health worker interacting with the toolkit. These tools and their corresponding data stores are::-&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Mobile app -&amp;gt; PouchDB&lt;/li&gt;
-&lt;li&gt;Webapp -&amp;gt; PouchDB / CouchDB&lt;/li&gt;
-&lt;li&gt;Text forms / sms -&amp;gt; SMS gateway / SMS aggregator -&amp;gt; CouchDB&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The mobile app and webapp, when deployed for offline first use, use a local database namely PouchDB. Similar to CouchDB, it is a document-oriented database. The data collected in PouchDB is synced to an online CouchDB upon the user connecting to the internet. Local storage is not applicable to SMS; instead, an &lt;a href=&#34;https://github.com/medic/medic-gateway&#34;&gt;SMS gateway&lt;/a&gt; or an &lt;a href=&#34;https://africastalking.com&#34;&gt;SMS aggregator&lt;/a&gt; is used to help get the data to an online CouchDB instance.&lt;/p&gt;
-&lt;p&gt;Ultimately all the data ends up in a CouchDB instance deployed in the cloud whether through data synchronization with PouchDB local to the health workers devices, use of SMS aggregators or gateway. It should be mentioned that you can have a deployment supported by all of webapp, mobile app and SMS and have all the data end up in the same CouchDB instance.&lt;/p&gt;
-&lt;h4 id=&#34;2-data-transformation&#34;&gt;2. Data Transformation&lt;/h4&gt;
-&lt;p&gt;We use &lt;a href=&#34;https://github.com/medic/medic-couch2pg&#34;&gt;couch2pg&lt;/a&gt; to move data from CouchDB to a relational database, PostgreSQL in this case. The choice of PostgreSQL for analytics dashboard data sources is to allow use of the more familiar SQL querying. It is an open source tool that can be &lt;a href=&#34;https://github.com/medic/medic-couch2pg#installation-steps-if-applicable&#34;&gt;easily deployed&lt;/a&gt;. When deployed the service uses &lt;a href=&#34;https://docs.couchdb.org/en/2.2.0/api/database/changes.html&#34;&gt;CouchDB&amp;rsquo;s changes feed&lt;/a&gt; which allows capturing of everything happening in CouchDB in incremental updates. It is run and monitored by the operating system where it is configured to fetch data at a configurable interval.&lt;/p&gt;
-&lt;p&gt;Data copied over to PostgreSQL is first stored as raw json (document) making use of PostgreSQL&amp;rsquo;s jsonb data type to create an exact replica of a CouchDB database. From this, default views are created at deployment of the service and refreshed during every subsequent run. Additional custom materialized views created later are also refreshed at this time.&lt;/p&gt;
-&lt;p&gt;Custom materialized views and functions are added specific to a deployment&amp;rsquo;s needs. Generally the following naming convention is recommended:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;formview&lt;/em&gt; as a view of raw forms&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;useview&lt;/em&gt; as a view of form data supporting a use case as defined by design&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;contactview&lt;/em&gt; as a view of people and places&lt;/li&gt;
-&lt;li&gt;Database functions are used as a way to join as much relevant data as possible for easier querying in analytics or dashboard visualizations.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Data in the views and functions mentioned in this section is as accurate as the accuracy of the SQL queries. Best practice is to begin the process of defining these objects at design in order to align analytics and dashboards requirements with workflows being deployed.&lt;/p&gt;
-&lt;h4 id=&#34;3-data-use&#34;&gt;3. Data Use&lt;/h4&gt;
-&lt;p&gt;The data in PostgreSQL is mostly either used by direct querying or via dashboard visualizations for impact monitoring and data driven-decision making. Database visualizations are built scoped to the requirements of supporting a successful deployment. The work of our Research &amp;amp; Learning team, specifically data science, is supported at the PostgreSQL level through updated contactviews, formviews, useviews and functions with access to these provided to relevant parties as and when needed. Our use of data follows our Privacy &amp;amp; Data Protection policy and is in accordance to agreements with our CHT partners.&lt;/p&gt;
-&lt;p&gt;As mentioned previously, formviews are built to present data in a structure similar to the data collection tool (form) used. Useviews are tailored to align with a use case, mostly using the formviews as the data sources. These are fundamentally guided by design of the workflows and should be interpreted in the context of the design materials including a document explaining the definitions of variables used.&lt;/p&gt;
-&lt;p&gt;The objects present here are not limited to views and functions. Additional tables can be added, for example providing mappings or supporting operations external to the functions available in the toolkit. In short, there is no limitation to the utility that can be added this level to support analytics and dashboards. That said, measures are taken to ensure controlled access, reliability and timely access of the data by the various parties. Some of these measures are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Roles and users allocation and deallocation done by specific roles within partner technical teams with support from Medic Mobile as needed;&lt;/li&gt;
-&lt;li&gt;Access control management is left to the partner technical teams where possible;&lt;/li&gt;
-&lt;li&gt;Dashboard data source refresh intervals set to align with project needs;&lt;/li&gt;
-&lt;li&gt;Update of the data sources monitored to ensure updating works as expected;&lt;/li&gt;
-&lt;li&gt;Review of the dashboards as part of the design process;&lt;/li&gt;
-&lt;li&gt;Qualitative design activities to interrogate trends observed in the dashboards and iterate on them if need be;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;beyond-our-current-pipeline&#34;&gt;Beyond Our Current Pipeline&lt;/h3&gt;
-&lt;p&gt;The &lt;a href=&#34;https://github.com/medic/cht-core&#34;&gt;cht-core&lt;/a&gt; is mostly data collection tools and is the first component of the data management pipeline. It is the core part of a deployment but the rest of the tools can be easily replaced with other preferred options. It also helps that couch2pg is an open source tool which provides the opportunity for collaboration to extend its functionality to support other implementations. Klipfolio, the tool that we currently use for visualizations, is a proprietary tool but there are many open source options, such as &lt;a href=&#34;https://superset.incubator.apache.org/&#34;&gt;Apache Superset&lt;/a&gt; that are worth exploring and building into future iterations of our impact monitoring and analytics support for the CHT.&lt;/p&gt;
-&lt;h2 id=&#34;backup&#34;&gt;Backup&lt;/h2&gt;
-&lt;p&gt;The machines running each of CouchDB and PostgreSQL instances are backed up daily.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Core: Transitions API</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/transitions/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/transitions/</guid>
-      <description>
-        
-        
-        &lt;p&gt;A transition is javascript code that runs when a document is changed.  A
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Overview of CHT Components</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/</link><description>Recent content in Overview of CHT Components on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/beta/core/overview/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Architecture of CHT Instances</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/architecture/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/architecture/</guid><description>
+&lt;h2 id="overview">Overview&lt;/h2>
+&lt;p>&lt;img src="../../img/architecture.png" alt="Architecture of a CHT project">&lt;/p>
+&lt;h2 id="server-side">Server side&lt;/h2>
+&lt;h3 id="couchdbhttpcouchdbapacheorg">&lt;a href="http://couchdb.apache.org">CouchDB&lt;/a>&lt;/h3>
+&lt;p>A free and open source NoSQL database we use to store all our data, configuration, and even the application code. CouchDB is really good at replication which is the process of sending the data to another database and back again.&lt;/p>
+&lt;h3 id="apihttpsgithubcommedicmedictreemasterapi">&lt;a href="https://github.com/medic/medic/tree/master/api">api&lt;/a>&lt;/h3>
+&lt;p>A NodeJS service which runs on the server as a wrapper around CouchDB. It provides some security, auditing, and integration APIs. It also includes a custom implementation of filtered replication to allow it to support more concurrent users.&lt;/p>
+&lt;h3 id="sentinelhttpsgithubcommedicmedictreemastersentinel">&lt;a href="https://github.com/medic/medic/tree/master/sentinel">sentinel&lt;/a>&lt;/h3>
+&lt;p>Another NodeJS service running on the server, sentinel performs actions called transitions every time a document in CouchDB is added or modified. Some examples are validations, generating scheduled messages, automatic responses, creating patients, and sending alerts.&lt;/p>
+&lt;h3 id="postgresqlhttpswwwpostgresqlorg">&lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a>&lt;/h3>
+&lt;p>A free and open source SQL database that we use for analytics queries for display in tools like klipfolio. We created a library called &lt;a href="https://github.com/medic/couch2pg">couch2pg&lt;/a> to replicate data from CouchDB into PostgreSQL.&lt;/p>
+&lt;h2 id="client-side">Client side&lt;/h2>
+&lt;h3 id="cht-corehttpsgithubcommediccht-core">&lt;a href="https://github.com/medic/cht-core">cht-core&lt;/a>&lt;/h3>
+&lt;p>This is the application that most users interact with. It&amp;rsquo;s an &lt;a href="https://angularjs.org">AngularJS&lt;/a> single page responsive web application.&lt;/p>
+&lt;p>We use an offline first strategy which means the data is stored on the client and all pages can load immediately regardless of whether you have a fast connection, slow connection, or no connection at all. The data is stored in &lt;a href="https://pouchdb.com">PouchDB&lt;/a> which replicates changes back and forth in the background with the server CouchDB.&lt;/p>
+&lt;p>We use &lt;a href="https://enketo.org">Enketo&lt;/a> to render configured xforms and help with styling and dynamic elements such as show/hide and validation rules.&lt;/p>
+&lt;p>We use the &lt;a href="https://github.com/C2FO/nools">nools&lt;/a> rules engine to compute the upcoming tasks and monthly targets of the users.&lt;/p>
+&lt;h3 id="medic-androidhttpsgithubcommedicmedic-android">&lt;a href="https://github.com/medic/medic-android">medic-android&lt;/a>&lt;/h3>
+&lt;p>The application works in the browser or wrapped in the medic-android app which allows for project branding, sets the project URL, and hides browser elements like the URL bar.&lt;/p>
+&lt;h2 id="other-applications">Other applications&lt;/h2>
+&lt;h3 id="medic-gatewayhttpsgithubcommedicmedic-gateway">&lt;a href="https://github.com/medic/medic-gateway">medic-gateway&lt;/a>&lt;/h3>
+&lt;p>Medic Gateway is an android app for sending and receiving SMS messages. Each SMS enabled project has one gateway running. It polls an api endpoint to write incoming SMS into the CouchDB and retrieve outgoing SMS to send.&lt;/p>
+&lt;h3 id="medic-collecthttpsgithubcommedicmedic-collect">&lt;a href="https://github.com/medic/medic-collect">medic-collect&lt;/a>&lt;/h3>
+&lt;p>An android app based on &lt;a href="https://opendatakit.org">Open Data Kit&lt;/a> to render xforms on the phone and send reports in to medic-gateway over SMS or directly to api over mobile data.&lt;/p>
+&lt;h3 id="medic-confhttpsgithubcommedicmedic-conf">&lt;a href="https://github.com/medic/medic-conf">medic-conf&lt;/a>&lt;/h3>
+&lt;p>A command line utility for uploading configuration and bulk importing of records.&lt;/p></description></item><item><title>Core: Database schema conventions</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/db-schema/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/db-schema/</guid><description>
+&lt;p>CouchDB (and PouchDB in the browser) is a JSON-based NoSQL datastore that we use to store our data. While unlike SQL databases there is no enforced schema, code still follows conventions, and this document aims to describe the schema as defined by how our code operates.&lt;/p>
+&lt;p>In this document &amp;ldquo;record&amp;rdquo; means a JSON object that resides in CouchDB or PouchDB.&lt;/p>
+&lt;h2 id="general-record-data-structure">General record data structure&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Required by&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>_id&lt;/code>&lt;/td>
+&lt;td>CouchDB&amp;rsquo;s unique identifier of the record&lt;/td>
+&lt;td>all records&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>_rev&lt;/code>&lt;/td>
+&lt;td>CouchDB&amp;rsquo;s revision marker&lt;/td>
+&lt;td>all records&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>type&lt;/code>&lt;/td>
+&lt;td>The general type of the document, see below&lt;/td>
+&lt;td>all user-created* documents&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>reported_date&lt;/code>&lt;/td>
+&lt;td>Numerical timestamp of when the document is first created&lt;/td>
+&lt;td>all user-created documents&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>User-created documents here generally means contacts and reports, but may extend further.&lt;/li>
+&lt;/ul>
+&lt;h2 id="contacts-persons-and-places">Contacts (Persons and Places)&lt;/h2>
+&lt;p>Contacts are either places (e.g. clinic), groupings (e.g. family) or people (e.g. a patient or CHW).&lt;/p>
+&lt;p>The &lt;code>type&lt;/code> property of contact records depends on the version of Medic you are running:&lt;/p>
+&lt;ul>
+&lt;li>If you are running 3.7 or later you get to &lt;a href="https://github.com/medic/medic-docs/blob/master/configuration/app-settings.md#configuring-the-contact-hierarchy">configure your contact hierarchy&lt;/a>, and the &lt;code>type&lt;/code> of contacts is &lt;code>contact&lt;/code>, and the configured type is in the &lt;code>contact_type&lt;/code> property.&lt;/li>
+&lt;li>In earlier versions the type depended on hierarchical location of the contact. There are 3 hard coded place types: &lt;code>district_hospital&lt;/code>, &lt;code>health_centre&lt;/code> and &lt;code>clinic&lt;/code> and one people type &lt;code>person&lt;/code>. These place names are often meaningless (hence the configurable contact hierarchy in later versions) to the configured project, and are textually (ie in the UI not in data structures) renamed to mean other things. For example, as &lt;code>clinic&lt;/code> is the lowest level it is often used to represent a family.&lt;/li>
+&lt;/ul>
+&lt;h3 id="places">Places&lt;/h3>
+&lt;p>Represent either an actual physical location such as a clinic, or a grouping such as a family or region.&lt;/p>
+&lt;p>Unless a place is at the top of the hierarchy it has a &lt;code>parent&lt;/code> place.&lt;/p>
+&lt;p>Each location has a primary contact, which is a &lt;code>person&lt;/code> contact stored in the &lt;code>contact&lt;/code> property.&lt;/p>
+&lt;h3 id="people">People&lt;/h3>
+&lt;p>People are both patients in the system and users of the system, such as CHWs or Nurses. Users have additional records marking them as users of the system (see &lt;a href="#users">User&lt;/a> below).&lt;/p>
+&lt;p>People always have a &lt;code>parent&lt;/code> place.&lt;/p>
+&lt;h3 id="parent-hierachy-representation">Parent hierachy representation&lt;/h3>
+&lt;p>Contacts &lt;strong>store&lt;/strong> their parent hierarchy as a minified hierarchical structure, which records the &lt;code>_id&lt;/code> of each parent up until the top of the hierarchy:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">type&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;person&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;health_centre-id&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;district_hospital-id&amp;#39;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Generally when contacts are &lt;strong>used&lt;/strong> in the app they are first &amp;ldquo;hydrated&amp;rdquo;, with the rest of the information filled in from their parent&amp;rsquo;s place documents:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">type&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;person&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;A clinic&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">reported_date&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1234&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span> &lt;span style="color:#8f5902;font-style:italic">// etc
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span> &lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;health_centre-id&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;A Health Centre&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">reported_date&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1134&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span> &lt;span style="color:#8f5902;font-style:italic">// etc
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span> &lt;span style="color:#000">parent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">_id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;district_hospital-id&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;THE District Hospital&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000">reported_date&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1034&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span> &lt;span style="color:#8f5902;font-style:italic">// etc
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="reports">Reports&lt;/h2>
+&lt;p>Reports are created by users filling out and submitting forms, as well as sending in SMS.&lt;/p>
+&lt;p>All reports:&lt;/p>
+&lt;ul>
+&lt;li>Use the &lt;code>data_record&lt;/code> type&lt;/li>
+&lt;li>Have their fields stored in the &lt;code>fields&lt;/code> property&lt;/li>
+&lt;li>Have the report author&amp;rsquo;s phone number (if it exists) stored in the &lt;code>from&lt;/code> field&lt;/li>
+&lt;li>Store the form&amp;rsquo;s identifier in the &lt;code>form&lt;/code> field&lt;/li>
+&lt;li>May have a &lt;code>contact&lt;/code> property, which is a minified version of the report author&amp;rsquo;s contact and its hierarchy (see above)&lt;/li>
+&lt;/ul>
+&lt;p>Reports can be about people or places.&lt;/p>
+&lt;p>Reports about people should have one or more of:&lt;/p>
+&lt;ul>
+&lt;li>A patient shortcode, found at &lt;code>doc.patient_id&lt;/code> or &lt;code>doc.fields.patient_id&lt;/code>&lt;/li>
+&lt;li>A patient record&amp;rsquo;s &lt;code>_id&lt;/code>, found at &lt;code>doc.patient_uuid&lt;/code> or &lt;code>doc.fields.patient_uuid&lt;/code>, as well as potientially in the same locations as the shortcode&lt;/li>
+&lt;/ul>
+&lt;p>Reports about places should have a &lt;code>doc.place_id&lt;/code>.&lt;/p>
+&lt;p>Additionally, SMS reports:&lt;/p>
+&lt;ul>
+&lt;li>Have an &lt;code>sms_message&lt;/code> property which contains, among other things, the raw SMS&lt;/li>
+&lt;li>May not have a &lt;code>contact&lt;/code> property if the SMS comes from a phone number that does not have an associated contact&lt;/li>
+&lt;/ul>
+&lt;p>Additionally, XML reports:&lt;/p>
+&lt;ul>
+&lt;li>Have the XML file that Enketo (the XForm renderer used) generates as an attachment&lt;/li>
+&lt;li>Have a &lt;code>content_type&lt;/code> property of &lt;code>xml&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="forms">Forms&lt;/h2>
+&lt;p>SMS forms are defined in &lt;a href="https://github.com/medic/medic-docs/blob/master/configuration/app-settings.md#patient-reports">application config&lt;/a>.&lt;/p>
+&lt;p>XML forms are stored in the database and have:&lt;/p>
+&lt;ul>
+&lt;li>An &lt;code>_id&lt;/code> of &lt;code>form:&amp;lt;formname&amp;gt;&lt;/code>&lt;/li>
+&lt;li>The &lt;code>type&lt;/code> of &lt;code>form&lt;/code>&lt;/li>
+&lt;li>The actual XML Xforms definition attached&lt;/li>
+&lt;/ul>
+&lt;p>XML forms are defined as XForm XML files&lt;/p>
+&lt;h2 id="users">Users&lt;/h2>
+&lt;p>Users represent credentials and roles / permissions for accessing the application. This can either be:&lt;/p>
+&lt;ul>
+&lt;li>people who can log into the application, such as CHWs or Nurses&lt;/li>
+&lt;li>or credentials granting external software restricted permissions to perform certain tasks, such as allowing an external service permission to write reports via the api.&lt;/li>
+&lt;/ul>
+&lt;p>User records have at least:&lt;/p>
+&lt;ul>
+&lt;li>An &lt;code>_id&lt;/code> of &lt;code>org.couchdb.user:&amp;lt;username&amp;gt;&lt;/code>&lt;/li>
+&lt;li>A &lt;code>name&lt;/code> which is the same as &lt;code>&amp;lt;username&amp;gt;&lt;/code> above&lt;/li>
+&lt;li>A &lt;code>roles&lt;/code> array&lt;/li>
+&lt;/ul>
+&lt;p>There are two slightly different copies of this record stored.&lt;/p>
+&lt;p>The record in the &lt;code>_users&lt;/code> database includes:&lt;/p>
+&lt;ul>
+&lt;li>The &lt;code>type&lt;/code> of &lt;code>user&lt;/code>&lt;/li>
+&lt;li>The password hash and associated data&lt;/li>
+&lt;/ul>
+&lt;p>The &lt;code>_users&lt;/code> database is what CouchDB uses for authentication and is only editable by administrative users, so is authoritive when it comes to roles and the like.&lt;/p>
+&lt;p>The &lt;code>medic&lt;/code> database stores a copy of roles and permissions along with:&lt;/p>
+&lt;ul>
+&lt;li>The &lt;code>type&lt;/code> of &lt;code>user-settings&lt;/code>&lt;/li>
+&lt;li>They may have a &lt;code>contact_id&lt;/code> field that is the &lt;code>_id&lt;/code> of the &lt;em>person&lt;/em> that the user is attached to&lt;/li>
+&lt;li>They may also have a &lt;code>facility_id&lt;/code> field that is the &lt;code>_id&lt;/code> of the &lt;em>place&lt;/em> that the user is attached to&lt;/li>
+&lt;li>They may also have a &lt;code>known&lt;/code> field. If this field is &lt;code>true&lt;/code>, it means the user has logged in once and will no longer be shown the tour by default. Otherwise, it will be &lt;code>undefined&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;p>Note that SMS users do not have a users record: their phone number will be attached to a &lt;code>person&lt;/code> record, but they do not have a user because they do not access the application.&lt;/p>
+&lt;p>Users then, can be represented by up to 3 docs:&lt;/p>
+&lt;ul>
+&lt;li>a &lt;code>person&lt;/code> document that represents a physical human being in our hierarchy of places and people&lt;/li>
+&lt;li>a &lt;code>users&lt;/code> document that represents authorisation and authentication information for physical people or authenticated external services&lt;/li>
+&lt;li>a &lt;code>user-settings&lt;/code> document that ties the &lt;code>user&lt;/code> and &lt;code>person&lt;/code> documents together&lt;/li>
+&lt;/ul>
+&lt;h2 id="tasks">Tasks&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/medic-docs/blob/master/configuration/developing-community-health-applications.md">Partner configuration code&lt;/a> running inside the Core Framework can cause tasks to appear within the Tasks tab. Each task in the tab is powered by a task document. Task documents are:&lt;/p>
+&lt;ul>
+&lt;li>updated only after the data for their emitting contact changes or every 7 days&lt;/li>
+&lt;li>created in the database for any task due within the last 60 days&lt;/li>
+&lt;li>immutable once their state is &amp;ldquo;terminal&amp;rdquo; (Cancelled, Completed, Failed)&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>State&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Draft&lt;/td>
+&lt;td>Task has been calculated but it is scheduled in the future&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Ready&lt;/td>
+&lt;td>Task is currently showing to the user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cancelled&lt;/td>
+&lt;td>Task was not emitted when refreshing the requester&amp;rsquo;s data. Task has invalid partner emission.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Completed&lt;/td>
+&lt;td>Task was emitted with { resolved: true }&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Failed&lt;/td>
+&lt;td>Task was never terminated and the endDate has past&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Attribute&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>user&lt;/td>
+&lt;td>The user settings id of the user who calculated and created the document. Used for controlling replication. (eg. &lt;code>org.couchdb.user:agatha&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>requester&lt;/td>
+&lt;td>The guid of the contact whose data brought about the creation of the document. Used for controlling cancellation.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>owner&lt;/td>
+&lt;td>The guid of the contact whose profile this task will appear on in the contact&amp;rsquo;s tab.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>forId&lt;/td>
+&lt;td>If completing a task&amp;rsquo;s action opens a form. Completing the form creates a report. &lt;code>forId&lt;/code> is the guid of the contact information that will be passed into the form. For most forms, the resulting report will be associated with this contact.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>emission&lt;/td>
+&lt;td>Minified task data emitted from the partner code.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>stateHistory&lt;/td>
+&lt;td>Each time the state attribute changes, the time of the change is recorded in the state history.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;task~org.couchdb.user:agatha~pregReport~pregnancy-facility-visit-reminder~2~523435132468&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;task&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;authoredOn&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">523435132468&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;user&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;requester&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;requester-contact-guid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;owner&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;owner-contact-guid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;state&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Ready&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;emission&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;pregReport~pregnancy-facility-visit-reminder~2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;forId&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;for-contact-guid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;dueDate&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2000-01-01&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;startDate&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1999-12-29&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;endDate&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2000-01-08&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#a40000">...&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;stateHistory&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;state&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Ready&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;timestamp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">523435132468&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}],&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="targets">Targets&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/medic-docs/blob/master/configuration/developing-community-health-applications.md">Partner configuration code&lt;/a> can configure targets to appear within the Targets/Analytics tab. Target documents are:&lt;/p>
+&lt;ul>
+&lt;li>one per analytics reporting period&lt;/li>
+&lt;li>updated when the user loads the application or when they view the targets tab&lt;/li>
+&lt;li>updated a maximum of once per day&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;target~2000-01~user-contact-guid~org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;target&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;user&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;owner&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;user-contact-guid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;updated_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">523435132468&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;targets&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;deaths-this-month&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#a40000">...&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;pass&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;total&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#a40000">...&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Core: Data Flows for Analytics</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/data-flows-for-analytics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/data-flows-for-analytics/</guid><description>
+&lt;p>In this section we focus on how data flows through the various components of the Community Health Toolkit. The CHT is built to support the delivery of quality community health care in the hardest to reach areas. The CHT is designed to work in areas with low connectivity, which means it is an offline-first toolkit. The architectural and technology choices in the stack are mostly guided by this principle, which will be evident in the discussion of the data management pipeline.&lt;/p>
+&lt;h2 id="overview">Overview&lt;/h2>
+&lt;p>&lt;img src="data-flows.png" alt="Data Flows">&lt;/p>
+&lt;p>At a high level:&lt;/p>
+&lt;ul>
+&lt;li>Data are collected from the device of a health worker;&lt;/li>
+&lt;li>Data are pushed to an online instance from where data are available to other health workers, supervisors and decision makers;&lt;/li>
+&lt;li>Data are transferred to a relational database (PostgreSQL) using &lt;a href="https://github.com/medic/medic-couch2pg">couch2pg&lt;/a> and made available for impact monitoring, data science projects and visualizations;&lt;/li>
+&lt;li>Access to PostreSQL is given to relevant parties at this level, for example Research &amp;amp; Learning team members for impact monitoring and data science;&lt;/li>
+&lt;li>Visualization platforms, such as &lt;a href="https://www.klipfolio.com/">Klipfolio&lt;/a>, are then connected to PostgreSQL from where program managers and other partner representatives can access visualizations of their data for decision-making&lt;/li>
+&lt;/ul>
+&lt;h2 id="details-of-the-data-flow">Details of the data flow&lt;/h2>
+&lt;p>The layout detailed here is specific to how Medic Mobile supports its CHT partners at the moment. It is replicable and can be deployed as is or tweaked independent of Medic Mobile either by modifying or replacing pieces of it with other options.&lt;/p>
+&lt;h3 id="current-infrastructure">Current infrastructure&lt;/h3>
+&lt;p>We look at this in three general phases.&lt;/p>
+&lt;h4 id="1-data-collection">1. Data Collection&lt;/h4>
+&lt;p>Data is collected in the community at the point of care, i.e. the community health worker interacting with the toolkit. These tools and their corresponding data stores are::-&lt;/p>
+&lt;ul>
+&lt;li>Mobile app -&amp;gt; PouchDB&lt;/li>
+&lt;li>Webapp -&amp;gt; PouchDB / CouchDB&lt;/li>
+&lt;li>Text forms / sms -&amp;gt; SMS gateway / SMS aggregator -&amp;gt; CouchDB&lt;/li>
+&lt;/ul>
+&lt;p>The mobile app and webapp, when deployed for offline first use, use a local database namely PouchDB. Similar to CouchDB, it is a document-oriented database. The data collected in PouchDB is synced to an online CouchDB upon the user connecting to the internet. Local storage is not applicable to SMS; instead, an &lt;a href="https://github.com/medic/medic-gateway">SMS gateway&lt;/a> or an &lt;a href="https://africastalking.com">SMS aggregator&lt;/a> is used to help get the data to an online CouchDB instance.&lt;/p>
+&lt;p>Ultimately all the data ends up in a CouchDB instance deployed in the cloud whether through data synchronization with PouchDB local to the health workers devices, use of SMS aggregators or gateway. It should be mentioned that you can have a deployment supported by all of webapp, mobile app and SMS and have all the data end up in the same CouchDB instance.&lt;/p>
+&lt;h4 id="2-data-transformation">2. Data Transformation&lt;/h4>
+&lt;p>We use &lt;a href="https://github.com/medic/medic-couch2pg">couch2pg&lt;/a> to move data from CouchDB to a relational database, PostgreSQL in this case. The choice of PostgreSQL for analytics dashboard data sources is to allow use of the more familiar SQL querying. It is an open source tool that can be &lt;a href="https://github.com/medic/medic-couch2pg#installation-steps-if-applicable">easily deployed&lt;/a>. When deployed the service uses &lt;a href="https://docs.couchdb.org/en/2.2.0/api/database/changes.html">CouchDB&amp;rsquo;s changes feed&lt;/a> which allows capturing of everything happening in CouchDB in incremental updates. It is run and monitored by the operating system where it is configured to fetch data at a configurable interval.&lt;/p>
+&lt;p>Data copied over to PostgreSQL is first stored as raw json (document) making use of PostgreSQL&amp;rsquo;s jsonb data type to create an exact replica of a CouchDB database. From this, default views are created at deployment of the service and refreshed during every subsequent run. Additional custom materialized views created later are also refreshed at this time.&lt;/p>
+&lt;p>Custom materialized views and functions are added specific to a deployment&amp;rsquo;s needs. Generally the following naming convention is recommended:&lt;/p>
+&lt;ul>
+&lt;li>&lt;em>formview&lt;/em> as a view of raw forms&lt;/li>
+&lt;li>&lt;em>useview&lt;/em> as a view of form data supporting a use case as defined by design&lt;/li>
+&lt;li>&lt;em>contactview&lt;/em> as a view of people and places&lt;/li>
+&lt;li>Database functions are used as a way to join as much relevant data as possible for easier querying in analytics or dashboard visualizations.&lt;/li>
+&lt;/ul>
+&lt;p>Data in the views and functions mentioned in this section is as accurate as the accuracy of the SQL queries. Best practice is to begin the process of defining these objects at design in order to align analytics and dashboards requirements with workflows being deployed.&lt;/p>
+&lt;h4 id="3-data-use">3. Data Use&lt;/h4>
+&lt;p>The data in PostgreSQL is mostly either used by direct querying or via dashboard visualizations for impact monitoring and data driven-decision making. Database visualizations are built scoped to the requirements of supporting a successful deployment. The work of our Research &amp;amp; Learning team, specifically data science, is supported at the PostgreSQL level through updated contactviews, formviews, useviews and functions with access to these provided to relevant parties as and when needed. Our use of data follows our Privacy &amp;amp; Data Protection policy and is in accordance to agreements with our CHT partners.&lt;/p>
+&lt;p>As mentioned previously, formviews are built to present data in a structure similar to the data collection tool (form) used. Useviews are tailored to align with a use case, mostly using the formviews as the data sources. These are fundamentally guided by design of the workflows and should be interpreted in the context of the design materials including a document explaining the definitions of variables used.&lt;/p>
+&lt;p>The objects present here are not limited to views and functions. Additional tables can be added, for example providing mappings or supporting operations external to the functions available in the toolkit. In short, there is no limitation to the utility that can be added this level to support analytics and dashboards. That said, measures are taken to ensure controlled access, reliability and timely access of the data by the various parties. Some of these measures are:&lt;/p>
+&lt;ul>
+&lt;li>Roles and users allocation and deallocation done by specific roles within partner technical teams with support from Medic Mobile as needed;&lt;/li>
+&lt;li>Access control management is left to the partner technical teams where possible;&lt;/li>
+&lt;li>Dashboard data source refresh intervals set to align with project needs;&lt;/li>
+&lt;li>Update of the data sources monitored to ensure updating works as expected;&lt;/li>
+&lt;li>Review of the dashboards as part of the design process;&lt;/li>
+&lt;li>Qualitative design activities to interrogate trends observed in the dashboards and iterate on them if need be;&lt;/li>
+&lt;/ul>
+&lt;h3 id="beyond-our-current-pipeline">Beyond Our Current Pipeline&lt;/h3>
+&lt;p>The &lt;a href="https://github.com/medic/cht-core">cht-core&lt;/a> is mostly data collection tools and is the first component of the data management pipeline. It is the core part of a deployment but the rest of the tools can be easily replaced with other preferred options. It also helps that couch2pg is an open source tool which provides the opportunity for collaboration to extend its functionality to support other implementations. Klipfolio, the tool that we currently use for visualizations, is a proprietary tool but there are many open source options, such as &lt;a href="https://superset.incubator.apache.org/">Apache Superset&lt;/a> that are worth exploring and building into future iterations of our impact monitoring and analytics support for the CHT.&lt;/p>
+&lt;h2 id="backup">Backup&lt;/h2>
+&lt;p>The machines running each of CouchDB and PostgreSQL instances are backed up daily.&lt;/p></description></item><item><title>Core: Transitions API</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/transitions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/transitions/</guid><description>
+&lt;p>A transition is javascript code that runs when a document is changed. A
 transition can edit the changed doc or do anything server side code can do for
-that matter.&lt;/p&gt;
-&lt;p&gt;Transitions are run in series, not in parallel:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;For a given change, you can expect one transition to be finished before the
-next runs.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;You can expected one change to be fully processed by all transitions before
-the next starts being processed.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Transitions obey the following rules:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;has a &lt;code&gt;filter(doc)&lt;/code&gt; function that accepts the changed document as an argument and
-returns &lt;code&gt;true&lt;/code&gt; if it needs to run/be applied.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;a &lt;code&gt;onMatch(change, db, auditDb, callback)&lt;/code&gt; function than will run on changes
-that pass the filter.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;can have an &lt;code&gt;init()&lt;/code&gt; function to do any required setup and throw Errors on invalid
-configuration.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;has an &lt;code&gt;onChange(change, db, audit, callback)&lt;/code&gt; function that makes changes to
-the &lt;code&gt;change.doc&lt;/code&gt; reference (copying is discouraged). &lt;code&gt;db&lt;/code&gt; and &lt;code&gt;audit&lt;/code&gt; are
-handles to let you query those DBs. More about &lt;code&gt;callback&lt;/code&gt; below.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;It is not necessary for an individual transition to save the changes to &lt;code&gt;change.doc&lt;/code&gt; to the db: the doc will be saved once, after all the transitions have edited it.
-If an individual transition saves the document provided at &lt;code&gt;change.doc&lt;/code&gt;, it takes responsibility re-attaching the newly saved document (with new seq etc) at &lt;code&gt;change.doc&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;guarantees the consistency of a document.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;runs serially and in any order.  A transition is free to make async calls but
+that matter.&lt;/p>
+&lt;p>Transitions are run in series, not in parallel:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>For a given change, you can expect one transition to be finished before the
+next runs.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>You can expected one change to be fully processed by all transitions before
+the next starts being processed.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Transitions obey the following rules:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>has a &lt;code>filter(doc)&lt;/code> function that accepts the changed document as an argument and
+returns &lt;code>true&lt;/code> if it needs to run/be applied.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>a &lt;code>onMatch(change, db, auditDb, callback)&lt;/code> function than will run on changes
+that pass the filter.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>can have an &lt;code>init()&lt;/code> function to do any required setup and throw Errors on invalid
+configuration.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>has an &lt;code>onChange(change, db, audit, callback)&lt;/code> function that makes changes to
+the &lt;code>change.doc&lt;/code> reference (copying is discouraged). &lt;code>db&lt;/code> and &lt;code>audit&lt;/code> are
+handles to let you query those DBs. More about &lt;code>callback&lt;/code> below.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>It is not necessary for an individual transition to save the changes to &lt;code>change.doc&lt;/code> to the db: the doc will be saved once, after all the transitions have edited it.
+If an individual transition saves the document provided at &lt;code>change.doc&lt;/code>, it takes responsibility re-attaching the newly saved document (with new seq etc) at &lt;code>change.doc&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>guarantees the consistency of a document.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>runs serially and in any order. A transition is free to make async calls but
 the next transition will only run after the previous transitions&amp;rsquo;s callback
 is called. If your transition is dependent on another transition then it will
-run on the next change.  Code your transition to support two changes rather
-than require a specific ordering.  You can optimize your ordering but don&amp;rsquo;t
-require it.  This keeps configuration simpler.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;is repeatable, it can run multiple times on the same document without
-negative effect.  You can use the &lt;code&gt;transitions&lt;/code&gt; property on a document to
-determine if a transition has run.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Callback arguments:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;callback(err, needsSaving)&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;needsSaving&lt;/code&gt; is true if the &lt;code&gt;change.doc&lt;/code&gt; needs to be saved to db by the transition runner. For instance the transition has edited the &lt;code&gt;change.doc&lt;/code&gt; in memory.
-&lt;code&gt;err&lt;/code&gt; if truthy, the error will be added to the &lt;code&gt;changes.doc&lt;/code&gt; in memory. (Note that if &lt;code&gt;needsSaving&lt;/code&gt; is falsy, the doc will not be saved, so that error will not be persisted).&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Regardless whether the doc is saved or not, the transitions will all be run (unless one crashes!).&lt;/p&gt;
-&lt;p&gt;When your transition encounters an error, there are different ways to deal with it. You can :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;finish your transition with &lt;code&gt;callback(someError, true)&lt;/code&gt;. This will save the error to &lt;code&gt;change.doc&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;finish your transition with &lt;code&gt;callback(someError, false)&lt;/code&gt;. The error will be logged to the sentinel log. This will not save the error on the &lt;code&gt;change.doc&lt;/code&gt;, so there will be no record that this transition ran. That particular &lt;code&gt;change&lt;/code&gt; will not go through transitions again, but if the same doc has another change in the future, since there is no record of the erroring transition having run, it will be rerun.&lt;/li&gt;
-&lt;li&gt;crash sentinel. When sentinel restarts, since that &lt;code&gt;change&lt;/code&gt; did not record a successful processing, it will be reprocessed. Transitions that did not save anything to the &lt;code&gt;change.doc&lt;/code&gt; will be rerun.&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Core: How To Manage Translations</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/translations/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/translations/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Apps built with CHT Core are localized so that users can use it in the language of their choice. It is currently available in English, French, Hindi, Nepali, Spanish, and Swahili. The goal of this doc is to help our team manage these and future translations.&lt;/p&gt;
-&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
-&lt;p&gt;Like the rest of our code, the translation files live in our GitHub repo. These translation files are &lt;a href=&#34;https://en.wikipedia.org/wiki/.properties&#34;&gt;properties&lt;/a&gt; files, which are a series of keys and their corresponding values. We use the English file as our default, and as such contains the entire set of keys. If any key is missing from another language file the English value is used.&lt;/p&gt;
-&lt;p&gt;In order to collaboratively edit the translations we use POEditor.com. Translators can be given access to specific languages so that we can more effectively edit language text to be included in Medic Mobile. Once the text is ready it can be exported from POEditor to GitHub and included in the next release of our app.&lt;/p&gt;
-&lt;p&gt;Note that &amp;ldquo;keys&amp;rdquo; in .properties files are referred to as &lt;code&gt;terms&lt;/code&gt; in POEditor.&lt;/p&gt;
-&lt;h2 id=&#34;adding-new-languages&#34;&gt;Adding new languages&lt;/h2&gt;
-&lt;p&gt;New languages must be added and configured in several places:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;In GitHub&lt;/em&gt;
-&lt;ul&gt;
-&lt;li&gt;Create a new &lt;a href=&#34;https://github.com/medic/medic/blob/master/translations/&#34;&gt;medic/translations/messages-XX.properties&lt;/a&gt; file, replacing XX with the 2 or 3 letter language code.&lt;/li&gt;
-&lt;li&gt;Add the language to the &lt;a href=&#34;https://github.com/medic/medic-api/blob/master/translations.js#L10&#34;&gt;LOCAL_NAME_MAP in api&lt;/a&gt;. Use the language code for the key, and the local name followed by the English name for the language in brackets, eg: &amp;ldquo;fr: &amp;lsquo;Français (French)&#39;&amp;quot;.&lt;/li&gt;
-&lt;li&gt;Import the moment language pack in the &lt;a href=&#34;https://github.com/medic/medic/blob/master/static/js/app.js#L25&#34;&gt;root app.js file&lt;/a&gt;. If moment doesn&amp;rsquo;t provide the required language pack you may need to contribute it upstream to the moment library.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;In POEditor&lt;/em&gt;
-&lt;ul&gt;
-&lt;li&gt;In the &lt;a href=&#34;https://poeditor.com/projects/view?id=33025&#34;&gt;Medic Mobile project&lt;/a&gt;, add the language&lt;/li&gt;
-&lt;li&gt;Add translations for a new language in the POEditor app&lt;/li&gt;
-&lt;li&gt;Export file from POEditor to GitHub, as described below&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;adding-new-keys&#34;&gt;Adding new keys&lt;/h2&gt;
-&lt;p&gt;In order to trace the addition of new terms and also updates to existing translations,
+run on the next change. Code your transition to support two changes rather
+than require a specific ordering. You can optimize your ordering but don&amp;rsquo;t
+require it. This keeps configuration simpler.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>is repeatable, it can run multiple times on the same document without
+negative effect. You can use the &lt;code>transitions&lt;/code> property on a document to
+determine if a transition has run.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Callback arguments:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>callback(err, needsSaving)&lt;/p>
+&lt;p>&lt;code>needsSaving&lt;/code> is true if the &lt;code>change.doc&lt;/code> needs to be saved to db by the transition runner. For instance the transition has edited the &lt;code>change.doc&lt;/code> in memory.
+&lt;code>err&lt;/code> if truthy, the error will be added to the &lt;code>changes.doc&lt;/code> in memory. (Note that if &lt;code>needsSaving&lt;/code> is falsy, the doc will not be saved, so that error will not be persisted).&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Regardless whether the doc is saved or not, the transitions will all be run (unless one crashes!).&lt;/p>
+&lt;p>When your transition encounters an error, there are different ways to deal with it. You can :&lt;/p>
+&lt;ul>
+&lt;li>finish your transition with &lt;code>callback(someError, true)&lt;/code>. This will save the error to &lt;code>change.doc&lt;/code>.&lt;/li>
+&lt;li>finish your transition with &lt;code>callback(someError, false)&lt;/code>. The error will be logged to the sentinel log. This will not save the error on the &lt;code>change.doc&lt;/code>, so there will be no record that this transition ran. That particular &lt;code>change&lt;/code> will not go through transitions again, but if the same doc has another change in the future, since there is no record of the erroring transition having run, it will be rerun.&lt;/li>
+&lt;li>crash sentinel. When sentinel restarts, since that &lt;code>change&lt;/code> did not record a successful processing, it will be reprocessed. Transitions that did not save anything to the &lt;code>change.doc&lt;/code> will be rerun.&lt;/li>
+&lt;/ul></description></item><item><title>Core: How To Manage Translations</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/translations/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/translations/</guid><description>
+&lt;p>Apps built with CHT Core are localized so that users can use it in the language of their choice. It is currently available in English, French, Hindi, Nepali, Spanish, and Swahili. The goal of this doc is to help our team manage these and future translations.&lt;/p>
+&lt;h2 id="overview">Overview&lt;/h2>
+&lt;p>Like the rest of our code, the translation files live in our GitHub repo. These translation files are &lt;a href="https://en.wikipedia.org/wiki/.properties">properties&lt;/a> files, which are a series of keys and their corresponding values. We use the English file as our default, and as such contains the entire set of keys. If any key is missing from another language file the English value is used.&lt;/p>
+&lt;p>In order to collaboratively edit the translations we use POEditor.com. Translators can be given access to specific languages so that we can more effectively edit language text to be included in Medic Mobile. Once the text is ready it can be exported from POEditor to GitHub and included in the next release of our app.&lt;/p>
+&lt;p>Note that &amp;ldquo;keys&amp;rdquo; in .properties files are referred to as &lt;code>terms&lt;/code> in POEditor.&lt;/p>
+&lt;h2 id="adding-new-languages">Adding new languages&lt;/h2>
+&lt;p>New languages must be added and configured in several places:&lt;/p>
+&lt;ul>
+&lt;li>&lt;em>In GitHub&lt;/em>
+&lt;ul>
+&lt;li>Create a new &lt;a href="https://github.com/medic/medic/blob/master/translations/">medic/translations/messages-XX.properties&lt;/a> file, replacing XX with the 2 or 3 letter language code.&lt;/li>
+&lt;li>Add the language to the &lt;a href="https://github.com/medic/medic-api/blob/master/translations.js#L10">LOCAL_NAME_MAP in api&lt;/a>. Use the language code for the key, and the local name followed by the English name for the language in brackets, eg: &amp;ldquo;fr: &amp;lsquo;Français (French)'&amp;quot;.&lt;/li>
+&lt;li>Import the moment language pack in the &lt;a href="https://github.com/medic/medic/blob/master/static/js/app.js#L25">root app.js file&lt;/a>. If moment doesn&amp;rsquo;t provide the required language pack you may need to contribute it upstream to the moment library.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;em>In POEditor&lt;/em>
+&lt;ul>
+&lt;li>In the &lt;a href="https://poeditor.com/projects/view?id=33025">Medic Mobile project&lt;/a>, add the language&lt;/li>
+&lt;li>Add translations for a new language in the POEditor app&lt;/li>
+&lt;li>Export file from POEditor to GitHub, as described below&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="adding-new-keys">Adding new keys&lt;/h2>
+&lt;p>In order to trace the addition of new terms and also updates to existing translations,
 the default translation file (messages-en.properties) must be updated directly.
-Our GitHub repo provides with a &lt;a href=&#34;https://github.com/medic/medic/tree/master/scripts/poe&#34;&gt;command line tool (CLI)&lt;/a&gt; to
+Our GitHub repo provides with a &lt;a href="https://github.com/medic/medic/tree/master/scripts/poe">command line tool (CLI)&lt;/a> to
 import updates into the POEditor app.
-If you don&amp;rsquo;t have an API token, please contact a Medic Mobile developer, product manager, or CTO. Please do not disclose this API token to anyone else.&lt;/p&gt;
-&lt;h3 id=&#34;translating-static-text&#34;&gt;Translating static text&lt;/h3&gt;
-&lt;p&gt;All text in the app is internationalised.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Pick a key.
-&lt;ul&gt;
-&lt;li&gt;First check if an appropriate key already exists in messages-en.properties (medic/config/standard/translations).&lt;/li&gt;
-&lt;li&gt;Otherwise create a new key and default English value. Keys must be all lower case, dot separated, and descriptive but not verbose. The values should include as much text as possible (eg: trailing punctuation), and must not contain any markup. Don&amp;rsquo;t add any values for other languages as this will be done later in the POEditor app.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;Use the translation. In angular this is done using angular-translate, and ideally using the &lt;a href=&#34;http://angular-translate.github.io/docs/#/guide/05_using-translate-directive&#34;&gt;translate directive&lt;/a&gt; to reduce the number of watchers, eg: &lt;code&gt;&amp;lt;h3 translate&amp;gt;date.incorrect.title&amp;lt;/h3&amp;gt;&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;translating-help-pages&#34;&gt;Translating help pages&lt;/h3&gt;
-&lt;p&gt;Because help pages are too large to manage easily through the standard translation mechanism, and we want to include lots of markup, help pages are translated by providing md documents for each language. This isn&amp;rsquo;t yet up and running so ask for help.&lt;/p&gt;
-&lt;h3 id=&#34;translating-configurations&#34;&gt;Translating configurations&lt;/h3&gt;
-&lt;p&gt;Much of the app is configurable (eg: forms and schedules). Because the specifics of the configuration aren&amp;rsquo;t known during development time these can&amp;rsquo;t be provided via messages. Instead we allow configurers to provide a map of locale to value for each translated property. Then use the &lt;code&gt;translateFrom&lt;/code&gt; filter to translate from the configured map using the user&amp;rsquo;s language.&lt;/p&gt;
-&lt;h2 id=&#34;modifying-any-existing-translation-values&#34;&gt;Modifying any existing translation values&lt;/h2&gt;
-&lt;p&gt;To be done &lt;em&gt;only&lt;/em&gt; by updating messages-en.properties, importing to POEditor through the CLI tool and updating the other language translations through the POEditor app.&lt;/p&gt;
-&lt;h2 id=&#34;modifying-or-removing-translation-keys&#34;&gt;Modifying or removing translation keys:&lt;/h2&gt;
-&lt;p&gt;To be done &lt;em&gt;only&lt;/em&gt; by updating messages-en.properties and importing to POEditor through the CLI tool.&lt;/p&gt;
-&lt;h2 id=&#34;exporting-changes-from-poeditor-to-github&#34;&gt;Exporting changes from POEditor to GitHub&lt;/h2&gt;
-&lt;p&gt;To be done &lt;em&gt;only&lt;/em&gt; by exporting all translations through the CLI tool.
-If you don&amp;rsquo;t have an API token, please contact a Medic Mobile developer, product manager, or CTO. Please do not disclose this API token to anyone else.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Core: Supported Versions</title>
-      <link>https://docs.communityhealthtoolkit.org/beta/core/overview/supported-software/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://docs.communityhealthtoolkit.org/beta/core/overview/supported-software/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Medic Mobile supports the latest patch of minor versions of the Core Framework for three months after the next minor version is made available, and the latest minor of a major version for twelve months after the next major version is made available.&lt;/p&gt;
-&lt;p&gt;Once a version is no longer supported it will not receive any further releases and upgrading may be required before Medic Mobile can investigate any issues.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Version&lt;/th&gt;
-&lt;th&gt;Status&lt;/th&gt;
-&lt;th&gt;Release date&lt;/th&gt;
-&lt;th&gt;End of life&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;3.8.1&lt;/td&gt;
-&lt;td&gt;Current&lt;/td&gt;
-&lt;td&gt;6-Apr-2020&lt;/td&gt;
-&lt;td&gt;TBA&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.8.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;11-Feb-2020&lt;/td&gt;
-&lt;td&gt;6-Apr-2020&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.7.1&lt;/td&gt;
-&lt;td&gt;Supported&lt;/td&gt;
-&lt;td&gt;13-Nov-2019&lt;/td&gt;
-&lt;td&gt;11-Jun-2020&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.7.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;22-Oct-2019&lt;/td&gt;
-&lt;td&gt;13-Nov-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.6.2&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;24-Mar-2020&lt;/td&gt;
-&lt;td&gt;24-Mar-2020&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.6.1&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;07-Aug-2019&lt;/td&gt;
-&lt;td&gt;22-Jan-2020&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.6.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;17-Jul-2019&lt;/td&gt;
-&lt;td&gt;07-Aug-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.5.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;27-Jun-2019&lt;/td&gt;
-&lt;td&gt;17-Oct-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.4.1&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;4-Jun-2019&lt;/td&gt;
-&lt;td&gt;27-Sep-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.4.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;27-Mar-2019&lt;/td&gt;
-&lt;td&gt;4-Jun-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.3.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;22-Feb-2019&lt;/td&gt;
-&lt;td&gt;27-Jun-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.2.1&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;23-Jan-2019&lt;/td&gt;
-&lt;td&gt;22-May-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.2.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;23-Jan-2019&lt;/td&gt;
-&lt;td&gt;23-Jan-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.1.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;21-Nov-2018&lt;/td&gt;
-&lt;td&gt;23-Apr-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3.0.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;15-Nov-2018&lt;/td&gt;
-&lt;td&gt;21-Feb-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;2.18.1&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;31-Oct-2018&lt;/td&gt;
-&lt;td&gt;15-Nov-2019&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;2.18.0&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;30-Aug-2018&lt;/td&gt;
-&lt;td&gt;31-Oct-2018&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;earlier&lt;/td&gt;
-&lt;td&gt;EOL&lt;/td&gt;
-&lt;td&gt;&amp;hellip;&lt;/td&gt;
-&lt;td&gt;30-Nov-2018&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h1 id=&#34;dependencies&#34;&gt;Dependencies&lt;/h1&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;medic&lt;/th&gt;
-&lt;th&gt;Node&lt;/th&gt;
-&lt;th&gt;CouchDB&lt;/th&gt;
-&lt;th&gt;Browsers&lt;/th&gt;
-&lt;th&gt;SMS bridge&lt;/th&gt;
-&lt;th&gt;Android&lt;/th&gt;
-&lt;th&gt;medic-android&lt;/th&gt;
-&lt;th&gt;medic-couch2pg&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;strong&gt;0.4&lt;/strong&gt;&lt;/td&gt;
-&lt;td&gt;0.12+&lt;/td&gt;
-&lt;td&gt;1.6+&lt;/td&gt;
-&lt;td&gt;Chrome 30+, Firefox latest&lt;/td&gt;
-&lt;td&gt;SMSSync&lt;/td&gt;
-&lt;td&gt;N/A&lt;/td&gt;
-&lt;td&gt;N/A&lt;/td&gt;
-&lt;td&gt;N/A&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;strong&gt;2.x&lt;/strong&gt;&lt;/td&gt;
-&lt;td&gt;6+&lt;/td&gt;
-&lt;td&gt;1.6+&lt;/td&gt;
-&lt;td&gt;Chrome 30+, Firefox latest&lt;/td&gt;
-&lt;td&gt;medic-gateway&lt;/td&gt;
-&lt;td&gt;4.4+&lt;/td&gt;
-&lt;td&gt;Any&lt;/td&gt;
-&lt;td&gt;2.0 &amp;lt; 3.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;strong&gt;3.x&lt;/strong&gt;&lt;/td&gt;
-&lt;td&gt;8.11+&lt;/td&gt;
-&lt;td&gt;2.1+&lt;/td&gt;
-&lt;td&gt;Chrome 53+, Firefox latest&lt;/td&gt;
-&lt;td&gt;medic-gateway&lt;/td&gt;
-&lt;td&gt;4.4+&lt;/td&gt;
-&lt;td&gt;0.4.5+&lt;/td&gt;
-&lt;td&gt;3.0+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h1 id=&#34;hardware-requirements&#34;&gt;Hardware requirements&lt;/h1&gt;
-&lt;h2 id=&#34;smartphones&#34;&gt;Smartphones&lt;/h2&gt;
-&lt;p&gt;The following is the minimum specification recommendation for smartphones to handle the typical workload of front line health workers. Users with particularly high workloads or facility or supervisor workloads will require more powerful devices.&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Specification&lt;/th&gt;
-&lt;th&gt;Minimum&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Android version&lt;/td&gt;
-&lt;td&gt;5.0&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Processor&lt;/td&gt;
-&lt;td&gt;1.0GHz dual-core&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;RAM&lt;/td&gt;
-&lt;td&gt;1GB&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Storage&lt;/td&gt;
-&lt;td&gt;8GB&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-      </description>
-    </item>
-    
-  </channel>
-</rss>
+If you don&amp;rsquo;t have an API token, please contact a Medic Mobile developer, product manager, or CTO. Please do not disclose this API token to anyone else.&lt;/p>
+&lt;h3 id="translating-static-text">Translating static text&lt;/h3>
+&lt;p>All text in the app is internationalised.&lt;/p>
+&lt;ul>
+&lt;li>Pick a key.
+&lt;ul>
+&lt;li>First check if an appropriate key already exists in messages-en.properties (medic/config/standard/translations).&lt;/li>
+&lt;li>Otherwise create a new key and default English value. Keys must be all lower case, dot separated, and descriptive but not verbose. The values should include as much text as possible (eg: trailing punctuation), and must not contain any markup. Don&amp;rsquo;t add any values for other languages as this will be done later in the POEditor app.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Use the translation. In angular this is done using angular-translate, and ideally using the &lt;a href="http://angular-translate.github.io/docs/#/guide/05_using-translate-directive">translate directive&lt;/a> to reduce the number of watchers, eg: &lt;code>&amp;lt;h3 translate&amp;gt;date.incorrect.title&amp;lt;/h3&amp;gt;&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h3 id="translating-help-pages">Translating help pages&lt;/h3>
+&lt;p>Because help pages are too large to manage easily through the standard translation mechanism, and we want to include lots of markup, help pages are translated by providing md documents for each language. This isn&amp;rsquo;t yet up and running so ask for help.&lt;/p>
+&lt;h3 id="translating-configurations">Translating configurations&lt;/h3>
+&lt;p>Much of the app is configurable (eg: forms and schedules). Because the specifics of the configuration aren&amp;rsquo;t known during development time these can&amp;rsquo;t be provided via messages. Instead we allow configurers to provide a map of locale to value for each translated property. Then use the &lt;code>translateFrom&lt;/code> filter to translate from the configured map using the user&amp;rsquo;s language.&lt;/p>
+&lt;h2 id="modifying-any-existing-translation-values">Modifying any existing translation values&lt;/h2>
+&lt;p>To be done &lt;em>only&lt;/em> by updating messages-en.properties, importing to POEditor through the CLI tool and updating the other language translations through the POEditor app.&lt;/p>
+&lt;h2 id="modifying-or-removing-translation-keys">Modifying or removing translation keys:&lt;/h2>
+&lt;p>To be done &lt;em>only&lt;/em> by updating messages-en.properties and importing to POEditor through the CLI tool.&lt;/p>
+&lt;h2 id="exporting-changes-from-poeditor-to-github">Exporting changes from POEditor to GitHub&lt;/h2>
+&lt;p>To be done &lt;em>only&lt;/em> by exporting all translations through the CLI tool.
+If you don&amp;rsquo;t have an API token, please contact a Medic Mobile developer, product manager, or CTO. Please do not disclose this API token to anyone else.&lt;/p></description></item><item><title>Core: Supported Versions</title><link>https://docs.communityhealthtoolkit.org/beta/core/overview/supported-software/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/beta/core/overview/supported-software/</guid><description>
+&lt;p>Medic Mobile supports the latest patch of minor versions of the Core Framework for three months after the next minor version is made available, and the latest minor of a major version for twelve months after the next major version is made available.&lt;/p>
+&lt;p>Once a version is no longer supported it will not receive any further releases and upgrading may be required before Medic Mobile can investigate any issues.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Version&lt;/th>
+&lt;th>Status&lt;/th>
+&lt;th>Release date&lt;/th>
+&lt;th>End of life&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>3.8.1&lt;/td>
+&lt;td>Current&lt;/td>
+&lt;td>6-Apr-2020&lt;/td>
+&lt;td>TBA&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.8.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>11-Feb-2020&lt;/td>
+&lt;td>6-Apr-2020&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.7.1&lt;/td>
+&lt;td>Supported&lt;/td>
+&lt;td>13-Nov-2019&lt;/td>
+&lt;td>11-Jun-2020&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.7.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>22-Oct-2019&lt;/td>
+&lt;td>13-Nov-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.6.2&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>24-Mar-2020&lt;/td>
+&lt;td>24-Mar-2020&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.6.1&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>07-Aug-2019&lt;/td>
+&lt;td>22-Jan-2020&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.6.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>17-Jul-2019&lt;/td>
+&lt;td>07-Aug-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.5.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>27-Jun-2019&lt;/td>
+&lt;td>17-Oct-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.4.1&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>4-Jun-2019&lt;/td>
+&lt;td>27-Sep-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.4.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>27-Mar-2019&lt;/td>
+&lt;td>4-Jun-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.3.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>22-Feb-2019&lt;/td>
+&lt;td>27-Jun-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.2.1&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>23-Jan-2019&lt;/td>
+&lt;td>22-May-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.2.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>23-Jan-2019&lt;/td>
+&lt;td>23-Jan-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.1.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>21-Nov-2018&lt;/td>
+&lt;td>23-Apr-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3.0.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>15-Nov-2018&lt;/td>
+&lt;td>21-Feb-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2.18.1&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>31-Oct-2018&lt;/td>
+&lt;td>15-Nov-2019&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2.18.0&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>30-Aug-2018&lt;/td>
+&lt;td>31-Oct-2018&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>earlier&lt;/td>
+&lt;td>EOL&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>30-Nov-2018&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h1 id="dependencies">Dependencies&lt;/h1>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>medic&lt;/th>
+&lt;th>Node&lt;/th>
+&lt;th>CouchDB&lt;/th>
+&lt;th>Browsers&lt;/th>
+&lt;th>SMS bridge&lt;/th>
+&lt;th>Android&lt;/th>
+&lt;th>medic-android&lt;/th>
+&lt;th>medic-couch2pg&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>0.4&lt;/strong>&lt;/td>
+&lt;td>0.12+&lt;/td>
+&lt;td>1.6+&lt;/td>
+&lt;td>Chrome 30+, Firefox latest&lt;/td>
+&lt;td>SMSSync&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>2.x&lt;/strong>&lt;/td>
+&lt;td>6+&lt;/td>
+&lt;td>1.6+&lt;/td>
+&lt;td>Chrome 30+, Firefox latest&lt;/td>
+&lt;td>medic-gateway&lt;/td>
+&lt;td>4.4+&lt;/td>
+&lt;td>Any&lt;/td>
+&lt;td>2.0 &amp;lt; 3.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>3.x&lt;/strong>&lt;/td>
+&lt;td>8.11+&lt;/td>
+&lt;td>2.1+&lt;/td>
+&lt;td>Chrome 53+, Firefox latest&lt;/td>
+&lt;td>medic-gateway&lt;/td>
+&lt;td>4.4+&lt;/td>
+&lt;td>0.4.5+&lt;/td>
+&lt;td>3.0+&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h1 id="hardware-requirements">Hardware requirements&lt;/h1>
+&lt;h2 id="smartphones">Smartphones&lt;/h2>
+&lt;p>The following is the minimum specification recommendation for smartphones to handle the typical workload of front line health workers. Users with particularly high workloads or facility or supervisor workloads will require more powerful devices.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Specification&lt;/th>
+&lt;th>Minimum&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Android version&lt;/td>
+&lt;td>5.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Processor&lt;/td>
+&lt;td>1.0GHz dual-core&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>1GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Storage&lt;/td>
+&lt;td>8GB&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item></channel></rss>
