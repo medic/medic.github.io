@@ -1,0 +1,434 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Process for Development</title><link>https://docs.communityhealthtoolkit.org/core/process/</link><description>Recent content in Process for Development on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/core/process/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Development Workflow</title><link>https://docs.communityhealthtoolkit.org/core/process/workflow/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/process/workflow/</guid><description>
+&lt;h2 id="code">Code&lt;/h2>
+&lt;h3 id="writing">Writing&lt;/h3>
+&lt;p>Where possible, follow our coding &lt;a href="https://docs.communityhealthtoolkit.org/docs-style-guide/">style guide&lt;/a>.&lt;/p>
+&lt;p>Aim for self-documenting code. Where code cannot be made self-documenting add commenting. Usually comments are useful when they explain why some code exists, and should not be explaining what some code is doing.&lt;/p>
+&lt;h3 id="reviewing">Reviewing&lt;/h3>
+&lt;p>The author and reviewer should use this &lt;a href="https://google.github.io/eng-practices/review/developer/">guide to code reviewing&lt;/a>.&lt;/p>
+&lt;h3 id="testing">Testing&lt;/h3>
+&lt;p>All features and bug fixes must have at least one unit test. All features must have at least one end-to-end test.&lt;/p>
+&lt;h3 id="migrating">Migrating&lt;/h3>
+&lt;p>When the schema is changed you must also provide a migration so when instances are upgraded existing data is compatible with the new code.&lt;/p>
+&lt;h2 id="commits">Commits&lt;/h2>
+&lt;p>The main branch is &lt;code>master&lt;/code> which must be kept stable so as not to impact other developers and so we can take a release branch as needed. To achieve this we do (almost) all development in a branch and submit a PR for code review. This means the CI runs and another developer has signed off on the change before it hits the &lt;code>master&lt;/code> branch.&lt;/p>
+&lt;p>Format your commit messages according to Git standards. First line should be a short title/summary (50 characters or so) with more details in a separate paragraph, respecting 79 character line widths. Using &lt;code>git commit -v&lt;/code> is recommended to review your diff while you write your commit message.&lt;/p>
+&lt;p>See tips on &lt;a href="https://chris.beams.io/posts/git-commit/">How to Write a Git Commit Message&lt;/a> and add your favorites here.&lt;/p>
+&lt;blockquote>
+&lt;p>Every good commit message should be able to complete the following sentence:&lt;/p>
+&lt;p>When applied, this commit will: {{YOUR COMMIT MESSAGE}}&lt;/p>
+&lt;/blockquote>
+&lt;p>Never force push remote. Prefer rebasing over merging as it makes for a cleaner history.&lt;/p>
+&lt;p>Commit reformats and refactors separately from actual code changes to make reviewing easier.&lt;/p>
+&lt;p>For more help with Git see: &lt;a href="./using-git.md">Using Git&lt;/a>.&lt;/p>
+&lt;h2 id="branches">Branches&lt;/h2>
+&lt;ul>
+&lt;li>The main branch is &lt;code>master&lt;/code> and is the github default branch and contains the latest code.&lt;/li>
+&lt;li>Release branches have the form &lt;code>&amp;lt;major&amp;gt;.&amp;lt;minor&amp;gt;.x&lt;/code> and should be stable.&lt;/li>
+&lt;li>Feature branches have the form &lt;code>&amp;lt;issue-number&amp;gt;-&amp;lt;issue-description&amp;gt;&lt;/code> and are work in progress.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Note&lt;/strong>: When backporting changes to an earlier release branch you should &lt;code>git cherry-pick&lt;/code> the appropriate commit(s) from &lt;code>master&lt;/code> into the release branch. Then use a pull request to make sure tests pass on Travis before merging (you do not need to get the pull request approved if there were no conflicts when cherry-picking).&lt;/p>
+&lt;h1 id="issues">Issues&lt;/h1>
+&lt;p>Issues are managed in Github. Issues should be created in the repository where the changes need to be made. If it is not clear in which repo to open an issue the default should be the &lt;code>medic&lt;/code> repository. If it is a security or sensitive issue it should be opened in the private &lt;code>medic-projects&lt;/code> repository.&lt;/p>
+&lt;p>When creating issues add the appropriate &lt;a href="https://github.com/medic/medic/labels?utf8=%E2%9C%93&amp;amp;q=Priority%3A+">Priority&lt;/a> and &lt;a href="https://github.com/medic/medic/labels?utf8=%E2%9C%93&amp;amp;q=Type%3A+">Type&lt;/a> labels.&lt;/p>
+&lt;h2 id="project-states">Project States&lt;/h2>
+&lt;p>When the issue is scheduled for development it will be added to the appropriate &lt;a href="https://github.com/orgs/medic/projects?query=is%3Aopen+sort%3Aname-asc">organisation project&lt;/a> named after the webapp version it will be released with. Each column in the project represents the state the issue is in.&lt;/p>
+&lt;h3 id="to-do">To do&lt;/h3>
+&lt;p>Issues in this column have been scheduled to be released with this webapp version. The issue has all the detail needed to begin design and development and it is free for anyone to start work on. If you start work on an issue assign it to yourself and move it to &amp;ldquo;In progress&amp;rdquo;.&lt;/p>
+&lt;h3 id="in-progress">In progress&lt;/h3>
+&lt;p>Issues in this column are being actively worked on, which includes development, design, and code reviews.&lt;/p>
+&lt;p>Any code should be in a feature branch in each of the repositories you update. The name of the feature branch should be in the form &lt;code>&amp;lt;issue-number&amp;gt;-&amp;lt;readable-name&amp;gt;&lt;/code>, for example &lt;code>1104-inclusive-export&lt;/code>. Once you&amp;rsquo;re satisfied with your changes:&lt;/p>
+&lt;ol>
+&lt;li>Submit a PR for each of the repositories. Each PR message and description will become the commit message and description so keep the message consise, describe what and why rather than how, and link to the issue in the description (eg: &amp;ldquo;medic/cht-core#123&amp;rdquo;).&lt;/li>
+&lt;li>If AT is required update the issue with AT instructions.&lt;/li>
+&lt;li>Wait for the builds to succeed and ensure there are no conflicts with the &lt;code>master&lt;/code> branch so the PR can be merged.&lt;/li>
+&lt;li>Pick at least one Reviewer for the PR and work with them until the code passes review.&lt;/li>
+&lt;li>If the issue requires AT then move the issue to &amp;ldquo;Ready for AT&amp;rdquo; for QA to test. Otherwise merge the PR, delete the branch, and close the issue.&lt;/li>
+&lt;/ol>
+&lt;h3 id="ready-for-at">Ready for AT&lt;/h3>
+&lt;p>Issues in this column are ready to be acceptance tested by a Quality Assurance engineer. When picking up an issue for AT:&lt;/p>
+&lt;ol>
+&lt;li>Check that the PR has no merge conflicts with &lt;code>master&lt;/code> and all required builds have passed. If not, notify the original developer to fix the branch and find another issue to AT.&lt;/li>
+&lt;li>Assign it to yourself.&lt;/li>
+&lt;li>Move it to the &amp;ldquo;AT in progress&amp;rdquo; column&lt;/li>
+&lt;/ol>
+&lt;h3 id="at-in-progress">AT in progress&lt;/h3>
+&lt;p>Issues in this column are in the process of being acceptance tested by a Quality Assurance engineer. To complete AT:&lt;/p>
+&lt;ol>
+&lt;li>Install the PR branch to test against.&lt;/li>
+&lt;li>If the issue fails AT then notify the original developer and move the issue back to &amp;ldquo;In progress&amp;rdquo;.&lt;/li>
+&lt;li>Once the issue passes AT move the issue to &amp;ldquo;Ready to merge&amp;rdquo; the notify the original developer to merge the PR.&lt;/li>
+&lt;/ol>
+&lt;h3 id="ready-to-merge">Ready to merge&lt;/h3>
+&lt;p>Issues in this column have passed AT and can be merged as soon as possible. The original developer will then:&lt;/p>
+&lt;ol>
+&lt;li>Write a useful commit message in the PR.&lt;/li>
+&lt;li>Click the button to &amp;ldquo;Squash and Merge&amp;rdquo; the PR.&lt;/li>
+&lt;li>Delete the PR branch.&lt;/li>
+&lt;li>If a backport is required cherry-pick the merged commit back to the release branches it&amp;rsquo;s required in.&lt;/li>
+&lt;li>Close the issue. This will automatically move it to &amp;ldquo;Done&amp;rdquo;.&lt;/li>
+&lt;/ol>
+&lt;h3 id="done">Done&lt;/h3>
+&lt;p>Issues in this column have passed acceptance testing and been merged into &lt;code>master&lt;/code> and/or release branches ready for release.&lt;/p>
+&lt;h2 id="triaging-old-issues">Triaging old issues&lt;/h2>
+&lt;p>We periodically run a &lt;a href="https://github.com/medic/github-issue-roulette">script&lt;/a> against medic issues. We do this to catch two situations:&lt;/p>
+&lt;ul>
+&lt;li>Issues that do not have the three labels they need (Type, Priority and Status)&lt;/li>
+&lt;li>Issues that have not been touched in 90 days&lt;/li>
+&lt;/ul>
+&lt;p>The plan is to keep cruft in our issue DB to a minimum, and have them curated into a colletion of detailed clear issues that can and should be actionable in the near to mid future.&lt;/p>
+&lt;p>You will occasionally get assigned issues and asked to deal with one or both of the above problems.&lt;/p>
+&lt;h3 id="what-do-i-do-when-i-get-one-of-these-issues">What do I do when I get one of these issues?&lt;/h3>
+&lt;p>Use your judgement (or someone else&amp;rsquo;s, feel free to pull in others either directly on the issue or via Slack etc) to decide:&lt;/p>
+&lt;ul>
+&lt;li>Is its description too vague? Is it detailed enough to be actionable?&lt;/li>
+&lt;li>Is this something we want to do &lt;strong>in the near future&lt;/strong>? Does it fit with our product etc?&lt;/li>
+&lt;li>If this is an older issue, do you think it is still relevant? Is there still interest? (If there is no interest it can be closed: it can always be re-opened or re-written in the future)&lt;/li>
+&lt;li>Is this covered by existing issues, or existing plans?&lt;/li>
+&lt;li>If it&amp;rsquo;s a bug, does it have: steps to reproduce; expected behaviour; actual behaviour; server info, browser info, screenshots etc where applicable?&lt;/li>
+&lt;/ul>
+&lt;p>From this decide if you need to go back to the issue creator for more information, or close the issue (using one of the &lt;code>Won't Fix&lt;/code> labels), or keep it.&lt;/p>
+&lt;p>Additionally, if there are missing labels:&lt;/p>
+&lt;ul>
+&lt;li>Type should be reasonably obvious: which of those labels most fits the issue&lt;/li>
+&lt;li>Status should almost certainly be &lt;code>Status: 1 - Triaged&lt;/code>&lt;/li>
+&lt;li>Priority is dependent on the severity of the problem: if it&amp;rsquo;s a production issue it&amp;rsquo;s probably high, if it&amp;rsquo;s a minor thing it&amp;rsquo;s probably low, medium for everything else (but use your judgement)&lt;/li>
+&lt;/ul>
+&lt;h3 id="anything-else">Anything else?&lt;/h3>
+&lt;p>Regardless of what you do with the issue, please:&lt;/p>
+&lt;ul>
+&lt;li>Remove the &lt;code>Needs Triage&lt;/code> label once triage is complete&lt;/li>
+&lt;li>Document the reasoning by commenting in the issue. This will help reduce mistakes, as the reasoning will be available for everyone to read, and any mistakes there can be rectified.&lt;/li>
+&lt;/ul>
+&lt;h1 id="workflow-for-contributing-to-cht-docs">Workflow for contributing to cht-docs&lt;/h1>
+&lt;p>Unlike the above development workflow, the workflow for contributing to &lt;a href="https://github.com/medic/cht-docs">cht-docs&lt;/a> does not involve release management and Acceptance Testing. In order to streamline the process of contributing to docs while still maintaining quality, please submit a pull request with any changes to &lt;a href="https://github.com/medic/cht-docs">cht-docs&lt;/a>. One of the repository&amp;rsquo;s maintainers will review the PR, request additional changes as needed, and merge the PR when it is ready.&lt;/p>
+&lt;p>Where possible, please follow our &lt;a href="https://docs.communityhealthtoolkit.org/docs-style-guide/">docs style guide&lt;/a>.&lt;/p></description></item><item><title>Core: Releasing</title><link>https://docs.communityhealthtoolkit.org/core/process/releasing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/process/releasing/</guid><description>
+&lt;h2 id="cht-core">CHT core&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/cht-core/issues/new/choose">Create an issue&lt;/a> for either a Major/Minor or Patch release issue template and assign it to the release manager to follow the process.&lt;/p>
+&lt;h2 id="medic-conf">medic-conf&lt;/h2>
+&lt;p>Follow the &lt;a href="https://github.com/medic/medic-conf/#releasing">instructions in the readme&lt;/a>.&lt;/p>
+&lt;h2 id="android-apps">Android apps&lt;/h2>
+&lt;p>All medic Android projects automatically build, sign, and publish builds via Travis. To create a new release:&lt;/p>
+&lt;ol>
+&lt;li>Determine what version the build will be. This should be a valid semver (eg. &lt;code>v1.1.1&lt;/code>). Increment the semver appropriately based on the latest release version:
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/medic/medic-android/releases">medic-android&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-gateway/releases">medic-gateway&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-collect/releases">medic-collect&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/rdt-capture/releases">rdt-capture&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Tag the commit in &lt;code>master&lt;/code> which you&amp;rsquo;d like to release. Use &lt;code>git tag v1.1.1&lt;/code> with the version from above and then run &lt;code>git push --tags&lt;/code>.&lt;/li>
+&lt;li>Wait for the build to complete. You can monitor the build via travis-ci.org.&lt;/li>
+&lt;li>&lt;strong>To Release via the Google Play Store&lt;/strong> - Login to the &lt;a href="https://play.google.com/apps/publish/">Google Play Console&lt;/a> and select the app flavor for release. Navigate to &amp;ldquo;Release Management &amp;gt; Alpha&amp;rdquo; and click &amp;ldquo;Release to Beta&amp;rdquo;. Repeat this for each flavor.&lt;/li>
+&lt;li>&lt;strong>To Side-Load&lt;/strong> (for Collect and Gateway) - Navigate to the GitHub Releases page (linked above) and download the relevant APKs for distribution.&lt;/li>
+&lt;/ol></description></item><item><title>Core: Updating Dependencies</title><link>https://docs.communityhealthtoolkit.org/core/process/update-dependencies/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/process/update-dependencies/</guid><description>
+&lt;p>Every minor release we update dependencies to get the latest fixes and improvements. We do this early in the release cycle so that we have some more time to find regressions and issues. This is done on all folders with a package.json, including:&lt;/p>
+&lt;ul>
+&lt;li>cht-core
+&lt;ul>
+&lt;li>/ (root)&lt;/li>
+&lt;li>/admin&lt;/li>
+&lt;li>/api&lt;/li>
+&lt;li>/sentinel&lt;/li>
+&lt;li>/shared-libs/*&lt;/li>
+&lt;li>/webapp&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>medic-conf&lt;/li>
+&lt;/ul>
+&lt;h2 id="steps">Steps&lt;/h2>
+&lt;ol>
+&lt;li>&lt;code>git checkout master &amp;amp;&amp;amp; git pull&lt;/code> - get the latest code&lt;/li>
+&lt;li>&lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code> - make a branch&lt;/li>
+&lt;/ol>
+&lt;p>Then for each folder go through these steps.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>npm ci&lt;/code> - update your local node_modules to match expected&lt;/li>
+&lt;li>&lt;code>npm outdated&lt;/code> - report on any dependencies which aren&amp;rsquo;t at the latest&lt;/li>
+&lt;li>&lt;code>npm install --save[-dev] package@version&lt;/code> - install the latest version (be careful and read the release notes if the new version is a major change from the current)&lt;/li>
+&lt;li>&lt;code>npm dedupe&lt;/code> - remove duplicated dependencies&lt;/li>
+&lt;li>&lt;code>npm audit fix&lt;/code> - automatically fix any nested dependencies with vulnerabilities&lt;/li>
+&lt;li>&lt;code>npm audit&lt;/code> - get a report on any remaining vulnerabilities and manually scan it to see if there&amp;rsquo;s anything else you can do&lt;/li>
+&lt;/ol>
+&lt;h2 id="problems">Problems&lt;/h2>
+&lt;ul>
+&lt;li>Don&amp;rsquo;t update bootstrap to 4+ as it has many breaking changes. One day we will either raise an issue to upgrade it or migrate off it, but that is outside the scope of this change.&lt;/li>
+&lt;li>Don&amp;rsquo;t update bootstrap-daterangepicker.&lt;/li>
+&lt;li>Don&amp;rsquo;t update select2 as the latest patch always seems to fail.&lt;/li>
+&lt;li>Make sure the version of &lt;code>api/enketo-xslt&lt;/code> is the same as &lt;code>webapp/enketo-core/enketo-transformer/enketo-xslt&lt;/code>.&lt;/li>
+&lt;li>Make sure the version of &lt;code>webapp/jquery&lt;/code> is the same as &lt;code>webapp/enketo-core/jquery&lt;/code>.&lt;/li>
+&lt;li>If you have trouble upgrading any other dependency and you think it&amp;rsquo;ll be challenging to fix it then raise a new issue to upgrade just that dependency. Don&amp;rsquo;t hold up all the other upgrades you&amp;rsquo;ve made.&lt;/li>
+&lt;/ul>
+&lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
+&lt;h3 id="npm-errno--17">npm errno -17&lt;/h3>
+&lt;p>If &lt;code>npm ci&lt;/code> errors with &amp;ldquo;errno -17&amp;rdquo; in shared-libs you may need to manually remove the nested dependencies from the package-lock.json. This needs move investigation to work out why this is happening.&lt;/p>
+&lt;h3 id="select2-is-not-a-function">select2 is not a function&lt;/h3>
+&lt;p>If you get &lt;code>TypeError: &amp;quot;$(...).select2 is not a function&amp;quot;&lt;/code> then either:&lt;/p>
+&lt;ol>
+&lt;li>You bumped select2. For some reason this breaks it.&lt;/li>
+&lt;li>You have multiple jquery libraries and select2 is getting attached to one but not the other. Make sure the jquery versions in enketo-core and webapp match and you&amp;rsquo;ve &lt;code>run dedupe&lt;/code> to remove the enketo-core copy.&lt;/li>
+&lt;/ol></description></item><item><title>Core: Coding Style Guide</title><link>https://docs.communityhealthtoolkit.org/core/process/style-guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/process/style-guide/</guid><description>
+&lt;p>This is a guide, not a law - use your discretion. Mostly based on &lt;a href="https://github.com/felixge/node-style-guide">Felix Geisendörfer&amp;rsquo;s&lt;/a> guide with our own tweaks.&lt;/p>
+&lt;h2 id="indention">Indention&lt;/h2>
+&lt;p>Use 2 spaces for indenting your code and swear an oath to never mix tabs and
+spaces - a special kind of hell is awaiting you otherwise.&lt;/p>
+&lt;h2 id="newlines">Newlines&lt;/h2>
+&lt;p>Use UNIX-style newlines (&lt;code>\n&lt;/code>), and a newline character as the last character
+of a file. Windows-style newlines (&lt;code>\r\n&lt;/code>) are forbidden inside any repository.&lt;/p>
+&lt;h2 id="no-trailing-whitespace">No trailing whitespace&lt;/h2>
+&lt;p>Just like you brush your teeth after every meal, you clean up any trailing
+whitespace in your JS files before committing. Otherwise the rotten smell of
+careless neglect will eventually drive away contributors and/or co-workers.&lt;/p>
+&lt;h2 id="use-semicolons">Use Semicolons&lt;/h2>
+&lt;p>According to &lt;a href="http://news.ycombinator.com/item?id=1547647">scientific research&lt;/a>, the usage of semicolons is
+a core value of our community. Consider the points of &lt;a href="http://blog.izs.me/post/2353458699/an-open-letter-to-javascript-leaders-regarding">the opposition&lt;/a>, but
+be a traditionalist when it comes to abusing error correction mechanisms for
+cheap syntactic pleasures.&lt;/p>
+&lt;h2 id="use-single-quotes">Use single quotes&lt;/h2>
+&lt;p>Use single quotes, unless you are writing JSON.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">foo&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">foo&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;bar&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="opening-braces-go-on-the-same-line">Opening braces go on the same line&lt;/h2>
+&lt;p>Your opening braces go on the same line as the statement, with whitespace before and after the condition, followed by a new line.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;winning&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;losing&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;losing&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">){&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;winning&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="method-chaining">Method chaining&lt;/h2>
+&lt;p>One method per line should be used if you want to chain methods.&lt;/p>
+&lt;p>You should also indent these methods so it&amp;rsquo;s easier to tell they are part of the same chain.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000">User&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">findOne&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;foo&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">})&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">populate&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exec&lt;/span>&lt;span style="color:#000;font-weight:bold">(()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000">User&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">findOne&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;foo&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">})&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">populate&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exec&lt;/span>&lt;span style="color:#000;font-weight:bold">(()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000">User&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">findOne&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;foo&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">})&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">populate&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exec&lt;/span>&lt;span style="color:#000;font-weight:bold">(()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000">User&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">findOne&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;foo&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">}).&lt;/span>&lt;span style="color:#000">populate&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exec&lt;/span>&lt;span style="color:#000;font-weight:bold">(()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000">User&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">findOne&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;foo&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">}).&lt;/span>&lt;span style="color:#000">populate&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;bar&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>
+&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exec&lt;/span>&lt;span style="color:#000;font-weight:bold">(()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-lowercamelcase-for-variables-properties-and-function-names">Use lowerCamelCase for variables, properties, and function names&lt;/h2>
+&lt;p>Variables, properties and function names should use &lt;code>lowerCamelCase&lt;/code>. They
+should also be descriptive. Single character variables and uncommon
+abbreviations should generally be avoided.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">adminUser&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">db&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">query&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">admin_user&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">db&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">query&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-uppercamelcase-for-class-names">Use UpperCamelCase for class names&lt;/h2>
+&lt;p>Class names should be capitalized using &lt;code>UpperCamelCase&lt;/code>.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">BankAccount&lt;/span>&lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">bank_Account&lt;/span>&lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-snake_case-for-couchdb-document-property-names">Use snake_case for CouchDB document property names&lt;/h2>
+&lt;p>All property names in CouchDB documents use lowercase underscore-separated formatting.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;word&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;values can have spaces and CAPS&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;multiple_words&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;UPPER_CASE_NAME&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;lowercasename&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;camelCaseName&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;kebab-case-name&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;Title_case_name&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;sTuDlYcAsEnAmE&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-const-and-let">Use &lt;code>const&lt;/code> and &lt;code>let&lt;/code>&lt;/h2>
+&lt;p>There is no longer a good reason to use &lt;code>var&lt;/code>. Use &lt;code>const&lt;/code> whenever you can,
+and &lt;code>let&lt;/code> when you must. Hardcoded constants should be named in all UPPERCASE.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">DELAY&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">10&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">*&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1000&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">output&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">input&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">*&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">10&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">let&lt;/span> &lt;span style="color:#000">temp&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">50&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">let&lt;/span> &lt;span style="color:#000">unknown&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">var&lt;/span> &lt;span style="color:#000">DELAY&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">10&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">*&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1000&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-arrow-functions">Use arrow functions&lt;/h2>
+&lt;p>Use arrow functions as much as possible for cleaner code and better scoping. Omit the
+return keyword when the entire function definition fits on one line. Omit the parens
+when taking a single parameter.&lt;/p>
+&lt;p>There are exceptions to this rule including when you want to access &lt;code>arguments&lt;/code> or
+&lt;code>this&lt;/code>, or when you want to be able to debug browserified code.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">let&lt;/span> &lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">append&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">+=&lt;/span> &lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">combine&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">b&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">+&lt;/span> &lt;span style="color:#000">b&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">getResult&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000">result&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">let&lt;/span> &lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">append&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">+=&lt;/span> &lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">combine&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">b&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">result&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">+&lt;/span> &lt;span style="color:#000">b&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">getResult&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span>
+&lt;span style="color:#000">result&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="object--array-creation">Object / Array creation&lt;/h2>
+&lt;p>Put short declarations on a single line. For long declarations put a line
+break after each comma.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;hello&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;world&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">];&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">b&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">good&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;code&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#39;is generally&amp;#39;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;pretty&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#39;hello&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;world&amp;#39;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">];&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">b&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;good&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;code&amp;#39;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">is&lt;/span> &lt;span style="color:#000">generally&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;pretty&amp;#39;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">c&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;one&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;two&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#39;three&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;four&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">];&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-the--operator">Use the === operator&lt;/h2>
+&lt;p>Programming is not about remembering &lt;a href="https://developer.mozilla.org/en/JavaScript/Reference/Operators/Comparison_Operators">stupid rules&lt;/a>. Use
+the triple equality operator as it will work just as expected.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">!==&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;winning&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">==&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;losing&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="do-not-extend-built-in-prototypes">Do not extend built-in prototypes&lt;/h2>
+&lt;p>Do not extend the prototype of native JavaScript objects. Your future self will be forever grateful.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[];&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">!&lt;/span>&lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">length&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;winning&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87">Array&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">prototype&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">empty&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span>&lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">!&lt;/span>&lt;span style="color:#204a87;font-weight:bold">this&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">length&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">a&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[];&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">a&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">empty&lt;/span>&lt;span style="color:#000;font-weight:bold">())&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;losing&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="use-descriptive-conditions">Use descriptive conditions&lt;/h2>
+&lt;p>Any non-trivial conditions should be assigned to a descriptively named variable or function:&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">isValidPassword&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">password&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">length&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">4&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#4e9a06">/^(?=.*\d).{4,}$/&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">test&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">isValidPassword&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;winning&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">length&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">4&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#4e9a06">/^(?=.*\d).{4,}$/&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">test&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#000;font-weight:bold">))&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">console&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">log&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;losing&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="write-small-functions">Write small functions&lt;/h2>
+&lt;p>Keep your functions short. A good function fits on a slide that the people in
+the last row of a big room can comfortably read. So don&amp;rsquo;t count on them having
+perfect vision and limit yourself to ~15 lines of code per function.&lt;/p>
+&lt;h2 id="return-early-from-functions">Return early from functions&lt;/h2>
+&lt;p>To avoid deep nesting of if-statements, always return a function&amp;rsquo;s value as early
+as possible.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">isPercentage&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;lt;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">100&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">isPercentage&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;lt;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">100&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span> &lt;span style="color:#204a87;font-weight:bold">else&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span> &lt;span style="color:#204a87;font-weight:bold">else&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Or for this particular example it may also be fine to shorten things even
+further:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">isPercentage&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">var&lt;/span> &lt;span style="color:#000">isInRange&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;lt;=&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">100&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#000">isInRange&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="adding-documentation-comments">Adding documentation comments&lt;/h2>
+&lt;p>To add documentation comments that will be built using jsdocs, use
+&lt;a href="https://jsdoc.app/">jsdoc block tags&lt;/a>. For angular code use the
+&lt;a href="https://www.npmjs.com/package/angular-jsdoc#tags-available">angular tags&lt;/a>, see
+&lt;a href="https://www.npmjs.com/package/angular-jsdoc#example">examples&lt;/a>.&lt;/p>
+&lt;p>Try to write comments that explain higher level mechanisms or clarify
+difficult segments of your code. Don&amp;rsquo;t use comments to restate trivial
+things.&lt;/p>
+&lt;p>&lt;em>Right:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#8f5902;font-style:italic">/**
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * &amp;#39;ID_SOMETHING=VALUE&amp;#39; -&amp;gt; [&amp;#39;ID_SOMETHING=VALUE&amp;#39;, &amp;#39;SOMETHING&amp;#39;, &amp;#39;VALUE&amp;#39;]
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * @type {boolean}
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">matches&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">match&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">/ID_([^\n]+)=([^\n]+)/&lt;/span>&lt;span style="color:#000;font-weight:bold">));&lt;/span>
+&lt;span style="color:#8f5902;font-style:italic">/**
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * Loads a user. This function has a nasty side effect where a failure to increment a
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * redis counter used for statistics will cause an exception. This needs
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * to be fixed in a later iteration.
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * @param {string} id the user id
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * @param {function} cb a callback function that applied to the user
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">loadUser&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">id&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">cb&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>Wrong:&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#8f5902;font-style:italic">/**
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * Execute a regex
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">matches&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">match&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">/ID_([^\n]+)=([^\n]+)/&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#8f5902;font-style:italic">/**
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * Usage: loadUser(5, function() { ... })
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000">loadUser&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">id&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">cb&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#8f5902;font-style:italic">/**
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> * Check if the session is valid
+&lt;/span>&lt;span style="color:#8f5902;font-style:italic"> */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">isSessionValid&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">session&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">expires&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;lt;&lt;/span> &lt;span style="color:#204a87">Date&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">now&lt;/span>&lt;span style="color:#000;font-weight:bold">());&lt;/span>
+&lt;span style="color:#8f5902;font-style:italic">/** If the session is valid */&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">isSessionValid&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000;font-weight:bold">...&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="objectfreeze-objectpreventextensions-objectseal-with-eval">Object.freeze, Object.preventExtensions, Object.seal, with, eval&lt;/h2>
+&lt;p>Crazy stuff that you will probably never need. Stay away from it.&lt;/p>
+&lt;h2 id="getters-and-setters">Getters and setters&lt;/h2>
+&lt;p>Do not use setters, they cause more problems for people who try to use your
+software than they can solve.&lt;/p>
+&lt;p>Feel free to use getters that are free from &lt;a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side effects&lt;/a>, like
+providing a length property for a collection class.&lt;/p></description></item></channel></rss>
