@@ -26,7 +26,1315 @@
 &lt;p>Applications built with the CHT are configurable by design, and support an exceptional range of features and health service areas. The ANC Reference App provides you with a template for structuring and organizing their digital health app, it’s configuration code, and its testing framework. It includes a foundation for forms related to pregnancy and delivery, flexible data fields, and analytics, and can be deployed as-is or customized by a developer for your unique context.&lt;/p>
 &lt;p>To install the ANC Reference Application, follow the &lt;a href="https://github.com/medic/cht-core/blob/master/INSTALL.md">easy installation instructions&lt;/a>. An &lt;a href="anc-reference-app-overview.pdf">overview of the ANC Reference App&lt;/a> and its key features is also available.&lt;/p>
 &lt;p>&lt;a href="anc-reference-app-overview.pdf">&lt;img src="preview-anc-ref-app-overview.png" alt="ANC Overview">&lt;/a>&lt;/p>
-&lt;p>If you want to modify our ANC Reference Application for your project or context, read our &lt;a href="https://docs.communityhealthtoolkit.org/design/apps/">configuration best practices&lt;/a> or learn how to &lt;a href="https://docs.communityhealthtoolkit.org/apps/">develop your own community health apps&lt;/a>.&lt;/p></description></item><item><title>Apps: DHIS2</title><link>https://docs.communityhealthtoolkit.org/apps/features/integrations/dhis2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/features/integrations/dhis2/</guid><description>
+&lt;p>If you want to modify our ANC Reference Application for your project or context, read our &lt;a href="https://docs.communityhealthtoolkit.org/design/apps/">configuration best practices&lt;/a> or learn how to &lt;a href="https://docs.communityhealthtoolkit.org/apps/">develop your own community health apps&lt;/a>.&lt;/p></description></item><item><title>Apps: API to interact with CHT Applications</title><link>https://docs.communityhealthtoolkit.org/apps/reference/api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/api/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This page covers the endpoints to use when integrating with the CHT server. If there isn&amp;rsquo;t an endpoint that provides the function or data you need, direct access to the database is possible via the &lt;a href="https://docs.couchdb.org/en/stable/api/index.html">CouchDB API&lt;/a>. Access to the &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">PostgreSQL database&lt;/a> may also prove useful for data analysis. If additional endpoints would be helpful, please make suggestions via a &lt;a href="https://github.com/medic/cht-core/issues/new/choose">GitHub issue&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;nav id="TableOfContents">
+&lt;ul>
+&lt;li>&lt;a href="#settings">Settings&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#get-apiv1settings">GET /api/v1/settings&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#put-apiv1settings">PUT /api/v1/settings&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#export">Export&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#get-apiv2exportdhis">GET /api/v2/export/dhis&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv2exportreports">GET /api/v2/export/reports&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv2exportmessages">GET /api/v2/export/messages&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv2exportfeedback">GET /api/v2/export/feedback&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv2exportcontacts">GET /api/v2/export/contacts&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#forms">Forms&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#get-apiv1forms">GET /api/v1/forms&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv1formsidformat">GET /api/v1/forms/{{id}}.{{format}}&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#records">Records&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#post-apiv2records">POST /api/v2/records&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#sms">SMS&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#post-apisms">POST /api/sms&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#people">People&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#supported-properties">Supported Properties&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1people">POST /api/v1/people&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#places">Places&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#supported-properties-1">Supported Properties&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1places">POST /api/v1/places&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1placesid">POST /api/v1/places/{{id}}&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#users">Users&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#supported-properties-2">Supported Properties&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv1users">GET /api/v1/users&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1users">POST /api/v1/users&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1usersusername">POST /api/v1/users/{{username}}&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#delete-apiv1usersusername">DELETE /api/v1/users/{{username}}&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv1users-info">GET /api/v1/users-info&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#bulk-operations">Bulk Operations&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#post-apiv1bulk-delete">POST /api/v1/bulk-delete&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#monitoring">Monitoring&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#get-apiv1monitoring">GET /api/v1/monitoring&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#upgrades">Upgrades&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#post-apiv1upgrade">POST /api/v1/upgrade&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1upgradestage">POST /api/v1/upgrade/stage&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1upgradecomplete">POST /api/v1/upgrade/complete&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="#hydrate">Hydrate&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#get-apiv1hydrate">GET api/v1/hydrate&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1hydrate">POST api/v1/hydrate&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/nav>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>Various properties throughout this API use a timestamp value, the
+following formats are supported:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>ISO 8601 combined date and time with timezone of the format below where &amp;ldquo;Z&amp;rdquo;
+is offset from UTC like &amp;ldquo;-03&amp;rdquo;, &amp;ldquo;+1245&amp;rdquo;, or just &amp;ldquo;Z&amp;rdquo; which is UTC (0 offset);&lt;/p>
+&lt;pre>&lt;code> YYYY-MM-DDTHH:mm:ssZ
+YYYY-MM-DDTHH:mm:ss.SSSZ
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>Milliseconds since Unix Epoch&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>A compatible value can be generated using the &lt;code>toISOString&lt;/code> or &lt;code>toValue&lt;/code> method
+on a Javascript Date object.&lt;/p>
+&lt;h5 id="examples">Examples&lt;/h5>
+&lt;ul>
+&lt;li>2011-10-10T14:48:00-0300&lt;/li>
+&lt;li>2016-07-01T13:48:24+00:00&lt;/li>
+&lt;li>2016-07-01T13:48:24Z&lt;/li>
+&lt;li>1467383343484 (MS since Epoch)&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;h2 id="settings">Settings&lt;/h2>
+&lt;p>Get and update the app settings.&lt;/p>
+&lt;h3 id="get-apiv1settings">GET /api/v1/settings&lt;/h3>
+&lt;p>Returns the settings in JSON format.&lt;/p>
+&lt;h3 id="put-apiv1settings">PUT /api/v1/settings&lt;/h3>
+&lt;h4 id="query-parameters">Query Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>overwrite&lt;/td>
+&lt;td>Whether to replace settings document with input document. If both replace and overwite are set, then it overwites only. Defaults to replace.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>replace&lt;/td>
+&lt;td>Whether to replace existing settings for the given properties or to merge. Defaults to false (merging).&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Returns a JSON object with two fields:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;success&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;upgraded&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>success&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>Always &lt;code>true&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>upgraded&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>Whether the settings doc was updated or not&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="export">Export&lt;/h2>
+&lt;p>Request different types of data in various formats.&lt;/p>
+&lt;p>Each of the export endpoints except contacts and feedback supports a parameter which returns date formatted in human readable form (ISO 8601). Setting this parameter to false or leaving it out will return dates formatted as an epoch timestamp.&lt;/p>
+&lt;p>To set this parameter for a GET request use:&lt;/p>
+&lt;pre>&lt;code>http://admin:pass@localhost:5988/api/v2/export/messages?options[humanReadable]=true
+&lt;/code>&lt;/pre>&lt;p>To set this parameter for a POST request submit this as the request body:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;humanReadable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="get-apiv2exportdhis">GET /api/v2/export/dhis&lt;/h3>
+&lt;p>Exports target data formatted as a DHIS2 dataValueSet. The data can be filtered to a specific section of the contact hierarchy or for a given time interval.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Parameter&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>dataSet&lt;/td>
+&lt;td>A DHIS2 dataSet ID. Targets associated with this dataSet will have their data aggregated. (required)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>date.from&lt;/td>
+&lt;td>Filter the target data to be aggregated to be within the month of this timestamp. (required)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>orgUnit&lt;/td>
+&lt;td>Filter the target data to only that associated with contacts with attribute &lt;code>{ dhis: { orgUnit } }&lt;/code>. (optional)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;filters&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;dataSet&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;VMuFODsyWaO&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;from&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">949392000000&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;orgUnit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;KbY9DJ8mBkx&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="get-apiv2exportreports">GET /api/v2/export/reports&lt;/h3>
+&lt;p>It uses the &lt;a href="https://github.com/medic/cht-core/tree/master/shared-libs/search">search shared library&lt;/a> to ensure identical results in the export and the front-end. It also only supports exporting CSV so we can efficiently stream infinitely large exports.&lt;/p>
+&lt;h4 id="query-parameters-1">Query parameters&lt;/h4>
+&lt;p>These are identical to the JS objects passed to the shared library, as if you were using it directly in Javascript.&lt;/p>
+&lt;p>You may either pass JSON in the request body using &lt;code>POST&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#a40000">POST&lt;/span> &lt;span style="color:#a40000">/api/v&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">2&lt;/span>&lt;span style="color:#a40000">/export/reports&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;filters&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;forms&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;selected&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;code&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;immunization_visit&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Or using form-style parameters as &lt;code>GET&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>GET /api/v2/export/reports?filters[search]=&amp;amp;filters[forms][selected][0][code]=immunization_visit
+&lt;/code>&lt;/pre>&lt;p>&lt;strong>NB:&lt;/strong> this API is bound directly to this library. For more information on what queries you can perform with the search library, see &lt;a href="https://github.com/medic/cht-core/tree/master/shared-lib/search">its documentation&lt;/a>.&lt;/p>
+&lt;h3 id="get-apiv2exportmessages">GET /api/v2/export/messages&lt;/h3>
+&lt;p>Download messages.&lt;/p>
+&lt;h4 id="output">Output&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Column&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Record UUID&lt;/td>
+&lt;td>The unique ID for the message in the database.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Patient ID&lt;/td>
+&lt;td>The generated short patient ID for use in SMS.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Reported Date&lt;/td>
+&lt;td>The date the message was received or generated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>From&lt;/td>
+&lt;td>This phone number the message is or will be sent from.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Contact Name&lt;/td>
+&lt;td>The name of the user this message is assigned to.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Message Type&lt;/td>
+&lt;td>The type of the message&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Message State&lt;/td>
+&lt;td>The state of the message at the time this export was generated&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Received Timestamp&lt;/td>
+&lt;td>The datetime the message was received. Only applies to incoming messages.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Other Timestamps&lt;/td>
+&lt;td>The datetime the message transitioned to each state.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Sent By&lt;/td>
+&lt;td>The phone number the message was sent from. Only applies to incoming messages.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>To Phone&lt;/td>
+&lt;td>The phone number the message is or will be sent to. Only applies to outgoing messages.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Message Body&lt;/td>
+&lt;td>The content of the message.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples">Examples&lt;/h4>
+&lt;pre>&lt;code>/api/v2/export/messages
+&lt;/code>&lt;/pre>&lt;h3 id="get-apiv2exportfeedback">GET /api/v2/export/feedback&lt;/h3>
+&lt;p>Export a file containing the user feedback.&lt;/p>
+&lt;h4 id="query-parameters-2">Query Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>format&lt;/td>
+&lt;td>The format of the returned file, either &amp;lsquo;csv&amp;rsquo; or &amp;lsquo;xml&amp;rsquo;. Defaults to &amp;lsquo;csv&amp;rsquo;.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>locale&lt;/td>
+&lt;td>Locale for translatable data. Defaults to &amp;lsquo;en&amp;rsquo;.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>tz&lt;/td>
+&lt;td>The timezone to show date values in, as an offset in minutes from GMT, for example &amp;lsquo;-120&amp;rsquo;.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>skip_header_row&lt;/td>
+&lt;td>&amp;lsquo;true&amp;rsquo; to omit the column headings. Defaults to &amp;lsquo;false&amp;rsquo;.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="get-apiv2exportcontacts">GET /api/v2/export/contacts&lt;/h3>
+&lt;p>Returns a JSON array of contacts.&lt;/p>
+&lt;h4 id="query-parameters-3">Query parameters&lt;/h4>
+&lt;p>These are identical to the JS objects passed to the shared library, as if you were using it directly in Javascript.&lt;/p>
+&lt;p>You may either pass JSON in the request body using &lt;code>POST&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#a40000">POST&lt;/span> &lt;span style="color:#a40000">/api/v&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">2&lt;/span>&lt;span style="color:#a40000">/export/contacts&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;filters&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;search&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;jim&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Or using form-style parameters as &lt;code>GET&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>GET /api/v2/export/contacts?filters[search]=jim
+&lt;/code>&lt;/pre>&lt;h2 id="forms">Forms&lt;/h2>
+&lt;h3 id="get-apiv1forms">GET /api/v1/forms&lt;/h3>
+&lt;p>Returns a list of currently installed forms (in all available formats) in JSON format.&lt;/p>
+&lt;h4 id="headers">Headers&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Value&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>X-OpenRosa-Version&lt;/td>
+&lt;td>1.0&lt;/td>
+&lt;td>If this header is specified returns XML formatted forms list. See &lt;a href="https://bitbucket.org/javarosa/javarosa/wiki/FormListAPI">OpenRosa FormListAPI&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-1">Examples&lt;/h4>
+&lt;p>Get list of forms currently installed.&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/forms
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200
+Content-Type: application/json; charset=utf-8
+[&amp;quot;anc_visit.xml&amp;quot;,&amp;quot;anc_registration.xml&amp;quot;,&amp;quot;off.xml&amp;quot;, &amp;quot;off.json&amp;quot;]
+&lt;/code>&lt;/pre>&lt;p>Get OpenRosa XForms compatible forms installed in XML format.&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/forms
+Host: medic.local
+X-OpenRosa-Version: 1.0
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: text/xml; charset=utf-8
+X-OpenRosa-Version: 1.0
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;xforms xmlns=&amp;quot;http://openrosa.org/xforms/xformsList&amp;quot;&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Visit&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;ANCVisit&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/anc_visit.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Registration with LMP&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;PregnancyRegistration&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/anc_registration.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Stop&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;Stop&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/off.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;/xforms&amp;gt;
+&lt;/code>&lt;/pre>&lt;h3 id="get-apiv1formsidformat">GET /api/v1/forms/{{id}}.{{format}}&lt;/h3>
+&lt;p>Return form definition for a given form ID and format.&lt;/p>
+&lt;h4 id="parameters">Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>id&lt;/td>
+&lt;td>Form identifier&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>format&lt;/td>
+&lt;td>Format string or file extension. e.g. xml, json&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-2">Examples&lt;/h4>
+&lt;p>Get latest version of the PregnancyRegistration form in xml (XForms) format.&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/forms/pregnancyregistration.xml
+&lt;/code>&lt;/pre>&lt;p>Get the latest version of the NPYY form in JSON format.&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/forms/NPYY.json
+&lt;/code>&lt;/pre>&lt;h2 id="records">Records&lt;/h2>
+&lt;h3 id="post-apiv2records">POST /api/v2/records&lt;/h3>
+&lt;p>Create a new record based on a &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/forms/">JSON form&lt;/a> that has been configured.&lt;/p>
+&lt;p>Records can be created one of two ways, parsing the form data yourself and submitting a JSON object or by submitting the raw message string.&lt;/p>
+&lt;h4 id="headers-1">Headers&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Value&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Content-Type&lt;/td>
+&lt;td>application/x-www-form-urlencoded&lt;/td>
+&lt;td>Processes form parameters.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Content-Type&lt;/td>
+&lt;td>application/json&lt;/td>
+&lt;td>Processes form data in request body as JSON.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Only one variant of the &lt;code>Content-Type&lt;/code> header may be provided; RFC 2616 does not
+allow multiple content types to appear in a single &lt;code>Content-Type&lt;/code> header.&lt;/p>
+&lt;h5 id="form-parameters">Form Parameters&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>message&lt;/td>
+&lt;td>Message string in a supported format like Muvuku or Textforms. Depending if your Medic Mobile instance is configured in forms-only mode or not you might receive an error if the form is not found.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>from&lt;/td>
+&lt;td>Reporting phone number.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>reported_date&lt;/td>
+&lt;td>Timestamp in MS since Unix Epoch of when the message was received on the gateway. Defaults to now.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="json-properties">JSON Properties&lt;/h5>
+&lt;p>Special values reside in the property &lt;code>_meta&lt;/code>, so you can&amp;rsquo;t have a form field named &lt;code>_meta&lt;/code>. Only strings and numbers are currently support as field values.&lt;/p>
+&lt;p>All property names will be lowercased.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>_meta.form&lt;/td>
+&lt;td>The form code.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>_meta.from&lt;/td>
+&lt;td>Reporting phone number. Optional.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>_meta.reported_date&lt;/td>
+&lt;td>Timestamp in MS since Unix Epoch of when the message was received on the gateway. Defaults to now.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>_meta.locale&lt;/td>
+&lt;td>Optional locale string. Example: &amp;lsquo;fr&amp;rsquo;&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-3">Examples&lt;/h4>
+&lt;p>Creating new record using message field.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/records
+Content-Type: application/x-www-form-urlencoded
+message=1!YYYZ!Sam#23#2015#ANC&amp;amp;from=+5511943348031&amp;amp;reported_date=1352399720000
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+{
+&amp;quot;success&amp;quot;: true,
+&amp;quot;id&amp;quot;: &amp;quot;364c796a843fbe0a73476f9153012733&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;p>Creating new record with JSON.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/records
+Content-Type: application/json
+{
+&amp;quot;nurse&amp;quot;: &amp;quot;Sam&amp;quot;,
+&amp;quot;week&amp;quot;: 23,
+&amp;quot;year&amp;quot;: 2015,
+&amp;quot;visit&amp;quot;: &amp;quot;ANC&amp;quot;,
+&amp;quot;_meta&amp;quot;: {
+&amp;quot;form&amp;quot;: &amp;quot;YYYZ&amp;quot;,
+&amp;quot;reported_date&amp;quot;: 1352399720000
+}
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+{
+&amp;quot;success&amp;quot;: true,
+&amp;quot;id&amp;quot;: &amp;quot;364c796a843fbe0a73476f9153012733&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;h4 id="errors">Errors&lt;/h4>
+&lt;p>If required fields are not found return 500.&lt;/p>
+&lt;p>If invalid JSON return error response 500.&lt;/p>
+&lt;p>If submitting JSON and corresponding form is not found on the server you will receive an error.&lt;/p>
+&lt;h2 id="sms">SMS&lt;/h2>
+&lt;h3 id="post-apisms">POST /api/sms&lt;/h3>
+&lt;p>Endpoint used by medic-gateway to send sms messages. More documentation in &lt;a href="https://github.com/medic/medic-gateway/blob/master/README.md">the medic-gateway repo&lt;/a>.&lt;/p>
+&lt;h2 id="people">People&lt;/h2>
+&lt;h3 id="supported-properties">Supported Properties&lt;/h3>
+&lt;p>Use JSON in the request body to specify a person&amp;rsquo;s details.&lt;/p>
+&lt;p>Note: this does not accomodate having a &lt;code>place&lt;/code> field on your form and will likely be revised soon.&lt;/p>
+&lt;h5 id="required">Required&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>name&lt;/td>
+&lt;td>String used to describe the person.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>type&lt;/td>
+&lt;td>ID of the &lt;code>contact_type&lt;/code> for the new person. Defaults to &amp;lsquo;person&amp;rsquo; for backwards compatibility.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="optional">Optional&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>place&lt;/td>
+&lt;td>String that references a place or object that defines a new place.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>reported_date&lt;/td>
+&lt;td>Timestamp of when the record was reported or created. Defaults to now.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="post-apiv1people">POST /api/v1/people&lt;/h3>
+&lt;p>Create new people.&lt;/p>
+&lt;h4 id="permissions">Permissions&lt;/h4>
+&lt;p>By default any user can create or modify a place. Use these permissions to restrict access:&lt;/p>
+&lt;p>&lt;code>can_create_people&lt;/code>, &lt;code>can_create_places&lt;/code>&lt;/p>
+&lt;h4 id="examples-4">Examples&lt;/h4>
+&lt;p>Create new person and place hierarchy.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/people
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;Hannah&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2548277210095&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;contact&amp;quot;,
+&amp;quot;contact_type&amp;quot;: &amp;quot;patient&amp;quot;,
+&amp;quot;place&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;CHP Area One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;CHP Branch One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district_hospital&amp;quot;
+}
+}
+}
+&lt;/code>&lt;/pre>&lt;p>Create new person and assign existing place.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/people
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;Samuel&amp;quot;,
+&amp;quot;place&amp;quot;: &amp;quot;1d83f2b4a27eceb40df9e9f9ad06d137&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;contact&amp;quot;,
+&amp;quot;contact_type&amp;quot;: &amp;quot;chp&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;p>Example response:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;id&amp;quot;: &amp;quot;71df9d25ed6732ea3b4435862510d115&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-a4060843d78f46a60a6f41051e40e3b5&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;h2 id="places">Places&lt;/h2>
+&lt;p>By default any user can create or modify a place.&lt;/p>
+&lt;h3 id="supported-properties-1">Supported Properties&lt;/h3>
+&lt;p>Use JSON in the request body to specify a place&amp;rsquo;s details.&lt;/p>
+&lt;h5 id="required-properties">Required Properties&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>name&lt;/td>
+&lt;td>String used to describe the place.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>type&lt;/td>
+&lt;td>Place type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>parent&lt;/td>
+&lt;td>String that references a place or object that defines a new place. Optional for District Hospital and National Office types.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="optional-properties">Optional Properties&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>contact&lt;/td>
+&lt;td>String identifier for a person or object that defines a new person.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>reported_date&lt;/td>
+&lt;td>Timestamp of when the record was reported or created. Defaults to now.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="place-types">Place Types&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>clinic&lt;/td>
+&lt;td>Clinic&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center&lt;/td>
+&lt;td>Health Center&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_hospital&lt;/td>
+&lt;td>District Hospital&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>national_office&lt;/td>
+&lt;td>National Office&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="post-apiv1places">POST /api/v1/places&lt;/h3>
+&lt;p>Create a new place and optionally a contact.&lt;/p>
+&lt;h4 id="permissions-1">Permissions&lt;/h4>
+&lt;p>By default any user can create new places. Use these permissions to restrict access:&lt;/p>
+&lt;p>&lt;code>can_create_places&lt;/code>, &lt;code>can_create_people&lt;/code>&lt;/p>
+&lt;h4 id="examples-5">Examples&lt;/h4>
+&lt;p>Create new place referencing existing parent.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/places
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;Busia Clinic&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;clinic&amp;quot;,
+&amp;quot;parent&amp;quot;: &amp;quot;1d83f2b4a27eceb40df9e9f9ad06d137&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;p>Create child and parent places.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/places
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;CHP Area One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;CHP Branch One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district_hospital&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;p>Also creates contact (person).&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/places
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;CHP Area One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;CHP Branch One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district_hospital&amp;quot;
+},
+&amp;quot;contact&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Paul&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+254883720611&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;p>Or assigns them.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/places
+Content-Type: application/json
+{
+&amp;quot;name&amp;quot;: &amp;quot;CHP Area One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;CHP Branch One&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district_hospital&amp;quot;
+},
+&amp;quot;contact&amp;quot;: &amp;quot;71df9d25ed6732ea3b4435862510ef8e&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;p>Example success response:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;id&amp;quot;: &amp;quot;71df9d25ed6732ea3b4435862510d115&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-a4060843d78f46a60a6f41051e40e3b5&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;p>Error response if facility structure is not correct:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 400 Bad Request
+Content-Type: text/plain
+Health Centers should have &amp;quot;district_hospital&amp;quot; parent type.
+&lt;/code>&lt;/pre>&lt;h3 id="post-apiv1placesid">POST /api/v1/places/{{id}}&lt;/h3>
+&lt;p>Update a place and optionally its contact.&lt;/p>
+&lt;h4 id="permissions-2">Permissions&lt;/h4>
+&lt;p>By default any user can update a place. Use these permissions to restrict access:&lt;/p>
+&lt;p>&lt;code>can_update_places&lt;/code>&lt;/p>
+&lt;h4 id="examples-6">Examples&lt;/h4>
+&lt;p>Update a place&amp;rsquo;s contact.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/places/1d83f2b4a27eceb40df9e9f9ad06d137
+Content-Type: application/json
+{
+&amp;quot;contact&amp;quot;: &amp;quot;71df9d25ed6732ea3b4435862505f7a9&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;id&amp;quot;: &amp;quot;1d83f2b4a27eceb40df9e9f9ad06d137&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;12-a4060843d78f46a60a6f41051e40e3b5&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;h2 id="users">Users&lt;/h2>
+&lt;p>All user related requests are limited to users with admin privileges by default.&lt;/p>
+&lt;h3 id="supported-properties-2">Supported Properties&lt;/h3>
+&lt;p>Use JSON in the request body to specify user details. Any properties submitted
+that are not on the list below will be ignored. Any properties not included
+will be undefined.&lt;/p>
+&lt;h5 id="required-1">Required&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>username&lt;/td>
+&lt;td>String identifier used for authentication.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>password&lt;/td>
+&lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="conditional">Conditional&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Details&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>roles&lt;/td>
+&lt;td>Array of roles.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>place&lt;/td>
+&lt;td>Place identifier string (UUID) or object this user resides in.&lt;/td>
+&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>contact&lt;/td>
+&lt;td>A person object based on the form configured in the app.&lt;/td>
+&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="optional-1">Optional&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fullname&lt;/td>
+&lt;td>Full name&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>email&lt;/td>
+&lt;td>Email address&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>phone&lt;/td>
+&lt;td>Phone number&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>language&lt;/td>
+&lt;td>Language preference. e.g. &amp;ldquo;sw&amp;rdquo; for Swahili&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>known&lt;/td>
+&lt;td>Boolean to define if the user has logged in before. Used mainly to determine whether or not to start a tour on first login.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="get-apiv1users">GET /api/v1/users&lt;/h3>
+&lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
+&lt;h5 id="permissions-3">Permissions&lt;/h5>
+&lt;p>&lt;code>can_view_users&lt;/code>&lt;/p>
+&lt;h4 id="examples-7">Examples&lt;/h4>
+&lt;p>Get list of users:&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/users
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+[
+{
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:admin&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;10-6486428924d11781c107ea74de6b63b6&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;admin&amp;quot;,
+&amp;quot;username&amp;quot;: &amp;quot;admin&amp;quot;,
+&amp;quot;language&amp;quot;: {
+&amp;quot;code&amp;quot;: &amp;quot;en&amp;quot;
+}
+},
+{
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:demo&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;14-8758c8493edcc6dac50366173fc3e24a&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district-manager&amp;quot;,
+&amp;quot;fullname&amp;quot;: &amp;quot;Example User&amp;quot;,
+&amp;quot;username&amp;quot;: &amp;quot;demo&amp;quot;,
+&amp;quot;language&amp;quot;: {
+&amp;quot;code&amp;quot;: &amp;quot;en&amp;quot;
+},
+&amp;quot;place&amp;quot;: {
+&amp;quot;_id&amp;quot;: &amp;quot;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district_hospital&amp;quot;,
+&amp;quot;name&amp;quot;: &amp;quot;Sample District&amp;quot;,
+&amp;quot;contact&amp;quot;: {
+&amp;quot;_id&amp;quot;: &amp;quot;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;person&amp;quot;,
+&amp;quot;name&amp;quot;: &amp;quot;Paul&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2868917046&amp;quot;
+}
+},
+&amp;quot;contact&amp;quot;: {
+&amp;quot;_id&amp;quot;: &amp;quot;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;person&amp;quot;,
+&amp;quot;name&amp;quot;: &amp;quot;Paul&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2868917046&amp;quot;
+}
+}
+]
+&lt;/code>&lt;/pre>&lt;h3 id="post-apiv1users">POST /api/v1/users&lt;/h3>
+&lt;p>Create a new user with a place and a contact.&lt;/p>
+&lt;h4 id="permissions-4">Permissions&lt;/h4>
+&lt;p>&lt;code>can_create_users&lt;/code>, &lt;code>can_create_places&lt;/code>, &lt;code>can_create_people&lt;/code>&lt;/p>
+&lt;h4 id="examples-8">Examples&lt;/h4>
+&lt;p>Create a new user that can authenticate with a username of &amp;ldquo;mary&amp;rdquo; and password
+of &amp;ldquo;secret&amp;rdquo; that can submit reports and view or modify records associated to
+their place. The place is created in the background and automatically linked
+to the contact.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/users
+Content-Type: application/json
+{
+&amp;quot;password&amp;quot;: &amp;quot;secret&amp;quot;,
+&amp;quot;username&amp;quot;: &amp;quot;mary&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district-manager&amp;quot;,
+&amp;quot;place&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Mary's Area&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: &amp;quot;d14e1c3d557761320b13a77e7806e8f8&amp;quot;
+},
+&amp;quot;contact&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Mary Anyango&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2868917046&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200
+Content-Type: application/json
+{
+&amp;quot;contact&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;65416b8ceb53ff88ac1847654501aeb3&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-0b74d219ae13137c1a06f03a0a52e187&amp;quot;
+},
+&amp;quot;user-settings&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-6ac1d36b775143835f4af53f9895d7ae&amp;quot;
+},
+&amp;quot;user&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-c3b82a0b47cfe68edd9284c89bebbae4&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;h4 id="errors-1">Errors&lt;/h4>
+&lt;p>Response if the username already exists:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 409 Conflict
+Content-Type: text/plain
+Document update conflict.
+&lt;/code>&lt;/pre>&lt;h3 id="post-apiv1usersusername">POST /api/v1/users/{{username}}&lt;/h3>
+&lt;p>Allows you to change property values on a user account. Properties listed above
+are supported except for &lt;code>contact.parent&lt;/code>. Creating or modifying people
+through the user is not supported, see People section.&lt;/p>
+&lt;h4 id="permissions-5">Permissions&lt;/h4>
+&lt;p>&lt;code>can_update_users&lt;/code>, &lt;code>can_update_places&lt;/code>, &lt;code>can_update_people&lt;/code>&lt;/p>
+&lt;h4 id="updating-yourself">Updating yourself&lt;/h4>
+&lt;p>You do not need any of the above permissions if the user you are modifying is yourself. However, you are not allowed to modify your &lt;code>type&lt;/code>, &lt;code>roles&lt;/code>, &lt;code>contact&lt;/code> or &lt;code>place&lt;/code>.&lt;/p>
+&lt;p>Further more, if you&amp;rsquo;re updating your &lt;code>password&lt;/code> you must be authenticating via Basic Auth (either the header or in the URL). This is to ensure the password is known at time of request, and no one is hijacking a cookie.&lt;/p>
+&lt;h4 id="url-parameters">URL Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>username&lt;/td>
+&lt;td>String identifier used for authentication.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-9">Examples&lt;/h4>
+&lt;pre>&lt;code>POST /api/v1/users/mary
+Content-Type: application/json
+{
+&amp;quot;password&amp;quot;: &amp;quot;secret&amp;quot;,
+&amp;quot;place&amp;quot;: &amp;quot;eeb17d6d-5dde-c2c0-62c4a1a0ca17e342&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;user&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;23-858e01fafdfa0d367d798fe5b44751ff&amp;quot;
+},
+&amp;quot;user-settings&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;17-c6d03b86d2d5d70f7270c85e67fea96d&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;h3 id="delete-apiv1usersusername">DELETE /api/v1/users/{{username}}&lt;/h3>
+&lt;p>Delete a user. Does not affect a person or place associated to a user.&lt;/p>
+&lt;h4 id="permissions-6">Permissions&lt;/h4>
+&lt;p>&lt;code>can_delete_users&lt;/code>&lt;/p>
+&lt;h4 id="url-parameters-1">URL Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>username&lt;/td>
+&lt;td>String identifier used for authentication.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-10">Examples&lt;/h4>
+&lt;pre>&lt;code>DELETE /api/v1/users/mary
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+&lt;/code>&lt;/pre>&lt;h3 id="get-apiv1users-info">GET /api/v1/users-info&lt;/h3>
+&lt;p>Returns the number of documents an offline user would replicate, along with a &lt;code>warn&lt;/code> flag if this number exceeds the recommended limit (now set at 10 000).&lt;/p>
+&lt;p>When the authenticated requester has an offline role, it returns the requester doc count.&lt;/p>
+&lt;h6 id="example">Example&lt;/h6>
+&lt;pre>&lt;code>GET /api/v1/users-info -H 'Cookie: AuthSession=OFFLINE_USER_SESSION;'
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;total_docs&amp;quot;: 5678,
+&amp;quot;warn&amp;quot;: false,
+&amp;quot;limit: 10000
+}
+&lt;/code>&lt;/pre>&lt;p>When the requester has an online role, the following query parameters are accepted:&lt;/p>
+&lt;h5 id="query-parameters-4">Query Parameters&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>facility_id&lt;/td>
+&lt;td>String identifier representing the uuid of the user&amp;rsquo;s facility&lt;/td>
+&lt;td>true&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>role&lt;/td>
+&lt;td>String identifier representing the user role - must be configured as an offline role. Accepts valid UTF-8 JSON array for multiple of roles.&lt;/td>
+&lt;td>true&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>contact_id&lt;/td>
+&lt;td>String identifier representing the uuid of the user&amp;rsquo;s associated contact&lt;/td>
+&lt;td>false&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h6 id="example-1">Example&lt;/h6>
+&lt;pre>&lt;code>GET /api/v1/users-info?facility_id={{facility_uuid}}&amp;amp;role={{role}}&amp;amp;contact_id={{contact_uuid}} -H 'Cookie: AuthSession=OFFLINE_USER_SESSION;'
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{
+&amp;quot;total_docs&amp;quot;: 10265,
+&amp;quot;warn&amp;quot;: true,
+&amp;quot;limit: 10000
+}
+&lt;/code>&lt;/pre>&lt;p>In case any of the required query parameters are omitted or the requested role is not configured as an offline role, the request will result in an error:&lt;/p>
+&lt;pre>&lt;code>GET /api/v1/users-info?role={{online_role}} -H 'Cookie: AuthSession=OFFLINE_USER_SESSION;'
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;quot;code&amp;quot;: 400,
+&amp;quot;error&amp;quot;: &amp;quot;Missing required query params: role and/or facility_id&amp;quot;
+}
+&lt;/code>&lt;/pre>&lt;h2 id="bulk-operations">Bulk Operations&lt;/h2>
+&lt;h3 id="post-apiv1bulk-delete">POST /api/v1/bulk-delete&lt;/h3>
+&lt;p>Bulk delete endpoint for deleting large numbers of documents. Docs will be batched into groups of 100 and will be sent sequentially to couch (new batch sent after the previous one has returned). The response will be chunked JSON (one batch at a time), so if you wish to get an indication of progress you will need to parse incomplete JSON (with a library such as this one &lt;a href="https://github.com/indgov/partial-json-parser)">https://github.com/indgov/partial-json-parser)&lt;/a>.&lt;/p>
+&lt;h4 id="permissions-7">Permissions&lt;/h4>
+&lt;p>Only available to online users.&lt;/p>
+&lt;h4 id="parameters-1">Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Parameter&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>docs&lt;/td>
+&lt;td>Array of JSON objects with &lt;code>_id&lt;/code> properties&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>An array of objects each with an &lt;code>_id&lt;/code> property is required (rather than an array of strings representing ids) to ensure forwards compatibility if we choose to require that any additional document information (such as &lt;code>_rev&lt;/code>) also be passed in to this endpoint.&lt;/p>
+&lt;h4 id="errors-2">Errors&lt;/h4>
+&lt;p>If an error is encountered part-way through the response (eg on the third batch), it&amp;rsquo;s impossible to send new headers to indicate a 5xx error, so the connection will simply be terminated (as recommended here &lt;a href="https://github.com/expressjs/express/issues/2700)">https://github.com/expressjs/express/issues/2700)&lt;/a>.&lt;/p>
+&lt;h4 id="examples-11">Examples&lt;/h4>
+&lt;pre>&lt;code>POST /api/v1/bulk-delete
+Content-Type: application/json
+{
+&amp;quot;docs&amp;quot;: [
+{ &amp;quot;_id&amp;quot;: &amp;quot;id1&amp;quot; },
+{ &amp;quot;_id&amp;quot;: &amp;quot;id2&amp;quot; },
+...
+{ &amp;quot;_id&amp;quot;: &amp;quot;id150&amp;quot; }
+]
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+[
+[
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id1&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev1&amp;quot; },
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id2&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev2&amp;quot; },
+...
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id100&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev100&amp;quot; }
+],
+[
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id101&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev101&amp;quot; },
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id102&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev102&amp;quot; },
+...
+{ &amp;quot;ok&amp;quot;: true, &amp;quot;id&amp;quot;: &amp;quot;id150&amp;quot;, &amp;quot;rev&amp;quot;: &amp;quot;1-rev150&amp;quot; }
+]
+]
+&lt;/code>&lt;/pre>&lt;h2 id="monitoring">Monitoring&lt;/h2>
+&lt;h3 id="get-apiv1monitoring">GET /api/v1/monitoring&lt;/h3>
+&lt;p>Used to retrieve a range of metrics about the instance. While the output is human readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
+&lt;h4 id="permissions-8">Permissions&lt;/h4>
+&lt;p>No permissions required.&lt;/p>
+&lt;h4 id="examples-12">Examples&lt;/h4>
+&lt;h5 id="json-format">JSON format&lt;/h5>
+&lt;pre>&lt;code>curl http://localhost:5988/api/v1/monitoring
+{&amp;quot;version&amp;quot;:{&amp;quot;app&amp;quot;:&amp;quot;3.9.0&amp;quot;,&amp;quot;node&amp;quot;:&amp;quot;v10.16.0&amp;quot;,&amp;quot;couchdb&amp;quot;:&amp;quot;2.3.1&amp;quot;},&amp;quot;couchdb&amp;quot;:{&amp;quot;medic&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;medic&amp;quot;,&amp;quot;update_sequence&amp;quot;:5733,&amp;quot;doc_count&amp;quot;:278,&amp;quot;doc_del_count&amp;quot;:32,&amp;quot;fragmentation&amp;quot;:1.0283517758420173}...
+&lt;/code>&lt;/pre>&lt;h4 id="response-content">Response content&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>JSON path&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>version.app&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of the webapp.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>version.node&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of NodeJS.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>version.couchdb&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of CouchDB.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.name&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The name of the db, usually one of &amp;ldquo;medic&amp;rdquo;, &amp;ldquo;medic-sentinel&amp;rdquo;, &amp;ldquo;medic-users-meta&amp;rdquo;, &amp;ldquo;_users&amp;rdquo;.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.update_sequence&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of changes in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.doc_count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.doc_del_count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of deleted docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.fragmentation&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The fragmentation of the db, lower is better, &amp;ldquo;1&amp;rdquo; is no fragmentation.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>date.current&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The current server date in millis since the epoch, useful for ensuring the server time is correct.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>date.uptime&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>How long API has been running.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>sentinel.backlog&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.due&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages due to be sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.scheduled&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages scheduled to be sent in the future.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.muted&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that are muted and therefore will not be sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>outbound_push.backlog&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of changes yet to be processed by Outbound Push.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>feedback.count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of feedback docs created usually indicative of client side errors.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>conflict.count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of doc conflicts which need to be resolved manually.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="errors-3">Errors&lt;/h4>
+&lt;ul>
+&lt;li>A metric of &lt;code>&amp;quot;&amp;quot;&lt;/code> (for string values) or &lt;code>-1&lt;/code> (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li>
+&lt;li>If no response or an error response is received the the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li>
+&lt;/ul>
+&lt;h2 id="upgrades">Upgrades&lt;/h2>
+&lt;p>All of these endpoints require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
+&lt;p>All of these endpoints are asynchronous. Progress can be followed by watching the &lt;code>horti-upgrade&lt;/code> document and looking at the &lt;code>log&lt;/code> property.&lt;/p>
+&lt;h3 id="post-apiv1upgrade">POST /api/v1/upgrade&lt;/h3>
+&lt;p>Performs a complete upgrade to the provided version. This is equivalent of calling &lt;code>/api/v1/upgrade/stage&lt;/code> and then &lt;code>/api/v1/upgrade/complete&lt;/code> once staging has finished.&lt;/p>
+&lt;h4 id="example-2">Example&lt;/h4>
+&lt;pre>&lt;code>POST /api/v1/upgrade
+{
+&amp;quot;build&amp;quot;: {
+&amp;quot;namespace&amp;quot;: &amp;quot;medic&amp;quot;,
+&amp;quot;application&amp;quot;: &amp;quot;medic&amp;quot;,
+&amp;quot;version&amp;quot;: &amp;quot;3.0.0-beta.1&amp;quot;
+}
+}
+&lt;/code>&lt;/pre>&lt;p>For potential forwards compatibility, you must pass the &lt;code>namespace&lt;/code> and &lt;code>application&lt;/code> as &lt;code>medic&lt;/code>.&lt;/p>
+&lt;p>The &lt;code>version&lt;/code> should correspond to a release, pre-release or branch that has been pushed to our builds server (currently hard-coded to &lt;a href="https://staging.dev.medicmobile.org/builds)">https://staging.dev.medicmobile.org/builds)&lt;/a>. This happens automatically upon a successful travis run.&lt;/p>
+&lt;p>Calling this endpoint will eventually cause api and sentinel to restart.&lt;/p>
+&lt;p>It is expected that the caller ensures forwards or backwards compatibility is maintained between deployed versions. This endpoint does not stop you from &amp;ldquo;upgrading&amp;rdquo; to an earlier version, or a branch that is incompatible with your current state.&lt;/p>
+&lt;h3 id="post-apiv1upgradestage">POST /api/v1/upgrade/stage&lt;/h3>
+&lt;p>Stages an upgrade to the provided version. Does as much of the upgrade as possible without actually swapping versions over and restarting.&lt;/p>
+&lt;p>Parameters are the same as &lt;code>/api/v1/upgrade&lt;/code>.&lt;/p>
+&lt;p>You know that an upgrade has been staged when the &lt;code>horti-upgrade&lt;/code> document in CouchDB has &lt;code>&amp;quot;staged&amp;quot;: true&lt;/code>.&lt;/p>
+&lt;h3 id="post-apiv1upgradecomplete">POST /api/v1/upgrade/complete&lt;/h3>
+&lt;p>Completes a staged upgrade. Throws a &lt;code>404&lt;/code> if there is no upgrade in the staged position.&lt;/p>
+&lt;h2 id="hydrate">Hydrate&lt;/h2>
+&lt;p>Accepts a JSON array of document uuids and returns fully hydrated documents, in the same order in which they were requested.
+When documents are not found, an entry with the missing uuid and an error is added instead.&lt;br>
+Supports both GET and POST.
+Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p>
+&lt;h3 id="get-apiv1hydrate">GET api/v1/hydrate&lt;/h3>
+&lt;h5 id="query-parameters-5">Query parameters&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>doc_ids&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>A JSON array of document uuids&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="example-3">Example&lt;/h5>
+&lt;pre>&lt;code>GET /api/v1/hydrate?doc_ids=[&amp;quot;id1&amp;quot;,&amp;quot;missingId&amp;quot;,&amp;quot;id3&amp;quot;]
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+[
+{ &amp;quot;id&amp;quot;: &amp;quot;id1&amp;quot;, &amp;quot;doc&amp;quot;: { &amp;lt;...the hydrated document...&amp;gt; } },
+{ &amp;quot;id&amp;quot;: &amp;quot;missingId1&amp;quot;, &amp;quot;error&amp;quot;: &amp;quot;not_found&amp;quot; },
+{ &amp;quot;id&amp;quot;: &amp;quot;id3&amp;quot;, &amp;quot;doc&amp;quot;: { &amp;lt;...the hydrated document...&amp;gt; } },
+]
+&lt;/code>&lt;/pre>&lt;h3 id="post-apiv1hydrate">POST api/v1/hydrate&lt;/h3>
+&lt;h5 id="parameters-2">Parameters&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>doc_ids&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>A JSON array of document uuids&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="example-4">Example&lt;/h5>
+&lt;pre>&lt;code>POST /api/v1/hydrate
+Content-Type: application/json
+{
+&amp;quot;doc_ids&amp;quot;: [&amp;quot;id1&amp;quot;,&amp;quot;missingId&amp;quot;,&amp;quot;id3&amp;quot;]
+}
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+[
+{ &amp;quot;id&amp;quot;: &amp;quot;id1&amp;quot;, &amp;quot;doc&amp;quot;: { &amp;lt;...the hydrated document...&amp;gt; } },
+{ &amp;quot;id&amp;quot;: &amp;quot;missingId&amp;quot;, &amp;quot;error&amp;quot;: &amp;quot;not_found&amp;quot; },
+{ &amp;quot;id&amp;quot;: &amp;quot;id3&amp;quot;, &amp;quot;doc&amp;quot;: { &amp;lt;...the hydrated document...&amp;gt; } },
+]
+&lt;/code>&lt;/pre></description></item><item><title>Apps: DHIS2</title><link>https://docs.communityhealthtoolkit.org/apps/features/integrations/dhis2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/features/integrations/dhis2/</guid><description>
 &lt;p>Most health systems have regular reporting requirements for community-level activities. Health workers often carry around heavy logbooks to manually record all relevant activities. When it is time to submit their data, community health workers (CHWs) summarize what was recorded in their logbooks and share this information with their supervisors, who in turn create paper records of these totals across entire community units or health facilities. This paper record is often passed to yet another individual whose responsibility is to manually key in the data into a health information management system, such as DHIS2.&lt;/p>
 &lt;p>In communities using digital health apps that do not integrate with DHIS2, it is highly likely that health workers are duplicating efforts by recording the same information both in their app and in their logbook(s). For example, they are not only registering new pregnancies in their app, but they are also manually recording this in their logbooks, manually adding them up at the end of the month, and then someone else is manually keying this into DHIS2.&lt;/p>
 &lt;p>In communities using digital health apps built with the CHT, health systems can reduce or eliminate the need to complete paper based forms for DHIS2 reporting needs. This gives health workers more time to focus on caring for the families in their community while also increasing accuracy and timeliness of their DHIS2 reporting requirements.&lt;/p>
@@ -4540,122 +5848,4 @@ In &lt;code>targets.js&lt;/code>, configure one or more data elements by setting
 &lt;li>Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li>
 &lt;li>Integrations are limited to &lt;em>monthly&lt;/em> DHIS2 data sets.&lt;/li>
 &lt;li>Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href="https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html">DHIS2 App&lt;/a> for your project.&lt;/li>
-&lt;/ul></description></item><item><title>Apps: EC2 Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/</guid><description>
-&lt;h2 id="configure-self-hosting">Configure self-hosting&lt;/h2>
-&lt;h4 id="1-create-ec2-use-security-best-practices">1. Create EC2 (use security best practices)&lt;/h4>
-&lt;pre>&lt;code>Be sure to change the file permissions to 0600 or lower
-for the .pem file:
-sudo chmod 0600 ~/Downloads/name_of_file.pem
-&lt;/code>&lt;/pre>&lt;ul>
-&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html">Create Elastic IP and Associate EIP to EC2&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>&lt;code>Goal&lt;/code>: SSH into instance&lt;/p>
-&lt;h4 id="2-create-or-restore-ebs-volume">2. Create or Restore EBS Volume&lt;/h4>
-&lt;ul>
-&lt;li>
-&lt;p>Create EBS Volume&lt;/p>
-&lt;ul>
-&lt;li>Be sure to tag appropriately&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html">Restore EBS Volume&lt;/a>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Attach volume to EC2 instance&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>(Optional): &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html">Increase disk size&lt;/a>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>If you are using a newly created EBS Volume, you will have to format the disk approriately:&lt;/p>
-&lt;ol>
-&lt;li>SSH into instance&lt;/li>
-&lt;li>Follow the instructions here: &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html">Using EBS Volumes&lt;/a>&lt;/li>
-&lt;li>Use &lt;code>sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code> in step 4&lt;/li>
-&lt;li>Mount disk to /srv&lt;/li>
-&lt;/ol>
-&lt;/li>
-&lt;/ul>
-&lt;p>&lt;code>Goal&lt;/code>: Mount EBS volume to /srv&lt;/p>
-&lt;h4 id="3-provision-docker-server">3. Provision Docker server&lt;/h4>
-&lt;ul>
-&lt;li>Follow README &amp;amp; Run scripts: &lt;a href="https://github.com/medic/medic-infrastructure/tree/master/self-hosting/prepare-system">Prepare Self-Hosting System&lt;/a>&lt;/li>
-&lt;li>A zip will be shared via Slack until the scripts are moved to a public repo&lt;/li>
-&lt;/ul>
-&lt;p>&lt;code>Goal&lt;/code>: CHT Application bootstraps and comes online&lt;/p>
-&lt;h4 id="4-dns-configuration">4. DNS configuration&lt;/h4>
-&lt;ul>
-&lt;li>Point A records to Elastic IP given to Docker server&lt;/li>
-&lt;/ul>
-&lt;h4 id="5-review-ssl-certs">5. Review SSL certs&lt;/h4>
-&lt;ul>
-&lt;li>Location of certs is &lt;code>/srv/settings/medic-core/nginx/private/&lt;/code>&lt;/li>
-&lt;li>Name the key file as &lt;code>default.key&lt;/code> and the certificate file as &lt;code>default.crt&lt;/code>&lt;/li>
-&lt;li>Restarting nginx with new certs: &lt;code>svc-restart medic-core nginx&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;h4 id="6-configure-couch2pg">6. Configure couch2pg&lt;/h4>
-&lt;ul>
-&lt;li>Basic configuration: &lt;a href="https://github.com/medic/medic-couch2pg/blob/master/README.md">https://github.com/medic/medic-couch2pg/blob/master/README.md&lt;/a>&lt;/li>
-&lt;li>Supervision/monitoring/notification&lt;/li>
-&lt;/ul>
-&lt;h4 id="7-setup-postgres-to-work-with-couch2pg">7. Setup postgres to work with couch2pg&lt;/h4>
-&lt;ul>
-&lt;li>Creating the database, setting up permissions, exploring the tables and what they store&lt;/li>
-&lt;/ul>
-&lt;h4 id="8debugging-couch2pgpostgres">8.Debugging couch2pg/postgres&lt;/h4>
-&lt;ul>
-&lt;li>Understanding the log and what the entries mean&lt;/li>
-&lt;/ul>
-&lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
-&lt;h4 id="1-restarting-processes">1. Restarting processes&lt;/h4>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/#how-to-access-container-retrieve-logs-isolate-security-groups">How to access container, retrieve logs, isolate security groups&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://github.com/medic/medic-os#service-management-scripts">MedicOS service management scripts&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h4 id="2-investigating-logs">2. Investigating logs&lt;/h4>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.docker.com/engine/reference/commandline/exec/">Log into container&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#helpful-docker-commands">Helpful docker commands&lt;/a>&lt;/li>
-&lt;li>Inside container, all appropriate logs can be found in: &lt;code>/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;h4 id="3upgrading-the-container">3.Upgrading the container&lt;/h4>
-&lt;ul>
-&lt;li>Backup all data (EBS)&lt;/li>
-&lt;li>Log into container and stop all services&lt;/li>
-&lt;li>DO NOT REMOVE &lt;code>/srv/storage/medic-core/&lt;/code>, &lt;code>/srv/settings/medic-core/couchdb/local.ini&lt;/code>, wipe all other files in /srv [Note: Make script publicly accessibile]&lt;/li>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#use-docker-compose">Change the image tag to the newest image release version&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#use-docker-compose">Change image tag in docker-compose file&lt;/a>&lt;/li>
-&lt;li>Launch new containers with appropriate COUCHDB_ADMIN_PASSWORD &amp;amp; HA_PASSWORD environment variables&lt;/li>
-&lt;/ul>
-&lt;h4 id="4upgrading-the-webapp">4.Upgrading the webapp&lt;/h4>
-&lt;ul>
-&lt;li>Use Admin GUI page&lt;/li>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/#links-to-medic-documentation-for-horticulturalist-for-upgrades">CLI via horticulturalist&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h4 id="4a-rds-help">4a. RDS help&lt;/h4>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h2 id="restore-from-backup-and-monitoring">Restore from backup and monitoring&lt;/h2>
-&lt;h4 id="1-configure-backups">1. Configure backups&lt;/h4>
-&lt;ul>
-&lt;li>EBS Snapshot Lifecycle Manager: &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h4 id="2-restoring-from-backup">2. Restoring from backup&lt;/h4>
-&lt;ul>
-&lt;li>Create volume from snapshot&lt;/li>
-&lt;li>Tag appropriately for backups&lt;/li>
-&lt;li>Mount volume to docker server&lt;/li>
-&lt;/ul>
-&lt;h4 id="3-process-supervison">3. Process supervison&lt;/h4>
-&lt;ul>
-&lt;li>supvisorctl&lt;/li>
-&lt;li>/boot/supervisor-inspect&lt;/li>
-&lt;/ul>
-&lt;h4 id="4-monitoring">4. Monitoring&lt;/h4>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h2 id="own-infrastructure-setup">Own Infrastructure Setup&lt;/h2>
-&lt;h4 id="1-team-to-set-up-own-infrastructure-based-on-best-practices-and-recommendations-above">1. Team to set up own infrastructure based on best-practices and recommendations above&lt;/h4></description></item></channel></rss>
+&lt;/ul></description></item></channel></rss>
