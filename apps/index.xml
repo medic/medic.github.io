@@ -1818,7 +1818,97 @@ The form is not submitted until the user scrolls to the very end of the summary 
 &lt;li>While a health worker is going through the form during the care visit, you can include a family planning question only if the person who the form is about is a woman and not pregnant.&lt;/li>
 &lt;li>You can include on-the-spot conversational prompts and advice for the CHW based on how they answer questions in the form. For instance, if a CHW answers “yes” to the question about a woman’s interest in family planning, text can automatically appear to provide information on her options.&lt;/li>
 &lt;li>An image showing how to read a rapid test can be displayed within a form, to help health workers to correctly interpret their test results.&lt;/li>
-&lt;/ul></description></item><item><title>Apps: .contact_types</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</guid><description>
+&lt;/ul></description></item><item><title>Apps: .accept_case_reports</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/accept_case_reports/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/accept_case_reports/</guid><description>
+&lt;p>The &lt;code>accept_case_reports&lt;/code> key contains the actions to take when reports about cases are received.&lt;/p>
+&lt;h2 id="app_settingsjson-accept_case_reports">&lt;code>app_settings.json .accept_case_reports[]&lt;/code>&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>description&lt;/th>
+&lt;th>required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>form&lt;/code>&lt;/td>
+&lt;td>Form ID of the case form.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>silence_type&lt;/code>&lt;/td>
+&lt;td>A comma separated list of schedules to mute.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>silence_for&lt;/code>&lt;/td>
+&lt;td>Duration from when the report was submitted for which messages should be muted. It is structured as a string with an integer value followed by a space and the time unit. For instance &lt;code>8 weeks&lt;/code> or &lt;code>2 days&lt;/code>. The units available are &lt;code>seconds&lt;/code>, &lt;code>minutes&lt;/code>, &lt;code>hours&lt;/code>, &lt;code>days&lt;/code>, &lt;code>weeks&lt;/code>, &lt;code>months&lt;/code>, &lt;code>years&lt;/code>, and their singular forms as well. When a message is muted all messages belonging to the same group will be muted, even if it falls outside of this time period. See &lt;code>messages[].group&lt;/code> in &lt;em>Schedules&lt;/em> for related info.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations&lt;/code>&lt;/td>
+&lt;td>A set of validations to perform on incoming reports. Read more information about &lt;a href="app-settings-validations.md">configuring validation rules&lt;/a>.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations.join_responses&lt;/code>&lt;/td>
+&lt;td>A boolean specifying whether validation messages should be combined into one message.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations.list[]&lt;/code>&lt;/td>
+&lt;td>An array of validation rules a report should pass to be considered valid.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations.list[].property&lt;/code>&lt;/td>
+&lt;td>Report field for which this validation rule will be applied.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations.list[].rule&lt;/code>&lt;/td>
+&lt;td>Validation condition to be applied to the property field.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>validations.list[].translation_key&lt;/code>&lt;/td>
+&lt;td>Translation key for the message reply to be sent if a report fails this rule.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages&lt;/code>&lt;/td>
+&lt;td>An array of automated responses to incoming reports.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages[].translation_key&lt;/code>&lt;/td>
+&lt;td>Translation key for the message text associated with this event&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages[].event_type&lt;/code>&lt;/td>
+&lt;td>An event that will trigger sending of this message. Typical values are: &lt;code>report_accepted&lt;/code> when the report has been successfully validated, &lt;code>registration_not_found&lt;/code> when the case ID supplied in the report doesn&amp;rsquo;t match any case ID issued by Medic. Read the &lt;a href="transitions.md#muting">documentation on muting&lt;/a>.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages[].recipient&lt;/code>&lt;/td>
+&lt;td>Who the message should be sent to. Use &lt;code>reporting_unit&lt;/code> for the sender of the report, &lt;code>clinic&lt;/code> for clinic contact, and &lt;code>parent&lt;/code> for the parent contact.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="code-sample">Code sample&lt;/h2>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;accept_case_reports&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;SIGNOFF&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;validations&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;report_accepted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;bool_expr&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some expression&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;message&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some message&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some recipients&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .contact_types</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</guid><description>
 &lt;p>From 3.7.0 it is possible to configure what types of places and people are available by modifying the &lt;code>contact_types&lt;/code> array in the app settings. Each type has the following properties.&lt;/p>
 &lt;h3 id="app_settingsjson-contact_types">&lt;code>app_settings.json .contact_types[]&lt;/code>&lt;/h3>
 &lt;table>
@@ -1969,6 +2059,12 @@ The form is not submitted until the user scrolls to the very end of the summary 
 &lt;td>&lt;code>meta.translation_key&lt;/code>&lt;/td>
 &lt;td>string&lt;/td>
 &lt;td>Name of the form shown in the app.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>meta.subject_key&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>A translation key to display in the report list instead of the subject name (default). The translation is provided with a summary of the report which can be used for evaluation, eg: &lt;code>Case registration {{case_id}}&lt;/code>. Useful properties available in the summary include: &lt;code>from&lt;/code> (the phone number of the sender), &lt;code>phone&lt;/code> (the phone number of the report contact), &lt;code>form&lt;/code> (the form code), &lt;code>subject.name&lt;/code> (the name of the subject), and &lt;code>case_id&lt;/code> (the generated case id). Added in 3.9.0&lt;/td>
 &lt;td>no&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -2384,10 +2480,7 @@ The form is not submitted until the user scrolls to the very end of the summary 
 &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;!-- TODO
-## Case Reports
-### `app_settings.json .case_reports[]`
---></description></item><item><title>Apps: .permissions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .permissions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/</guid><description>
 &lt;h3 id="app_settingsjson-permissions">&lt;code>app_settings.json .permissions{}&lt;/code>&lt;/h3>
 &lt;table>
 &lt;thead>
@@ -2756,6 +2849,10 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;td>Validates reports about a patient and silences relevant reminders.&lt;/td>
 &lt;/tr>
 &lt;tr>
+&lt;td>&lt;a href="#accept-case-reports">accept_case_reports&lt;/a>&lt;/td>
+&lt;td>Validates reports about a case, assigns the associated place_uuid, and silences relevant reminders. Available since 3.9.0&lt;/td>
+&lt;/tr>
+&lt;tr>
 &lt;td>&lt;a href="#generate-shortcode-on-contacts">generate_shortcode_on_contacts&lt;/a>&lt;/td>
 &lt;td>Automatically generates the &lt;code>patient_id&lt;/code> on all person documents and the &lt;code>place_id&lt;/code> on all place documents. Available since 3.8.x.&lt;/td>
 &lt;/tr>
@@ -2988,7 +3085,9 @@ To provide an alternative location for the place name, provide a &lt;code>place_
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;params&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;{\&amp;#34;place_name_field\&amp;#34;: \&amp;#34;clinic_name\&amp;#34;}&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="generate-shortcode-on-contacts">Generate Shortcode on Contacts&lt;/h3>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="add_case-as-of-390">&lt;code>add_case&lt;/code> &lt;em>as of 3.9.0&lt;/em>&lt;/h5>
+&lt;p>Sets the &lt;code>case_id&lt;/code> on the root of the registration document.&lt;/p>
+&lt;h3 id="generate-shortcode-on-contacts">Generate Shortcode on Contacts&lt;/h3>
 &lt;p>No custom configuration for &lt;code>generate_shortcode_on_contacts&lt;/code>.&lt;/p>
 &lt;h3 id="generate-patient-id-on-people">Generate Patient ID On People&lt;/h3>
 &lt;p>&lt;strong>Deprecated since 3.8.x&lt;/strong> in favor of &lt;code>generate_shortcode_on_contacts&lt;/code>&lt;/p>
@@ -3161,7 +3260,33 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 }
 ]
 }
-&lt;/code>&lt;/pre>&lt;h3 id="self_report">self_report&lt;/h3>
+&lt;/code>&lt;/pre>&lt;h3 id="accept-case-reports">Accept case reports&lt;/h3>
+&lt;p>Allow reporting about case centric workflows by&lt;/p>
+&lt;ul>
+&lt;li>validating the report configuration documentation,&lt;/li>
+&lt;li>assigning the relevant place to the report if a registration with the given case_id exists,&lt;/li>
+&lt;li>clearing messages on the registration, and&lt;/li>
+&lt;li>generating response messages on the report.&lt;/li>
+&lt;/ul>
+&lt;h4 id="example-2">Example&lt;/h4>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;registrations&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;events&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;on_create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;trigger&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;add_case&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;accept_case_reports&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;SIGNOFF&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;validations&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;report_accepted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;bool_expr&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some expression&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;message&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some message&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some recipients&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="self_report">self_report&lt;/h3>
 &lt;p>Updates a &lt;code>data_record&lt;/code> to set its patient to its sender. The resulting doc will have &lt;code>fields.patient_uuid&lt;/code> and &lt;code>fields.patient_id&lt;/code> filled with the sender&amp;rsquo;s information. Provides hydrated patient information to subsequent transitions.
 The &lt;code>sender&lt;/code> is the contact associated with the phone number that sent the original SMS.&lt;br>
 If a doc already contains a &lt;code>patient&lt;/code> field, does not have a sender or its &lt;code>form&lt;/code> is not configured to be enabled for this transition, it will be ignored.&lt;/p>
@@ -3205,7 +3330,7 @@ Every object should have this structure:&lt;/p>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h5 id="example-2">Example&lt;/h5>
+&lt;h5 id="example-3">Example&lt;/h5>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;self_report&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
 &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;FORM&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -3555,6 +3680,11 @@ Every object should have this structure:&lt;/p>
 &lt;td>&lt;code>icon&lt;/code>&lt;/td>
 &lt;td>Icon associated with the form. The value is the image&amp;rsquo;s key in the &lt;code>resources.json&lt;/code> file, as described in the &lt;a href="#icons">Icons section&lt;/a>&lt;/td>
 &lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>subject_key&lt;/code>&lt;/td>
+&lt;td>Override the default report list title with a custom translation key. The translation uses a summary of the report as the evaluation context so you can include report fields in your value, for example: &lt;code>Case registration {{case_id}}&lt;/code>. Useful properties available in the summary include: &lt;code>from&lt;/code> (the phone number of the sender), &lt;code>phone&lt;/code> (the phone number of the report contact), &lt;code>form&lt;/code> (the form code), &lt;code>subject.name&lt;/code> (the name of the subject), and &lt;code>case_id&lt;/code> (the generated case id). Defaults to the name of the report subject.&lt;/td>
+&lt;td>no&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>context&lt;/code>&lt;/td>
@@ -5745,107 +5875,4 @@ curl &lt;span style="color:#4e9a06">&amp;#39;https://yourserver/medic/1B7922A6-A
 &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, there are two references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, both in the &lt;code>1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code> document, one at &lt;code>fields.inputs.contact._id&lt;/code> and one at &lt;code>fields.patient_id&lt;/code>.&lt;/p>
-&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: DHIS2 Aggregate</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/dhis2-aggregate/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/dhis2-aggregate/</guid><description>
-&lt;p>One of the first things you’ll need to do is identify the specific &lt;a href="https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-sets-and-forms.html#what-is-a-data-set">DHIS2 data set&lt;/a> that you plan to implement. You’ll need a list of all the &lt;a href="https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/data-elements-and-custom-dimensions.html#data-elements">data elements&lt;/a> on that data set, a detailed understanding of how each is calculated, the frequency in which the data set is submitted (weekly, monthly, etc…), and for which &lt;a href="https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/organisation-units.html">organisation units&lt;/a> the data set applies. You’ll also want to identify and engage the appropriate DHIS2 stakeholders to get access to DHIS2 metadata, test environments, and discuss workflows. The DHIS2 documentation site provides additional background and advice &lt;a href="https://docs.dhis2.org/2.34/en/dhis2_implementation_guide/integration-concepts.html#integration-concepts">here&lt;/a>.&lt;/p>
-&lt;h2 id="design-considerations">Design Considerations&lt;/h2>
-&lt;p>There are a few very important considerations related to how you design workflows and set up your CHT application to make sure you will be able to integrate with DHIS2. The main areas are:&lt;/p>
-&lt;ol>
-&lt;li>Hierarchies&lt;/li>
-&lt;li>Fields and calculations&lt;/li>
-&lt;li>Workflows and user access.&lt;/li>
-&lt;/ol>
-&lt;p>These considerations are summarized below.&lt;/p>
-&lt;h3 id="hierarchies">Hierarchies&lt;/h3>
-&lt;p>The CHT relies on your Place hierarchy to determine how data should be aggregated for DHIS2. As such, it’s important that you consider how organization units are configured in the DHIS2 instance that you need to integrate data into. If your CHT Place hierarchy does not align with the DHIS2 organisation unit structure, the CHT will not be able to aggregate data in the way DHIS2 needs it.&lt;/p>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-There should be a one-to-one relationship between DHIS2 organistion units and CHT places.
-&lt;/div>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/concepts/hierarchy/#>Hierarchies&lt;/a>&lt;/p>
-&lt;h3 id="fields-and-calculations">Fields and calculations&lt;/h3>
-&lt;p>It’s important to understand each data element on the DHIS2 data set you want to integrate data into and how each data element is calculated. When you are designing your forms in the CHT, you will need to make sure you are capturing information in your forms so that every data element on the chosen DHIS2 data set can be calculated within the CHT.&lt;/p>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-Once you obtain the list of data elements on the data set, be sure to go through them one by one and figure out how to calculate each one using information available in your CHT forms.
-&lt;/div>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/concepts/forms/#>Forms&lt;/a>&lt;/p>
-&lt;h3 id="workflows-and-user-access">Workflows and User Access&lt;/h3>
-&lt;p>The aggregate data workflow is really designed around 3 key user personas. You’ll need to make sure that your context can support those assumptions and will be able to have access to the appropriate features in the CHT and DHIS2.&lt;/p>
-&lt;p>Moving data from the CHT to DHIS2 can be done in three main ways.&lt;/p>
-&lt;ol>
-&lt;li>Manually downloading from the CHT&lt;/li>
-&lt;li>Building an app in DHIS2 and calling an API in the CHT&lt;/li>
-&lt;li>Orchestrating the steps using an interoperability layer such as &lt;a href="http://openhim.org/">OpenHIM&lt;/a>, &lt;a href="https://www.openfn.org/">OpenFn&lt;/a>, etc&amp;hellip;&lt;/li>
-&lt;/ol>
-&lt;h2 id="configuration">Configuration&lt;/h2>
-&lt;p>Once you have designed your hierarchies, forms, calculations, and workflows, there are a few key configurations that need to be made.&lt;/p>
-&lt;h3 id="data-sets">Data sets&lt;/h3>
-&lt;p>For the CHT to be able to export the file for DHIS2, it needs to know the specific name and ID of the data set in DHIS2. You will need to obtain the ID from the test or production DHIS2 environment.&lt;/p>
-&lt;p>Configure the data set in &lt;code>app_settings.json&lt;/code>.&lt;/p>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/reference/app-settings/dhis2/#>DHIS2 in App Settings&lt;/a>&lt;/p>
-&lt;h3 id="organisation-units">Organisation units&lt;/h3>
-&lt;p>Aggregation in the CHT is based on your Place hierarchy. As mentioned in the Hierarchies Design Considerations above, your Places must align with DHIS2 organisation units. You will need to specify the DHIS2 organisation unit&amp;rsquo;s ID on the Place document in the CHT.&lt;/p>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-Update the contact document of each place you wish to map to an organisation unit. Add a &lt;code>dhis.orgUnit&lt;/code> attribute.
-&lt;/div>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/reference/forms/contact/#>Contact Forms&lt;/a>&lt;/p>
-&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;my_place&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;dhis&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;orgUnit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HJiPOcmziQA&amp;#34;&lt;/span>
-&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="data-elements">Data elements&lt;/h3>
-&lt;p>Calculations for DHIS2 indicators are done using CHT Target functionality. For each DHIS2 data element, you will need to configure a corresponding CHT Target and specify the ID of the DHIS2 data set and data element. If you do not include the data set, this data element will be included in every data set.&lt;/p>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-In &lt;code>targets.js&lt;/code>, configure one or more data elements by setting the &lt;code>dhis.dataSet&lt;/code> and &lt;code>dhis.dataElement&lt;/code> attributes in the target schema.
-&lt;/div>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/reference/targets/#>Targets&lt;/a>&lt;/p>
-&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#000">module&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#204a87;font-weight:bold">export&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#000">id&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;births-this-month&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">type&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;count&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">icon&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;icon-infant&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">translation_key&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;targets.births.title&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">subtitle_translation_key&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;targets.this_month.subtitle&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">goal&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">-&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">appliesTo&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;contacts&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">appliesToType&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;person&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
-&lt;span style="color:#000">appliesIf&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000">contact&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">!!&lt;/span>&lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">date&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">date_of_birth&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">dhis&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#000">dataSet&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;VMuFODsyWaO&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#000">dataElement&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;kB0ZBFisE0e&amp;#39;&lt;/span>
-&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;span style="color:#000;font-weight:bold">];&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="users">Users&lt;/h3>
-&lt;p>For the HRIO role, create a new user role and a new user with that role; or update an existing user role. To export DHIS2 metrics, users need to have the following permissions: &lt;code>can_configure&lt;/code>, &lt;code>can_export_all&lt;/code>, and &lt;code>can_export_dhis&lt;/code>.&lt;/p>
-&lt;p>&lt;em>See Also:&lt;/em> &lt;a href=https://docs.communityhealthtoolkit.org/apps/concepts/users/#>Users&lt;/a>&lt;/p>
-&lt;h2 id="user-experience">User experience&lt;/h2>
-&lt;p>Once your CHT project is configured to integrate with DHIS2, follow these steps to export the data from CHT and import it into DHIS:&lt;/p>
-&lt;h3 id="export-data">Export data&lt;/h3>
-&lt;ol>
-&lt;li>Login to the CHT instance using a user account with the required permissions. You should be automatically navigated to the Admin Console.&lt;/li>
-&lt;li>Select &amp;ldquo;Import &amp;amp; export data&amp;rdquo; from the side&lt;/li>
-&lt;li>Select &amp;ldquo;DHIS2&amp;rdquo; from the header along the top&lt;/li>
-&lt;li>Select the data set, org unit, and time period that you&amp;rsquo;d like to send to DHIS2. Click &amp;ldquo;Export&amp;rdquo;&lt;/li>
-&lt;li>A file should download in your browser. This file contains a &lt;a href="https://docs.dhis2.org/master/en/developer/html/webapi_data_values.html">dataValueSet&lt;/a> with aggregated user&amp;rsquo;s data.&lt;/li>
-&lt;/ol>
-&lt;h3 id="import-data">Import data&lt;/h3>
-&lt;ol>
-&lt;li>Login to DHIS2 using a user account with permission to manage the relevant dataset and organisation units.&lt;/li>
-&lt;li>Select the &amp;ldquo;import/export&amp;rdquo; application inside DHIS2. Select &amp;ldquo;import data&amp;rdquo;.&lt;/li>
-&lt;li>Upload the file you downloaded in Step 5.&lt;/li>
-&lt;li>Click &amp;ldquo;Import&amp;rdquo;&lt;/li>
-&lt;/ol>
-&lt;p>Check the UI for any errors. If you get errors you don&amp;rsquo;t understand or are unable to resolve an error, you can always ask for assistance on the &lt;a href="https://forum.communityhealthtoolkit.org/c/support/18">CHT Forum&lt;/a>. If there are no errors, you can review the numbers that resulted by reviewing the data set in DHIS2.&lt;/p>
-&lt;h2 id="known-limitations">Known limitations&lt;/h2>
-&lt;ul>
-&lt;li>Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li>
-&lt;li>Integrations are limited to &lt;em>monthly&lt;/em> DHIS2 data sets.&lt;/li>
-&lt;li>Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href="https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html">DHIS2 App&lt;/a> for your project.&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item></channel></rss>
