@@ -1,4 +1,70 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Guides</title><link>https://docs.communityhealthtoolkit.org/core/guides/</link><description>Recent content in Guides on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/core/guides/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Fixing E2E Tests</title><link>https://docs.communityhealthtoolkit.org/core/guides/fixing-e2e-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/fixing-e2e-tests/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Guides</title><link>https://docs.communityhealthtoolkit.org/core/guides/</link><description>Recent content in Guides on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/core/guides/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Releasing</title><link>https://docs.communityhealthtoolkit.org/core/guides/releasing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/releasing/</guid><description>
+&lt;h2 id="cht-core">CHT core&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/cht-core/issues/new/choose">Create an issue&lt;/a> for either a Major/Minor or Patch release issue template and assign it to the release manager to follow the process.&lt;/p>
+&lt;h2 id="medic-conf">medic-conf&lt;/h2>
+&lt;p>Follow the &lt;a href="https://github.com/medic/medic-conf/#releasing">instructions in the readme&lt;/a>.&lt;/p>
+&lt;h2 id="android-apps">Android apps&lt;/h2>
+&lt;p>All medic Android projects automatically build, sign, and publish builds via Travis. To create a new release:&lt;/p>
+&lt;ol>
+&lt;li>Determine what version the build will be. This should be a valid semver (eg. &lt;code>v1.1.1&lt;/code>). Increment the semver appropriately based on the latest release version:
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/medic/medic-android/releases">medic-android&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-gateway/releases">medic-gateway&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-collect/releases">medic-collect&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/rdt-capture/releases">rdt-capture&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Tag the commit in &lt;code>master&lt;/code> which you&amp;rsquo;d like to release. Use &lt;code>git tag v1.1.1&lt;/code> with the version from above and then run &lt;code>git push --tags&lt;/code>.&lt;/li>
+&lt;li>Wait for the build to complete. You can monitor the build via travis-ci.org.&lt;/li>
+&lt;li>&lt;strong>To Release via the Google Play Store&lt;/strong> - Login to the &lt;a href="https://play.google.com/apps/publish/">Google Play Console&lt;/a> and select the app flavor for release. Navigate to &amp;ldquo;Release Management &amp;gt; Alpha&amp;rdquo; and click &amp;ldquo;Release to Beta&amp;rdquo;. Repeat this for each flavor.&lt;/li>
+&lt;li>&lt;strong>To Side-Load&lt;/strong> (for Collect and Gateway) - Navigate to the GitHub Releases page (linked above) and download the relevant APKs for distribution.&lt;/li>
+&lt;/ol></description></item><item><title>Core: Updating Dependencies</title><link>https://docs.communityhealthtoolkit.org/core/guides/update-dependencies/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/update-dependencies/</guid><description>
+&lt;p>Every minor release we update dependencies to get the latest fixes and improvements. We do this early in the release cycle so that we have some more time to find regressions and issues. This is done on all folders with a package.json, including:&lt;/p>
+&lt;ul>
+&lt;li>cht-core
+&lt;ul>
+&lt;li>/ (root)&lt;/li>
+&lt;li>/admin&lt;/li>
+&lt;li>/api&lt;/li>
+&lt;li>/sentinel&lt;/li>
+&lt;li>/shared-libs/*&lt;/li>
+&lt;li>/webapp&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>medic-conf&lt;/li>
+&lt;/ul>
+&lt;h2 id="steps">Steps&lt;/h2>
+&lt;ol>
+&lt;li>&lt;code>git checkout master &amp;amp;&amp;amp; git pull&lt;/code> - get the latest code&lt;/li>
+&lt;li>&lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code> - make a branch&lt;/li>
+&lt;/ol>
+&lt;p>Then for each folder go through these steps.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>npm ci&lt;/code> - update your local node_modules to match expected&lt;/li>
+&lt;li>&lt;code>npm outdated&lt;/code> - report on any dependencies which aren&amp;rsquo;t at the latest&lt;/li>
+&lt;li>&lt;code>npm install --save[-dev] package@version&lt;/code> - install the latest version (be careful and read the release notes if the new version is a major change from the current)&lt;/li>
+&lt;li>&lt;code>npm dedupe&lt;/code> - remove duplicated dependencies&lt;/li>
+&lt;li>&lt;code>npm audit fix&lt;/code> - automatically fix any nested dependencies with vulnerabilities&lt;/li>
+&lt;li>&lt;code>npm audit&lt;/code> - get a report on any remaining vulnerabilities and manually scan it to see if there&amp;rsquo;s anything else you can do&lt;/li>
+&lt;/ol>
+&lt;h2 id="problems">Problems&lt;/h2>
+&lt;ul>
+&lt;li>Don&amp;rsquo;t update bootstrap to 4+ as it has many breaking changes. One day we will either raise an issue to upgrade it or migrate off it, but that is outside the scope of this change.&lt;/li>
+&lt;li>Don&amp;rsquo;t update bootstrap-daterangepicker.&lt;/li>
+&lt;li>Don&amp;rsquo;t update select2 as the latest patch always seems to fail.&lt;/li>
+&lt;li>Make sure the version of &lt;code>api/enketo-xslt&lt;/code> is the same as &lt;code>webapp/enketo-core/enketo-transformer/enketo-xslt&lt;/code>.&lt;/li>
+&lt;li>Make sure the version of &lt;code>webapp/jquery&lt;/code> is the same as &lt;code>webapp/enketo-core/jquery&lt;/code>.&lt;/li>
+&lt;li>If you have trouble upgrading any other dependency and you think it&amp;rsquo;ll be challenging to fix it then raise a new issue to upgrade just that dependency. Don&amp;rsquo;t hold up all the other upgrades you&amp;rsquo;ve made.&lt;/li>
+&lt;/ul>
+&lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
+&lt;h3 id="npm-errno--17">npm errno -17&lt;/h3>
+&lt;p>If &lt;code>npm ci&lt;/code> errors with &amp;ldquo;errno -17&amp;rdquo; in shared-libs you may need to manually remove the nested dependencies from the package-lock.json. This needs move investigation to work out why this is happening.&lt;/p>
+&lt;h3 id="select2-is-not-a-function">select2 is not a function&lt;/h3>
+&lt;p>If you get &lt;code>TypeError: &amp;quot;$(...).select2 is not a function&amp;quot;&lt;/code> then either:&lt;/p>
+&lt;ol>
+&lt;li>You bumped select2. For some reason this breaks it.&lt;/li>
+&lt;li>You have multiple jquery libraries and select2 is getting attached to one but not the other. Make sure the jquery versions in enketo-core and webapp match and you&amp;rsquo;ve &lt;code>run dedupe&lt;/code> to remove the enketo-core copy.&lt;/li>
+&lt;/ol></description></item><item><title>Core: Fixing E2E Tests</title><link>https://docs.communityhealthtoolkit.org/core/guides/fixing-e2e-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/fixing-e2e-tests/</guid><description>
 &lt;h1 id="how-to-fix-e2e-tests">How to fix e2e tests&lt;/h1>
 &lt;p>End to end (e2e) tests can be really difficult to debug - sometimes they fail seemingly at random, and sometimes they only fail on certain environments (eg: ci but not locally). This can make reproducing and reliably fixing the issue challenging, so here are some tips to help!&lt;/p>
 &lt;h2 id="read-the-protractor-logs">Read the protractor logs&lt;/h2>
