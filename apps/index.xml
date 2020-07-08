@@ -2339,7 +2339,6 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;p>&lt;em>Outbound is only available in Medic 3.5.0 and above&lt;/em>&lt;/p>
 &lt;p>Outbound push allows configurers to have the creation or editing of CouchDB documents trigger outbound REST requests using the data in that document. For example, upon receiving a referral report you could send that referral to an external facility system that will manage and process that event.&lt;/p>
 &lt;p>These triggers can apply to all document types (not just common types such as reports or contacts) and as such care should be taken to only send the documents you intend (see configuration of &lt;code>relevant_to&lt;/code> below).&lt;/p>
-&lt;p>This feature is experimental, and may be replaced by some third party technology over time as we discover the feature-set we&amp;rsquo;re looking for.&lt;/p>
 &lt;h2 id="configuration">Configuration&lt;/h2>
 &lt;p>For outbound pushes to occur, you must &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#available-transitions">enable the &lt;code>mark_for_outbound&lt;/code> transition in config&lt;/a>:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
@@ -2492,16 +2491,37 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;li>Click &lt;code>Create&lt;/code>&lt;/li>
 &lt;li>You should then be able to see your credential in the list of configuration shown\&lt;/li>
 &lt;/ul>
-&lt;h2 id="flow">Flow&lt;/h2>
-&lt;p>Outbound pushes happen in two stages:&lt;/p>
+&lt;h2 id="how-outbound-messages-are-sent">How Outbound messages are sent&lt;/h2>
+&lt;p>Send semantics have changed over the course of developing this feature, and are important to understand for your deployment to be successful.&lt;/p>
+&lt;h2 id="in-310-and-above">In 3.10 and above&lt;/h2>
 &lt;ul>
-&lt;li>Sentinel picks up the report and runs transitions over it. Any outbound configuration that is relevant (via executing the &lt;code>relevant_to&lt;/code> expression) will be added to a task queue&lt;/li>
-&lt;li>Every 5 minutes sentinel will check its task queue. For each outbound push that is queued, sentinel will perform the mapping and attempt to send the resulting payload (via POST) to the configured web address
-&lt;ul>
-&lt;li>If the push succeeds it will be taken out of the task queue&lt;/li>
-&lt;li>If the push fails (i.e. the response is not 2xx) it remains in the task queue, to be tried again in 5 minutes&lt;/li>
+&lt;li>Outbound messages are sent immediately&lt;/li>
+&lt;li>If there is an error in sending it will be added to a send queue to be retried every 5 minutes.&lt;/li>
+&lt;li>When it does finally send it will include any new changes to the document that have occurred in that time.&lt;/li>
+&lt;li>&lt;strong>Documents can be sent again&lt;/strong>, as long as the resulting payload (as defined in the configuration&amp;rsquo;s &lt;code>mapping&lt;/code> property) is different from the most recent outbound push performed for this document and configuration.&lt;/li>
 &lt;/ul>
-&lt;/li>
+&lt;p>It&amp;rsquo;s important to understand that if your &lt;code>mapping&lt;/code> configuration produces a different result every time it&amp;rsquo;s run you may experience Outbound sending the &amp;ldquo;same&amp;rdquo; data many more times than you&amp;rsquo;d expect.&lt;/p>
+&lt;p>For example, if you want a timestamp in your payload you could configure it like this:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;timestamp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;#34;expr&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;new Date()&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Outbound may send your request multiple times even if the user just hit save once. If this is a problem for your deployment, consider using values on the document itself that will not change every time your mapping is executed:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;timestamp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;doc.timestamp&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="in-39">In 3.9&lt;/h2>
+&lt;ul>
+&lt;li>Outbound messages are sent immediately&lt;/li>
+&lt;li>If there is an error in sending it will be added to a send queue to be retried every 5 minutes.&lt;/li>
+&lt;li>When it does finally send it will include any new changes to the document that have occurred in that time.&lt;/li>
+&lt;li>&lt;strong>Documents are only ever sent once for configuration&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;h2 id="in-34-38">In 3.4-3.8&lt;/h2>
+&lt;ul>
+&lt;li>Outbound messages are added to a send queue that is executed once every 5 minutes or so.&lt;/li>
+&lt;li>If there is an error in sending it will be kept in the queue to be retried in another 5 minutes.&lt;/li>
+&lt;li>When it does finally send it will include any new changes to the document that have occurred in that time.&lt;/li>
+&lt;li>Once the document has successfully sent if the document is changed again it will be sent again, using the same rules as above.&lt;/li>
 &lt;/ul>
 &lt;h2 id="inbound">Inbound?&lt;/h2>
 &lt;p>The outbound feature is used for sending data to an external service. If you are looking to &lt;strong>receive&lt;/strong> data from an external service, take a look at &lt;a href="https://github.com/medic/medic/tree/master/api#post-apiv2records">the records api&lt;/a>.&lt;/p></description></item><item><title>Apps: .patient_reports</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/patient_reports/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/patient_reports/</guid><description>
