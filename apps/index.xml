@@ -800,83 +800,164 @@ Content-Type: application/json
 &lt;p>Use JSON in the request body to specify user details. Any properties submitted
 that are not on the list below will be ignored. Any properties not included
 will be undefined.&lt;/p>
-&lt;h5 id="required-1">Required&lt;/h5>
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>Key&lt;/th>
+&lt;th>Name&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;th>Type&lt;/th>
 &lt;th>Description&lt;/th>
+&lt;th>Version&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
 &lt;td>username&lt;/td>
-&lt;td>String identifier used for authentication.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>identifier used for authentication&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
-&lt;tr>
-&lt;td>password&lt;/td>
-&lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h5 id="conditional">Conditional&lt;/h5>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Key&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;th>Details&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
 &lt;tr>
 &lt;td>roles&lt;/td>
-&lt;td>Array of roles.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Array&lt;/td>
+&lt;td>&lt;/td>
 &lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>place&lt;/td>
+&lt;td>yes, if the roles contain an offline role&lt;/td>
+&lt;td>string or object&lt;/td>
 &lt;td>Place identifier string (UUID) or object this user resides in.&lt;/td>
-&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>contact&lt;/td>
-&lt;td>A person object based on the form configured in the app.&lt;/td>
-&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;td>yes, if the roles contain an offline role&lt;/td>
+&lt;td>string or object&lt;/td>
+&lt;td>A person identifier string (UUID) or object based on the form configured in the app.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>password&lt;/td>
+&lt;td>yes, if &lt;code>token_login&lt;/code> is not enabled for the user&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>phone&lt;/td>
+&lt;td>yes, if &lt;code>token_login&lt;/code> is enabled for the user&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Valid phone number&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>token_login&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>A boolean representing whether or not the Login by SMS should be enabled for this user.&lt;/td>
+&lt;td>3.10.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>fullname&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Full name&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>email&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Email address&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>language&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Language preference. e.g. &amp;ldquo;sw&amp;rdquo; for Swahili&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>known&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>Boolean to define if the user has logged in before. Used mainly to determine whether or not to start a tour on first login.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h5 id="optional-1">Optional&lt;/h5>
+&lt;h5 id="login-by-sms">Login by SMS&lt;/h5>
+&lt;p>When creating or updating a user, sending a truthy value for the field &lt;code>token_login&lt;/code> will enable Login by SMS for this user.
+This action resets the user&amp;rsquo;s password to an unknown string and generates a complex 64 character token, that is used to generate a token-login URL.
+The URL is sent to the user&amp;rsquo;s phone number by SMS, along with another (configurable) SMS that can contain additional information.
+Accessing this link, before its expiration time, will log the user in directly - without the need of any other credentials.&lt;br>
+The link can only be accessed once, the token becomes invalid after being used for one login.&lt;br>
+The token expires in 24 hours, after which logging in is only possible by either generating a new token, or disabling &lt;code>token_login&lt;/code> and manually setting a password.&lt;/p>
+&lt;p>The SMS messages are stored in a doc of a new type &lt;code>login_token&lt;/code>. These docs cannot be viewed as reports from the webapp, and can only be edited by admins, but their messages are visible in the Admin Message Queue page.&lt;/p>
+&lt;p>To disable login by SMS for a user, update the user sending &lt;code>token_login&lt;/code> with a &lt;code>false&lt;/code> value.
+To regenerate the token, update the user sending &lt;code>token_login&lt;/code> with a &lt;code>true&lt;/code> value.&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>Key&lt;/th>
-&lt;th>Description&lt;/th>
+&lt;th>&lt;code>token_login&lt;/code>&lt;/th>
+&lt;th>user state&lt;/th>
+&lt;th>action&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>fullname&lt;/td>
-&lt;td>Full name&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>None&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>email&lt;/td>
-&lt;td>Email address&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>None&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>phone&lt;/td>
-&lt;td>Phone number&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>None. Login by SMS remains enabled. Token is unchanged.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>language&lt;/td>
-&lt;td>Language preference. e.g. &amp;ldquo;sw&amp;rdquo; for Swahili&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>Login by SMS enabled. Token is generated and SMS is sent.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>known&lt;/td>
-&lt;td>Boolean to define if the user has logged in before. Used mainly to determine whether or not to start a tour on first login.&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>Password is reset. Login by SMS enabled. Token is generated and SMS is sent. Existent sessions are invalidated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>true&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>Password is reset. Login by SMS enabled. New token is generated and SMS is sent. Old token is invalid. Existent sessions are invalidated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>None.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>None.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>Request requires a password. Login by SMS is disabled. Old token is invalidated. Existent sessions are invalidated.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;p>This feature uses &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/#app_settingsjson">&lt;code>app_settings.app_url&lt;/code>&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/token_login/">&lt;code>app_settings.token_login&lt;/code>&lt;/a> to be defined and enabled.
+If &lt;code>app_settings.app_url&lt;/code> is not defined, the generated token-login URL will use the &lt;code>Host&lt;/code> request header, which may not always be correct.&lt;/p>
 &lt;h3 id="get-apiv1users">GET /api/v1/users&lt;/h3>
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
 &lt;h5 id="permissions-3">Permissions&lt;/h5>
@@ -3593,7 +3674,40 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="duplicate-sms-messages-handling">Duplicate SMS messages handling&lt;/h4>
 &lt;p>Every time a service (API or Sentinel) creates an SMS, we cache the recipient, and the message content, along with the current timestamp.
 When more than &lt;code>duplicate_limit&lt;/code> messages have been created for the same pair of recipient+content, within the cache time limit, we mark the new message with a &amp;ldquo;duplicate&amp;rdquo; status. Such messages are never sent.
-The cache is cleared 30 minutes after the last SMS message for a specific pair was generated.&lt;/p></description></item><item><title>Apps: .transitions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</guid><description>
+The cache is cleared 30 minutes after the last SMS message for a specific pair was generated.&lt;/p></description></item><item><title>Apps: .token_login</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/token_login/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/token_login/</guid><description>
+&lt;p>Login via SMS settings are defined under the &lt;code>token_login&lt;/code> key, as an object supporting the following properties:&lt;/p>
+&lt;h2 id="app_settingsjson-token_login">&lt;code>app_settings.json .token_login&lt;/code>&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>type&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>enabled&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Enables or disables token_login deployment-wide. When this is false, users can&amp;rsquo;t be updated to use token_login and any requests to login with a token link will fail.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>translation_key&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Translation key for the information (helper) sms message that the user receives, along with their token-login link&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="code-sample">Code sample&lt;/h2>
+&lt;p>The definition takes the typical form below:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;token_login&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;enabled&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sms.token.login.help&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .transitions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</guid><description>
 &lt;p>When sentinel detects a document has changed it runs transitions against the doc. These transitions can be used to generate a short form patient id or assign a report to a facility.&lt;/p>
 &lt;h2 id="configuration">Configuration&lt;/h2>
 &lt;p>By default all transitions are disabled. They can be enabled by configuring the &lt;code>transitions&lt;/code> property to have a key with the transitions name and a &lt;code>truthy&lt;/code> value, eg:&lt;/p>
@@ -5918,98 +6032,4 @@ curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="testing">Testing&lt;/h2>
-&lt;p>To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href="https://account.africastalking.com">Africa&amp;rsquo;s Talking&lt;/a>, and go to the Sandbox app.&lt;/p></description></item><item><title>Apps: Making Calls and Sending SMS from App Forms</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/app-form-sms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/forms/app-form-sms/</guid><description>
-&lt;h2 id="triggering-calls-and-sms">Triggering Calls and SMS&lt;/h2>
-&lt;p>When a XForm is loaded on a phone you can start a phone call or trigger the sending of an SMS within the form itself. This can be useful if within a task or assessment you want to tell the user to contact a patient, or perhaps a health worker at a facility.&lt;/p>
-&lt;p>To set up the call or SMS you&amp;rsquo;ll need to create a link with &lt;code>tel:&lt;/code> or &lt;code>sms:&lt;/code> within a &lt;code>note&lt;/code> field. To create the link, use the markdown link format, eg &lt;code>[Call Patient](tel:+2547009875000)&lt;/code>. You can specify the content of the SMS by using the body parameter, eg &lt;code>[Send SMS](sms://+25470098765000?body=Hello World!)&lt;/code>.&lt;/p>
-&lt;p>The phone number and message can be generated from fields within the XForm. For instance, if you have &lt;code>patient_name&lt;/code>, &lt;code>patient_phone&lt;/code> and &lt;code>message&lt;/code> fields, you can generate the SMS as follows:&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;strong>XLSForm&lt;/strong>
-&lt;code>[Send SMS to ${patient_name}](sms://${patient_phone}?body=${message})&lt;/code>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>XForm&lt;/strong>
-&lt;code>[Send SMS to &amp;lt;output value=&amp;quot; /data/patient_name &amp;quot;/&amp;gt;](sms://&amp;lt;output value=&amp;quot; /data/patient_phone &amp;quot;/&amp;gt;?body=&amp;lt;output value=&amp;quot; /data/message &amp;quot;/&amp;gt;)&lt;/code>&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;p>If you want to use a button to make the action more obvious, this can be done using HTML and CSS within the note:&lt;/p>
-&lt;pre>&lt;code>[&amp;lt;span style='background-color: #CC0000; color:white; padding: 1em; text-decoration: none; '&amp;gt;Call the patient&amp;lt;/span&amp;gt;](tel:${patient_phone})
-&lt;/code>&lt;/pre>&lt;p>Note that the SMS link notation can be interpreted differently from one phone to another. Some devices work well with &lt;code>sms:${phone}?body=${message}&lt;/code>, others with &lt;code>sms://${phone}?body=${message}&lt;/code>. You may find &lt;a href="https://bradorego.com/test/sms.html">these SMS link tests&lt;/a> helpful in determining what works on devices for your deployment.&lt;/p>
-&lt;h2 id="sending-reports-as-sms">Sending reports as SMS&lt;/h2>
-&lt;p>To define that an XForm should be converted to an SMS, add the field &lt;code>xml2sms&lt;/code> to the form&amp;rsquo;s CouchDB doc and assign it a truthy value (either a boolean or a string).&lt;br>
-When submitting such a form, along with creating the report document, the app will try to compact the report&amp;rsquo;s content into an SMS that would be sent to the configured Gateway phone number.&lt;/p>
-&lt;p>There are two formats available - either using the &lt;a href="https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)">ODK&amp;rsquo;s compact record representation for SMS&lt;/a>, or Medic&amp;rsquo;s custom format.
-When the form compaction fails or returns no content, no SMS will be sent.&lt;/p>
-&lt;h3 id="odk-compact-record-representation-for-sms">ODK compact record representation for SMS&lt;/h3>
-&lt;p>When &lt;code>xml2sms&lt;/code> field value is Boolean &lt;code>true&lt;/code>, the app will try to compact the form using this format.
-To get forms sent in this format, follow the &lt;a href="https://opendatakit.github.io/xforms-spec/#compact-record-representation-(for-sms)">ODK documentation&lt;/a>.&lt;/p>
-&lt;h3 id="medic-custom-sms-representation">Medic Custom SMS representation&lt;/h3>
-&lt;p>To configure a form to send using Medic&amp;rsquo;s custom SMS definition, the value of &lt;code>xml2sms&lt;/code> from the form&amp;rsquo;s CouchDB doc should be an string containing an &lt;a href="https://docs.angularjs.org/guide/expression">Angular expression&lt;/a>.
-This allows access to the &lt;code>fields&lt;/code> property of the &lt;code>data_record&lt;/code> doc created when saving the form submission to the database. Extra functions are also provided to make compiling a form submission more simple.&lt;/p>
-&lt;h4 id="special-functions">Special Functions&lt;/h4>
-&lt;h5 id="concatargs">&lt;code>concat(...args)&lt;/code>&lt;/h5>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;code>...args&lt;/code>: 0 or more values to be concatenated.&lt;/p>
-&lt;pre>&lt;code> concat('A', 'bee', 'Sea') =&amp;gt; 'AbeeSea'
-&lt;/code>&lt;/pre>
-&lt;/li>
-&lt;/ul>
-&lt;h5 id="spacedargs">&lt;code>spaced(...args)&lt;/code>&lt;/h5>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;code>...args&lt;/code>: 0 or more values to be concatenated with spaces between them.&lt;/p>
-&lt;pre>&lt;code> spaced('A', 'bee', 'Sea') =&amp;gt; 'A bee Sea'
-&lt;/code>&lt;/pre>
-&lt;/li>
-&lt;/ul>
-&lt;h5 id="matchval-matchers">&lt;code>match(val, matchers)&lt;/code>&lt;/h5>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;code>val&lt;/code>: the value to run matches against&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;code>matchers&lt;/code>: a string representing values to match and their corresponding outputs&lt;/p>
-&lt;pre>&lt;code> match('a', 'a:Hay,b:bzz,c:see') =&amp;gt; 'Hay'
-match('b', 'a:Hay,b:bzz,c:see') =&amp;gt; 'bzz'
-match('c', 'a:Hay,b:bzz,c:see') =&amp;gt; 'c'
-&lt;/code>&lt;/pre>
-&lt;/li>
-&lt;/ul>
-&lt;h4 id="examples">Examples&lt;/h4>
-&lt;h5 id="form-submission-json">Form Submission JSON&lt;/h5>
-&lt;pre>&lt;code>doc.fields = {
-s_acc_danger_signs: {
-s_acc_danger_sign_seizure: 'no',
-s_acc_danger_sign_loss_consiousness: 'yes',
-s_acc_danger_sign_unable_drink: 'no',
-s_acc_danger_sign_confusion: 'yes',
-s_acc_danger_sign_vomit: 'no',
-s_acc_danger_sign_chest_indrawing: 'yes',
-s_acc_danger_sign_wheezing: 'no',
-s_acc_danger_sign_bleeding: 'yes',
-s_acc_danger_sign_lathargy: 'no',
-has_danger_sign: 'true',
-},
-};
-&lt;/code>&lt;/pre>
-&lt;h5 id="formdocreport2sms">&lt;code>formDoc.report2sms&lt;/code>&lt;/h5>
-&lt;pre>&lt;code>concat(
-&amp;quot;U5 &amp;quot;,
-match(doc.s_acc_danger_signs.has_danger_sign, &amp;quot;true:DANGER, false:NO_DANGER&amp;quot;),
-&amp;quot; &amp;quot;,
-match(doc.s_acc_danger_signs.s_acc_danger_sign_seizure, &amp;quot;yes:S&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_loss_consiousness, &amp;quot;yes:L&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_unable_drink, &amp;quot;yes:D&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_confusion, &amp;quot;yes:C&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_vomit, &amp;quot;yes:V&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_chest_indrawing, &amp;quot;yes:I&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_wheezing, &amp;quot;yes:W&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_bleeding, &amp;quot;yes:B&amp;quot;),
-match(doc.s_acc_danger_signs.s_acc_danger_sign_lathargy, &amp;quot;yes:Y&amp;quot;)
-)
-&lt;/code>&lt;/pre>
-&lt;h5 id="sms-content">SMS content&lt;/h5>
-&lt;pre>&lt;code>U5 DANGER LCIB
-&lt;/code>&lt;/pre></description></item></channel></rss>
+&lt;p>To test your integration, set your &amp;ldquo;username&amp;rdquo; to &amp;ldquo;sandbox&amp;rdquo;, log in to &lt;a href="https://account.africastalking.com">Africa&amp;rsquo;s Talking&lt;/a>, and go to the Sandbox app.&lt;/p></description></item></channel></rss>

@@ -772,83 +772,164 @@ Content-Type: application/json
 &lt;p>Use JSON in the request body to specify user details. Any properties submitted
 that are not on the list below will be ignored. Any properties not included
 will be undefined.&lt;/p>
-&lt;h5 id="required-1">Required&lt;/h5>
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>Key&lt;/th>
+&lt;th>Name&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;th>Type&lt;/th>
 &lt;th>Description&lt;/th>
+&lt;th>Version&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
 &lt;td>username&lt;/td>
-&lt;td>String identifier used for authentication.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>identifier used for authentication&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
-&lt;tr>
-&lt;td>password&lt;/td>
-&lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h5 id="conditional">Conditional&lt;/h5>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Key&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;th>Details&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
 &lt;tr>
 &lt;td>roles&lt;/td>
-&lt;td>Array of roles.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Array&lt;/td>
+&lt;td>&lt;/td>
 &lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>place&lt;/td>
+&lt;td>yes, if the roles contain an offline role&lt;/td>
+&lt;td>string or object&lt;/td>
 &lt;td>Place identifier string (UUID) or object this user resides in.&lt;/td>
-&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>contact&lt;/td>
-&lt;td>A person object based on the form configured in the app.&lt;/td>
-&lt;td>Required if your roles contain &lt;code>district_admin&lt;/code>.&lt;/td>
+&lt;td>yes, if the roles contain an offline role&lt;/td>
+&lt;td>string or object&lt;/td>
+&lt;td>A person identifier string (UUID) or object based on the form configured in the app.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>password&lt;/td>
+&lt;td>yes, if &lt;code>token_login&lt;/code> is not enabled for the user&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>phone&lt;/td>
+&lt;td>yes, if &lt;code>token_login&lt;/code> is enabled for the user&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Valid phone number&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>token_login&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>A boolean representing whether or not the Login by SMS should be enabled for this user.&lt;/td>
+&lt;td>3.10.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>fullname&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Full name&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>email&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Email address&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>language&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>Language preference. e.g. &amp;ldquo;sw&amp;rdquo; for Swahili&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>known&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>Boolean to define if the user has logged in before. Used mainly to determine whether or not to start a tour on first login.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h5 id="optional-1">Optional&lt;/h5>
+&lt;h5 id="login-by-sms">Login by SMS&lt;/h5>
+&lt;p>When creating or updating a user, sending a truthy value for the field &lt;code>token_login&lt;/code> will enable Login by SMS for this user.
+This action resets the user&amp;rsquo;s password to an unknown string and generates a complex 64 character token, that is used to generate a token-login URL.
+The URL is sent to the user&amp;rsquo;s phone number by SMS, along with another (configurable) SMS that can contain additional information.
+Accessing this link, before its expiration time, will log the user in directly - without the need of any other credentials.&lt;br>
+The link can only be accessed once, the token becomes invalid after being used for one login.&lt;br>
+The token expires in 24 hours, after which logging in is only possible by either generating a new token, or disabling &lt;code>token_login&lt;/code> and manually setting a password.&lt;/p>
+&lt;p>The SMS messages are stored in a doc of a new type &lt;code>login_token&lt;/code>. These docs cannot be viewed as reports from the webapp, and can only be edited by admins, but their messages are visible in the Admin Message Queue page.&lt;/p>
+&lt;p>To disable login by SMS for a user, update the user sending &lt;code>token_login&lt;/code> with a &lt;code>false&lt;/code> value.
+To regenerate the token, update the user sending &lt;code>token_login&lt;/code> with a &lt;code>true&lt;/code> value.&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>Key&lt;/th>
-&lt;th>Description&lt;/th>
+&lt;th>&lt;code>token_login&lt;/code>&lt;/th>
+&lt;th>user state&lt;/th>
+&lt;th>action&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>fullname&lt;/td>
-&lt;td>Full name&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>None&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>email&lt;/td>
-&lt;td>Email address&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>None&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>phone&lt;/td>
-&lt;td>Phone number&lt;/td>
+&lt;td>undefined&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>None. Login by SMS remains enabled. Token is unchanged.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>language&lt;/td>
-&lt;td>Language preference. e.g. &amp;ldquo;sw&amp;rdquo; for Swahili&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>Login by SMS enabled. Token is generated and SMS is sent.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>known&lt;/td>
-&lt;td>Boolean to define if the user has logged in before. Used mainly to determine whether or not to start a tour on first login.&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>Password is reset. Login by SMS enabled. Token is generated and SMS is sent. Existent sessions are invalidated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>true&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>Password is reset. Login by SMS enabled. New token is generated and SMS is sent. Old token is invalid. Existent sessions are invalidated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>new&lt;/td>
+&lt;td>None.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>existent, no token&lt;/td>
+&lt;td>None.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>false&lt;/td>
+&lt;td>existent, with token&lt;/td>
+&lt;td>Request requires a password. Login by SMS is disabled. Old token is invalidated. Existent sessions are invalidated.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;p>This feature uses &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/#app_settingsjson">&lt;code>app_settings.app_url&lt;/code>&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/token_login/">&lt;code>app_settings.token_login&lt;/code>&lt;/a> to be defined and enabled.
+If &lt;code>app_settings.app_url&lt;/code> is not defined, the generated token-login URL will use the &lt;code>Host&lt;/code> request header, which may not always be correct.&lt;/p>
 &lt;h3 id="get-apiv1users">GET /api/v1/users&lt;/h3>
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
 &lt;h5 id="permissions-3">Permissions&lt;/h5>
@@ -1495,6 +1576,12 @@ targets.assessments.title = Assessments Completed
 &lt;td>The number of days before a task is due to show the due date.&lt;/td>
 &lt;td>4&lt;/td>
 &lt;td>3.9.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>app_url&lt;/td>
+&lt;td>The URL of the app, eg: &amp;ldquo;&lt;a href="https://demo.app.medicmobile.org">https://demo.app.medicmobile.org&lt;/a>&amp;rdquo;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>3.10.0&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
