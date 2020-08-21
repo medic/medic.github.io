@@ -1587,9 +1587,161 @@ targets.assessments.title = Assessments Completed
 &lt;/table>
 &lt;h2 id="sms-workflows">SMS Workflows&lt;/h2>
 &lt;p>Workflows involving SMS are configured by defining &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/schedules/">schedules&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/registrations/">registrations&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/patient_reports/">patient reports&lt;/a>, and &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/accept_case_reports/">case reports&lt;/a>. Schedules of automated messages can be sent from the server at specificied times in the future, and reports can be associated to contacts.Forms can also be configured to clear the schedule, or silence it for a period of time.&lt;/p>
+&lt;h2 id="sms-recipient-resolution">SMS recipient resolution&lt;/h2>
+&lt;p>An outgoing SMS message configuration has the following fields:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>description&lt;/th>
+&lt;th>required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>translation_key&lt;/code>&lt;/td>
+&lt;td>The translation key of the message to send out. Available in 2.15+.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages&lt;/code>&lt;/td>
+&lt;td>(&lt;strong>deprecated&lt;/strong>) Array of message objects, each with &lt;code>content&lt;/code> and &lt;code>locale&lt;/code> properties. From 2.15 on use &lt;code>translation_key&lt;/code> instead.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>recipient&lt;/code>&lt;/td>
+&lt;td>Recipient of the message.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="recipient-values-and-resolutions">&lt;code>recipient&lt;/code> values and resolutions:&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>value&lt;/th>
+&lt;th>resolves to&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;em>empty&lt;/em>&lt;/td>
+&lt;td>submitter&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>reporting_unit&lt;/code>&lt;/td>
+&lt;td>submitter&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>parent&lt;/code>&lt;/td>
+&lt;td>primary contact of the patient&amp;rsquo;s/submitter&amp;rsquo;s place&amp;rsquo;s parent (&lt;code>patient.parent.parent.contact&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>grandparent&lt;/code>&lt;/td>
+&lt;td>primary contact of the patient&amp;rsquo;s/submitter&amp;rsquo;s place&amp;rsquo;s grandparent (&lt;code>patient.parent.parent.parent.contact&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>clinic&lt;/code>&lt;/td>
+&lt;td>primary contact of the &lt;code>clinic&lt;/code> in the patient&amp;rsquo;s/submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>health_center&lt;/code>&lt;/td>
+&lt;td>primary contact of the &lt;code>health_center&lt;/code> in the patient&amp;rsquo;s/submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>district&lt;/code>&lt;/td>
+&lt;td>primary contact of the &lt;code>district_hospital&lt;/code> in the patient&amp;rsquo;s/submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ancestor:&amp;lt;contact_type&amp;gt;&lt;/code>&lt;/td>
+&lt;td>primary contact of the place of the requested type in the patient&amp;rsquo;s/submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>link:&amp;lt;tag&amp;gt;&lt;/code>&lt;/td>
+&lt;td>Linked doc that has requested &lt;code>tag&lt;/code> in the patient&amp;rsquo;s / submitter&amp;rsquo;s lineage (direct mapping, not to primary contact). &lt;em>As of 3.10.x&lt;/em>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>link:&amp;lt;contact_type&amp;gt;&lt;/code>&lt;/td>
+&lt;td>primary contact of the place of the requested &lt;code>contact_type&lt;/code> in the patient&amp;rsquo;s/submitter&amp;rsquo;s lineage. &lt;em>As of 3.10.x&lt;/em>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;em>custom object path&lt;/em>&lt;/td>
+&lt;td>a direct object path in the &lt;a href="#message-context">message context object&lt;/a> eg: &lt;code>patient.parent.contact.other_phone&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;em>valid phone number&lt;/em>&lt;/td>
+&lt;td>requested phone number&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;ul>
+&lt;li>if &lt;code>recipient&lt;/code> resolution does not yield a phone number, it will default to submitter&amp;rsquo;s phone number&lt;/li>
+&lt;li>if there is no submitter phone number available, the actual &lt;code>recipient&lt;/code> property value will be used&lt;/li>
+&lt;li>when mapping a contact phone number, &lt;code>patient&lt;/code> lineage and &lt;code>linked_docs&lt;/code> take precedence over &lt;code>submitter&lt;/code> lineage and &lt;code>linked_docs&lt;/code>.&lt;/li>
+&lt;li>except for &lt;code>link:&amp;lt;tag&amp;gt;&lt;/code>, phone numbers are resolved to the primary contacts of the requested places. &lt;code>linked_docs&lt;/code> hydration is shallow, so the primary contact of the linked doc will not be available.&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;h3 id="message-context">Message context&lt;/h3>
+&lt;p>The message context object consists of:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>value description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;em>every property from the original report&lt;/em>&lt;/td>
+&lt;td>unchanged unless specified below&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;em>every &lt;code>fields&lt;/code> property from the original report&lt;/em>&lt;/td>
+&lt;td>eg: if the report has &lt;code>fields.test = 'test'&lt;/code> then &lt;code>context.test = 'test'&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>patient&lt;/td>
+&lt;td>deeply hydrated patient contact (resolved from &lt;code>patient_id&lt;/code>, &lt;code>fields.patient_id&lt;/code> or &lt;code>fields.patient_uuid&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>patient_name&lt;/td>
+&lt;td>patient&amp;rsquo;s name&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>place&lt;/td>
+&lt;td>deeply hydrated place document (resolved from &lt;code>place_id&lt;/code>) - &lt;em>only available in &lt;code>registration&lt;/code> transition, when creating the place via SMS&lt;/em>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>contact&lt;/td>
+&lt;td>deeply hydrated submitter contact&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>parent&lt;/td>
+&lt;td>deeply hydrated &lt;code>health_center&lt;/code> type document from the patient&amp;rsquo;s or submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>grandparent&lt;/td>
+&lt;td>deeply hydrated &lt;code>district_hospital&lt;/code> type document from the patient&amp;rsquo;s or submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>clinic&lt;/td>
+&lt;td>deeply hydrated &lt;code>clinic&lt;/code> type document from the patient&amp;rsquo;s or submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center&lt;/td>
+&lt;td>deeply hydrated &lt;code>health_center&lt;/code> type document from the patient&amp;rsquo;s or submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_hospital&lt;/td>
+&lt;td>deeply hydrated &lt;code>district_hospital&lt;/code> type document from the patient&amp;rsquo;s or submitter&amp;rsquo;s lineage&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
 &lt;h2 id="variables">Variables&lt;/h2>
-&lt;p>Outgoing messages can use &lt;a href="https://mustache.github.io/mustache.5.html">Mustache templating&lt;/a> to insert variables and specify data formats.&lt;/p>
-&lt;p>All the fields on the report doc are available as variables. Additionally, the &lt;code>contact&lt;/code> variable is the sender of the report.&lt;/p>
+&lt;p>Outgoing messages can use &lt;a href="https://mustache.github.io/mustache.5.html">Mustache templating&lt;/a> to insert variables and specify data formats.
+All &lt;a href="#message-context">message context fields&lt;/a> are available as variables.&lt;/p>
 &lt;h3 id="code-sample">Code sample&lt;/h3>
 &lt;p>The following translation label includes the &lt;code>name&lt;/code> field of &lt;code>contact&lt;/code>, along with the submitted &lt;code>patient_name&lt;/code> field, and the generated &lt;code>patient_id&lt;/code> field.&lt;/p>
 &lt;h4 id="translationsmessages-enproperties">&lt;code>translations/messages-en.properties&lt;/code>&lt;/h4>
