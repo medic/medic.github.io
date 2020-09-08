@@ -861,4 +861,499 @@ Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &l
 &lt;ul>
 &lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-you-schedule-sms-based-on-date-field-in-report/87">Can you schedule SMS based on date field in report?&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-sms-schedules-be-cleared-based-on-a-field-in-a-form/651">Can SMS schedules be cleared based on a field in a form?&lt;/a>&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;/ul></description></item><item><title>Apps: Building App Forms</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/app-forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/app-forms/</guid><description>
+&lt;p>App forms allow users to submit reports from Android devices&lt;/p>
+&lt;h2 id="purpose-of-the-tutorial">Purpose of the Tutorial&lt;/h2>
+&lt;p>This tutorial will take you through how to build App forms for CHT applications, including:&lt;/p>
+&lt;ul>
+&lt;li>Authoring forms in Excel, Google sheets or other spreadsheet applications.&lt;/li>
+&lt;li>Converting XLSForms to XForms&lt;/li>
+&lt;li>Uploading XForms to CHT&lt;/li>
+&lt;/ul>
+&lt;p>You will be building assessment workflow that allows Community Health Workers to conduct a health assessment for children under the age of 5.&lt;/p>
+&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/">App forms&lt;/a>&lt;/em> serve as actions within the app.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#xlsform">XLSForm&lt;/a>&lt;/em> is a form &lt;a href="http://xlsform.org/en/">standard&lt;/a> created to help simplify the authoring of forms in Excel.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#xform">XForm&lt;/a>&lt;/em> is a CHT-enhanced version of the &lt;a href="https://getodk.github.io/xforms-spec/">ODK XForm&lt;/a> standard.&lt;/p>
+&lt;h2 id="required-resources">Required Resources&lt;/h2>
+&lt;p>You should have a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">functioning CHT instance with &lt;code>medic-conf&lt;/code> installed locally&lt;/a> and a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/#3-create-and-upload-a-blank-project">project folder set up&lt;/a> already.&lt;/p>
+&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
+&lt;p>Create a new spread sheet in Google sheets or other preferred editor like Excel or Open Office. Name the spreadsheet &lt;code>assessment&lt;/code>. The final file name should be &lt;code>assessment.xlsx&lt;/code>.&lt;/p>
+&lt;p>Create 2 additional sheets. Rename the sheets &lt;code>survey&lt;/code>, &lt;code>choices&lt;/code> and &lt;code>settings&lt;/code>.&lt;/p>
+&lt;h3 id="1-define-xls-surveyform-fields">1. Define XLS Survey/Form Fields&lt;/h3>
+&lt;p>Create the following columns in the survey sheet and then add the following rows that are populated automatically before the form is rendered to the user. These fields are usually hidden by default but can be accessed to display certain information about the person being assessed:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>choice_filter&lt;/th>
+&lt;th>hint&lt;/th>
+&lt;th>default&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>inputs&lt;/td>
+&lt;td>Patient&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>./source = &amp;lsquo;user&amp;rsquo;&lt;/td>
+&lt;td>field-list&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>source&lt;/td>
+&lt;td>Source&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>source_id&lt;/td>
+&lt;td>Source_ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>contact&lt;/td>
+&lt;td>Contact&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>db:person&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>Patient ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>db-object&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Select a person from the list&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>patient_id&lt;/td>
+&lt;td>Medic ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>Patient Name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>parent&lt;/td>
+&lt;td>Parent&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>Family UUID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>parent&lt;/td>
+&lt;td>Grandparent&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>CHW Area UUID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>CHW Name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>phone&lt;/td>
+&lt;td>CHW Phone&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>parent&lt;/td>
+&lt;td>Great Grandparent&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>CU UUID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>patient_name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>../inputs/contact/name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Add the following rows that define the data collection fields below the existing rows (leave out the column names):&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>choice_filter&lt;/th>
+&lt;th>hint&lt;/th>
+&lt;th>default&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>group_assessment&lt;/td>
+&lt;td>Assessment&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one yes_no&lt;/td>
+&lt;td>cough&lt;/td>
+&lt;td>Does ${patient_name} have a cough?&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one symptom_duration&lt;/td>
+&lt;td>cough_duration&lt;/td>
+&lt;td>How long has the cough lasted?&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>${cough} = &amp;lsquo;yes&amp;rsquo;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="2-define-the-choices">2. Define the Choices&lt;/h3>
+&lt;p>Add the following column names and rows to the choices sheet:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>list_name&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>yes_no&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>yes_no&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>No&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>symptom_duration&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>3 days or less&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>symptom_duration&lt;/td>
+&lt;td>7&lt;/td>
+&lt;td>4 - 7 days&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>symptom_duration&lt;/td>
+&lt;td>13&lt;/td>
+&lt;td>8 - 13 days&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>symptom_duration&lt;/td>
+&lt;td>14&lt;/td>
+&lt;td>14 days or more&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="3-define-the-xls-settings">3. Define the XLS Settings&lt;/h3>
+&lt;p>Add the following column names and rows to the settings sheet:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>form_title&lt;/th>
+&lt;th>form_id&lt;/th>
+&lt;th>version&lt;/th>
+&lt;th>style&lt;/th>
+&lt;th>path&lt;/th>
+&lt;th>instance_name&lt;/th>
+&lt;th>default_language&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Assess patient&lt;/td>
+&lt;td>assessment&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>pages&lt;/td>
+&lt;td>data&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>en&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="4-convert-the-xlsform-and-upload-the-xform">4. Convert the XLSForm and Upload the XForm&lt;/h3>
+&lt;p>Add the file to the &lt;code>forms/app&lt;/code> subfolder in your project.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-text" data-lang="text">project-name
+forms
+app
+assessment.xlsx
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>To convert and upload the form to your local instance, run the following command from the root folder:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-zsh" data-lang="zsh">medic-conf --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs convert-app-forms upload-app-forms -- assessment
+&lt;/code>&lt;/pre>&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &lt;code>&amp;lt;password&amp;gt;&lt;/code> with the actual username and password of your test instance.
+&lt;/div>
+&lt;h2 id="next-steps">Next steps&lt;/h2>
+&lt;p>In the next tutorial, you will define the form &lt;code>&amp;lt;form_id&amp;gt;.properties.json&lt;/code> which will allow you to define the form’s title and icon, as well as when and where the form should be available.&lt;/p></description></item></channel></rss>
