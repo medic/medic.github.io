@@ -33,7 +33,33 @@
 &lt;h4 class="alert-heading">Note&lt;/h4>
 The magic link workflow will not work for users who want to use multiple devices or for multiple users on one device.
 &lt;/div>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/examples/training/">Remote Onboarding and Training&lt;/a>&lt;/p></description></item><item><title>Apps: API to interact with CHT Applications</title><link>https://docs.communityhealthtoolkit.org/apps/reference/api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/api/</guid><description>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/examples/training/">Remote Onboarding and Training&lt;/a>&lt;/p></description></item><item><title>Apps: Android</title><link>https://docs.communityhealthtoolkit.org/apps/features/integrations/android/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/features/integrations/android/</guid><description>
+&lt;p>The &lt;a href="https://github.com/medic/medic-android/">CHT Android application&lt;/a> can be launched by clicking on a link or invoking an intent in another Android app. This is useful for enabling login by SMS, directing a user to a specific page, and integrating between Android applications.&lt;/p>
+&lt;h2 id="sending-a-url">Sending a URL&lt;/h2>
+&lt;p>When the user clicks on a link to a CHT instance from an SMS, email, WhatsApp, or any other app, Android will prompt the user to choose whether to open the URL in the Android app or the browser. If a CHT app is not installed then the URL will be opened in the browser.&lt;/p>
+&lt;p>&lt;img src="android-prompt.png" alt="Android prompt" title="Android prompt screenshot">&lt;/p>
+&lt;p>Users can choose &amp;ldquo;Always&amp;rdquo; to skip this prompt in future. The prompt may look different depending on the version of Android being used.&lt;/p>
+&lt;h2 id="using-an-intent">Using an intent&lt;/h2>
+&lt;p>To have another Android application launch the CHT Android application, use an &lt;a href="https://developer.android.com/reference/android/content/Intent.html#ACTION_VIEW">ACTION_VIEW&lt;/a> intent, for example:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-java" data-lang="java">&lt;span style="color:#000">String&lt;/span> &lt;span style="color:#000">url&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;https://myapplication.app.medicmobile.org&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000">Intent&lt;/span> &lt;span style="color:#000">i&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">new&lt;/span> &lt;span style="color:#000">Intent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>&lt;span style="color:#000">Intent&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">.&lt;/span>&lt;span style="color:#c4a000">ACTION_VIEW&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">);&lt;/span>
+&lt;span style="color:#000">i&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">.&lt;/span>&lt;span style="color:#c4a000">setData&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>&lt;span style="color:#000">Uri&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">.&lt;/span>&lt;span style="color:#c4a000">parse&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>&lt;span style="color:#000">url&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">));&lt;/span>
+&lt;span style="color:#000">startActivity&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>&lt;span style="color:#000">i&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="version-notes">Version notes&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Feature&lt;/th>
+&lt;th>CHT Core version&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Released&lt;/td>
+&lt;td>3.10.0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Apps: API to interact with CHT Applications</title><link>https://docs.communityhealthtoolkit.org/apps/reference/api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/api/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This page covers the endpoints to use when integrating with the CHT server. If there isn&amp;rsquo;t an endpoint that provides the function or data you need, direct access to the database is possible via the &lt;a href="https://docs.couchdb.org/en/stable/api/index.html">CouchDB API&lt;/a>. Access to the &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">PostgreSQL database&lt;/a> may also prove useful for data analysis. If additional endpoints would be helpful, please make suggestions via a &lt;a href="https://github.com/medic/cht-core/issues/new/choose">GitHub issue&lt;/a>.&lt;/p>
 &lt;/div>
@@ -6708,27 +6734,4 @@ If you&amp;rsquo;re configuring medic-gateway(v 0.62 and below - recommended if 
 &lt;li>&lt;code>WiFi &amp;gt; MORE &amp;gt; Keep WiFi on during sleep &amp;gt; ALWAYS (increases battery usage)&lt;/code>&lt;/li>
 &lt;li>&lt;code>Smart Manager &amp;gt; Battery &amp;gt; App Power Saving &amp;gt; OFF&lt;/code>, or&lt;/li>
 &lt;li>&lt;code>Smart Manager &amp;gt; Battery &amp;gt; App Power Saving &amp;gt; Detail &amp;gt; Medic Gateway &amp;gt; Disable&lt;/code>&lt;/li>
-&lt;/ul></description></item><item><title>Apps: Phones</title><link>https://docs.communityhealthtoolkit.org/apps/guides/messaging/gateway/phones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/messaging/gateway/phones/</guid><description>
-&lt;p>In order to implement the Medic Mobile Standard package at your site, you will require an Android device for the Medic gateway. You may use an existing Android device and are not required to purchase a new one. However, please note that the Android device must always stay in your organization’s office or facility, and must be connected to stable and continuous internet at all times.&lt;/p>
-&lt;p>Below is a list of recommended Android devices across a range of prices. You may find these in local mobile equipment stores as well as online through Amazon and other e-commerce sites.&lt;/p>
-&lt;h2 id="low-cost-devices">Low-cost devices:&lt;/h2>
-&lt;ul>
-&lt;li>LG L60 *&lt;/li>
-&lt;li>Samsung Duos *&lt;/li>
-&lt;li>Lenovo A1000&lt;/li>
-&lt;/ul>
-&lt;h2 id="medium-cost-devices">Medium-cost devices:&lt;/h2>
-&lt;ul>
-&lt;li>Samsung Galaxy J5 *&lt;/li>
-&lt;li>Huawei Honor 4x *&lt;/li>
-&lt;li>Huawei G Play mini *&lt;/li>
-&lt;li>Motorola Moto X play&lt;/li>
-&lt;/ul>
-&lt;h2 id="high-cost-devices">High-cost devices:&lt;/h2>
-&lt;ul>
-&lt;li>OnePlus 3T&lt;/li>
-&lt;li>Nexus 6&lt;/li>
-&lt;/ul>
-&lt;p>*Devices marked with an asterisk have been tested and used by Medic Mobile and our partners before.&lt;/p>
-&lt;p>Android OS: We also support Android version 4.1 (Jelly Beans) and above. Details of the Android history can be found &lt;a href="https://en.wikipedia.org/wiki/Android_version_history">here&lt;/a>.&lt;/p>
-&lt;p>We highly recommend investing in devices that are medium to high-cost, and in models that are marked with an asterisk in the list above to ensure optimal efficiency.&lt;/p></description></item></channel></rss>
+&lt;/ul></description></item></channel></rss>
