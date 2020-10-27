@@ -221,8 +221,8 @@ Carson Crane,male,2015-01-23
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;date_of_birth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1985-12-31&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dbfbc0f0-117a-59ec-9542-3313fb10ef25&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="special-notations">Special notations&lt;/h4>
-&lt;h5 id="specifying-property-type">Specifying property type&lt;/h5>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="special-notations">Special notations&lt;/h3>
+&lt;h4 id="specifying-property-type">Specifying property type&lt;/h4>
 &lt;p>By default, values are parsed as strings. To parse a CSV column as a different JSON type, append the JSON type name to the column definition, e.g.&lt;/p>
 &lt;pre>&lt;code>column_one,column_two:bool,column_three:int,column_four:float,column_five:date,column_six:timestamp
 some string,true,1,2.3,2017-12-31,1513255007072
@@ -242,7 +242,50 @@ some string,true,1,2.3,2017-12-31,1513255007072
 &lt;pre>&lt;code>my_column_that_will_not_be_a_property:excluded
 &lt;/code>&lt;/pre>
 &lt;p>This can be useful if using a column for doc references.&lt;/p>
-&lt;h4 id="including-another-doc">Including another doc&lt;/h4>
+&lt;h4 id="available-types">Available types&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>outcome&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>date&lt;/td>
+&lt;td>Creates a date using Date() in javascript&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-date&lt;/td>
+&lt;td>Creates a date with the addition of number days to the current date. A negative number results in a past date.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>timestamp&lt;/td>
+&lt;td>Sets the string passed in as a timestamp number. If the timestamp in the csv is in milliseconds that will be used. If a date is passed it will be parsed and the milliseconds returned. EX: 04 Dec 1995 00:12:00 GMT becomes 818035920000&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-timestamp&lt;/td>
+&lt;td>Creates a timestamp that is offset by milliseconds against the current(NOW) timestamp. A negative number results in a past timestamp&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>int&lt;/td>
+&lt;td>Parses the value as an int using Number.parseInt()&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>bool&lt;/td>
+&lt;td>Sets boolean value based on string passed, either &lt;code>&amp;quot;true&amp;quot;&lt;/code> or &lt;code>&amp;quot;false&amp;quot;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>Sets the value as the string being interpreted. Can be omitted if values are only strings.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>float&lt;/td>
+&lt;td>Sets value using Number.parseFloat()&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="including-another-doc">Including another doc&lt;/h3>
 &lt;p>Often times database documents need to include or refer to other documents in the database. This can be achieved with queries across CSV files, which is done by specifying a query in the column header. The query specifies the doc type (&lt;code>person&lt;/code> or &lt;code>place&lt;/code>) and matching condition.&lt;/p>
 &lt;p>For instance, to include the parent district&amp;rsquo;s doc in a health center&amp;rsquo;s doc, the &lt;code>parent:place WHERE reference_id=COL_VAL&lt;/code> column header is used. The &lt;code>COL_VAL&lt;/code> is a special notation for that column&amp;rsquo;s value for the row, and it will be used to match against the &lt;code>reference_id&lt;/code> field in all other places. Given these example CSVs, you can see the corresponding JSON structure:&lt;/p>
 &lt;p>&lt;strong>&lt;code>place.district.csv&lt;/code>:&lt;/strong>&lt;/p>
