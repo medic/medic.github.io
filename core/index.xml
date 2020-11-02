@@ -1082,42 +1082,11 @@ $: code .
 Memory: 4 GiB
 CPUs: 2&lt;/p>
 &lt;h2 id="use-docker-compose">Use Docker-Compose:&lt;/h2>
-&lt;p>In the location you would like to host your configuration files, create a file titled &amp;lt;project_name&amp;gt;-medic-os-compose.yml with the following contents:&lt;/p>
-&lt;pre>&lt;code>version: '3.7'
-services:
-medic-os:
-container_name: medic-os
-image: medicmobile/medic-os:latest
-volumes:
-- medic-data:/srv
-ports:
-- 80:80
-- 443:443
-working_dir: /srv
-depends_on:
-- haproxy
-networks:
-- medic-net
-environment:
-- DOCKER_NETWORK_NAME=haproxy
-- DOCKER_COUCHDB_ADMIN_PASSWORD=$DOCKER_COUCHDB_ADMIN_PASSWORD
-haproxy:
-container_name: haproxy
-image: medicmobile/haproxy:latest
-volumes:
-- medic-data:/srv
-environment:
-- COUCHDB_HOST=medic-os
-- HA_PASSWORD=$DOCKER_COUCHDB_ADMIN_PASSWORD
-networks:
-- medic-net
-volumes:
-medic-data:
-name: medic-data
-networks:
-medic-net:
-name: medic-net
-&lt;/code>&lt;/pre>&lt;p>Export a password for admin user named &lt;code>medic&lt;/code>:&lt;/p>
+&lt;p>In the location you would like to host your configuration files, create a file titled &amp;lt;project_name&amp;gt;-medic-os-compose.yml with the following contents.&lt;/p>
+&lt;p>One way to do this is using the &lt;code>curl&lt;/code> command line tool. In this example we&amp;rsquo;re creating a file called &lt;code>test-docs-medic-os-compose.yml&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>curl -o test-docs-medic-os-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml
+&lt;/code>&lt;/pre>&lt;p>Alternately, if you do not have &lt;code>curl&lt;/code>, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml">right click this link&lt;/a> and choose &amp;ldquo;Save link as&amp;hellip;&amp;rdquo; and specify the correct location to save.&lt;/p>
+&lt;p>Export a password for admin user named &lt;code>medic&lt;/code>:&lt;/p>
 &lt;pre>&lt;code>export DOCKER_COUCHDB_ADMIN_PASSWORD=&amp;lt;random_pw&amp;gt;
 &lt;/code>&lt;/pre>&lt;h3 id="launch-docker-compose-containers">Launch docker-compose containers&lt;/h3>
 &lt;p>Inside the directory that you saved the above &amp;lt;project_name&amp;gt;-medic-os-compose.yml, run:&lt;/p>
