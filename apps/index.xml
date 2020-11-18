@@ -4795,8 +4795,45 @@ The &lt;code>+&lt;/code> operator for string concatenation is deprecated and wil
 &lt;h3 id="difference-in-months">&lt;code>difference-in-months&lt;/code>&lt;/h3>
 &lt;p>Calculates the number of whole calendar months between two dates. This is often used when determining a child&amp;rsquo;s age for immunizations or assessments.&lt;/p>
 &lt;h3 id="z-score">&lt;code>z-score&lt;/code>&lt;/h3>
-&lt;p>In Enketo forms you have access to an XPath function to calculate the z-score value for a patient.&lt;/p>
-&lt;h2 id="uploading-binary-attachments">Uploading Binary Attachments&lt;/h2>
+&lt;p>In Enketo forms you have access to an XPath function to calculate the z-score value for a patient. The function accesses table data stored in CouchDB.&lt;/p>
+&lt;p>The &lt;code>z-score&lt;/code> function takes four parameters:&lt;/p>
+&lt;ul>
+&lt;li>The name of z-score table to use, which corresponds to value of the database document&amp;rsquo;s &lt;code>_id&lt;/code> attribute.&lt;/li>
+&lt;li>Patient&amp;rsquo;s sex, which corresponds to the data object&amp;rsquo;s name. In the example below &lt;code>male&lt;/code> for this parameter corresponds to &lt;code>charts[].data.male&lt;/code> in the database document.&lt;/li>
+&lt;li>First parameter for the table lookup, such as age. Value maps to the &lt;code>key&lt;/code> value in the database document.&lt;/li>
+&lt;li>Second parameter for the table lookup, such as height. Value is compared against the &lt;code>points&lt;/code> in the databae document.&lt;/li>
+&lt;/ul>
+&lt;h4 id="example-use">Example Use&lt;/h4>
+&lt;p>&lt;a href="https://github.com/medic/cht-core/blob/master/demo-forms/z-score.xml">This example XForm form&lt;/a> shows the use of the z-score function. To calculate the z-score for a patient given their sex, age, and weight the XPath calculation is as follows:&lt;/p>
+&lt;p>&lt;code>z-score('weight-for-age', ../my_sex, ../my_age, ../my_weight)&lt;/code>&lt;/p>
+&lt;p>The data used by this function needs to be added to CouchDB. The example below shows the structure of the database document. It creates a &lt;code>weight-for-age&lt;/code> table, where you can see that a male aged 0 at 2.08kg has a z-score of -3. Your database doc will be substantially larger, so you may find the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/zscore-table-to-json.js">conversion script&lt;/a> helpful to convert z-score tables to the required doc format.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;zscore-charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;weight-for-age&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;male&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;points&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">1.701&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">2.08&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">2.459&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">2.881&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">3.346&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">3.859&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">4.419&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">5.031&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#0000cf;font-weight:bold">5.642&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="uploading-binary-attachments">Uploading Binary Attachments&lt;/h2>
 &lt;p>Forms can include arbitrary binary data which is submitted and included in the doc as an attachment. If this is an image type it&amp;rsquo;ll then be displayed inline in the report UI.&lt;/p>
 &lt;p>To mark an element as having binary data add an extra column in the XLSForm called &lt;code>instance::type&lt;/code> and specify &lt;code>binary&lt;/code> in the element&amp;rsquo;s row.&lt;/p>
 &lt;h2 id="properties">Properties&lt;/h2>
