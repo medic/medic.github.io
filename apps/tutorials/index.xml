@@ -1488,6 +1488,228 @@ Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &l
 &lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
 &lt;ul>
 &lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-you-associate-an-icon-to-a-xml-form/88">Can you associate an icon to a xml form?&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Apps: Configuring Tasks</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks/</guid><description>
+&lt;p>Tasks guide health workers through their days and weeks.&lt;/p>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This tutorial will take you through how to configure tasks for CHT applications, including:&lt;/p>
+&lt;ul>
+&lt;li>Authoring tasks&lt;/li>
+&lt;li>Compiling tasks into app settings and uploading&lt;/li>
+&lt;/ul>
+&lt;p>You will be configuring a task that allows Community Health Workers to conduct a health assessment follow up for children under the age of 5 that have a cough lasting more than 3 days, within 24 hours.&lt;/p>
+&lt;/div>
+&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/features/tasks/">Tasks&lt;/a>&lt;/em> gives a UI overview of tasks.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/design/best-practices/#anatomy-of-a-task">Anatomy of a Task&lt;/a>&lt;/em> takes you through the anatomy of a task&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/tasks/#tasksjs">Task schema&lt;/a>&lt;/em> details a set of properties for tasks.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/tasks/#utils">Utils&lt;/a>&lt;/em> define a set of utility functions in the Core Framework can make common tasks much easier.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/nools-extras/">Nools extras&lt;/a>&lt;/em> where helper variables and functions for Tasks and Targets are defined.&lt;/p>
+&lt;h2 id="required-resources">Required Resources&lt;/h2>
+&lt;p>You should have a functioning &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">CHT instance with &lt;code>medic-conf&lt;/code> installed locally&lt;/a>, completed a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/#3-create-and-upload-a-blank-project">project folder&lt;/a> setup, and an &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/app-forms/">assessment form&lt;/a>.&lt;/p>
+&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
+&lt;p>It is good practice to set up a reference document for the tasks similar to the one below. Other formats may also be used.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Source&lt;/th>
+&lt;th>UI Label&lt;/th>
+&lt;th>Condition&lt;/th>
+&lt;th>Due Date&lt;/th>
+&lt;th>Resolved&lt;/th>
+&lt;th>Window period&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Assessment form&lt;/td>
+&lt;td>Assessment follow up&lt;/td>
+&lt;td>cough_duration &amp;gt; 3&lt;/td>
+&lt;td>reported + 1 days&lt;/td>
+&lt;td>When assessment follow up or another assessment report is submitted&lt;/td>
+&lt;td>7 days&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Create the task as per the detail above.&lt;/p>
+&lt;h3 id="1-define-the-task">1. Define the task&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-text" data-lang="text">{
+name: &amp;#39;cough-gt-3-days-follow-up&amp;#39;,
+icon: &amp;#39;icon-followup-general&amp;#39;,
+title: &amp;#39;task.&amp;#39;cough_gt_3_days.follow_up&amp;#39;,
+appliesTo: &amp;#39;reports&amp;#39;,
+appliesToType: [‘assessment&amp;#39;],
+appliesIf: function(contact, report) {
+return r &amp;amp;&amp;amp; r.fields.group_assessment &amp;amp;&amp;amp; parseInt(r.fields.group_assessment) &amp;gt; 3;
+},
+actions: [
+{
+type: &amp;#39;report&amp;#39;,
+form: &amp;#39;assessment_follow_up&amp;#39;
+}
+],
+events: [
+{
+id: &amp;#39;cough-gt-3-days-follow-up&amp;#39;,
+days: 0,
+start: 2,
+end: 7
+}
+],
+resolvedIf: function(c, r, event, dueDate) {
+return isFormArraySubmittedInWindow(c.reports, [&amp;#39;assessment_follow_up&amp;#39;], dueDate, event, null, r._id);
+}
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="2-create-an-assessment_follow_up-form-as-specified-below-referenced-by-the-task-you-created-refer-to-the-app-forms-tutorial">2. Create an &lt;code>assessment_follow_up&lt;/code> form as specified below referenced by the task you created. Refer to the app-forms tutorial.&lt;/h3>
+&lt;h5 id="data-fields">Data fields&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>choice_filter&lt;/th>
+&lt;th>hint&lt;/th>
+&lt;th>default&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>group_assessment&lt;/td>
+&lt;td>Assessment&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one yes_no&lt;/td>
+&lt;td>visited_hf&lt;/td>
+&lt;td>Did ${patient_name} go to a health facility for treatment?&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one progress_since_last_visit&lt;/td>
+&lt;td>progress&lt;/td>
+&lt;td>How is ${patient_name}&amp;lsquo;s condition since the last visit?&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>${visited_hf} = &amp;lsquo;yes&amp;rsquo;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="choices">Choices&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>list_name&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>yes_no&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>yes_no&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>No&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>progress_since_last_visit&lt;/td>
+&lt;td>improved&lt;/td>
+&lt;td>Improved&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>progress_since_last_visit&lt;/td>
+&lt;td>same&lt;/td>
+&lt;td>Stayed same&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>progress_since_last_visit&lt;/td>
+&lt;td>worse&lt;/td>
+&lt;td>Worsened&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="settings">Settings&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>form_title&lt;/th>
+&lt;th>form_id&lt;/th>
+&lt;th>version&lt;/th>
+&lt;th>style&lt;/th>
+&lt;th>path&lt;/th>
+&lt;th>instance_name&lt;/th>
+&lt;th>default_language&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Follow up&lt;/td>
+&lt;td>assessment_follow_up&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>pages&lt;/td>
+&lt;td>data&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>en&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="sub-folder">Sub-folder&lt;/h5>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#a40000">forms/app&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="build">Build&lt;/h4>
+&lt;p>To build your tasks into your app, you must compile them into app-settings, then upload them to your instance.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-zsh" data-lang="zsh">medic-conf --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs compile-app-settings backup-app-settings upload-app-settings
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Remember to convert and upload your assessment_follow_up form&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-zsh" data-lang="zsh">medic-conf --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs convert-app-forms upload-app-forms -- assessment_follow_up
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/tasks-not-appearing/537">Tasks not appearing&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/how-can-i-debug-task-rules/108">How can I debug task rules?&lt;/a>&lt;/li>
 &lt;/ul></description></item><item><title>Apps: Building Target Widgets</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/targets/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/targets/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This tutorial will take you through how to build target widgets.&lt;/p>
