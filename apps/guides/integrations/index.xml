@@ -101,7 +101,100 @@ In &lt;code>targets.js&lt;/code>, configure one or more data elements by setting
 &lt;li>Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li>
 &lt;li>Integrations are limited to &lt;em>monthly&lt;/em> DHIS2 data sets.&lt;/li>
 &lt;li>Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href="https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html">DHIS2 App&lt;/a> for your project.&lt;/li>
-&lt;/ul></description></item><item><title>Apps: RapidPro</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/rapidpro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/rapidpro/</guid><description>
+&lt;/ul></description></item><item><title>Apps: OppiaMobile</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</guid><description>
+&lt;p>The training modules configuration consists of five main components:&lt;/p>
+&lt;ul>
+&lt;li>App Forms - Content that the user will interact with;&lt;/li>
+&lt;li>Tasks - How forms are presented to the user: how and when the user accesses the forms for input;&lt;/li>
+&lt;li>Targets - Shows the progress of the user;&lt;/li>
+&lt;li>Contact Summary - Gives a highlight of the modules completed by the user;&lt;/li>
+&lt;li>Context - Defines what forms are available to fill from the user’s profile, or available as tasks.&lt;/li>
+&lt;/ul>
+&lt;h3 id="app-forms">App Forms&lt;/h3>
+&lt;p>The CHT application uses &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/">XLSForms&lt;/a> (app forms), which are a simplified method of setting up form configurations using Excel (or Libre Office Calc, Google sheets, etc). The forms contain the questions/content that the user will interact with, including &lt;a href="https://oppiamobile.readthedocs.io/en/latest/implementers/integration/launch_from_other_app.html">web links&lt;/a> that enable the users to navigate from the CHT application to a specific course in OppiaMobile. App forms are typically created in the &lt;code>project-folder &amp;gt; forms &amp;gt; app&lt;/code> directory of a project. If the content requires a user to access any form of media, then a media folder for the specific form is created and named after the form. For example, to add video content for a form module_one.xlsx, save the video file to the following directory: &lt;code>project-folder &amp;gt; forms &amp;gt; app &amp;gt; module_one-media &amp;gt; video&lt;/code>. Once the forms are set up with content, the forms are converted to XForms, which are in xml format. To limit access of App Forms to certain contacts, an App Forms must have a properties file, which defines when and for whom certain forms should be accessed. Once configured, the forms are uploaded to an instance using the medic-configurer with the following commands, which upload specific forms and all forms respectively:&lt;/p>
+&lt;pre>&lt;code>Medic-conf --instance=&amp;lt;instance&amp;gt; convert-app-forms upload-app-forms -- &amp;lt;form1&amp;gt; &amp;lt;form2&amp;gt;
+&lt;/code>&lt;/pre>&lt;p>or&lt;/p>
+&lt;pre>&lt;code>Medic-conf --instance=&amp;lt;instance&amp;gt; convert-app-forms upload-app-forms
+&lt;/code>&lt;/pre>&lt;p>The image below shows an example of an XLSForm configured for the Educational Modules:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="xls-modules.png">
+&lt;img src="xls-modules.png"/> &lt;/a>
+&lt;/figure>
+&lt;h3 id="integration-with-oppiamobile-using-weblinks">Integration with OppiaMobile using weblinks&lt;/h3>
+&lt;p>The CHT application makes use of weblinks to direct the user to the OppiaMobile application. Each task in the CHT has a weblink configured to point to a specific course in OppiaMobile. The weblinks are configured in the forms as a button, which, when clicked or tapped, redirects the user accordingly, depending on the installation status of the OppiaMobile application and the respective course. The weblinks are configured in each of the XLSForms that are triggered by a selected task as illustrated in the image below:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="weblink.png">
+&lt;img src="weblink.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;p>&lt;code>[&amp;lt;span style='background-color: #648af7; color:white; padding: 1em; text-decoration: none;border-radius: 8px; '&amp;gt;Open Oppia Mobile&amp;lt;/span&amp;gt;]&lt;/code> represents the button styling and label.&lt;/p>
+&lt;p>&lt;code>https://staging.cha.oppia-mobile.org/view?course=introduction-to-covid-19&lt;/code> represents the weblink, where &lt;code>course=introduction-to-covid-19&lt;/code> specifies the name of the course to be launched in OppiaMobile as configured on Moodle.&lt;/p>
+&lt;p>This image shows the outcome of the button configuration:&lt;/p>
+&lt;figure class="left col-7 col-lg-4">&lt;a href="weblink-config-outcome.png">
+&lt;img src="weblink-config-outcome.png"/> &lt;/a>
+&lt;/figure>
+&lt;h3 id="tasks">Tasks&lt;/h3>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/tasks/">Tasks&lt;/a> are a set of actions available to users from the task tab. Selecting a task opens up a specific form that completes a workflow. Tasks are available within a given timeframe, after which they expire and the user is unable to view or do them. Tasks are defined as an array of objects in a tasks.js file under the project folder, with each task following the task schema. The required properties of a task include:&lt;/p>
+&lt;ul>
+&lt;li>Name - unique identifier of the task;&lt;/li>
+&lt;li>Title - displays the workflow to be completed for a contact;&lt;/li>
+&lt;li>AppliesTo - determines if the task is emitted per contact or report;&lt;/li>
+&lt;li>ResolvedIf - conditions to mark a task as resolved/completed;&lt;/li>
+&lt;li>Events - specifies the timeframe of a task;&lt;/li>
+&lt;li>Actions - specifies the forms accessed by the user and allows injecting content from previous submissions.&lt;/li>
+&lt;/ul>
+&lt;p>On completing the task configuration, the following command is used to compile and upload the applications settings (tasks, targets, contact-summary, form properties):&lt;/p>
+&lt;p>&lt;code>Medic-conf --instance=&amp;lt;instance&amp;gt; compile-app-settings upload-app-settings&lt;/code>&lt;/p>
+&lt;p>The image below illustrates an example of a task configured for the educational modules:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="code-tasks.png">
+&lt;img src="code-tasks.png"/> &lt;/a>
+&lt;/figure>
+&lt;h3 id="targets">Targets&lt;/h3>
+&lt;p>The users also have access to &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/targets/">targets&lt;/a>. Targets are a visual representation of the progress and goals of the user. These are app analytics accessed through the targets tab, where the user is able to view how many modules they have completed. Similar to tasks, targets are defined as an array of objects in a targets.js file under the project folder, with each target following the targets schema. The required properties of a target object include:&lt;/p>
+&lt;ul>
+&lt;li>Id - unique identifier of the target;&lt;/li>
+&lt;li>Translation_key - title displayed for the widget;&lt;/li>
+&lt;li>Type - type of numeric representation i.e. count/percentage;&lt;/li>
+&lt;li>Goal - denotes how much the user should achieve;&lt;/li>
+&lt;li>appliesTo - Determines whether a contact or a report is counted.&lt;/li>
+&lt;/ul>
+&lt;p>On completing the targets configuration, the following command is used to compile and upload the applications settings (tasks, targets, contact-summary, form properties):&lt;/p>
+&lt;pre>&lt;code>Medic-conf --instance=&amp;lt;instance&amp;gt; compile-app-settings upload-app-settings
+&lt;/code>&lt;/pre>&lt;p>The image below shows a code snippet of an example of a target configured for the educational modules:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="code-targets.png">
+&lt;img src="code-targets.png"/> &lt;/a>
+&lt;/figure>
+&lt;h3 id="contact-summary">Contact Summary&lt;/h3>
+&lt;p>In addition to targets, the user is able to see which specific modules they have completed, and view upcoming tasks and other general information on their profile. The section containing this information is known as the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/contact-page/">contact summary&lt;/a>. The contact summary has 3 main outputs: cards, fields, and context. Contact summary is defined in the &lt;code>contact-summary.templated.js&lt;/code> file under the project folder.&lt;/p>
+&lt;p>Cards are an array of objects which can be customized to group information viewed on a contact’s profile. The required properties of a card include:&lt;/p>
+&lt;ul>
+&lt;li>Label - title of the card;&lt;/li>
+&lt;li>Fields - content of the card;
+&lt;ul>
+&lt;li>Field name- title/label of a field;&lt;/li>
+&lt;li>Field value - value displayed for a field.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>The image below shows a code snippet of an example of a card configured for the educational modules:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="code-contact-summary.png">
+&lt;img src="code-contact-summary.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;p>This image shows the training card configured to show completion status of the educational modules:&lt;/p>
+&lt;figure class="left col-7 col-lg-4">&lt;a href="status.png">
+&lt;img src="status.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;p>Context provides information to App Forms, which are initiated from the contact&amp;rsquo;s profile page. To show an App Form on a contact’s profile, the form’s expression field in its properties file must evaluate to true for the contact. The context information from the profile is accessible as the variable &lt;code>summary&lt;/code>.&lt;/p>
+&lt;p>The image below shows a code snippet that defines the context variables that can be accessed in the app forms:&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="code-forms.png">
+&lt;img src="code-forms.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;p>The three variables &lt;code>hasCompletedModuleOne&lt;/code>, &lt;code>hasCompletedModuleTwo&lt;/code> and has &lt;code>CompletedModuleThree&lt;/code> are used in the educational modules app forms to determine whether the user will access the forms through the care guide.&lt;/p>
+&lt;p>The image below shows an example of an App Form properties file, where the user can only access the form as a care guide if they have completed module one task. This is defined by the phrase &lt;code>summary.hasCompletedModuleOne&lt;/code> in the expression statement.&lt;/p>
+&lt;figure class="left col-12 col-lg-9">&lt;a href="code-properties.png">
+&lt;img src="code-properties.png"/> &lt;/a>
+&lt;/figure></description></item><item><title>Apps: RapidPro</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/rapidpro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/rapidpro/</guid><description>
 &lt;p>Before you embark on designing an integrated RapidPro/CHT workflow, you should start by understanding the needs of your users, identifying a problem to solve, and establishing goals. While an integrated RapidPro/CHT workflow can open up many powerful and personalized messaging capabilities, introducing an additional technology solution does come with complexities and cost. A good way to mitigate some of the complexities of setting up and &lt;a href="https://rapidpro.github.io/rapidpro/docs/hosting/">hosting&lt;/a> RapidPro yourself is to utilize a SaaS solution such as &lt;a href="https://textit.in/">TextIt&lt;/a>. TextIt offers transparent per message &lt;a href="https://textit.in/pricing/">pricing&lt;/a> and free credits to start off.&lt;/p>
 &lt;p>Coming up with a design to accommodate user needs requires a detailed understanding of the capabilities of both systems and conceptually where it makes sense to introduce interactions between them. Below we introduce some of the key concepts in RapidPro, but to learn more you can take one of their &lt;a href="https://community.rapidpro.io/online-courses/">online courses&lt;/a>, watch some of their &lt;a href="https://community.rapidpro.io/videos/">videos&lt;/a>, and check out their &lt;a href="https://community.rapidpro.io/deployment-toolkit/">deployment toolkit&lt;/a>.&lt;/p>
 &lt;h2 id="rapidpro-concepts">RapidPro Concepts&lt;/h2>
