@@ -1570,7 +1570,11 @@ end: 7
 }
 ],
 resolvedIf: function(contact, report, event, dueDate) {
-return isFormArraySubmittedInWindow(contact.reports, [&amp;#39;assessment_follow_up&amp;#39;], dueDate, event, null, report._id);
+const startTime = Math.max(addDays(dueDate, -event.start).getTime(), report.reported_date);
+const endTime = addDays(dueDate, event.end + 1).getTime();
+return isFormArraySubmittedInWindow(
+contact.reports, [&amp;#39;assessment_follow_up&amp;#39;], startTime, endTime
+);
 }
 }
 &lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="2-create-an-assessment_follow_up-form-as-specified-below-referenced-by-the-task-you-created-refer-to-the-app-forms-tutorial">2. Create an &lt;code>assessment_follow_up&lt;/code> form as specified below referenced by the task you created. Refer to the app-forms tutorial.&lt;/h3>
