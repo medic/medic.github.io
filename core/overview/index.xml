@@ -12,10 +12,121 @@
 &lt;p>A free and open source SQL database that we use for analytics queries for display in tools like klipfolio. We created a library called &lt;a href="https://github.com/medic/couch2pg">couch2pg&lt;/a> to replicate data from CouchDB into PostgreSQL. See more at the &lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a> site.&lt;/p>
 &lt;h2 id="client-side">Client side&lt;/h2>
 &lt;h3 id="cht-core">cht-core&lt;/h3>
-&lt;p>&lt;a href="https://github.com/medic/cht-core">cht-core&lt;/a> is the application that most users interact with. It&amp;rsquo;s an &lt;a href="https://angularjs.org">AngularJS&lt;/a> single page responsive web application.&lt;/p>
-&lt;p>We use an offline first strategy which means the data is stored on the client and all pages can load immediately regardless of whether you have a fast connection, slow connection, or no connection at all. The data is stored in &lt;a href="https://pouchdb.com">PouchDB&lt;/a> which replicates changes back and forth in the background with the server CouchDB.&lt;/p>
-&lt;p>We use &lt;a href="https://enketo.org">Enketo&lt;/a> to render configured xforms and help with styling and dynamic elements such as show/hide and validation rules.&lt;/p>
-&lt;p>We use the &lt;a href="https://github.com/C2FO/nools">nools&lt;/a> rules engine to compute the upcoming tasks and monthly targets of the users.&lt;/p>
+&lt;p>&lt;a href="https://github.com/medic/cht-core">cht-core&lt;/a> is composed of the following web applications:&lt;/p>
+&lt;h4 id="cht-web-application">CHT Web Application&lt;/h4>
+&lt;p>The CHT Web Application is used by Community Health Workers and provides a large variety of &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/">features&lt;/a>.&lt;/p>
+&lt;p>View the source code in &lt;a href="https://github.com/medic/cht-core/tree/master/webapp">our GitHub repository&lt;/a>.&lt;/p>
+&lt;h5 id="technology">Technology&lt;/h5>
+&lt;p>The CHT Web Application is &lt;a href="https://angular.io/guide/rx-library">reactive&lt;/a>, responsive and a single page application built with &lt;a href="https://angular.io/">Angular&lt;/a> and &lt;a href="https://ngrx.io">NgRx&lt;/a> frameworks. Additionally, it uses the following technology:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Technology&lt;/th>
+&lt;th>Usage&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;a href="https://pouchdb.com">PouchDB&lt;/a>&lt;/td>
+&lt;td>To implement an offline first strategy which means the data is stored on the client and all pages can load immediately regardless of whether the user has a fast connection, slow connection, or no connection at all. The data is stored in PouchDB which replicates changes back and forth in the background with the server CouchDB.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://enketo.org">Enketo&lt;/a>&lt;/td>
+&lt;td>To render configured xforms and help with styling and dynamic elements such as show/hide and validation rules.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/C2FO/nools">Nools&lt;/a>&lt;/td>
+&lt;td>A rules engine to compute the upcoming tasks and monthly targets of the users.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/valor-software/ngx-bootstrap">Ngx-Bootstrap&lt;/a>&lt;/td>
+&lt;td>To integrate Bootstrap components in the Angular application.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/ngx-translate/core">Ngx-translate&lt;/a>&lt;/td>
+&lt;td>To automatically translate the labels from a Angular application. Read more about &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/translations/">how to configure translations&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/karma-runner/karma">Karma&lt;/a>&lt;/td>
+&lt;td>A test runner for &lt;a href="https://github.com/medic/cht-core/tree/master/webapp/tests">unit tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://mochajs.org/">MochaJS&lt;/a>&lt;/td>
+&lt;td>A test framework to run the &lt;a href="https://github.com/medic/cht-core/tree/master/webapp/tests">unit tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://www.protractortest.org/#/">Protractor&lt;/a>&lt;/td>
+&lt;td>To run the &lt;a href="https://github.com/medic/cht-core/tree/master/tests/e2e">e2e tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="http://lesscss.org/">Less&lt;/a>&lt;/td>
+&lt;td>A CSS preprocessor&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="structure">Structure&lt;/h5>
+&lt;p>The CHT Web Application has the following high level structure:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>/js&lt;/strong>: Contains the vanilla JavaScript scripts, for example: Enketo widgets, MomentJS locales, etc.&lt;/li>
+&lt;li>&lt;strong>/ts&lt;/strong>: Contains the Angular application source code which uses TypeScript.
+&lt;ul>
+&lt;li>&lt;strong>/actions&lt;/strong>, &lt;strong>/effects&lt;/strong>, &lt;strong>/reducers&lt;/strong> and &lt;strong>/selectors&lt;/strong>: Contain the implementation for the application’s reactive state which uses &lt;a href="https://ngrx.io">NgRx&lt;/a> framework.&lt;/li>
+&lt;li>&lt;strong>/components&lt;/strong>, &lt;strong>/directives&lt;/strong>, &lt;strong>/pipes&lt;/strong>, &lt;strong>/providers&lt;/strong> and &lt;strong>/services&lt;/strong>: Contain the reusable elements from &lt;a href="https://angular.io/">Angular&lt;/a> framework.&lt;/li>
+&lt;li>&lt;strong>/modals&lt;/strong>: Contains the all application’s modals components.&lt;/li>
+&lt;li>&lt;strong>/modules&lt;/strong>: Contains the application’s modules, each of them has components that are associated to the modules’ routing.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>/css&lt;/strong>: Contains the style files. It uses &lt;a href="http://lesscss.org/">Less&lt;/a> as a CSS preprocessor.&lt;/li>
+&lt;li>&lt;strong>/fonts&lt;/strong>: Contains the fonts.&lt;/li>
+&lt;li>&lt;strong>/img&lt;/strong>: Contains the static images.&lt;/li>
+&lt;/ul>
+&lt;h4 id="app-management">App Management&lt;/h4>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/apps/features/admin/">App Management&lt;/a> is an interface for non-technical administrative users to manage users and settings.&lt;/p>
+&lt;p>View the application source code in &lt;a href="https://github.com/medic/cht-core/tree/master/admin">our GitHub repository&lt;/a>.&lt;/p>
+&lt;h5 id="technology-1">Technology&lt;/h5>
+&lt;p>App Management is a single page application built with &lt;a href="https://angularjs.org">AngularJS&lt;/a> framework and implements &lt;a href="https://github.com/reduxjs/redux">Redux&lt;/a> to manage a reactive state. Additionally, it uses the following technology:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Technology&lt;/th>
+&lt;th>Usage&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/angular-translate/angular-translate">Angular Translate&lt;/a>&lt;/td>
+&lt;td>To automatically translate the labels from a AngularJS application. Read more about &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/translations/">how to manage translations&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://github.com/karma-runner/karma">Karma&lt;/a>&lt;/td>
+&lt;td>A test runner for &lt;a href="https://github.com/medic/cht-core/tree/master/admin/tests">unit tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://mochajs.org/">MochaJS&lt;/a>&lt;/td>
+&lt;td>A test framework to run the &lt;a href="https://github.com/medic/cht-core/tree/master/admin/tests">unit tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="https://www.protractortest.org/#/">Protractor&lt;/a>&lt;/td>
+&lt;td>To run the &lt;a href="https://github.com/medic/cht-core/tree/master/tests/e2e">e2e tests&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;a href="http://lesscss.org/">Less&lt;/a>&lt;/td>
+&lt;td>A CSS preprocessor&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="structure-1">Structure&lt;/h5>
+&lt;ul>
+&lt;li>&lt;strong>/css&lt;/strong>: Contains style files. It uses &lt;a href="http://lesscss.org/">Less&lt;/a> as a CSS preprocessor.&lt;/li>
+&lt;li>&lt;strong>/js&lt;/strong>: Contains the JavaScript code.
+&lt;ul>
+&lt;li>&lt;strong>/actions&lt;/strong>, &lt;strong>/reducers&lt;/strong> and &lt;strong>/selectors&lt;/strong>: Contain the implementation of &lt;a href="https://github.com/reduxjs/redux">Redux&lt;/a>.&lt;/li>
+&lt;li>&lt;strong>/controllers&lt;/strong>, &lt;strong>/directives&lt;/strong>, &lt;strong>/filters&lt;/strong> and &lt;strong>/services&lt;/strong>: Contain the reusable elements from &lt;a href="https://angularjs.org">AngularJS&lt;/a> framework.&lt;/li>
+&lt;li>&lt;strong>/modules&lt;/strong>: Contains the vanilla JavaScript scripts.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>/template&lt;/strong>: Contains the HTML templates that are used in the AngularJS components and directives.&lt;/li>
+&lt;/ul>
 &lt;h3 id="medic-android">medic-android&lt;/h3>
 &lt;p>&lt;a href="https://github.com/medic/medic-android">medic-android&lt;/a> application works in the browser or wrapped in the medic-android app which allows for project branding, sets the project URL, and hides browser elements like the URL bar.&lt;/p>
 &lt;h2 id="other-applications">Other applications&lt;/h2>
