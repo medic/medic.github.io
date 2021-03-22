@@ -1263,7 +1263,7 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;td>For registering a patient to a schedule. Performs some validation and creates the patient document if the patient does not already exist. Can create places (as of 3.8.x).&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>accept_patient_reports&lt;/td>
+&lt;td>&lt;a href="#accept-patient-reports">accept_patient_reports&lt;/a>&lt;/td>
 &lt;td>Validates reports about a patient and silences relevant reminders.&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -1678,7 +1678,48 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 }
 ]
 }
-&lt;/code>&lt;/pre>&lt;h3 id="accept-case-reports">Accept case reports&lt;/h3>
+&lt;/code>&lt;/pre>&lt;h3 id="accept-patient-reports">Accept patient reports&lt;/h3>
+&lt;p>Allow reporting about patient centric workflows by&lt;/p>
+&lt;ul>
+&lt;li>validating the report,&lt;/li>
+&lt;li>assigning the relevant patient to the report if a registration with the given patient_id exists,&lt;/li>
+&lt;li>clearing messages on the registration, and&lt;/li>
+&lt;li>generating response messages on the report.&lt;/li>
+&lt;/ul>
+&lt;h4 id="example-2">Example&lt;/h4>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;transitions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;accept_patient_reports&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;registrations&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;P&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;events&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;on_create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;trigger&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;assign_schedule&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;params&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;ANC Reminders&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;bool_expr&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;!doc.fields.last_menstrual_period || !(/^[0-9]+$/.test(doc.fields.last_menstrual_period))&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;schedules&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;ANC Reminders&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;schedule.anc_no_lmp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;summary&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;start_from&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;patient_reports&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;pregnancy_visit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;silence_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;ANC Reminders&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;silence_for&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;8 days&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;fields&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[],&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;validations&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;messages.pregnancy_visit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;report_accepted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="accept-case-reports">Accept case reports&lt;/h3>
 &lt;p>Allow reporting about case centric workflows by&lt;/p>
 &lt;ul>
 &lt;li>validating the report configuration documentation,&lt;/li>
@@ -1686,7 +1727,7 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 &lt;li>clearing messages on the registration, and&lt;/li>
 &lt;li>generating response messages on the report.&lt;/li>
 &lt;/ul>
-&lt;h4 id="example-2">Example&lt;/h4>
+&lt;h4 id="example-3">Example&lt;/h4>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;registrations&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;events&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
@@ -1748,7 +1789,7 @@ Every object should have this structure:&lt;/p>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h5 id="example-3">Example&lt;/h5>
+&lt;h5 id="example-4">Example&lt;/h5>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;self_report&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
 &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;FORM&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
