@@ -642,7 +642,7 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;tbody>
 &lt;tr>
 &lt;td>&lt;code>form&lt;/code>&lt;/td>
-&lt;td>Form ID of the patient form.&lt;/td>
+&lt;td>Form ID of the form.&lt;/td>
 &lt;td>yes&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -712,7 +712,7 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>messages[].event_type&lt;/code>&lt;/td>
-&lt;td>An event that will trigger sending of this message. Typical values are: &lt;code>report_accepted&lt;/code> when the report has been successfully validated, &lt;code>registration_not_found&lt;/code> when the patient ID supplied in the report doesn&amp;rsquo;t match any patient ID issued by Medic. &lt;code>on_mute&lt;/code> and &lt;code>on_unmute&lt;/code> are used in the context of muting as described &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#muting">here&lt;/a>&lt;/td>
+&lt;td>An event that will trigger sending of this message. Typical values are: &lt;code>report_accepted&lt;/code> when the report has been successfully validated, &lt;code>registration_not_found&lt;/code> when the shortcode (patient ID or place ID) supplied in the report doesn&amp;rsquo;t match any shortcode issued by Medic. &lt;code>on_mute&lt;/code> and &lt;code>on_unmute&lt;/code> are used in the context of muting as described &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#muting">here&lt;/a>&lt;/td>
 &lt;td>no&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -807,7 +807,7 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>event[].trigger&lt;/code>&lt;/td>
-&lt;td>What should happen after the named event. &lt;code>assign_schedule&lt;/code> will assign the schedule named in &lt;code>params&lt;/code> to this report. Similarly &lt;code>clear_schedule&lt;/code> will permanently clear all messages for a patient that are part of schedules listed in the &lt;code>params&lt;/code> field. The full set of trigger configuration directives are described &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#triggers">here&lt;/a>.&lt;/td>
+&lt;td>What should happen after the named event. &lt;code>assign_schedule&lt;/code> will assign the schedule named in &lt;code>params&lt;/code> to this report. Similarly &lt;code>clear_schedule&lt;/code> will permanently clear all messages for a patient or place that are part of schedules listed in the &lt;code>params&lt;/code> field. The full set of trigger configuration directives are described &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#triggers">here&lt;/a>.&lt;/td>
 &lt;td>yes&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -862,7 +862,7 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>messages[].event_type&lt;/code>&lt;/td>
-&lt;td>An event that will trigger sending of this message. Typical values are: &lt;code>report_accepted&lt;/code> when the report has been successfully validated and &lt;code>registration_not_found&lt;/code> when the patient ID supplied in the report doesn&amp;rsquo;t match any patient ID issued by Medic.&lt;/td>
+&lt;td>An event that will trigger sending of this message. Typical values are: &lt;code>report_accepted&lt;/code> when the report has been successfully validated and &lt;code>registration_not_found&lt;/code> when the shortcode (patient ID or place ID) supplied in the report doesn&amp;rsquo;t match any shortcode issued by Medic.&lt;/td>
 &lt;td>no&lt;/td>
 &lt;/tr>
 &lt;tr>
@@ -1260,11 +1260,11 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="#registration">registration&lt;/a>&lt;/td>
-&lt;td>For registering a patient to a schedule. Performs some validation and creates the patient document if the patient does not already exist. Can create places (as of 3.8.x).&lt;/td>
+&lt;td>For registering a patient or place to a schedule. Performs some validation and creates the patient document if the patient does not already exist. Can create places (as of 3.8.x). Can assign schedules to places (as of 3.11.x)&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="#accept-patient-reports">accept_patient_reports&lt;/a>&lt;/td>
-&lt;td>Validates reports about a patient and silences relevant reminders.&lt;/td>
+&lt;td>Validates reports about a patient or place and silences relevant reminders.&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="#accept-case-reports">accept_case_reports&lt;/a>&lt;/td>
@@ -1679,10 +1679,10 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 ]
 }
 &lt;/code>&lt;/pre>&lt;h3 id="accept-patient-reports">Accept patient reports&lt;/h3>
-&lt;p>Allow reporting about patient centric workflows by&lt;/p>
+&lt;p>Allow reporting about patient and place centric workflows by&lt;/p>
 &lt;ul>
 &lt;li>validating the report,&lt;/li>
-&lt;li>assigning the relevant patient to the report if a registration with the given patient_id exists,&lt;/li>
+&lt;li>assigning the relevant subject (patient or place) to the report if a registration with the given shortcode (patient_id or place_id) exists,&lt;/li>
 &lt;li>clearing messages on the registration, and&lt;/li>
 &lt;li>generating response messages on the report.&lt;/li>
 &lt;/ul>
