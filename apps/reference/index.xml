@@ -23,6 +23,7 @@
 &lt;ul>
 &lt;li>&lt;a href="#get-apiv1forms">GET /api/v1/forms&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#get-apiv1formsidformat">GET /api/v1/forms/{{id}}.{{format}}&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#post-apiv1formsvalidate">POST /api/v1/forms/validate&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>&lt;a href="#records">Records&lt;/a>
@@ -419,11 +420,69 @@ X-OpenRosa-Version: 1.0
 &lt;pre>&lt;code>GET /api/v1/forms/pregnancyregistration.xml
 &lt;/code>&lt;/pre>&lt;p>Get the latest version of the NPYY form in JSON format.&lt;/p>
 &lt;pre>&lt;code>GET /api/v1/forms/NPYY.json
+&lt;/code>&lt;/pre>&lt;h3 id="post-apiv1formsvalidate">POST /api/v1/forms/validate&lt;/h3>
+&lt;p>&lt;em>Added in 3.12.0&lt;/em>
+Validate the XForm passed. Require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
+&lt;h4 id="headers-1">Headers&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Key&lt;/th>
+&lt;th>Value&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Content-Type&lt;/td>
+&lt;td>application/xml&lt;/td>
+&lt;td>The form is sent in XML format&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Authorization&lt;/td>
+&lt;td>Basic KEY&lt;/td>
+&lt;td>KEY is the &amp;ldquo;basic&amp;rdquo; token&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="examples-3">Examples&lt;/h4>
+&lt;pre>&lt;code>POST /api/v1/forms/validate HTTP/1.1
+Content-Type: application/xml
+Authorization: Basic XXXXXXXXXX
+&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;xforms xmlns=&amp;quot;http://openrosa.org/xforms/xformsList&amp;quot;&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Visit&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;ANCVisit&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/anc_visit.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Registration with LMP&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;PregnancyRegistration&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/anc_registration.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;xform&amp;gt;
+&amp;lt;name&amp;gt;Stop&amp;lt;/name&amp;gt;
+&amp;lt;formID&amp;gt;Stop&amp;lt;/formID&amp;gt;
+&amp;lt;hash&amp;gt;md5:1f0f096602ed794a264ab67224608cf4&amp;lt;/hash&amp;gt;
+&amp;lt;downloadUrl&amp;gt;http://medic.local/api/v1/forms/off.xml&amp;lt;/downloadUrl&amp;gt;
+&amp;lt;/xform&amp;gt;
+&amp;lt;/xforms&amp;gt;
+&lt;/code>&lt;/pre>&lt;p>Example response when the form passed the validations:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json
+{ok: true}
+&lt;/code>&lt;/pre>&lt;p>Example response when the form failed the validations:&lt;/p>
+&lt;pre>&lt;code>HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{error: &amp;quot;Error transforming xml. xsltproc return ...&amp;quot;}
 &lt;/code>&lt;/pre>&lt;h2 id="records">Records&lt;/h2>
 &lt;h3 id="post-apiv2records">POST /api/v2/records&lt;/h3>
 &lt;p>Create a new record based on a &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/forms/">JSON form&lt;/a> that has been configured.&lt;/p>
 &lt;p>Records can be created one of two ways, parsing the form data yourself and submitting a JSON object or by submitting the raw message string.&lt;/p>
-&lt;h4 id="headers-1">Headers&lt;/h4>
+&lt;h4 id="headers-2">Headers&lt;/h4>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -499,7 +558,7 @@ allow multiple content types to appear in a single &lt;code>Content-Type&lt;/cod
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h4 id="examples-3">Examples&lt;/h4>
+&lt;h4 id="examples-4">Examples&lt;/h4>
 &lt;p>Creating new record using message field.&lt;/p>
 &lt;pre>&lt;code>POST /api/v1/records
 Content-Type: application/x-www-form-urlencoded
@@ -583,7 +642,7 @@ Content-Type: application/json; charset=utf-8
 &lt;h4 id="permissions">Permissions&lt;/h4>
 &lt;p>By default any user can create or modify a place. Use these permissions to restrict access:&lt;/p>
 &lt;p>&lt;code>can_create_people&lt;/code>, &lt;code>can_create_places&lt;/code>&lt;/p>
-&lt;h4 id="examples-4">Examples&lt;/h4>
+&lt;h4 id="examples-5">Examples&lt;/h4>
 &lt;p>Create new person and place hierarchy.&lt;/p>
 &lt;pre>&lt;code>POST /api/v1/people
 Content-Type: application/json
@@ -695,7 +754,7 @@ Content-Type: application/json
 &lt;h4 id="permissions-1">Permissions&lt;/h4>
 &lt;p>By default any user can create new places. Use these permissions to restrict access:&lt;/p>
 &lt;p>&lt;code>can_create_places&lt;/code>, &lt;code>can_create_people&lt;/code>&lt;/p>
-&lt;h4 id="examples-5">Examples&lt;/h4>
+&lt;h4 id="examples-6">Examples&lt;/h4>
 &lt;p>Create new place referencing existing parent.&lt;/p>
 &lt;pre>&lt;code>POST /api/v1/places
 Content-Type: application/json
@@ -758,7 +817,7 @@ Health Centers should have &amp;quot;district_hospital&amp;quot; parent type.
 &lt;h4 id="permissions-2">Permissions&lt;/h4>
 &lt;p>By default any user can update a place. Use these permissions to restrict access:&lt;/p>
 &lt;p>&lt;code>can_update_places&lt;/code>&lt;/p>
-&lt;h4 id="examples-6">Examples&lt;/h4>
+&lt;h4 id="examples-7">Examples&lt;/h4>
 &lt;p>Update a place&amp;rsquo;s contact.&lt;/p>
 &lt;pre>&lt;code>POST /api/v1/places/1d83f2b4a27eceb40df9e9f9ad06d137
 Content-Type: application/json
@@ -940,7 +999,7 @@ If &lt;code>app_settings.app_url&lt;/code> is not defined, the generated token-l
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
 &lt;h5 id="permissions-3">Permissions&lt;/h5>
 &lt;p>&lt;code>can_view_users&lt;/code>&lt;/p>
-&lt;h4 id="examples-7">Examples&lt;/h4>
+&lt;h4 id="examples-8">Examples&lt;/h4>
 &lt;p>Get list of users:&lt;/p>
 &lt;pre>&lt;code>GET /api/v1/users
 &lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
@@ -987,7 +1046,7 @@ Content-Type: application/json; charset=utf-8
 &lt;p>Create a new user with a place and a contact.&lt;/p>
 &lt;h4 id="permissions-4">Permissions&lt;/h4>
 &lt;p>&lt;code>can_create_users&lt;/code>, &lt;code>can_create_places&lt;/code>, &lt;code>can_create_people&lt;/code>&lt;/p>
-&lt;h4 id="examples-8">Examples&lt;/h4>
+&lt;h4 id="examples-9">Examples&lt;/h4>
 &lt;p>Create a new user that can authenticate with a username of &amp;ldquo;mary&amp;rdquo; and password
 of &amp;ldquo;secret&amp;rdquo; that can submit reports and view or modify records associated to
 their place. The place is created in the background and automatically linked
@@ -1053,7 +1112,7 @@ through the user is not supported, see People section.&lt;/p>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h4 id="examples-9">Examples&lt;/h4>
+&lt;h4 id="examples-10">Examples&lt;/h4>
 &lt;pre>&lt;code>POST /api/v1/users/mary
 Content-Type: application/json
 {
@@ -1091,7 +1150,7 @@ Content-Type: application/json
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h4 id="examples-10">Examples&lt;/h4>
+&lt;h4 id="examples-11">Examples&lt;/h4>
 &lt;pre>&lt;code>DELETE /api/v1/users/mary
 &lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200 OK
 &lt;/code>&lt;/pre>&lt;h3 id="get-apiv1users-info">GET /api/v1/users-info&lt;/h3>
@@ -1174,7 +1233,7 @@ Content-Type: application/json
 &lt;p>An array of objects each with an &lt;code>_id&lt;/code> property is required (rather than an array of strings representing ids) to ensure forwards compatibility if we choose to require that any additional document information (such as &lt;code>_rev&lt;/code>) also be passed in to this endpoint.&lt;/p>
 &lt;h4 id="errors-2">Errors&lt;/h4>
 &lt;p>If an error is encountered part-way through the response (eg on the third batch), it&amp;rsquo;s impossible to send new headers to indicate a 5xx error, so the connection will simply be terminated (as recommended here &lt;a href="https://github.com/expressjs/express/issues/2700)">https://github.com/expressjs/express/issues/2700)&lt;/a>.&lt;/p>
-&lt;h4 id="examples-11">Examples&lt;/h4>
+&lt;h4 id="examples-12">Examples&lt;/h4>
 &lt;pre>&lt;code>POST /api/v1/bulk-delete
 Content-Type: application/json
 {
@@ -1206,7 +1265,7 @@ Content-Type: application/json
 &lt;p>Used to retrieve a range of metrics about the instance. While the output is human readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
 &lt;h4 id="permissions-8">Permissions&lt;/h4>
 &lt;p>No permissions required.&lt;/p>
-&lt;h4 id="examples-12">Examples&lt;/h4>
+&lt;h4 id="examples-13">Examples&lt;/h4>
 &lt;h5 id="json-format">JSON format&lt;/h5>
 &lt;pre>&lt;code>curl http://localhost:5988/api/v1/monitoring
 {&amp;quot;version&amp;quot;:{&amp;quot;app&amp;quot;:&amp;quot;3.9.0&amp;quot;,&amp;quot;node&amp;quot;:&amp;quot;v10.16.0&amp;quot;,&amp;quot;couchdb&amp;quot;:&amp;quot;2.3.1&amp;quot;},&amp;quot;couchdb&amp;quot;:{&amp;quot;medic&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;medic&amp;quot;,&amp;quot;update_sequence&amp;quot;:5733,&amp;quot;doc_count&amp;quot;:278,&amp;quot;doc_del_count&amp;quot;:32,&amp;quot;fragmentation&amp;quot;:1.0283517758420173}...
