@@ -1174,40 +1174,25 @@ $: grunt
 $: code .
 &lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="problems">Problems?&lt;/h2>
 &lt;p>As none of our code developers use Windows as a development environment daily this solution may not be as stable as directly using MacOS or Linux. If you encounter issues please let a developer know&lt;/p></description></item><item><title>Core: Docker Image Setup</title><link>https://docs.communityhealthtoolkit.org/core/guides/docker-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/docker-setup/</guid><description>
-&lt;p>This document helps to quickly install the necessary tools to download and run the public docker image for CHT applications.&lt;/p>
-&lt;h2 id="download-docker">Download Docker&lt;/h2>
-&lt;p>Ubuntu:&lt;/p>
-&lt;ul>
-&lt;li>Install both below&lt;/li>
-&lt;li>&lt;a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/">Docker CE&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.docker.com/compose/install/">Docker-Compose&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>Mac OSX:&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://download.docker.com/mac/stable/Docker.dmg">Docker for Mac&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>Windows:&lt;/p>
-&lt;ul>
-&lt;li>If you have Hyper-V Capability, please ensure it is enabled in order to run Linux Containers on Windows. If you are running your Windows Server in cloud services, please ensure it is running on &lt;a href="https://en.wikipedia.org/wiki/Bare_machine">bare-metal&lt;/a>. You will not be able to run Linux Containers in Windows if the previous comments are not adhered due to nested virtualization.&lt;/li>
-&lt;li>&lt;a href="https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe">Docker for Windows&lt;/a>&lt;/li>
-&lt;li>If you do not have Hyper-V capability, but your server still supports virtualization, ensure that is enabled in your BiOS, and install the following package:&lt;/li>
-&lt;li>&lt;a href="https://github.com/docker/toolbox/releases">Docker Toolbox using VirtualBox&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>Run the installation and follow the instructions.&lt;/p>
-&lt;p>Launch Docker.&lt;/p>
-&lt;p>Performance Settings that can be changed:
-Memory: 4 GiB
-CPUs: 2&lt;/p>
+&lt;p>This document helps to download and run the public docker image for CHT applications.&lt;/p>
+&lt;h2 id="install-docker">Install Docker&lt;/h2>
+&lt;p>Please be sure &lt;code>docker&lt;/code> and &lt;code>docker-compose&lt;/code> are &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#docker">installed&lt;/a>.&lt;/p>
 &lt;h2 id="use-docker-compose">Use Docker-Compose:&lt;/h2>
-&lt;p>In the location you would like to host your configuration files, create a file titled &amp;lt;project_name&amp;gt;-medic-os-compose.yml with the following contents.&lt;/p>
-&lt;p>One way to do this is using the &lt;code>curl&lt;/code> command line tool. In this example we&amp;rsquo;re creating a file called &lt;code>test-docs-medic-os-compose.yml&lt;/code>:&lt;/p>
-&lt;pre>&lt;code>curl -o test-docs-medic-os-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml
-&lt;/code>&lt;/pre>&lt;p>Alternately, if you do not have &lt;code>curl&lt;/code>, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml">right click this link&lt;/a> and choose &amp;ldquo;Save link as&amp;hellip;&amp;rdquo; and specify the correct location to save.&lt;/p>
+&lt;p>In the location you would like to host your configuration files, create a file &lt;code>docker-compose.yml&lt;/code>:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Use the &lt;code>curl&lt;/code> command line tool:&lt;/p>
+&lt;pre>&lt;code>curl https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Alternately, if you do not have &lt;code>curl&lt;/code>, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml">right click this link&lt;/a> and choose &amp;ldquo;Save link as&amp;hellip;&amp;rdquo; and specify the correct location to save.&lt;/p>
+&lt;/li>
+&lt;/ol>
 &lt;p>Export a password for admin user named &lt;code>medic&lt;/code>:&lt;/p>
 &lt;pre>&lt;code>export DOCKER_COUCHDB_ADMIN_PASSWORD=&amp;lt;random_pw&amp;gt;
 &lt;/code>&lt;/pre>&lt;h3 id="launch-docker-compose-containers">Launch docker-compose containers&lt;/h3>
-&lt;p>Inside the directory that you saved the above &amp;lt;project_name&amp;gt;-medic-os-compose.yml, run:&lt;/p>
-&lt;pre>&lt;code>$ docker-compose -f &amp;lt;project_name&amp;gt;-medic-os-compose.yml up
+&lt;p>Inside the directory that you saved the above &lt;code>docker-compose.yml&lt;/code>, run:&lt;/p>
+&lt;pre>&lt;code>$ docker-compose -f docker-compose.yml up
 &lt;/code>&lt;/pre>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
@@ -1219,7 +1204,7 @@ $ docker exec -it medic-os /bin/bash -c &amp;quot;/boot/svc-stop medic-core open
 &lt;/code>&lt;/pre>&lt;p>The first command fixes a postrun script for horticulturalist to prevent unique scenarios of re-install.
 The second command stops extra services that you will not need.&lt;/p>
 &lt;h3 id="visit-your-project">Visit your project&lt;/h3>
-&lt;p>Open a browser to: https://localhost&lt;/p>
+&lt;p>Open a browser to: &lt;a href="https://localhost">https://localhost&lt;/a>&lt;/p>
 &lt;p>You will have to click to through the SSL Security warning. Click Advanced -&amp;gt; Continue to site.&lt;/p>
 &lt;h3 id="delete--re-install">Delete &amp;amp; Re-Install&lt;/h3>
 &lt;p>Stop containers:&lt;/p>
@@ -1263,47 +1248,55 @@ ports:
 You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.
 &lt;/div>
 &lt;h2 id="helpful-docker-commands">Helpful Docker commands&lt;/h2>
-&lt;h4 id="ssh-into-containerapplication--view-specific-service-logs">ssh into container/application &amp;amp; view specific service logs&lt;/h4>
+&lt;h3 id="restart-services">Restart services&lt;/h3>
+&lt;p>&lt;code>/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code>&lt;/p>
+&lt;p>See &lt;a href="https://github.com/medic/medic-os#user-content-service-management-scripts">medic-os docs&lt;/a> for more.&lt;/p>
+&lt;h3 id="viewing-logs-inside-medic-os">Viewing logs inside &lt;code>medic-os&lt;/code>&lt;/h3>
+&lt;p>To view logs, first run this to access a shell in the &lt;code>medic-os&lt;/code> container:&lt;/p>
 &lt;ul>
-&lt;li>ssh: &lt;code>docker exec -it medic-os /bin/bash&lt;/code>&lt;/li>
+&lt;li>&lt;code>docker exec -it medic-os /bin/bash&lt;/code>&lt;/li>
 &lt;/ul>
-&lt;h4 id="once-inside-container">Once inside container:&lt;/h4>
+&lt;p>View CouchDB logs:&lt;/p>
 &lt;ul>
-&lt;li>view couchdb logs:
+&lt;li>&lt;code>less /srv/storage/medic-core/couchdb/logs/startup.log&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>View &lt;code>medic-api&lt;/code> logs:&lt;/p>
 &lt;ul>
-&lt;li>#less /srv/storage/medic-core/couchdb/logs/startup.log&lt;/li>
+&lt;li>&lt;code>less /srv/storage/medic-api/logs/medic-api.log&lt;/code>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;li>view medic-api logs:
+&lt;p>View &lt;code>medic-sentinel&lt;/code> logs:&lt;/p>
 &lt;ul>
-&lt;li>#less /srv/storage/medic-api/logs/medic-api.log&lt;/li>
+&lt;li>&lt;code>less /srv/storage/medic-sentinel/logs/medic-sentinel.log&lt;/code>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;li>view medic-sentinel logs:
+&lt;h3 id="viewing-default-stderrstdout-logs">Viewing default stderr/stdout logs&lt;/h3>
 &lt;ul>
-&lt;li>#less /srv/storage/medic-sentinel/logs/medic-sentinel.log&lt;/li>
+&lt;li>&lt;code>sudo docker logs medic-os&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo docker logs haproxy&lt;/code>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h4 id="view-container-stderrstdout-logs">View container stderr/stdout logs:&lt;/h4>
+&lt;h3 id="clean-up">Clean Up&lt;/h3>
+&lt;p>List running containers:&lt;/p>
 &lt;ul>
-&lt;li>docker logs medic-os&lt;/li>
-&lt;li>docker logs haproxy&lt;/li>
+&lt;li>&lt;code>sudo docker ps&lt;/code>&lt;/li>
 &lt;/ul>
-&lt;h4 id="clean-up">Clean Up&lt;/h4>
-&lt;pre>&lt;code># list running containers
-docker ps
-# list all available docker containers with their status
-sudo docker ps -a
-# stop container
-docker stop &amp;lt;container_id&amp;gt;
-# start container
-docker start &amp;lt;container_id&amp;gt;
-# list all stoped containers
-docker ps -f &amp;quot;status=exited&amp;quot;
-&lt;/code>&lt;/pre>&lt;h4 id="prune-entire-docker-system">Prune entire Docker system&lt;/h4>
-&lt;p>Use this prune command when unable to launch the containers and you&amp;rsquo;d like to restart from a clean slate. WARNING: This will delete all your unused images, containers, networks and volumes including those not related to CHT.
-&lt;code>docker system prune -a --volumes&lt;/code>&lt;/p></description></item><item><title>Core: Get Android Logs</title><link>https://docs.communityhealthtoolkit.org/core/guides/get-android-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/get-android-logs/</guid><description>
+&lt;p>List all available docker containers with their status&lt;/p>
+&lt;ul>
+&lt;li>`sudo docker ps -a&lt;/li>
+&lt;/ul>
+&lt;p>Stop container&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker stop &amp;lt;container_id&amp;gt;/&amp;lt;container_name&amp;gt;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Start container&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker start &amp;lt;container_id&amp;gt;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>List all stopped containers&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker ps -f &amp;quot;status=exited&amp;quot;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="prune-entire-docker-system">Prune entire Docker system&lt;/h3>
+&lt;p>Use this &lt;code>prune&lt;/code> command when unable to launch the containers and need to restart from a clean slate. &lt;strong>WARNING:&lt;/strong> This will delete all your unused images, containers, networks and volumes &lt;strong>including those not related to CHT&lt;/strong>.&lt;/p>
+&lt;p>&lt;code>docker system prune -a --volumes&lt;/code>&lt;/p></description></item><item><title>Core: Get Android Logs</title><link>https://docs.communityhealthtoolkit.org/core/guides/get-android-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/get-android-logs/</guid><description>
 &lt;p>With Android 4.1 (aka Jelly Bean) and upwards the full system log is only visible if you have root.&lt;br>
 To get logs, you have to use &lt;code>adb logcat&lt;/code> via a computer.&lt;/p>
 &lt;p>These are the instructions for getting logs using ADB:&lt;/p>
