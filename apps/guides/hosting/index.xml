@@ -325,7 +325,46 @@ sudo docker cp /path/to/ssl.key medic-os:/srv/settings/medic-core/nginx/private/
 &lt;li>error-ssl.log&lt;/li>
 &lt;li>error.log&lt;/li>
 &lt;li>startup.log&lt;/li>
-&lt;/ul></description></item><item><title>Apps: Android App Publishing</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/android-app/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/android-app/</guid><description>
+&lt;/ul></description></item><item><title>Apps: Offline Hosting of CHT Server</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/offline/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/offline/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>This guide is not meant for a production CHT instance. Support may be added in the future an offline CHT server in a production environment. Please see the &amp;ldquo;Considerations&amp;rdquo; section below.&lt;/p>
+&lt;p>Proceed only if you have staff familiar with DNS, TLS Certs, DHCP, LAN topology and Linux in general. This is a complex deployment where mistakes are easy to make unless proper training is in place.&lt;/p>
+&lt;/div>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>The CHT is built as an offline first application. This applies to clients, either browsers or Android applications, connecting to the CHT server. The server itself assumes it has Internet connectivity to provide services such as DNS, software updates and general use connectivity. This document explores what it looks like when the CHT server is offline without these services available.&lt;/p>
+&lt;p>Running a CHT server offline requires no modifications to the CHT itself. Instead, supporting services normally found online are replicated locally.&lt;/p>
+&lt;h2 id="considerations">Considerations&lt;/h2>
+&lt;p>An offline CHT server is most appropriate for a development environment. There are serious implications to consider before deploying an offline instance per our &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#considerations">existing requirements&lt;/a>.&lt;/p>
+&lt;p>Additionally, if users are going to migrate between offline locations with the same domain name, always ensure different login and passwords are used for all users across instances. This will prevent a client from another CHT instance trying to synchronize with a CHT instance it shouldn&amp;rsquo;t synchronize with, possibly causing data corruption or privacy issues through unintended data access.&lt;/p>
+&lt;h2 id="requirements">Requirements&lt;/h2>
+&lt;p>A CHT instance is accessible offline when you can resolve the domain to an IP address, and a TLS certificate is on the CHT server with a common name (CN) that matches the domain name. On top of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">existing requirements&lt;/a>, the following aspects must also be considered.&lt;/p>
+&lt;h3 id="static-ip">Static IP&lt;/h3>
+&lt;p>The CHT server needs to be given a static IP so that DNS will always resolve to the correct host.&lt;/p>
+&lt;h3 id="tls-certificate">TLS Certificate&lt;/h3>
+&lt;p>Browsers might allow you to connect to a server with an invalid TLS certificate after you &lt;a href="https://www.ssl.com/guide/troubleshooting-ssl-tls-browser-errors-and-warnings/">bypass the warning&lt;/a>. Android apps however, like &lt;a href="https://github.com/medic/medic-android/">Medic Android App&lt;/a>, require a valid TLS certificate to work correctly, therefore you would need to acquire a valid TLS certificate from a certificate authority (CA) and install it on your CHT server.&lt;/p>
+&lt;p>It is common to use &lt;a href="https://en.wikipedia.org/wiki/Let%27s_encrypt">Let&amp;rsquo;s Encrypt&lt;/a> to acquire certificates because they provide free certificates. Let&amp;rsquo;s Encrypt certificates expire after 90 days, so the server will need to be constantly updated with a new certificate. Other CAs provide certificates that expire after a year, so this concern will always apply.&lt;/p>
+&lt;p>After acquiring the certificate, if you are running a Docker-based CHT deployment, see &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/">TLS instructions for Docker&lt;/a> to install the certificate.&lt;/p>
+&lt;h3 id="domain-name-server">Domain Name Server&lt;/h3>
+&lt;p>In order to match the static IP of the web server to the CN in the certificate, a Domain Name Server (DNS) must be used. This will allow any client on the LAN to easily connect to your CHT server without needing anything more than the domain name.&lt;/p>
+&lt;p>Most LANs will defer to the Internet Service Provider (ISP) to provide DNS, but there is no ISP in an offline scenario. Instead, one must be provided. This DNS server will then be configured to have an &lt;code>A&lt;/code> record (or &lt;code>AAAA&lt;/code> in the case of IPv6) to point to the CHT server.&lt;/p>
+&lt;h3 id="dynamic-host-configuration-protocol">Dynamic Host Configuration Protocol&lt;/h3>
+&lt;p>Any new client that connects to a network will get an IP address from a Dynamic Host Configuration Protocol (DHCP) server. It is critical that the DHCP server for the LAN the CHT is on instructs all clients to use the DNS server configured above.&lt;/p>
+&lt;h3 id="wi-fi-ap">Wi-Fi AP&lt;/h3>
+&lt;p>A Wi-FI Access Point (AP) needs to be deployed on the LAN so Android devices can connect to the CHT. This can be an AP included with the router or a standalone AP. If the AP is standalone, check that any DHCP or DNS servers that could conflict with the one above are disabled.&lt;/p>
+&lt;h2 id="benefits-over-other-solutions">Benefits Over Other Solutions&lt;/h2>
+&lt;p>An offline deployment may consider substituting some requirements above with these other solutions. Note that ngrok and local-ip.co require Internet connectivity, so are not an offline solution.&lt;/p>
+&lt;h3 id="ngrok">ngrok&lt;/h3>
+&lt;p>When an offline solution is deployed, traffic stays 100% local, whereas when using either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/debugging/secure-sharing-of-developer-instance/">your own reverse proxy&lt;/a> or a third party provider like &lt;a href="https://ngrok.com/">ngrok&lt;/a>, traffic may traverse 100s or 1,000s of kilometers to ultimately reach the CHT server which is 10 meters away. This can help when Internet connectivity is very slow, very expensive per megabyte, or both.&lt;/p>
+&lt;h3 id="local-ipco">local-ip.co&lt;/h3>
+&lt;p>&lt;a href="http://local-ip.co/">local-ip.co&lt;/a> offers both the TLS certificate and private key for &lt;code>*.my.local-ip.co&lt;/code>. Additionally, the service has a DNS server that dynamically maps any IP you pass in the sub-sub-domain to the real world IP such that &lt;code>192-168-0-1.my.local-ip.co&lt;/code> would resolve to &lt;code>192.168.0.1&lt;/code>. This can make it very handy to deploy a development instance where all HTTP traffic remains local (unlike &lt;code>ngrok&lt;/code> above).&lt;/p>
+&lt;p>As the DNS traffic still needs to leave your network and return, it is not a viable solution for a truly offline CHT deployment.&lt;/p>
+&lt;h3 id="self-signed-certificates">Self-Signed Certificates&lt;/h3>
+&lt;p>Another option to consider is to &lt;a href="https://gist.github.com/anand-k-p/851e57c3aa43e1e36df164f1c215609e">self-sign the certificates&lt;/a> and then either bypass the warnings in browsers or install the new CA root certificate on your devices. While this may work for a development environment with a single developer, it will be hard to scale to an environment where you&amp;rsquo;d like to easily provision many Android devices. The work will be much more than just installing an APK form the Play Store (or the slightly harder side load process).&lt;/p>
+&lt;p>This may only work on certain, older version of Android as well.&lt;/p>
+&lt;h3 id="no-dhcp-or-dns-server">No DHCP or DNS Server&lt;/h3>
+&lt;p>To avoid installing both the DHCP and DNS servers, an Android app that enables custom DNS entries, like &lt;a href="https://play.google.com/store/apps/details?id=com.burakgon.dnschanger">DNS Changer&lt;/a> or &lt;a href="https://play.google.com/store/apps/details?id=org.itxtech.daedalus">Daedalus&lt;/a> could be used. As &lt;a href="https://stackoverflow.com/questions/6370017/mapping-a-hostname-to-an-ip-address-on-android">seen here&lt;/a>, on each Android device you could install this and add custom DNS entries to reach the TLS certificate on the CHT.&lt;/p>
+&lt;p>Like the self-signed certificate solution, this is hard to scale and would need to be complimented by editing &lt;code>/etc/hosts&lt;/code> files on desktop browsers.&lt;/p></description></item><item><title>Apps: Android App Publishing</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/android-app/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/android-app/</guid><description>
 &lt;h2 id="building">Building&lt;/h2>
 &lt;h3 id="branding">Branding&lt;/h3>
 &lt;p>You can overwrite aspects of the generic Android app by providing your own brand. Common elements to overwrite are:&lt;/p>
