@@ -132,13 +132,8 @@ See the &lt;a href="https://github.com/medic/medic-couch2pg/blob/master/README.m
 &lt;p>Log into container and stop all services&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>To prepare for the upgrade, delete all other files in &lt;code>/srv&lt;/code> EXCEPT for these three:&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>/srv/storage/medic-core/&lt;/code>&lt;/li>
-&lt;li>&lt;code>/srv/settings/medic-core/couchdb/local.ini&lt;/code>&lt;/li>
-&lt;li>&lt;code>/srv/settings/medic-core/couchdb/local.d&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;p>The &lt;code>medic-core&lt;/code> directory is where the CHT stores user data. CouchdDB uses both &lt;code>local.ini&lt;/code> and &lt;code>local.d&lt;/code> store configuration changes. Be sure not to delete these.&lt;/p>
+&lt;p>To prepare for the upgrade, delete all other files in &lt;code>/srv&lt;/code> EXCEPT for &lt;code>/srv/storage/medic-core/&lt;/code>&lt;/p>
+&lt;p>The &lt;code>medic-core&lt;/code> directory is where the CHT stores user data. Of key importance is &lt;code>./couchdb/local.in&lt;/code> and &lt;code>./medic-core/couchdb/local.d/&lt;/code> where custom CouchDB configuration is stored.&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#use-docker-compose">Change the image tag to the newest image release version&lt;/a>&lt;/p>
@@ -305,7 +300,20 @@ Containers that are already set up will lose all data when following the steps b
 &lt;p>Alternatively, can create the &lt;code>/srv&lt;/code> folder on any drive with enough space that is regularly backed up. Then map the path to the folder in the compose file like this.&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
 &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- /path/to/srv&lt;span style="color:#000;font-weight:bold">:&lt;/span>/srv&lt;span style="color:#f8f8f8;text-decoration:underline">
-&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be sure to check the available storage space regularly and expand your volume when needed&lt;/p></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be sure to check the available storage space regularly and expand your volume when needed&lt;/p>
+&lt;h2 id="backup">Backup&lt;/h2>
+&lt;p>Regular backups should be made of the &lt;code>/srv&lt;/code> directory to have holistic and easy to restore copies of all important data and the current CHT version installed. To backup just the data and not the CHT, make copies of &lt;code>/srv/storage/medic-core/&lt;/code>. This directory includes 4 key sub-directies:&lt;/p>
+&lt;ul>
+&lt;li>./couchdb&lt;/li>
+&lt;li>./openssh&lt;/li>
+&lt;li>./nginx&lt;/li>
+&lt;li>./passwd&lt;/li>
+&lt;/ul>
+&lt;p>To make backups of just CouchDB data outside of the CHT docker infrastructure, please see &lt;a href="https://docs.couchdb.org/en/2.3.1/maintenance/backups.html">CouchDB&amp;rsquo;s Backup docs for 2.3.1&lt;/a>. Please note:&lt;/p>
+&lt;ul>
+&lt;li>CouchDB data files are in &lt;code>/srv/storage/medic-core/couchdb/data&lt;/code> in the &lt;code>medic-os&lt;/code> container.&lt;/li>
+&lt;li>Backing up via replication is discouraged as restored DBs can cause offline users to restart replication from zero. Use file backups instead.&lt;/li>
+&lt;/ul></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
 &lt;h2 id="requirements">Requirements&lt;/h2>
 &lt;ul>
 &lt;li>Installed CHT-Core 3.x via either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">Self Hosted&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">EC2&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">Local Setup&lt;/a>, but must use &lt;code>docker-compose&lt;/code>.&lt;/li>
