@@ -684,9 +684,65 @@ It only works in conjunction with &lt;code>depth&lt;/code>.&lt;/p>
 &lt;td>&lt;code>rules-engine:ensureTargetFreshness:cancel&lt;/code>&lt;/td>
 &lt;td>The time taken to cancel the automated target freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:user-initiated&lt;/code>&lt;/td>
+&lt;td>Number of times the user clicked &amp;ldquo;Sync now&amp;rdquo;. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:success&lt;/code>&lt;/td>
+&lt;td>Time taken to replicate, when replication was successful. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure&lt;/code>&lt;/td>
+&lt;td>Time taken to replicate, when replication failed. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:offline:client&lt;/code>&lt;/td>
+&lt;td>Number of times replication failed because of connection errors, and the app detects the client is offline. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:offline:server&lt;/code>&lt;/td>
+&lt;td>Number of times replication failed because of connection errors, and the app detects the client is online. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:error&lt;/code>&lt;/td>
+&lt;td>Number of times replication failed because of errors other than connection errors. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:docs&lt;/code>&lt;/td>
+&lt;td>Number of replicated docs. For &lt;code>medic&lt;/code> replication, stores number of &amp;ldquo;read&amp;rdquo; docs, for &lt;code>meta&lt;/code> replication, stores sum of read docs for every direction. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:medic:&amp;lt;direction&amp;gt;:ms-since-last-replicated-date&lt;/code>&lt;/td>
+&lt;td>Time between a replication attempt and the last successful replication. Only recorded for medic database, every time replication is attempted. Added in 3.12.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication:medic:&amp;lt;direction&amp;gt;:denied&lt;/code>&lt;/td>
+&lt;td>Number of times replication was denied[2]. Added in 3.12.&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;p>[1] &amp;ldquo;Dirty&amp;rdquo; indicates that the contact&amp;rsquo;s task documents are not up to date. They will be refreshed before being used.&lt;/p>
+&lt;p>[1] &amp;ldquo;Dirty&amp;rdquo; indicates that the contact&amp;rsquo;s task documents are not up to date. They will be refreshed before being used. &lt;br>
+[2] Replication can be denied when the user doesn&amp;rsquo;t have permissions to create a doc (hierarchy permissions) or when a doc fails a &lt;code>validate_doc_update&lt;/code> check.&lt;/p>
+&lt;p>Unless otherwise specified, &lt;code>database&lt;/code> and &lt;code>direction&lt;/code> placeholders stand for any combination of:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>database&lt;/th>
+&lt;th>direction&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>medic&lt;/code>&lt;/td>
+&lt;td>&lt;code>from&lt;/code> or &lt;code>to&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>meta&lt;/code>&lt;/td>
+&lt;td>&lt;code>sync&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
 &lt;h2 id="metadata">Metadata&lt;/h2>
 &lt;p>When the aggregate doc is created the Telemetry service also includes a snapshot of some metadata.&lt;/p>
 &lt;table>
