@@ -2782,7 +2782,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>resolvedIf&lt;/code>&lt;/td>
 &lt;td>&lt;code>function(contact, report, event, dueDate)&lt;/code>&lt;/td>
 &lt;td>Return true to mark the task as &amp;ldquo;resolved&amp;rdquo;. A resolved task uses memory on the phone, but is not displayed.&lt;/td>
-&lt;td>yes&lt;/td>
+&lt;td>no, if any &lt;code>actions[n].type&lt;/code> is &lt;code>'report'&lt;/code>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>events&lt;/code>&lt;/td>
@@ -3086,6 +3086,22 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;span style="color:#8f5902;font-style:italic">// ...
 &lt;/span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
 &lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="default-resolvedif-method">Default resolvedIf method&lt;/h3>
+&lt;p>If the &lt;code>resolvedIf&lt;/code> is undefined in an action of type &lt;code>report&lt;/code>, then &lt;code>resolvedIf&lt;/code> is going to default to &lt;code>defaultResolvedIf&lt;/code> method.&lt;/p>
+&lt;p>The &lt;code>defaultResolvedIf&lt;/code> method returns &lt;code>true&lt;/code> if it finds any report assigned to the contact that matches the &lt;code>form&lt;/code> defined in the action of type &lt;code>report&lt;/code>. Only the reports submitted during a specific time period are considered:&lt;/p>
+&lt;ul>
+&lt;li>For a contact-based task, the period is the same as the task window period i.e. when the task is visible.&lt;/li>
+&lt;li>For a report based task, the period is determined between &lt;code>start&lt;/code> and &lt;code>end&lt;/code> as:
+&lt;ul>
+&lt;li>&lt;code>start&lt;/code>: the latest date between start of the task window and one millisecond after the report&amp;rsquo;s reported date&lt;/li>
+&lt;li>&lt;code>end&lt;/code>: end of the task window&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>You can also use &lt;code>this.definition.defaultResolvedIf&lt;/code> inside the &lt;code>resolvedIf&lt;/code> definition and optionally add more conditions:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#000">resolvedIf&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">report&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">event&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">dueDate&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">this&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">defaultResolvedIf&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">contact&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">report&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">event&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">dueDate&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#000">otherConditions&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="build">Build&lt;/h2>
 &lt;p>To build your tasks into your app, you must compile them into app-settings, then upload them to your instance.&lt;/p>
 &lt;p>&lt;code>medic-conf --local compile-app-settings backup-app-settings upload-app-settings&lt;/code>&lt;/p></description></item><item><title>Apps: Utils Functions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</guid><description>
