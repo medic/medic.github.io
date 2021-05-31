@@ -151,6 +151,7 @@ The magic link workflow will not work for users who want to use multiple devices
 &lt;li>&lt;a href="#monitoring">Monitoring&lt;/a>
 &lt;ul>
 &lt;li>&lt;a href="#get-apiv1monitoring">GET /api/v1/monitoring&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#get-apiv2monitoring">GET /api/v2/monitoring&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>&lt;a href="#upgrades">Upgrades&lt;/a>
@@ -1346,7 +1347,8 @@ Content-Type: application/json
 ]
 &lt;/code>&lt;/pre>&lt;h2 id="monitoring">Monitoring&lt;/h2>
 &lt;h3 id="get-apiv1monitoring">GET /api/v1/monitoring&lt;/h3>
-&lt;p>Used to retrieve a range of metrics about the instance. While the output is human readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
+&lt;p>&lt;em>Deprecated in 3.12.x in favor of &lt;a href="#get-apiv2monitoring">/api/v2/monitoring&lt;/a>&lt;/em>&lt;br>
+Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
 &lt;h4 id="permissions-8">Permissions&lt;/h4>
 &lt;p>No permissions required.&lt;/p>
 &lt;h4 id="examples-13">Examples&lt;/h4>
@@ -1419,19 +1421,29 @@ Content-Type: application/json
 &lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;code>messaging.outgoing.due&lt;/code>&lt;/td>
+&lt;td>&lt;code>messaging.outgoing.state.due&lt;/code>&lt;/td>
 &lt;td>Number&lt;/td>
 &lt;td>The number of messages due to be sent.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;code>messaging.outgoing.scheduled&lt;/code>&lt;/td>
+&lt;td>&lt;code>messaging.outgoing.state.scheduled&lt;/code>&lt;/td>
 &lt;td>Number&lt;/td>
 &lt;td>The number of messages scheduled to be sent in the future.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;code>messaging.outgoing.muted&lt;/code>&lt;/td>
+&lt;td>&lt;code>messaging.outgoing.state.muted&lt;/code>&lt;/td>
 &lt;td>Number&lt;/td>
 &lt;td>The number of messages that are muted and therefore will not be sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.state.delivered&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that have been delivered or sent. As of 3.12.x.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.state.failed&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages have failed to be delivered. As of 3.12.x&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>outbound_push.backlog&lt;/code>&lt;/td>
@@ -1458,7 +1470,228 @@ Content-Type: application/json
 &lt;h4 id="errors-3">Errors&lt;/h4>
 &lt;ul>
 &lt;li>A metric of &lt;code>&amp;quot;&amp;quot;&lt;/code> (for string values) or &lt;code>-1&lt;/code> (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li>
-&lt;li>If no response or an error response is received the the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li>
+&lt;li>If no response or an error response is received the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li>
+&lt;/ul>
+&lt;h3 id="get-apiv2monitoring">GET /api/v2/monitoring&lt;/h3>
+&lt;p>Available as of 3.12.x.
+Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
+&lt;h4 id="permissions-9">Permissions&lt;/h4>
+&lt;p>No permissions required.&lt;/p>
+&lt;h4 id="examples-14">Examples&lt;/h4>
+&lt;h5 id="json-format-1">JSON format&lt;/h5>
+&lt;pre>&lt;code>curl http://localhost:5988/api/v2/monitoring
+{&amp;quot;version&amp;quot;:{&amp;quot;app&amp;quot;:&amp;quot;3.12.0&amp;quot;,&amp;quot;node&amp;quot;:&amp;quot;v10.16.0&amp;quot;,&amp;quot;couchdb&amp;quot;:&amp;quot;2.3.1&amp;quot;},&amp;quot;couchdb&amp;quot;:{&amp;quot;medic&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;medic&amp;quot;,&amp;quot;update_sequence&amp;quot;:5733,&amp;quot;doc_count&amp;quot;:278,&amp;quot;doc_del_count&amp;quot;:32,&amp;quot;fragmentation&amp;quot;:1.0283517758420173}...
+&lt;/code>&lt;/pre>&lt;h4 id="response-content-1">Response content&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>JSON path&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>version.app&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of the webapp.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>version.node&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of NodeJS.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>version.couchdb&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The version of CouchDB.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.name&lt;/code>&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>The name of the db, usually one of &amp;ldquo;medic&amp;rdquo;, &amp;ldquo;medic-sentinel&amp;rdquo;, &amp;ldquo;medic-users-meta&amp;rdquo;, &amp;ldquo;_users&amp;rdquo;.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.update_sequence&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of changes in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.doc_count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.doc_del_count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of deleted docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couchdb.&amp;lt;dbname&amp;gt;.fragmentation&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The fragmentation of the db, lower is better, &amp;ldquo;1&amp;rdquo; is no fragmentation.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>date.current&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The current server date in millis since the epoch, useful for ensuring the server time is correct.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>date.uptime&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>How long API has been running.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>sentinel.backlog&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.total.due&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages due to be sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.total.scheduled&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages scheduled to be sent in the future.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.total.muted&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that are muted and therefore will not be sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.total.delivered&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that have been delivered or sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.total.failed&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages have failed to be delivered.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.seven_days.due&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages due to be sent in the last seven days.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.seven_days.scheduled&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that were scheduled to be sent in the last seven days.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.seven_days.muted&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that were due in the last seven days and are muted.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.seven_days.delivered&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that were due in the last seven days and have been delivered or sent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.seven_days.failed&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>The number of messages that were due in the last seven days and have failed to be delivered.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.pending&lt;/code>&lt;/td>
+&lt;td>Object&lt;/td>
+&lt;td>Counts within last 100 messages that have received status updates, and are one of the &amp;ldquo;pending&amp;rdquo; group statuses&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.pending.pending&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are pending&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.pending.forwarded-to-gateway&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are forwarded-to-gateway&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.pending.received-by-gateway&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are received-by-gateway&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.pending.forwarded-by-gateway&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are forwarded-by-gateway&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final&lt;/code>&lt;/td>
+&lt;td>Object&lt;/td>
+&lt;td>Counts within last 100 messages that have received status updates, and are in one of the &amp;ldquo;final&amp;rdquo; group statuses&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.sent&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are sent&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.delivered&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are delivered&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.failed&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are failed&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.muted&lt;/code>&lt;/td>
+&lt;td>Object&lt;/td>
+&lt;td>Counts within last 100 messages that have received status updates, and are in one of the &amp;ldquo;muted&amp;rdquo; group statuses&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.denied&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are denied&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.cleared&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are cleared&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.muted&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are muted&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messaging.outgoing.last_hundred.final.duplicate&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of messages that are duplicate&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>outbound_push.backlog&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of changes yet to be processed by Outbound Push.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>feedback.count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of feedback docs created usually indicative of client side errors.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>conflict.count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of doc conflicts which need to be resolved manually.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>replication_limit.count&lt;/code>&lt;/td>
+&lt;td>Number&lt;/td>
+&lt;td>Number of users that exceeded the replication limit of documents.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="errors-4">Errors&lt;/h4>
+&lt;ul>
+&lt;li>A metric of &lt;code>&amp;quot;&amp;quot;&lt;/code> (for string values) or &lt;code>-1&lt;/code> (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li>
+&lt;li>If no response or an error response is received the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li>
 &lt;/ul>
 &lt;h2 id="upgrades">Upgrades&lt;/h2>
 &lt;p>All of these endpoints require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
