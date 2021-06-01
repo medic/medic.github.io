@@ -540,9 +540,13 @@ It only works in conjunction with &lt;code>depth&lt;/code>.&lt;/p>
 &lt;h3 id="sensitive-documents">Sensitive documents&lt;/h3>
 &lt;p>We won&amp;rsquo;t replicate reports that are &lt;code>private&lt;/code> and are about the user when the sender is someone the user can&amp;rsquo;t access. A report is private when it has a property &lt;code>doc.fields.private&lt;/code> with a value of &lt;code>true&lt;/code>. For example, if a supervisor submits a private report about one of their CHPs, that CHP won&amp;rsquo;t be able to see it.&lt;/p></description></item><item><title>Apps: User telemetry</title><link>https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/</guid><description>
 &lt;p>&lt;em>Introduced in v3.4.0&lt;/em>&lt;/p>
-&lt;p>The app collects performance data on certain user actions which is then aggregated over each calendar month and replicated to the server. This can be used to evaluate the performance of the code and configuration and to evaluate where improvements can be made.&lt;/p>
-&lt;p>The aggregate doc for the previous month is created when the first telemetry item is recorded each month. This is stored in the &lt;code>medic-user-&amp;lt;username&amp;gt;-meta&lt;/code> database on the device and replicated to the server when an internet connection is available. This user specific server db is then replicated into the &lt;code>medic-users-meta&lt;/code> database which holds all aggregate telemetry docs for all users.&lt;/p>
-&lt;p>The aggregate docs&amp;rsquo; IDs follow the pattern &lt;code>telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code>.&lt;/p>
+&lt;p>The app collects performance data on certain user actions which is then aggregated each day and replicated to the server. This can be used to evaluate the performance of the code and configuration and to evaluate where improvements can be made.&lt;/p>
+&lt;p>The aggregate doc for the previous day is created when the first telemetry item is recorded each day. This is stored in the &lt;code>medic-user-&amp;lt;username&amp;gt;-meta&lt;/code> database on the device and replicated to the server when an internet connection is available. This user specific server db is then replicated into the &lt;code>medic-users-meta&lt;/code> database which holds all aggregate telemetry docs for all users.&lt;/p>
+&lt;p>The aggregate docs&amp;rsquo; IDs follow the pattern &lt;code>telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;day&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code>.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Versions prior to v3.12.0 do aggregate in a monthly basis instead of daily, and the aggregate docs&amp;rsquo; IDs follow the pattern &lt;code>telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code>.
+&lt;/div>
 &lt;h2 id="performance-data">Performance data&lt;/h2>
 &lt;p>Each aggregate data point has the following fields.&lt;/p>
 &lt;table>
@@ -762,6 +766,10 @@ It only works in conjunction with &lt;code>depth&lt;/code>.&lt;/p>
 &lt;td>The month the data was collected. Initially the month was 0 indexed (eg: 0=Jan, 1=Feb, &amp;hellip;), but from 3.8.0 &lt;a href="https://github.com/medic/cht-core/issues/5949">this bug was fixed&lt;/a> so it changed to 1 indexed (eg: 1=Jan, 2=Feb, &amp;hellip;). Added in 3.4.0.&lt;/td>
 &lt;/tr>
 &lt;tr>
+&lt;td>&lt;code>day&lt;/code>&lt;/td>
+&lt;td>The day of the month the data was collected. Added in 3.12.0.&lt;/td>
+&lt;/tr>
+&lt;tr>
 &lt;td>&lt;code>user&lt;/code>&lt;/td>
 &lt;td>The username of the logged in user. Added in 3.4.0.&lt;/td>
 &lt;/tr>
@@ -951,6 +959,7 @@ Telemetry data can be viewed directly in your browser with &lt;a href="https://c
 &lt;span style="color:#4e9a06">&amp;#34;metadata&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#4e9a06">&amp;#34;year&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2020&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#4e9a06">&amp;#34;month&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">5&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#4e9a06">&amp;#34;day&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">20&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#4e9a06">&amp;#34;user&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#4e9a06">&amp;#34;deviceId&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;016304ab-7167-4c97-93bb-a6626ef6128d&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#4e9a06">&amp;#34;versions&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
