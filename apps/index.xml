@@ -4193,8 +4193,8 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;td>Records metadata about the document such as when it was replicated. Enabled by default.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>update_clinics&lt;/td>
-&lt;td>Adds a contact&amp;rsquo;s info to a new data record. This is used to attribute an incoming SMS message or report to the appropriate contact. The &lt;code>rc_code&lt;/code> value on the contact is used to match to the value of the form field set as the &lt;code>facility_reference&lt;/code> in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/forms/#app_settingsjson-forms">JSON form definition&lt;/a>. This matching is useful when reports are sent on behalf of a facility by unknown or various phone numbers. If &lt;code>facility_reference&lt;/code> is not set for a form, the contact match is attempted using the sender&amp;rsquo;s phone number.&lt;/td>
+&lt;td>&lt;a href="#update_clinics">update_clinics&lt;/a>&lt;/td>
+&lt;td>Adds a contact&amp;rsquo;s info to a new data record. This is used to attribute an incoming SMS message or report to the appropriate contact. The &lt;code>rc_code&lt;/code> value on the contact is used to match to the value of the form field set as the &lt;code>facility_reference&lt;/code> in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/forms/#app_settingsjson-forms">JSON form definition&lt;/a>. This matching is useful when reports are sent on behalf of a facility by unknown or various phone numbers. If &lt;code>facility_reference&lt;/code> is not set for a form, the contact match is attempted using the sender&amp;rsquo;s phone number. If a form is not public and a match is not found then the &lt;code>sys.facility_not_found&lt;/code> error is raised. A message will be sent out whenever this error is raised.&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="#registration">registration&lt;/a>&lt;/td>
@@ -4756,6 +4756,67 @@ Every object should have this structure:&lt;/p>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sender_not_found&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;reporting_unit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;messages.other.sender_not_found&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="update_clinics">update_clinics&lt;/h3>
+&lt;p>Adds a contact’s info to a data record so as to attribute an incoming SMS message or report to the appropriate contact.&lt;/p>
+&lt;h4 id="configuration-6">Configuration&lt;/h4>
+&lt;p>As of version 3.12 you can add configuration to send a message whenever a contact match fails while running this transition. Configuration is stored in the &lt;code>update_clinics&lt;/code> field of app_settings.json as a list of objects connecting forms to messages. Every object should have this structure:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>form&lt;/code>&lt;/td>
+&lt;td>Form code.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages&lt;/code>&lt;/td>
+&lt;td>List of tasks/errors that will be created, determined by &lt;code>event_type&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Supported &lt;code>events_types&lt;/code> are:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Event Type&lt;/th>
+&lt;th>Trigger&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>sys.facility_not_found&lt;/code>&lt;/td>
+&lt;td>Facility not found&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>If this configuration is not set then the message defaults to what is set in the &lt;code>messages.generic.sys.facility_not_found&lt;/code> key.&lt;/p>
+&lt;h5 id="example-5">Example&lt;/h5>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#4e9a06">&amp;#34;update_clinics&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;FORM&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sys.facility_not_found&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;reporting_unit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sys.facility_not_found&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;OTHER&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;messages&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;event_type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sys.facility_not_found&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;reporting_unit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;translation_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;messages.other.facility_not_found&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
