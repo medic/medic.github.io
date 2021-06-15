@@ -4168,16 +4168,18 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .transitions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/</guid><description>
 &lt;p>When sentinel detects a document has changed it runs transitions against the doc. These transitions can be used to generate a short form patient id or assign a report to a facility.&lt;/p>
 &lt;h2 id="configuration">Configuration&lt;/h2>
-&lt;p>By default all transitions are disabled. They can be enabled by configuring the &lt;code>transitions&lt;/code> property to have a key with the transitions name and a &lt;code>truthy&lt;/code> value, eg:&lt;/p>
+&lt;p>By default all transitions are disabled. They can be enabled by configuring the &lt;code>transitions&lt;/code> property to have a key with the transitions name and a &lt;code>truthy&lt;/code> value.
+As of version 3.12.0 some transitions will partially run on the client for offline users. To opt out from client-side transitions, add a &lt;code>&amp;quot;client_side: false&amp;quot;&lt;/code> property to the transition configuration.&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;transitions&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;a&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;b&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;c&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;disable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;d&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;disable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;d&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;disable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;e&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;client_side&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example the &lt;code>d&lt;/code> transition will not be applied, but the other three will be.&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example the &lt;code>d&lt;/code> transition will not be applied, &lt;code>a&lt;/code>, &lt;code>b&lt;/code> &lt;code>c&lt;/code> will be applied on the server and on the client, while &lt;code>e&lt;/code> will only be applied on the server.&lt;/p>
 &lt;h2 id="available-transitions">Available transitions&lt;/h2>
 &lt;p>The following transitions are available and executed in order.&lt;/p>
 &lt;table>
@@ -4254,7 +4256,7 @@ The cache is cleared 30 minutes after the last SMS message for a specific pair w
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="#muting">muting&lt;/a>&lt;/td>
-&lt;td>Implements muting/unmuting actions of people and places. Available since 3.2.x.&lt;/td>
+&lt;td>Implements muting/unmuting actions of people and places. Available since 3.2.x. Is partially applied on the client, as of 3.12.0.&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/outbound/">mark_for_outbound&lt;/a>&lt;/td>
@@ -4478,24 +4480,45 @@ To provide an alternative location for the place name, provide a &lt;code>place_
 }
 &lt;/code>&lt;/pre>&lt;h3 id="muting">Muting&lt;/h3>
 &lt;p>Implements muting/unmuting of persons and places. Supports multiple forms for each action, for webapp and sms workflows.&lt;/p>
-&lt;p>Muting action:&lt;/p>
+&lt;h5 id="muting-action">Muting action&lt;/h5>
+&lt;p>As of 3.12.0, client-side muting only runs on new reports or new contacts, before they are saved in the local database:&lt;/p>
 &lt;ul>
-&lt;li>updates target contact and all its descendants&lt;sup>[1]&lt;/sup>, setting the &lt;code>muted&lt;/code> property equal to the current &lt;code>date&lt;/code> in ISO format&lt;sup>[2]&lt;/sup>&lt;/li>
+&lt;li>updates the target contact and all its descendants&lt;sup>[10]&lt;/sup>, setting the &lt;code>muted&lt;/code> property equal to the device&amp;rsquo;s current &lt;code>date&lt;/code> in ISO format&lt;sup>[8]&lt;/sup>.&lt;/li>
+&lt;li>adds/updates the &lt;code>muting_history&lt;/code>&lt;sup>[11]&lt;/sup> property on every updated contact, to keep track of all the updates that have been processed client-side, as well as the last known server-side state of the contact and sets the &lt;code>last_update&lt;/code> property to &lt;code>client_side&lt;/code>&lt;/li>
+&lt;li>updates the report doc to add a &lt;code>client_side_transitions&lt;/code> property to track which transitions have run client-side&lt;/li>
+&lt;/ul>
+&lt;p>Server-side:&lt;/p>
+&lt;ul>
+&lt;li>updates the target contact and all its descendants&lt;sup>[1]&lt;/sup>, setting the &lt;code>muted&lt;/code> property equal to the current &lt;code>date&lt;/code> in ISO format&lt;sup>[2]&lt;/sup>. If the contact was already muted by a client, the &lt;code>muted&lt;/code> date will be overwritten. The client-side &lt;code>muting_history&lt;/code> will have a copy of the client-side muting date.&lt;/li>
 &lt;li>adds a &lt;code>muting_history&lt;/code> entry to Sentinel &lt;code>info&lt;/code> docs for every updated contact&lt;sup>[7]&lt;/sup>&lt;/li>
 &lt;li>updates all connected registrations&lt;sup>[3]&lt;/sup>, changing the state of all unsent&lt;sup>[4]&lt;/sup> &lt;code>scheduled_tasks&lt;/code> to &lt;code>muted&lt;/code>&lt;/li>
+&lt;li>as of 3.12.0, updates the contact&amp;rsquo;s client-side &lt;code>muting_history&lt;/code> to set the &lt;code>last_update&lt;/code> property to &lt;code>server_side&lt;/code> and update the &lt;code>server_side&lt;/code> section with the current date and muted state.&lt;/li>
+&lt;li>as of 3.12.0, if the report was processed client-side, all &amp;ldquo;following&amp;rdquo; muting/unmuting events that have affected the same contacts will be replayed. This means the transition &lt;em>could&lt;/em> end up running multiple times over the same report&lt;sup>[9]&lt;/sup>.&lt;/li>
 &lt;/ul>
-&lt;p>Unmuting action:&lt;/p>
+&lt;h5 id="unmuting-action">Unmuting action:&lt;/h5>
+&lt;p>As of 3.12.0, client-side unmuting only runs on new reports before they are saved in the local database:&lt;/p>
 &lt;ul>
-&lt;li>updates target contact&amp;rsquo;s topmost muted ancestor&lt;sup>[1][5]&lt;/sup> and all its descendants, removing the &lt;code>muted&lt;/code> property&lt;/li>
+&lt;li>updates the target contact&amp;rsquo;s topmost muted ancestor&lt;sup>[10][5]&lt;/sup> and all its descendants, removing the &lt;code>muted&lt;/code> property.&lt;/li>
+&lt;li>adds/updates the &lt;code>muting_history&lt;/code>&lt;sup>[9]&lt;/sup> property on every updated contact, sets the last known server-side state of the contact and sets the &lt;code>last_update&lt;/code> property to &lt;code>client_side&lt;/code>&lt;/li>
+&lt;li>updates the report doc to add a &lt;code>client_side_transitions&lt;/code> property to track which transitions have run client-side&lt;/li>
+&lt;/ul>
+&lt;p>Server-side:&lt;/p>
+&lt;ul>
+&lt;li>updates the target contact&amp;rsquo;s topmost muted ancestor&lt;sup>[1][5]&lt;/sup> and all its descendants, removing the &lt;code>muted&lt;/code> property&lt;/li>
 &lt;li>adds a &lt;code>muting_history&lt;/code> entry to Sentinel &lt;code>info&lt;/code> docs for every updated contact&lt;sup>[7]&lt;/sup>&lt;/li>
 &lt;li>updates all connected registrations&lt;sup>[3]&lt;/sup>, changing the state of all present/future&lt;sup>[6]&lt;/sup> &lt;code>muted&lt;/code> &lt;code>scheduled_tasks&lt;/code> to &lt;code>scheduled&lt;/code>&lt;/li>
+&lt;li>as of 3.12.0, updates the contact&amp;rsquo;s client-side &lt;code>muting_history&lt;/code> to set the &lt;code>last_update&lt;/code> property to &lt;code>server_side&lt;/code> and update the &lt;code>server_side&lt;/code> section with the current date and muted state.&lt;/li>
+&lt;li>as of 3.12.0, if the report was processed client-side, all &amp;ldquo;following&amp;rdquo; muting/unmuting events that have affected the same contacts will be replayed. This means the transition &lt;em>could&lt;/em> end up running multiple times over the same report&lt;sup>[10]&lt;/sup>.&lt;/li>
 &lt;/ul>
-&lt;p>[1] Contacts that are already in the correct state are skipped. This applies to updates to the contact itself, updates to the Sentinel &lt;code>muting_history&lt;/code> and to the connected registrations (registrations of a contact that is already in the correct state will not be updated).
-[2] The date represents the moment Sentinel has processed the muting action
-[3] target contact and descendants&amp;rsquo; registrations
-[4] &lt;code>scheduled_tasks&lt;/code> being in either &lt;code>scheduled&lt;/code> or &lt;code>pending&lt;/code> state
-[5] Because the muted state is inherited, unmuting cascades upwards to the highest level muted ancestor. If none of the ancestors is muted, unmuting cascades downwards only.
-[6] &lt;code>scheduled_tasks&lt;/code> which are due today or in the future. All &lt;code>scheduled_tasks&lt;/code> with a due date in the past will remain unchanged.&lt;/p>
+&lt;p>[1] Contacts that are already in the correct state are skipped. This applies to updates to the contact itself, updates to the Sentinel &lt;code>muting_history&lt;/code> and to the connected registrations (registrations of a contact that is already in the correct state will not be updated).&lt;br>
+[2] The date represents the moment Sentinel has processed the muting action&lt;br>
+[3] target contact and descendants&amp;rsquo; registrations&lt;br>
+[4] &lt;code>scheduled_tasks&lt;/code> being in either &lt;code>scheduled&lt;/code> or &lt;code>pending&lt;/code> state&lt;br>
+[5] Because the muted state is inherited, unmuting cascades upwards to the highest level muted ancestor. If none of the ancestors is muted, unmuting cascades downwards only.&lt;br>
+[6] &lt;code>scheduled_tasks&lt;/code> which are due today or in the future. All &lt;code>scheduled_tasks&lt;/code> with a due date in the past will remain unchanged.&lt;br>
+[8] The date represents the device&amp;rsquo;s date when the report is processed.&lt;br>
+[9] Replaying is required due to how PouchDB &amp;lt;-&amp;gt; CouchDB synchronization does not respect the order in which the documents have been created, to ensure that contacts end up in the correct muted state. &lt;br>
+[10] The updated contacts are limited to the contacts available on the device.&lt;/p>
 &lt;h5 id="7-muting-history">[7] Muting history&lt;/h5>
 &lt;p>Each time the &lt;code>muted&lt;/code> state of a contact changes, an entry is added to a &lt;code>muting_history&lt;/code> list saved in Sentinel &lt;code>info&lt;/code> docs (stored as an array property with the same name).
 Entries in &lt;code>muting_history&lt;/code> contain the following information:&lt;/p>
@@ -4518,6 +4541,60 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 &lt;tr>
 &lt;td>report_id&lt;/td>
 &lt;td>An &lt;code>_id&lt;/code> reference to the report that triggered the action&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="11-client-side-muting-history-as-of-3120">[11] Client-side Muting history as of 3.12.0&lt;/h5>
+&lt;p>Each time the client changes the &lt;code>muted&lt;/code> state of a contact, an entry is added to a &lt;code>muting_history&lt;/code> property on the contact&amp;rsquo;s doc. The &lt;code>last_update&lt;/code> entry is also changed to &lt;code>client_side&lt;/code>.
+The &lt;code>muting_history&lt;/code> property contains the following information:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Values&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>last_update&lt;/td>
+&lt;td>&lt;code>server_side&lt;/code> or &lt;code>client_side&lt;/code>&lt;/td>
+&lt;td>Updated every time a service updates the contact, with the corresponding value&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>server_side&lt;/td>
+&lt;td>Object&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>server_side.muted&lt;/td>
+&lt;td>&lt;code>true&lt;/code> or &lt;code>false&lt;/code>&lt;/td>
+&lt;td>Last known server-side muting state&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>server_side.date&lt;/td>
+&lt;td>Date in ISO format&lt;/td>
+&lt;td>Last known server-side muting/unmuting date&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client_side&lt;/td>
+&lt;td>Array&lt;/td>
+&lt;td>Client-side muting/unmuting events list. &lt;br> New events are pushed at the end of this list and it should never be re-ordered. &lt;br>The list represents the &amp;ldquo;chronological&amp;rdquo; order in which the reports that triggered muting were created.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client_side[].muted&lt;/td>
+&lt;td>&lt;code>true&lt;/code> or &lt;code>false&lt;/code>&lt;/td>
+&lt;td>Client-side muting state&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client_side[].date&lt;/td>
+&lt;td>Date in ISO format&lt;/td>
+&lt;td>Client-side muting/unmuting date&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client_side[].report_id&lt;/td>
+&lt;td>uuid&lt;/td>
+&lt;td>The uuid of the muting/unmuting report that triggered the update&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -4580,6 +4657,18 @@ Entries in &lt;code>muting_history&lt;/code> contain the following information:&
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>When muting events are processed both client-side and server-side, there is no guarantee that the state of the database will be the same between the two processing events. Some possible cases where the data is changed in significant ways, that will affect the final muting state are:&lt;/p>
+&lt;ul>
+&lt;li>updated muting settings between client and server processing of the same report / contact&lt;/li>
+&lt;li>editing the muting/unmuting reports before they are synced, but after the transition ran locally, that either change the target contact or change the validity of the report&lt;/li>
+&lt;li>deleting muting/unmuting reports before they are synced&lt;/li>
+&lt;li>validation rules that depend on database data (for example using the &amp;ldquo;exists&amp;rdquo; rule, which will run over different data sets, a report could be valid for the client but invalid for the server and the other way around).&lt;/li>
+&lt;li>conflicts that overwrite &lt;code>muting_history&lt;/code> for contacts&lt;/li>
+&lt;li>delayed sync for some docs (either contacts or reports) could exacerbate the above because of the &amp;ldquo;replay&amp;rdquo; behavior.&lt;/li>
+&lt;/ul>
+&lt;/div>
 &lt;h5 id="example-1">Example&lt;/h5>
 &lt;pre>&lt;code>&amp;quot;muting&amp;quot;: {
 &amp;quot;mute_forms&amp;quot;: [&amp;quot;mute_person&amp;quot;, &amp;quot;mute_clinic&amp;quot;],
