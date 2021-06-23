@@ -1,4 +1,65 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Building and Maintaining Forms</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/</link><description>Recent content in Building and Maintaining Forms on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/forms/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Creating Additional Docs from App Forms</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/additional-docs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/forms/additional-docs/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Building and Maintaining Forms</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/</link><description>Recent content in Building and Maintaining Forms on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/forms/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Universal Health Coverage (UHC) mode</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/uhc-mode/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/forms/uhc-mode/</guid><description>
+&lt;p>&lt;em>Introduced in v2.18.0&lt;/em>&lt;/p>
+&lt;figure class="right col-6 col-lg-3">&lt;a href="UHC.gif">
+&lt;img src="UHC.gif"
+alt="UHC mode screenshot"/> &lt;/a>
+&lt;/figure>
+&lt;p>UHC mode empowers CHWs to provide equitable and timely care to families in their catchment area. The Community Health Toolkit supports this use-case by displaying the number of
+visits made to a household and highlighting households which haven&amp;rsquo;t met their visit goal in red at the top of the contact list.&lt;/p>
+&lt;p>The date last visited is colored red whenever the date is 30 days or more in the past. The date last visited is displayed as a relative date. This period is described in terms of &amp;ldquo;days&amp;rdquo; up until two months, so &amp;ldquo;Visited 3 days ago&amp;rdquo; or &amp;ldquo;Visited 36 days ago&amp;rdquo;. After two months, we simply say &amp;ldquo;2 months&amp;rdquo; or &amp;ldquo;3 months&amp;rdquo;.&lt;/p>
+&lt;h3 id="sorting">Sorting&lt;/h3>
+&lt;figure class="right col-6 col-lg-3">&lt;a href="sort-dropdown.png">
+&lt;img src="sort-dropdown.png"
+alt="Contact sorting screenshot"/> &lt;/a>
+&lt;/figure>
+&lt;p>The date of the last visit is displayed and contacts can be sorted by last visit date to allow the CHW plan their work.&lt;/p>
+&lt;p>&amp;ldquo;Date last visited&amp;rdquo; and &amp;ldquo;Visits this month&amp;rdquo; are different data points:&lt;/p>
+&lt;ul>
+&lt;li>Date last visited is calculated based upon a rolling count of &amp;ldquo;how many days ago&amp;rdquo; and is not tied to the calendar at all.&lt;/li>
+&lt;li>Visits this month are tied directly to the calendar.&lt;/li>
+&lt;/ul>
+&lt;h2 id="configuration">Configuration&lt;/h2>
+&lt;p>Any patient- or household-level form or forms can be used to update the date last visited. You may run into performance issues if you configure this to look at forms submitted very frequently. For example, five forms submitted only once a month would work better than two forms submitted every day.&lt;/p>
+&lt;h3 id="uhc-permissions">UHC Permissions&lt;/h3>
+&lt;p>To see the date last visited instead of the primary contact, grant the relevant user role (usually CHW) the &lt;code>can_view_last_visited_date&lt;/code> permission. Once that permission is enabled, you&amp;rsquo;ll be able to display the date the household was last visited in the list.&lt;/p>
+&lt;p>To view UHC metrics, the &lt;code>can_view_uhc_stats&lt;/code> permission needs to be granted to the CHW user role.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json"> &lt;span style="color:#4e9a06">&amp;#34;permissions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;can_view_last_visited_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;chwUserRole&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="forms">Forms&lt;/h3>
+&lt;p>Indicate which forms should be included in the calculation of the date last visited. You can use forms at the person or household level. Add the &lt;code>visited_contact_uuid&lt;/code> field to forms to track visits. This should be a &lt;code>calculate&lt;/code> field that contains the household (clinic level place) UUID of the visited contact. Ensure this is a top-level field (not in any group) and should be in &lt;code>doc.fields.visited_contact_uuid&lt;/code> when the form is submitted.&lt;/p>
+&lt;h3 id="settings">Settings&lt;/h3>
+&lt;p>Information on when to begin counting visits, household visit goals, and default contact sorting is defined in &lt;code>base_settings.json&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Setting&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Default&lt;/th>
+&lt;th>Version&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>uhc.contacts_default_sort&lt;/td>
+&lt;td>&lt;ul>&lt;li>&amp;quot;alpha&amp;rdquo;: Sort contacts alphanumerically&lt;/li>&lt;li>&amp;quot;last_visited_date&amp;rdquo;: sort contacts by the date they were most recently visited.&lt;/li>&lt;/ul>&lt;/td>
+&lt;td>&amp;ldquo;alpha&amp;rdquo;&lt;/td>
+&lt;td>2.18.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>uhc.visit_count.month_start_date&lt;/td>
+&lt;td>The date of each month when the visit count is reset to 0.&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>2.18.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>uhc.visit_count.visit_count_goal&lt;/td>
+&lt;td>The monthly visit count goal.&lt;/td>
+&lt;td>0&lt;/td>
+&lt;td>2.18.0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Apps: Creating Additional Docs from App Forms</title><link>https://docs.communityhealthtoolkit.org/apps/guides/forms/additional-docs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/forms/additional-docs/</guid><description>
 &lt;p>In version 2.13.0 and higher, you can configure app forms to generate additional docs upon submission. You can create one or more docs using variations on the configuration described below. One case where this can be used is to register a newborn from a delivery report, as shown below. First, here is an overview of what you can do and how the configuration should look in XML:&lt;/p>
 &lt;h2 id="extra-docs">Extra Docs&lt;/h2>
 &lt;p>Extra docs can be added by defining structures in the model with the attribute&lt;/p>
