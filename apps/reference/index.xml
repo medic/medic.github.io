@@ -2381,7 +2381,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>uhcStats&lt;/code>&lt;/td>
-&lt;td>Object containing UHC stats information.&lt;/td>
+&lt;td>Object containing UHC stats information. Added in &lt;code>v3.12.0&lt;/code>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>uhcStats.uhcInterval&lt;/code>&lt;/td>
@@ -2411,8 +2411,44 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>uhcStats.homeVisits.countGoal&lt;/code>&lt;/td>
 &lt;td>Number, home visits goal, defined in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/#app_settingsjson">UHC visit count settings&lt;/a>.&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht&lt;/code>&lt;/td>
+&lt;td>Object containing the &lt;a href="#cht-api">CHT API&lt;/a> for contact summary, targets and tasks. Added in &lt;code>v3.12.0&lt;/code>&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;h2 id="cht-api">CHT API&lt;/h2>
+&lt;p>&lt;em>Introduced in v3.12.0&lt;/em>&lt;/p>
+&lt;p>Provides CHT-Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code>cht&lt;/code> reserved variable under the &lt;code>v1&lt;/code> version.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Function&lt;/th>
+&lt;th>Arguments&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>hasPermissions(permissions, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissions&lt;/code>: String or array of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has the permission(s), otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hasAnyPermission(permissionsGroups, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canEdit&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_edit&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canManagePlaces&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_create_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_update_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">hasAnyGroup&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasAnyPermission&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="contact-summary">Contact Summary&lt;/h2>
 &lt;p>Each field that can be shown on a contact&amp;rsquo;s profile is defined as an object in the &lt;code>fields&lt;/code> array of &lt;code>contact-summary.templated.js&lt;/code>. The properties for each object determine how and when the field is shown.&lt;/p>
 &lt;h3 id="contact-summarytemplatedjs-fields">&lt;code>contact-summary.templated.js .fields[]&lt;/code>&lt;/h3>
@@ -2889,6 +2925,38 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/table>
 &lt;p>Please open &lt;a href="https://github.com/medic/cht-core/issues/new">an issue&lt;/a> if you&amp;rsquo;d like other functions included.&lt;/p>
 &lt;p>Custom functions and variables can be written in &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/nools-extras/">&lt;code>nools-extra.js&lt;/code>&lt;/a>, which is accessible to both Targets and Tasks.&lt;/p>
+&lt;h2 id="cht-api">CHT API&lt;/h2>
+&lt;p>&lt;em>Introduced in v3.12.0&lt;/em>&lt;/p>
+&lt;p>Provides CHT-Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code>cht&lt;/code> reserved variable under the &lt;code>v1&lt;/code> version.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Function&lt;/th>
+&lt;th>Arguments&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>hasPermissions(permissions, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissions&lt;/code>: String or array of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has the permission(s), otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hasAnyPermission(permissionsGroups, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canEdit&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_edit&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canManagePlaces&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_create_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_update_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">hasAnyGroup&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasAnyPermission&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="code-samples">Code Samples&lt;/h2>
 &lt;p>This sample &lt;code>targets.js&lt;/code> generates three widgets, and uses functions written in the &lt;code>targets-extras.js&lt;/code> file.&lt;/p>
 &lt;h3 id="targetsjs-1">&lt;code>targets.js&lt;/code>&lt;/h3>
@@ -3171,6 +3239,38 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/table>
 &lt;p>Please open &lt;a href="https://github.com/medic/cht-core/issues/new">an issue&lt;/a> if you&amp;rsquo;d like other functions included.&lt;/p>
 &lt;p>Custom functions and variables can be written in &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/nools-extras/">&lt;code>nools-extra.js&lt;/code>&lt;/a>, which is accessible to both Targets and Tasks.&lt;/p>
+&lt;h2 id="cht-api">CHT API&lt;/h2>
+&lt;p>&lt;em>Introduced in v3.12.0&lt;/em>&lt;/p>
+&lt;p>Provides CHT-Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code>cht&lt;/code> reserved variable under the &lt;code>v1&lt;/code> version.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Function&lt;/th>
+&lt;th>Arguments&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>hasPermissions(permissions, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissions&lt;/code>: String or array of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has the permission(s), otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hasAnyPermission(permissionsGroups, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canEdit&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_edit&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canManagePlaces&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_create_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_update_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">hasAnyGroup&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasAnyPermission&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="code-samples">Code samples&lt;/h2>
 &lt;h3 id="basic-task">Basic task&lt;/h3>
 &lt;p>This sample &lt;code>tasks.js&lt;/code> generates two postnatal-visit tasks for each delivery form. The tasks are due 7 and 14 days after the delivery report was submitted. Each task is displayed for 2 days before the due date and 2 days after the due date.&lt;/p>
@@ -3347,7 +3447,38 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="build">Build&lt;/h2>
 &lt;p>To build your tasks into your app, you must compile them into app-settings, then upload them to your instance.&lt;/p>
-&lt;p>&lt;code>medic-conf --local compile-app-settings backup-app-settings upload-app-settings&lt;/code>&lt;/p></description></item><item><title>Apps: Utils Functions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</guid><description>
+&lt;p>&lt;code>medic-conf --local compile-app-settings backup-app-settings upload-app-settings&lt;/code>&lt;/p></description></item><item><title>Apps: CHT API</title><link>https://docs.communityhealthtoolkit.org/apps/reference/_partial_cht_api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/_partial_cht_api/</guid><description>
+&lt;p>&lt;em>Introduced in v3.12.0&lt;/em>&lt;/p>
+&lt;p>Provides CHT-Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code>cht&lt;/code> reserved variable under the &lt;code>v1&lt;/code> version.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Function&lt;/th>
+&lt;th>Arguments&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>hasPermissions(permissions, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissions&lt;/code>: String or array of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has the permission(s), otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hasAnyPermission(permissionsGroups, userRoles, chtPermissionsSettings)&lt;/td>
+&lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
+&lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-js" data-lang="js">&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canEdit&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_edit&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">canManagePlaces&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasPermissions&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_create_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_update_places&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">hasAnyGroup&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">hasAnyPermission&lt;/span>&lt;span style="color:#000;font-weight:bold">([&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: Utils Functions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</guid><description>
 &lt;p>Utility functions in the Core Framework can make common tasks much easier. These are available only for Tasks and Targets. To use the function call &lt;code>Utils.&amp;lt;function-name&amp;gt;(&amp;lt;params&amp;gt;)&lt;/code>, for example &lt;code>Utils.addDate(report.reported_date, 10)&lt;/code>.&lt;/p>
 &lt;table>
 &lt;thead>
