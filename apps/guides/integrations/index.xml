@@ -101,7 +101,415 @@ In &lt;code>targets.js&lt;/code>, configure one or more data elements by setting
 &lt;li>Data for each user is aggregated based on the contents of the user&amp;rsquo;s target document. Note that if your users don&amp;rsquo;t login and synchronize, their data won&amp;rsquo;t be represented in the exported data.&lt;/li>
 &lt;li>Integrations are limited to &lt;em>monthly&lt;/em> DHIS2 data sets.&lt;/li>
 &lt;li>Integrations are limited to numeric data-types. To support other data types, consider making a &lt;a href="https://docs.dhis2.org/master/en/developer/html/apps_creating_apps.html">DHIS2 App&lt;/a> for your project.&lt;/li>
-&lt;/ul></description></item><item><title>Apps: OppiaMobile</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</guid><description>
+&lt;/ul></description></item><item><title>Apps: OpenMRS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/openmrs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/openmrs/</guid><description>
+&lt;p>&lt;a href="https://openmrs.org">OpenMRS&lt;/a> is an open source electronic medical record system used in dozens of countries. Integrating CHT apps with OpenMRS can open up opportunities to improve health outcomes for patients by promoting better coordination of care. For example, referrals by CHWs in the community can be sent electronically to health facilities using OpenMRS so that nurses and clinicians can prepare for their visit and have full access to the assessment done by a CHW.&lt;/p>
+&lt;p>Integrating CHT apps with OpenMRS can be achieved using the &lt;a href="https://rest.openmrs.org/">OpenMRS REST API&lt;/a> and following the guidance in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/integrations/custom/">Custom Integrations&lt;/a> documentation.&lt;/p>
+&lt;h2 id="overview">Overview&lt;/h2>
+&lt;p>The CHT Core Framework supports integrations with OpenMRS in a variety of ways:&lt;/p>
+&lt;ol>
+&lt;li>Sending patient and patient contacts data&lt;/li>
+&lt;li>Sending reports (encounters and observations) data&lt;/li>
+&lt;li>Exposing an API for OpenMRS developers to pull data from CHT Core&lt;/li>
+&lt;li>Receiving data from OpenMRS&lt;/li>
+&lt;/ol>
+&lt;p>Sending patients, patient contacts, and reports data can be achieved using the &lt;a href="(https://docs.communityhealthtoolkit.org/apps/reference/app-settings/outbound/)">Outbound push&lt;/a>. Receiving data from OpenMRS can be achieved using the CHT Core Web &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/">API&lt;/a>.&lt;/p>
+&lt;p>Common OpenMRS use cases include:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Linkage to care&lt;/strong>: Completion of medical visits after diagnosis&lt;/li>
+&lt;li>&lt;strong>Contact tracing&lt;/strong>: OpenMRS generates a list of contacts to be followed up&lt;/li>
+&lt;li>&lt;strong>Care coordination&lt;/strong>: Reminding patients to self-report or health-care givers to complete follow ups on patients of interest&lt;/li>
+&lt;/ol>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;p>As you design your usecases, bear in mind that at the heart of OpenMRS is the &lt;a href="https://wiki.openmrs.org/display/docs/Concept+Dictionary+Basics">Concept Dictionary&lt;/a>. Every contact, relationship, encounter or observation metadata exists first, which guides the definition of the forms in the CHT. Therefore, you need to have good understanding of what data maps to what concept.&lt;/p>
+&lt;h2 id="getting-started">Getting started&lt;/h2>
+&lt;p>The &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/">CHT API&lt;/a> and &lt;a href="https://rest.openmrs.org/#openmrs-rest-api">OpenMRS API&lt;/a> are used for integration. However, the APIs do not do data cleaning and formatting out-of-the-box. Therefore, both systems require custom solutions that ochestrate the functionality to transform exchanged data to be accepted. In the following sections, we focus more on the general procedure for setting up custom modules and services.&lt;/p>
+&lt;h3 id="cht-to-openmrs">CHT to OpenMRS&lt;/h3>
+&lt;p>This section focuses on a simple process and the best practices to send data to OpenMRS.&lt;/p>
+&lt;h4 id="mapping-forms">Mapping forms&lt;/h4>
+&lt;p>The first thing is to define forms to capture data. Forms can be contact or app, which translate to patient and encounter (for example, observation, lab request, and referral) respectively. Forms are defined using the XLS Form standard.
+Some of the best practices here include adopting a convention that results in minimum disruption (or that would require minimal processing) of the concept dictionary.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Defining contact forms&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>Here, you need to capture the basic details required for registering a patient or a patient contact in OpenMRS. Below is a sample naming convention for demographic details such as a person&amp;rsquo;s name (under field name):&lt;/p>
+&lt;p>&lt;code>patient_familyName&lt;/code> for family_name,
+&lt;code>patient_firstName&lt;/code> for first_name,
+&lt;code>patient_middleName&lt;/code> for middle_name&lt;/p>
+&lt;p>Another example of patient identifiers could take the form &lt;code>_IdentiferType_humanReadableName_IdentifierTypeUuid&lt;/code>. For example, national Id identifier type definition would be, &lt;code>patient_identifierType_nationalId_49af6cdc-7968-4abb-bf46-de10d7f4859f&lt;/code>.&lt;/p>
+&lt;p>A sample form definition could be as follows:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>choice_filter&lt;/th>
+&lt;th>hint&lt;/th>
+&lt;th>default&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>patient_demographics&lt;/td>
+&lt;td>Demographic details&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>patient_familyName&lt;/td>
+&lt;td>Family name&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>patient_firstName&lt;/td>
+&lt;td>First name&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>patient_middleName&lt;/td>
+&lt;td>Middle name&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>patient_identifierType_nationalId_49af6cdc-7968-4abb-bf46-de10d7f4859f&lt;/td>
+&lt;td>National ID&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>A sample payload would be as follows:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-text" data-lang="text">{
+...,
+&amp;#34;patient_demographics&amp;#34;: {
+&amp;#34;patient_familyName&amp;#34;: &amp;#34;Doe&amp;#34;,
+&amp;#34;patient_firstName&amp;#34;: &amp;#34;John&amp;#34;,
+&amp;#34;patient_middleName&amp;#34;: &amp;#34;Test&amp;#34;,
+&amp;#34;patient_identifierType_nationalId_49af6cdc-7968-4abb-bf46-de10d7f4859f&amp;#34;: &amp;#34;38839128&amp;#34;,
+&amp;#34;patient_identifierType_clinicNumber_000f85aa-a460-46d1-87be-daabe7bd9d99&amp;#34;: &amp;#34;1271891&amp;#34;
+}
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Such convention makes it easier to process the payload for queueing handling.&lt;/p>
+&lt;ol start="2">
+&lt;li>&lt;strong>Defining app forms&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>An encounter form consists of input and observation groups in the XForm. &lt;code>form_uuid&lt;/code> and &lt;code>encounter_type_uuid&lt;/code> define the uuids for the encounter form and encounter type respectively. Please note that these are defined within the general &lt;code>input&lt;/code> group provided by CHT.&lt;/p>
+&lt;p>The &lt;code>observation&lt;/code> group is used to define the clinical observation variables to be collected by the form. This group is equivalent to the group of &lt;code>&amp;lt;obs&amp;gt;&lt;/code> in OpenMRS html form entry module. In OpenMRS, an observation construct has concept ID (with inherent concept type), label, and answer options if it requires. In Xforms, one needs to define the following:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Observation type (field type of the xlsform)&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Name - this will be used as &lt;code>key&lt;/code> in the generated JSON payload for the form data. Using the adopted convention above, &lt;code>_conceptID_humanReadableConceptName_99DCT&lt;/code>, we could have:&lt;/p>
+&lt;p>&lt;code>_5089_weight_99DC&lt;/code> for weight.&lt;/p>
+&lt;p>For multi-select (obs group in OpenMRS), we can easily append &lt;code>MULTISELECT&lt;/code> to the &lt;code>humanReadableConceptName&lt;/code> for example:
+&lt;code>_162558_disabilityTypeMULTISELECT_99DCT&lt;/code> for diability type with the options &lt;code>blind, dumb, ...&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>A label which is displayed to the user during form entry&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>Here is a sample form snippet followed by sample select list in the choices worksheet.&lt;/p>
+&lt;h5 id="data-fields">Data fields&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>choice_filter&lt;/th>
+&lt;th>hint&lt;/th>
+&lt;th>default&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>form_uuid&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>_99DCT&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>encounter_type_uuid&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>group_assessment&lt;/td>
+&lt;td>Assessment&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one client_consented&lt;/td>
+&lt;td>_1710_clientConsented_99DCT&lt;/td>
+&lt;td>Has ${patient_name} consented?&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_multiple disability_type&lt;/td>
+&lt;td>_162558_disabilityTypeMULTISELECT_99DCT&lt;/td>
+&lt;td>Disability type&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>_160632_Specify_99DCT&lt;/td>
+&lt;td>Specify (0ther)&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>${_162558_disabilityTypeMULTISELECT_99DCT} = &amp;lsquo;other&amp;rsquo;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h5 id="choices">Choices&lt;/h5>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>list_name&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>client_consented&lt;/td>
+&lt;td>_1065_Yes_99DCT&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>client_consented&lt;/td>
+&lt;td>_1066_No_99DCT&lt;/td>
+&lt;td>No&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>disability_type&lt;/td>
+&lt;td>_1058_vision_99DCT&lt;/td>
+&lt;td>Vision&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>disability_type&lt;/td>
+&lt;td>_1059_hearing_99DCT&lt;/td>
+&lt;td>Hearing&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>disability_type&lt;/td>
+&lt;td>_1060_mental_99DCT&lt;/td>
+&lt;td>Mental&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>disability_type&lt;/td>
+&lt;td>_1061_other_99DCT&lt;/td>
+&lt;td>Other&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Remember to convert and upload your forms&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-zsh" data-lang="zsh">medic-conf --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs convert-contact-forms upload-contact-forms convert-app-forms upload-app-forms
+&lt;/code>&lt;/pre>&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Remember to setup the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/outbound/">Outbound push&lt;/a> modules to send data to OpenMRS.
+&lt;/div>
+&lt;h4 id="handling-the-data">Handling the data&lt;/h4>
+&lt;p>After collecting data using the forms defined above, the next step is to process and persist it in OpenMRS. Processing includes:&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Cleaning&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>First, the data has to be transformed to an OpenMRS-compatible format before it is queued. This means that you need to define custom RESTful endpoints if not already existing, that would be utilized by the Outbound push modules configured above. Transformation basically involves extracting form data into an object. Most importantly, &lt;code>discriminators&lt;/code>, which are like flags appended to form data to inform the type of data being processed. For example, a &lt;code>registration&lt;/code> discriminator implies that we&amp;rsquo;re dealing with demographic details. A sample transformed payload is shown below:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-text" data-lang="text">{
+&amp;#34;patient&amp;#34;: {
+&amp;#34;patient.family_name&amp;#34;: &amp;#34;Doe&amp;#34;,
+&amp;#34;patient.first_name&amp;#34;: &amp;#34;John&amp;#34;,
+&amp;#34;patient.middle_name&amp;#34;: &amp;#34;Test&amp;#34;,
+&amp;#34;patient.other_identifier&amp;#34;: [
+{
+&amp;#34;identifier_type_uuid&amp;#34;: &amp;#34;49af6cdc-7968-4abb-bf46-de10d7f4859f&amp;#34;,
+&amp;#34;identifier_type&amp;#34;: &amp;#34;38839128&amp;#34;,
+&amp;#34;identifier_type_name&amp;#34;: &amp;#34;National ID&amp;#34;,
+},
+{
+&amp;#34;identifier_type_uuid&amp;#34;: &amp;#34;000f85aa-a460-46d1-87be-daabe7bd9d99&amp;#34;,
+&amp;#34;identifier_type&amp;#34;: &amp;#34;1271891&amp;#34;,
+&amp;#34;identifier_type_name&amp;#34;: &amp;#34;Clinic Number&amp;#34;,
+}
+]
+},
+&amp;#34;observation&amp;#34;: {
+&amp;#34;1710^CLIENT CONSENTED^99DCT&amp;#34;: &amp;#34;1065^Yes^99DCT&amp;#34;,
+&amp;#34;1542^OCCUPATION^99DCT&amp;#34;: &amp;#34;1538^Farmer^99DCT&amp;#34;
+},
+&amp;#34;discriminator&amp;#34;: {
+&amp;#34;dicriminator&amp;#34;: &amp;#34;registration&amp;#34;
+}
+}
+&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
+&lt;li>&lt;strong>Queueing&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>This step involves adding a transformed payload, now objects, to a queue. This is important because it helps to capture errors that occur during processing and the data can be corrected and re-queued. A queue will have both registration and encounter objects.&lt;/p>
+&lt;p>You need to define a queue processor that will be consuming the queue and push each object to the rightful handler.&lt;/p>
+&lt;ol start="3">
+&lt;li>&lt;strong>Data handlers&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>Data handlers are responsible for persisting the data in OpenMRS. The handler can also be used to trigger feedback to submitters of the data (this can be a brief summary such as number of synced documents and success rate). The following steps apply:&lt;/p>
+&lt;ul>
+&lt;li>Define handlers for each object type (e.g. person / patient, trace report.&lt;/li>
+&lt;li>Create a scheduler to start the queue processor above. The queue processor shall get to the handler for processing.&lt;/li>
+&lt;li>Closely monitor the errors log for prompt action where necessary.&lt;/li>
+&lt;/ul>
+&lt;p>You may want to further configure a service that relays feedback to the CHT. Feel free to utilize in-app text messages, which can be triggered via the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#post-apisms">sms endpoint&lt;/a> of CHT. The health workers would receive these feedback messages on their phones as well as access via the Messages tab in-app.&lt;/p>
+&lt;h4 id="error-handling">Error Handling&lt;/h4>
+&lt;p>Exceptions thrown during processing can be added to a queue and presented on an interface for action. The erring data may then be re-queued. You need to consider what works best at this point. For convenience, it makes sense for a backend user to resolve such errors.&lt;/p>
+&lt;p>Sample OpenMRS handler scripts include:&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://github.com/kmatiya/emr-yendanafe-test-script">PIH Malawi&amp;rsquo;s EMR handler&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/palladiumkenya/openmrs-module-afyastat">KenyaEMR handler&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;h3 id="openmrs-to-cht">OpenMRS to CHT&lt;/h3>
+&lt;h4 id="scheduled-tasks">Scheduled tasks&lt;/h4>
+&lt;p>This includes defining a scheduler and a task that will be compiling the payload to be pushed to the CHT on specific intervals. Remember that the CHT expects data in JSON format.
+The CHT API can be used to process incoming reports. For custom payloads, the &lt;a href="https://docs.couchdb.org/en/stable/api/database/bulk-api.html#db-bulk-docs">{db}/bulk_docs&lt;/a> can be utilized to save multiple payloads concurrent&lt;/p>
+&lt;h4 id="listener-script-in-the-cht">Listener script in the CHT&lt;/h4>
+&lt;p>This is a service that would help shift information in the CHT &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">hierarchy&lt;/a> to support the usecases of interest. Through {db}/bulk_docs, OpenMRS posts a data record that contains data objects such as observations and contact list (if available) details. The service obtains the record, and unpacks it into a contact in CHT and parented under the correct hierarchy level based on the metadata received from OpenMRS. The script should:&lt;/p>
+&lt;ol>
+&lt;li>Do patient matching to avoid duplicate details. Querying can be achieved via available endpoints such as &lt;code>contacts_by_phone&lt;/code> &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv1contacts-by-phone">endpoint&lt;/a> and &lt;code>hydrate&lt;/code> &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv1hydrate">endpoint&lt;/a> among others/&lt;/li>
+&lt;li>If the incoming data matches what exists, update the contact found in CHT.&lt;/li>
+&lt;li>Process all reports payloads and append them to the linked contact’s profile. Note that the &lt;code>&amp;lt;report type&amp;gt;&lt;/code> xml or JSON form has to be defined in the CHT.&lt;/li>
+&lt;li>Delete the payload that is received from OpenMRS after it is processed since it will have been used to create CHT data structures.&lt;/li>
+&lt;li>Monitor and log failed transactions&lt;/li>
+&lt;/ol>
+&lt;p>Once you have configured the above for data exchange, the data flow will be like this:&lt;/p>
+&lt;p>&lt;img src="cht-openmrs.jpg" alt="CHT - OpenMRS Data Flow">&lt;/p></description></item><item><title>Apps: OppiaMobile</title><link>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/integrations/oppia/</guid><description>
 &lt;p>The training modules configuration consists of five main components:&lt;/p>
 &lt;ul>
 &lt;li>App Forms - Content that the user will interact with;&lt;/li>
