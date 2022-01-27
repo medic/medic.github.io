@@ -1,0 +1,426 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Android</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/</link><description>Recent content in Android on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/core/guides/android/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Development Environment</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>The following instructions allows you to setup a development environment for the &lt;strong>&lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>&lt;/strong> apps, to either contribute to the project or just add a new flavor (branded app). Most of the instructions also applies to the &lt;strong>&lt;a href="https://github.com/medic/cht-gateway">CHT Gateway&lt;/a>&lt;/strong> app (the differences are highlighted in the guide).&lt;/p>
+&lt;p>Finally, you will learn how to assemble the app, run the tests, and how to choose the right artifacts when installing or publishing the apps.&lt;/p>
+&lt;/div>
+&lt;h2 id="requirements">Requirements&lt;/h2>
+&lt;ul>
+&lt;li>Java 11+ for CHT Android, Java 8+ for CHT Gateway (OpenJDK versions work).&lt;/li>
+&lt;li>Android SDK, and optionally Android Studio.&lt;/li>
+&lt;li>The &lt;code>adb&lt;/code> command for debugging and get the logs.&lt;/li>
+&lt;li>The source code. To run all the tests in the CHT Android app you need to clone also the submodules: &lt;code>git clone --recurse-submodules https://github.com/medic/cht-android.git&lt;/code>.&lt;/li>
+&lt;li>The &lt;code>make&lt;/code> command.&lt;/li>
+&lt;li>If you are going to build a new flavor (CHT Android), you also need to have installed: &lt;code>head&lt;/code>, &lt;code>xxd&lt;/code>, &lt;code>openssl&lt;/code> and &lt;code>apksigner&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Gradle&lt;/strong> is also used but it&amp;rsquo;s downloaded and installed in the user space the first time &lt;code>make&lt;/code> is executed. You can also build and launch the app with &lt;a href="#android-studio">Android Studio&lt;/a>.&lt;/p>
+&lt;p>Bellow are the instructions of how to install and setup some of the tools required.&lt;/p>
+&lt;h2 id="install">Install&lt;/h2>
+&lt;h3 id="java">Java&lt;/h3>
+&lt;p>Java 11+ needs to be installed. The CHT Gateway can be also compiled with Java 8, but you can use the same Java 11 used for the CHT Android apps. The &lt;code>bin/&lt;/code> folder of the JDK must added in the &lt;code>$PATH&lt;/code> environment variable, and it&amp;rsquo;s recommended to have &lt;code>$JAVA_HOME&lt;/code> pointing to the JDK folder as well.&lt;/p>
+&lt;p>To install different versions of Java and without the need to have root permissions, checkout &lt;a href="https://sdkman.io/">Sdkman!&lt;/a>, if you are familiar with tools like &lt;code>nvm&lt;/code> or &lt;code>rvm&lt;/code>, this tool is pretty much the same for Java, and the command takes care of adding the selected JDK to the &lt;code>$PATH&lt;/code> variable and to set the &lt;code>$JAVA_HOME&lt;/code> variable when switching across different versions.&lt;/p>
+&lt;h3 id="android-studio-and-the-sdk">Android Studio and the SDK&lt;/h3>
+&lt;p>Android Studio is the full package: the IDE based on IntelliJ IDEA, the Android SDK and the SDK Manager with the UI to manage different packages visually, while the SDK alone only includes the command line tools like the &lt;code>sdkmanager&lt;/code> CLI.&lt;/p>
+&lt;p>You don&amp;rsquo;t need the IDE to build the app or to install a &amp;ldquo;debug&amp;rdquo; version in a device, or get the logs, but it&amp;rsquo;s recommended if you also want to debug the app or modify the code.&lt;/p>
+&lt;ul>
+&lt;li>Android Studio: download from &lt;a href="https://developer.android.com/studio">https://developer.android.com/studio&lt;/a>&lt;/li>
+&lt;li>Command line tools only: download from &lt;a href="https://developer.android.com/studio#command-tools">https://developer.android.com/studio#command-tools&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>If you install Android Studio it&amp;rsquo;s still recommended to download and setup the command line tools separately to be able to use them without the IDE.&lt;/p>
+&lt;p>The binary folder of the command also need to be added to the &lt;code>$PATH&lt;/code>, and &lt;code>$ANDROID_HOME&lt;/code> pointing to the root of the SDK. Moreover, the SDK requires to be stored in the &lt;code>$ANDROID_HOME&lt;/code> and inside a folder called &lt;code>latest&lt;/code>.&lt;/p>
+&lt;p>Here are the steps from the command line you can follow to install the CLI tools once downloaded the zip file:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-bash" data-lang="bash">$ mkdir -p Android/Sdk/cmdline-tools
+$ unzip commandlinetools-linux-7583922_latest.zip
+$ mv cmdline-tools/ Android/Sdk/cmdline-tools/latest/
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then, to add the environment variables required, you can add the following to your &lt;code>~/.bashrc&lt;/code> file:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-bash" data-lang="bash">&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">ANDROID_HOME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000">$HOME&lt;/span>&lt;span style="color:#4e9a06">/Android/Sdk&amp;#34;&lt;/span>
+&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">:&lt;/span>&lt;span style="color:#000">$ANDROID_HOME&lt;/span>&lt;span style="color:#4e9a06">/cmdline-tools/latest/bin&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="debug-tool-adb">Debug tool &lt;code>adb&lt;/code>&lt;/h3>
+&lt;p>Old SDK distributions used to have it pre-packaged, now you have to install it separately. Once installed SDK following the steps above, you can install the latest version of &lt;code>adb&lt;/code> with:&lt;/p>
+&lt;pre>&lt;code>$ sdkmanager --install platform-tools
+&lt;/code>&lt;/pre>&lt;p>If you also installed Android Studio you can use the &lt;a href="https://developer.android.com/studio/intro/update#sdk-manager">SDK Manager&lt;/a> instead.&lt;/p>
+&lt;p>Finally edit again the &lt;code>$PATH&lt;/code> environment variable to add the adb path: &lt;code>$ANDROID_HOME/platform-tools&lt;/code>.&lt;/p>
+&lt;h3 id="apksigner">&lt;code>apksigner&lt;/code>&lt;/h3>
+&lt;p>This tool is used automatically by the Android SDK for signing APKs, and to check the certificate of a given APK, so chances are that after installing the SDK following the steps above you already have it installed, but not configured in the &lt;code>$PATH&lt;/code> that is needed to manually check APKs signature.&lt;/p>
+&lt;p>The CLI is part of other CLI tolls under the &lt;code>build-tools&lt;/code> package, and multiple build tools package can be installed, so check what versions you have under the &lt;code>$ANDROID_HOME/build-tools&lt;/code> folder, and add the most up to date to the &lt;code>$PATH&lt;/code> folder. E.g. if you have the version 30.0.3 installed in you computer, apksigner should be installed at &lt;code>$ANDROID_HOME/build-tools/30.0.3/apksigner&lt;/code>, so add the &lt;code>$ANDROID_HOME/build-tools/30.0.3&lt;/code> folder to the &lt;code>$PATH&lt;/code> variable.&lt;/p>
+&lt;p>In case you don&amp;rsquo;t have it installed or want to install a newer version, checkout the versions available with &lt;code>sdkmanager --list&lt;/code>. You will see a table with a list of installed and available packages, not just the build tools.&lt;/p>
+&lt;p>To install the version 31.0.0: &lt;code>sdkmanager --install 'build-tools;31.0.0'&lt;/code>. Then update or add it to the &lt;code>$PATH&lt;/code> variable.&lt;/p>
+&lt;h2 id="development">Development&lt;/h2>
+&lt;h3 id="flavor-selection">Flavor selection&lt;/h3>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Some &lt;code>make&lt;/code> targets support the flavor and the rendering engine as &lt;code>make flavor=[Flavor][Engine] [task]&lt;/code>, where &lt;code>[Flavor]&lt;/code> is the branded version with the first letter capitalized and the &lt;code>[Engine]&lt;/code> is either &lt;code>Webview&lt;/code> or &lt;code>Xwalk&lt;/code>. The &lt;code>[task]&lt;/code> is the action to execute: &lt;code>deploy&lt;/code>, &lt;code>assemble&lt;/code>, &lt;code>lint&lt;/code>, etc.&lt;/p>
+&lt;p>The default value for &lt;code>flavor&lt;/code> is &lt;code>UnbrandedWebview&lt;/code>, e.g. executing &lt;code>make deploy&lt;/code> will assemble and install that flavor, while executing &lt;code>make flavor=MedicmobilegammaXwalk deploy&lt;/code> will do the same for the &lt;em>Medicmobilegamma&lt;/em> brand and the &lt;code>Xwalk&lt;/code> engine.&lt;/p>
+&lt;p>See the &lt;a href="https://github.com/medic/cht-android/blob/master/Makefile">Makefile&lt;/a> for more details.&lt;/p>
+&lt;h3 id="build-and-assemble">Build and assemble&lt;/h3>
+&lt;p>To build and assemble the CHT Gateway use &lt;code>make build&lt;/code>.&lt;/p>
+&lt;p>For CHT Android app use:&lt;/p>
+&lt;pre>&lt;code>$ make assemble
+&lt;/code>&lt;/pre>
+&lt;p>The command above builds and assembles the &lt;em>debug&lt;/em> and &lt;em>release&lt;/em> APKs of the Unbranded Webview version of the app.&lt;/p>
+&lt;p>Each APK will be generated and stored in &lt;code>build/outputs/apk/[flavor][Engine]/[debug|release]/&lt;/code>, for example after assembling the &lt;em>Simprints Webview&lt;/em> flavor with &lt;code>make flavor=SimprintsWebview assemble&lt;/code>, the &lt;em>release&lt;/em> versions of the APKs generated are stored in &lt;code>build/outputs/apk/simprintsWebview/release/&lt;/code>.&lt;/p>
+&lt;p>To assemble other flavors, use the following command: &lt;code>make flavour=[Flavor][Engine] assemble&lt;/code>. See the &lt;a href="#flavor-selection">Flavor selection&lt;/a> section for more details about &lt;code>make&lt;/code> commands.&lt;/p>
+&lt;p>To create the &lt;code>.aab&lt;/code> bundle file, use &lt;code>make bundle&lt;/code>, although signed versions are generated when &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/">releasing&lt;/a>, and the Play Store requires the AAB to be signed with the right key.&lt;/p>
+&lt;p>To clean the APKs and compiled resources: &lt;code>make clean&lt;/code>.&lt;/p>
+&lt;h3 id="testing">Testing&lt;/h3>
+&lt;p>To execute unit tests: &lt;code>make test&lt;/code> (static checks are also executed).&lt;/p>
+&lt;h4 id="static-checks">Static checks&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>To only execute the &lt;strong>linter checks&lt;/strong>, run: &lt;code>make lint&lt;/code>. To perform the same checks for the &lt;em>XView&lt;/em> source code, use: &lt;code>make flavor=UnbrandedXwalk lint&lt;/code> instead.&lt;/p>
+&lt;h4 id="instrumentation-tests">Instrumentation Tests&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The UI tests run on a device.&lt;/p>
+&lt;ol>
+&lt;li>Uninstall previous versions of the app, otherwise an &lt;code>InstallException: INSTALL_FAILED_VERSION_DOWNGRADE&lt;/code> can cause tests to fail.&lt;/li>
+&lt;li>Select English as default language in the device.&lt;/li>
+&lt;li>Ensure you meet all the &lt;a href="#requirements">Requirements&lt;/a>.&lt;/li>
+&lt;li>Execute: &lt;code>make test-ui-all&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h4 id="shell-tests">Shell tests&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The project has bash tests that verify the Make targets used to create and manage the keystores used to sign the apps. Use &lt;code>make test-bash-keystore&lt;/code> to run them. In CI they are executed in Linux and MacOS VMs.&lt;/p>
+&lt;p>If you get an error like &lt;code>make: ./src/test/bash/bats/bin/bats: Command not found&lt;/code>, it&amp;rsquo;s because you cloned the project without the &lt;code>--recurse-submodules&lt;/code> git argument. Execute first &lt;code>git submodule update --init&lt;/code> to clone
+the submodules within the cht-android folder.&lt;/p>
+&lt;h4 id="connecting-to-the-server-locally">Connecting to the server locally&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Refer to the &lt;a href="https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md#testing-locally-with-devices">CHT Core Developer Guide&lt;/a>.&lt;/p>
+&lt;h3 id="android-studio">Android Studio&lt;/h3>
+&lt;p>The &lt;a href="https://developer.android.com/studio">Android Studio&lt;/a> can be used to build and launch the app instead. Be sure to select the right flavor and rendering engine from the &lt;em>Build Variants&lt;/em> dialog (see &lt;a href="https://developer.android.com/studio/run#changing-variant">Change the build variant&lt;/a>). To launch the app in an emulator, you need to uncomment the code that has the strings for the &lt;code>x86&lt;/code> or the &lt;code>x86_64&lt;/code> architecture in the &lt;code>android&lt;/code> / &lt;code>splits&lt;/code> / &lt;code>include&lt;/code> sections of the &lt;code>build.gradle&lt;/code> file.&lt;/p>
+&lt;h3 id="artifact-formats">Artifact formats&lt;/h3>
+&lt;p>When building the app there are two output formats you can use: Android App Bundle or APK.&lt;/p>
+&lt;h4 id="android-app-bundles">Android App Bundles&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The &lt;a href="https://github.com/medic/cht-android/blob/master/.github/workflows/publish.yml">publish&lt;/a> script in CI produces multiple AABs for publishing to the &lt;strong>Google Play Store&lt;/strong>, so the generated &lt;code>.aab&lt;/code> files need to be uploaded instead of the &lt;code>.apk&lt;/code> files if the Play Store require so. Old apps published for the first time before Aug 1, 2021 can be updated with the APK format.&lt;/p>
+&lt;p>For each flavor two bundles are generated, one for each rendering engine: &lt;em>Webview&lt;/em> and &lt;em>Xwalk&lt;/em>. When distributing via the Play Store using the bundle files, upload all AABs and it will automatically choose the right one for the target device.&lt;/p>
+&lt;p>The AABs are named as follows: &lt;code>cht-android-{version}-{brand}-{rendering-engine}-release.aab&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Rendering engine&lt;/th>
+&lt;th>Android version&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>webview&lt;/code>&lt;/td>
+&lt;td>10+&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>xwalk&lt;/code>&lt;/td>
+&lt;td>4.4 - 9&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="apks">APKs&lt;/h4>
+&lt;p>For compatibility with a wide range of devices, the &lt;a href="https://github.com/medic/cht-android/blob/master/.github/workflows/publish.yml">publish&lt;/a> script in CI produces multiple APKs. The two variables are the instruction set used by the device&amp;rsquo;s CPU, and the supported Android version. When sideloading the application, it is essential to pick the correct APK or the application may crash.&lt;/p>
+&lt;p>If distributing APKs via the Play Store, upload all APKs and it will automatically choose the right one for the target device.&lt;/p>
+&lt;p>To help you pick which APK to install, you can find information about the version of Android and the CPU in the About section of the phone&amp;rsquo;s settings menu.&lt;/p>
+&lt;p>The APKs are named as follows: &lt;code>cht-android-{version}-{brand}-{rendering-engine}-{instruction-set}-release.apk&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Rendering engine&lt;/th>
+&lt;th>Instruction set&lt;/th>
+&lt;th>Android version&lt;/th>
+&lt;th>Notes&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>webview&lt;/code>&lt;/td>
+&lt;td>&lt;code>arm64-v8a&lt;/code>&lt;/td>
+&lt;td>10+&lt;/td>
+&lt;td>Preferred. Use this APK if possible.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>webview&lt;/code>&lt;/td>
+&lt;td>&lt;code>armeabi-v7a&lt;/code>&lt;/td>
+&lt;td>10+&lt;/td>
+&lt;td>Built but not compatible with any devices. Ignore this APK.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>xwalk&lt;/code>&lt;/td>
+&lt;td>&lt;code>arm64-v8a&lt;/code>&lt;/td>
+&lt;td>4.4 - 9&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>xwalk&lt;/code>&lt;/td>
+&lt;td>&lt;code>armeabi-v7a&lt;/code>&lt;/td>
+&lt;td>4.4 - 9&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Core: Get Android Logs</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/get-android-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/get-android-logs/</guid><description>
+&lt;p>With Android 4.1 (aka Jelly Bean) and upwards the full system log is only visible if you have root.&lt;br>
+To get logs, you have to use &lt;code>adb logcat&lt;/code> via a computer.&lt;/p>
+&lt;p>To &lt;strong>install&lt;/strong> the &lt;code>adb&lt;/code> command follow the instructions under the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/#debug-tool-adb">Development Environment &amp;gt; Debug tool adb&lt;/a> section.&lt;/p>
+&lt;h2 id="configure-on-device-usb-debugging">Configure on-device USB debugging&lt;/h2>
+&lt;p>If you trying to get the logs from a device for the first time, follow these steps:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Enable USB debugging on your phone. This varies from phone to phone, checkout how to do it from the official Android &lt;a href="https://developer.android.com/studio/debug/dev-options#enable">documentation&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Connect your phone by USB to the computer.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>You will see a popup &lt;em>&amp;ldquo;Allow USB debugging. The computer&amp;rsquo;s RSA fingerprint&amp;hellip;&amp;quot;&lt;/em>, click &lt;em>&amp;ldquo;OK&amp;rdquo;&lt;/em>. If you don&amp;rsquo;t see the popup when the cable is plugged in, you will see it after the next step.&lt;/p>
+&lt;p>&lt;img src="allow_usb_debugging.png" alt="Allow USB debugging">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Within a command line session write the following command: &lt;code>adb start-server&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To check if your phone is properly connected, write the command &lt;code>adb devices&lt;/code>. This will list the devices connected. Something like:&lt;/p>
+&lt;p>&lt;img src="adb_devices.png" alt="ADB Devices">&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>All set to get the logs!&lt;/p>
+&lt;h2 id="get-the-logs">Get the logs&lt;/h2>
+&lt;p>Once the device is configured following the steps above, follow up with the command &lt;code>adb logcat &amp;gt; phone.log&lt;/code> to get the android logs in the file &lt;code>phone.log&lt;/code>. You can stop the recording at any time pressing &lt;em>Ctrl+C&lt;/em>.&lt;/p>
+&lt;p>Now while taking android logs is the time to try to reproduce the error.
+Check some of the messages that are &amp;lsquo;WAITING&amp;rsquo; and click retry. Do this for as many times as you deem necessary to capture logs for that event.&lt;/p>
+&lt;p>You can also get the same logs with &lt;strong>Android Studio&lt;/strong>. The steps to connect the phone for the first time are the same, but then you can just open Android Studio with the phone connected and checkout the &lt;em>Logcat&lt;/em> tab.&lt;/p>
+&lt;h3 id="get-only-the-app-logs">Get only the app logs&lt;/h3>
+&lt;p>Either if you get the logs from &lt;code>adb&lt;/code> or Android Studio you will notice that all the logs from all the apps and the Android OS are recorded, but there are ways to filter the content to only from the app we are trying to debug.&lt;/p>
+&lt;p>If the app ins &lt;strong>CHT Android&lt;/strong>, within a command line session go to the project source code folder, and execute:&lt;/p>
+&lt;pre>&lt;code>$ make logs
+&lt;/code>&lt;/pre>&lt;p>The logs will be shown in the console, and stored in the &lt;code>android.log&lt;/code> file.&lt;/p>
+&lt;p>At the beginning of the execution you will notice that the &lt;code>adb&lt;/code> command is executed and the content is filter with the following argument: &lt;code>MedicMobile:V AndroidRuntime:E '*:S'&lt;/code>. If that doesn&amp;rsquo;t work, try to execute:&lt;/p>
+&lt;pre>&lt;code>$ adb logcat MedicMobile:V AndroidRuntime:E chromium:V '*:S'
+&lt;/code>&lt;/pre>&lt;p>Or a simpler solution could be get all the logs and filter with &lt;code>grep&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>$ adb logcat | grep MedicMobile
+&lt;/code>&lt;/pre>&lt;p>To get more specific logs you can use other expressions in the &lt;code>grep&lt;/code> command as well.&lt;/p></description></item><item><title>Core: Releasing</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/releasing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/releasing/</guid><description>
+&lt;p>All Medic&amp;rsquo;s android projects automatically build, sign, and release builds via Github Actions or Travis. The following guide applies to any of these apps, although the last 2 are in maintenance mode (links pointing to the release sections):&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/medic/cht-android/releases">cht-android&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/cht-gateway/releases">cht-gateway&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-collect/releases">medic-collect&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/rdt-capture/releases">rdt-capture&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="alpha-for-release-testing">Alpha for release testing&lt;/h2>
+&lt;ol>
+&lt;li>Make sure all issues for this release have passed AT and been merged into &lt;code>master&lt;/code>. You can also create an alpha release from a feature branch, to provide the needed &lt;code>.apk&lt;/code> files to the QA team.&lt;/li>
+&lt;li>Create a git tag starting with &lt;code>v&lt;/code> and ending with the alpha version, e.g. &lt;code>git tag v1.2.3-alpha.1&lt;/code> and push the tag to GitHub (&lt;code>git push --tags&lt;/code>). For features branches, you can add the name of the branch or whatever keyword helps to identify the the release, e.g. &lt;code>v1.2.3-alpha.dark-theme.4&lt;/code>.&lt;/li>
+&lt;li>Creating the tag will trigger the building and signing of the app in CI. The release-ready APKs are available for side-loading from the Releases section in the project (e.g. &lt;a href="https://github.com/medic/cht-android/releases">CHT-Android Releases&lt;/a>), along with the AABs that may be required by the Google Play Store.&lt;/li>
+&lt;li>&lt;strong>Side-Load&lt;/strong>: for testing internally, or apps that are not published in the Play Store like Collect and Gateway: Navigate to the GitHub Releases page (linked above) and download the relevant APKs for distribution.&lt;/li>
+&lt;li>Announce the release in &lt;em>#quality-assurance&lt;/em>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="production-release">Production release&lt;/h2>
+&lt;ol>
+&lt;li>Repeat step 2-3 from the above &lt;a href="#alpha-for-release-testing">alpha release section&lt;/a> with the naming convention &lt;code>v&amp;lt;major&amp;gt;.&amp;lt;minor&amp;gt;.&amp;lt;patch&amp;gt;&lt;/code>.&lt;/li>
+&lt;li>The CI build for the tag will create a new draft release on GitHub. Include the release notes from the CHANGELOG in the description of the release and publish the release on GitHub.&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/publishing/">Publish&lt;/a> in the Play Store, F-Droid or whatever channel is used for publishing. For the CHT-Android app, the &amp;ldquo;reference&amp;rdquo; apps (&lt;code>medicmobilegamma&lt;/code> and &lt;code>unbranded&lt;/code>) must be published in the Play Store.&lt;/li>
+&lt;li>Announce the release on the &lt;a href="https://forum.communityhealthtoolkit.org">CHT forum&lt;/a>, under the &amp;ldquo;Product - Releases&amp;rdquo; category.&lt;/li>
+&lt;/ol>
+&lt;h2 id="new-flavor-release">New flavor release&lt;/h2>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>If the release only contains a new flavor but is based on the last version, tag it with the same version that the last one plus a number suffix separated with a &lt;code>-&lt;/code>, e.g. if the last version was &lt;code>v1.2.3&lt;/code>, tag it as &lt;code>v1.2.3-1&lt;/code>. In this case there is no need to publish again the reference apps in the Play Store, or to announce the release in the forum if isn&amp;rsquo;t relevant.&lt;/p></description></item><item><title>Core: Publishing</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</guid><description>
+&lt;p>Once &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/">released&lt;/a> the app, there are many different ways to publish the binaries for installation.&lt;/p>
+&lt;h3 id="google-play-store">Google Play Store&lt;/h3>
+&lt;p>The Play Store has the advantage of being installed on all Android phones by default. This makes it very easy for users to install your app, which makes it the approach we recommend for most applications.&lt;/p>
+&lt;p>One of the downsides is it can be more difficult to get your app published and it may be removed in future if it&amp;rsquo;s found to not comply with future requirements.&lt;/p>
+&lt;p>Follow these instructions to &lt;a href="https://support.google.com/googleplay/android-developer/answer/9859751?hl=en">publish your app&lt;/a>. In the &lt;a href="https://play.google.com/console">Google Play Console&lt;/a>, for each flavor to publish, create a new &lt;code>Production&lt;/code> release:&lt;/p>
+&lt;ul>
+&lt;li>Upload app bundles (from the GitHub Release) for the flavor&lt;/li>
+&lt;li>Use the new cht-android version as the Release name&lt;/li>
+&lt;li>Add a one sentence summary of the CHANGELOG entry as the Release notes.&lt;/li>
+&lt;/ul>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Published apps are not immediately available to users on the Play Store. Confirm, via the Google Play Console, that the release is available before officially announcing it (this could take hours or days).
+&lt;/div>
+&lt;h4 id="new-app-in-the-play-store">New App in the Play Store&lt;/h4>
+&lt;p>Remember that when the app is created in the Play Store, it&amp;rsquo;s required to choose the way the app will be signed by Google: we upload the signed AAB files, but then Google creates optimized versions of the app in .apk format. The app has to be configured to use the same signing and upload signatures by Google. Choose to upload a &amp;ldquo;Java keystore&amp;rdquo;, the Play Console will require a file encrypted with a tool named PEPK, that file is &lt;code>&amp;lt;brand&amp;gt;_private_key.pepk&lt;/code> generated when following the instructions of &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/branding/">New brand&lt;/a> (the button to upload the &lt;code>.pepk&lt;/code> in the Play Console may say &amp;ldquo;Upload generated ZIP&amp;rdquo; although the PEPK file doesn&amp;rsquo;t look like a .zip file).&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+New apps cannot longer be uploaded with the APK format in the Play Store. Apps created before Aug 1, 2021 can still be updated with &lt;code>.apk&lt;/code> files, but new ones needs to be uploaded with the Android App Bundle format (&lt;code>.aab&lt;/code>). Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/#artifact-formats">Artifact formats&lt;/a> section.
+&lt;/div>
+&lt;h3 id="side-loading">Side loading&lt;/h3>
+&lt;p>This method gives an app developer full control over installation. It is also possible to do the installation without an internet connection which makes it ideal for remote installation, or to save bandwidth when performing multiple installs.&lt;/p>
+&lt;ol>
+&lt;li>In the phone settings &lt;a href="https://developer.android.com/distribute/marketing-tools/alternative-distribution#unknown-sources">select the option&lt;/a> to &amp;ldquo;opt in for installing unknown apps&amp;rdquo;.&lt;/li>
+&lt;li>Download the correct APK on to the phone. It&amp;rsquo;s important to select the right APK for the instruction set and Android version, as documented &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/#apks">in this table&lt;/a>. This is likely easiest done by using the phone&amp;rsquo;s browser to navigate to the download page.&lt;/li>
+&lt;li>After downloading, you should be prompted to install the APK.&lt;/li>
+&lt;/ol>
+&lt;h3 id="f-droid">F-Droid&lt;/h3>
+&lt;p>F-Droid is a free open source application store which gives the app developer more control over the listing. As it isn&amp;rsquo;t installed on Android devices by default it takes a little more effort to set up originally, but is easier than manually sideloading.&lt;/p>
+&lt;p>We are still investigating the viability of this distribution method, but in the meantime you can learn more on their &lt;a href="https://f-droid.org">website&lt;/a>.&lt;/p>
+&lt;h3 id="mobile-device-management">Mobile Device Management&lt;/h3>
+&lt;p>This gives the IT administrator full control over which applications are installed on the devices in the program. MDM is recommended when you want complete control over the software and configuration.&lt;/p>
+&lt;p>There are several providers to choose from with a range of features and prices so it is recommend to do your own research and pick the one that&amp;rsquo;s right for you.&lt;/p></description></item><item><title>Core: Building CHT Android Flavors</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/branding/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/branding/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This tutorial will take you through building a CHT Android Application off the existing wrapper.&lt;/p>
+&lt;p>The cht-android application is a thin wrapper to load the CHT Core Framework web application in a webview.&lt;/p>
+&lt;p>You will be adding a new android flavor based off the &lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
+&lt;p>The CHT Android is a native Android container for the Community Health Toolkit (CHT). The repo contains &amp;ldquo;flavored&amp;rdquo; configurations, where each &amp;ldquo;flavor&amp;rdquo; or &amp;ldquo;brand&amp;rdquo; is an app. All apps share the same code and features, but can be customized, hard-coding a specific CHT deployment and have a partner specific logo and display name.&lt;/p>
+&lt;h2 id="add-a-new-brand">Add a new Brand&lt;/h2>
+&lt;p>Adding a new &lt;em>&amp;ldquo;brand&amp;rdquo;&lt;/em> or &lt;em>&amp;ldquo;flavor&amp;rdquo;&lt;/em> requires the following steps:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Check you meet the &lt;strong>&lt;a href="#1-required-resources">Required Resources&lt;/a>&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the &lt;strong>&lt;a href="#2-new-brand">New Brand&lt;/a>&lt;/strong> in the source code.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;a href="#3-generate-a-new-keystore">Generate a new keystore&lt;/a>&lt;/strong> if there is no one.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;a href="#4-test-locally-the-keystore">Test locally&lt;/a>&lt;/strong> and create a pull request with the changes.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;a href="#5-release-the-new-flavor">Release&lt;/a>&lt;/strong> the new flavor.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;a href="#6-publish-the-app">Publish&lt;/a>&lt;/strong> in the Play Store or whatever channel.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Below are more instructions for each step.&lt;/p>
+&lt;h3 id="1-required-resources">1. Required Resources&lt;/h3>
+&lt;p>To proceed you need to have ready the following:&lt;/p>
+&lt;ul>
+&lt;li>The URL of your CHT server so users don&amp;rsquo;t have to type it in post install.&lt;/li>
+&lt;li>The app logo and title.&lt;/li>
+&lt;li>Translations for your supported languages (most flavors don&amp;rsquo;t need to customize translations though).&lt;/li>
+&lt;/ul>
+&lt;p>Also be sure to have a working &lt;strong>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/">Development Environment&lt;/a>&lt;/strong>.&lt;/p>
+&lt;h4 id="play-store-assets">Play Store assets&lt;/h4>
+&lt;p>If you are going to publish the app in the &lt;strong>Play Store&lt;/strong>, Google will require to provide the following to list the app:&lt;/p>
+&lt;ul>
+&lt;li>A description of the app.&lt;/li>
+&lt;li>A shorter description (80 characters).&lt;/li>
+&lt;li>Logo 512x512px, typically a version of the partner logo e.g. square design icons.&lt;/li>
+&lt;li>A background image.&lt;/li>
+&lt;li>Screenshots.&lt;/li>
+&lt;/ul>
+&lt;p>Google is constantly changing the requirments to publish in the Play Store, it&amp;rsquo;s a good practice to check in advance whether all the requirements are met (checkout &lt;em>&lt;a href="https://support.google.com/googleplay/android-developer/answer/9866151">Add preview assets&amp;hellip;&lt;/a>&lt;/em>).&lt;/p>
+&lt;h5 id="test-data">Test data&lt;/h5>
+&lt;p>When publishing for the first time in the Play Store, a reviewer from Google will try to check whether the permission requested by the app follows the Play Store rules. The CHT Android app has enabled by default location request permissions, and the workflow to request the permission follows the strict rules imposed by Google, but they won&amp;rsquo;t be aware that your &lt;em>flavored&lt;/em> app is based on the CHT Android, so you have to provide Google with instructions of how to test the app, specifically how to test the location request.&lt;/p>
+&lt;p>To do so, give them instructions of how to login with the app (with a real username and password), and the basic steps to reach the location request, like open up a form.&lt;/p>
+&lt;p>Once approved you can delete the &amp;ldquo;test&amp;rdquo; user, Google conduct the tests only the first time, or when a new permission request is added to the app.&lt;/p>
+&lt;h3 id="2-new-brand">2. New Brand&lt;/h3>
+&lt;p>Each branded app has an identifier (&lt;em>id&lt;/em>) that is used to identify and configure it in different parts of the source code and when invoking some commands. In the instructions below we will use as example the id &lt;strong>&lt;code>new_brand&lt;/code>&lt;/strong>.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Add &lt;code>productFlavors { &amp;lt;new_brand&amp;gt; { ... } }&lt;/code> in &lt;a href="https://github.com/medic/cht-android/blob/master/build.gradle">build.gradle&lt;/a>, e.g.:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-groovy" data-lang="groovy"> &lt;span style="color:#000">new_brand&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>
+&lt;span style="color:#000">dimension&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;brand&amp;#39;&lt;/span>
+&lt;span style="color:#000">applicationId&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;org.medicmobile.webapp.mobile.new_brand&amp;#39;&lt;/span>
+&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Add icons, strings etc. in the &lt;code>src/&amp;lt;new_brand&amp;gt;&lt;/code> folder. It&amp;rsquo;s required to place there at least the &lt;code>src/new_brand/res/values/strings.xml&lt;/code> file with the name of the app and the URL of the CHT instance:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-xml" data-lang="xml">&lt;span style="color:#8f5902;font-style:italic">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;lt;resources&amp;gt;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;lt;string&lt;/span> &lt;span style="color:#c4a000">name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;app_name&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;gt;&lt;/span>New Brand&lt;span style="color:#204a87;font-weight:bold">&amp;lt;/string&amp;gt;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;lt;string&lt;/span> &lt;span style="color:#c4a000">name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;app_host&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;gt;&lt;/span>new_brand.app.medicmobile.org&lt;span style="color:#204a87;font-weight:bold">&amp;lt;/string&amp;gt;&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;lt;/resources&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Enable automated builds of the APKs and AABs: add the &lt;code>new_brand&lt;/code> flavor in &lt;a href="https://github.com/medic/cht-android/blob/master/.github/workflows/publish.yml">.github/workflows/publish.yml&lt;/a>. The &lt;em>Unpack secrets &amp;hellip;&lt;/em> task unpacks and decrypts the secret file with the keystore (next section), The &lt;em>Assemble &amp;hellip;&lt;/em> task takes care of generating the &lt;code>.apk&lt;/code> files for sideloading, and the &lt;em>Bundle &amp;hellip;&lt;/em> task is responsible of generating the &lt;code>.aab&lt;/code> files for publishing in the Play Store (you can skip the last if you are not going to publish in the Play Store):&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-yml" data-lang="yml">&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>Unpack&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">env&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_SECRETS_KEY&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_SECRETS_KEY_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_SECRETS_IV&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_SECRETS_IV_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">run&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>make&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>org=new_brand&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>keydec&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>Assemble&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">uses&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>maierj/fastlane-action@v1&lt;span style="color:#0000cf;font-weight:bold">.4.0&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">with&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">lane&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>build&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">options&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{ &amp;#34;flavor&amp;#34;: &amp;#34;new_brand&amp;#34; }&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">env&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PATH&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand.keystore&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEYSTORE_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEY_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEY_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>Bundle&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">uses&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>maierj/fastlane-action@v1&lt;span style="color:#0000cf;font-weight:bold">.4.0&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">with&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">lane&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>bundle&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">options&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{ &amp;#34;flavor&amp;#34;: &amp;#34;new_brand&amp;#34; }&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">env&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PATH&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand.keystore&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEYSTORE_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEY_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEY_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The variables in the &lt;code>env&lt;/code> sections point to a keystore and the passwords to unlock the keystore that will be generated in the following steps, but it&amp;rsquo;s important to follow the name convention, in the example all the variables that are configured in Github Actions end with the suffix &lt;code>_NEW_BRAND&lt;/code>, these variables need to be added in the cht-android repo settings by a manager of Medic.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="3-generate-a-new-keystore">3. Generate a new keystore&lt;/h3>
+&lt;p>Each branded app created needs its own keystore to sign the binaries for releasing.&lt;/p>
+&lt;p>Since the &lt;code>.aab&lt;/code> files generated here are signed with the same key you generated, the files and key can be uploaded to the Play Store later and any file generated locally following the steps above will be compatible with any installation made from the Play Store.&lt;/p>
+&lt;p>The keystore files are placed into a compressed and encrypted file in the &lt;a href="https://github.com/medic/cht-android/tree/master/secrets">secrets/&lt;/a> folder. In our case the file will be &lt;code>secrets/secrets-new_brand.tar.gz.enc&lt;/code>, and the content inside when the file is decrypted is:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>new_brand.keystore&lt;/code>: the Java keystore with a signature key inside that is always called &lt;code>medicmobile&lt;/code>. It&amp;rsquo;s used to sign the APKs and the bundles, and the one that Google will use to sign the optimized APKs that generates in the Play Store.&lt;/li>
+&lt;li>&lt;code>new_brand_private_key.pepk&lt;/code>: a PEPK file is an encrypted file that contains inside the &lt;code>medicmobile&lt;/code> key from the keystore above, ready to be uploaded to the Play Store the first time the app is registered in the Play Console. The file is only used there, but kept in the compressed file as a backup.&lt;/li>
+&lt;/ul>
+&lt;p>Don&amp;rsquo;t worry to follow all the name conventions and how to generate these files, you can create all them in one step: the new keystore, the passwords and the PEPK file with &lt;code>make org=new_brand keygen&lt;/code>.&lt;/p>
+&lt;p>Executing the command will check that you have the necessary tooling installed, and ask you the information about the certificate like the organization name, organization unit, etc. The command also takes care of picking random passwords that meet the security requirements, and then compresses the key files and finally encrypt the &lt;code>.tar.gz&lt;/code> file into the &lt;code>.enc&lt;/code> file. At the end of the execution, the script will also show the list of environment variables that you have to setup in CI (Github Actions) and locally in order to sign the apps with the new keystore. Below is an example of executing it to create the keystore for our &amp;ldquo;new_brand&amp;rdquo;:&lt;/p>
+&lt;pre>&lt;code>$ make org=new_brand keygen
+Verifying the following executables are in the $PATH: java keytool openssl ...
+keytool -genkey -storepass dd8668... -v -keystore new_brand.keystore -alias medicmobile -keyalg RSA -keysize 2048 -validity 9125
+What is your first and last name?
+[Unknown]:
+What is the name of your organizational unit?
+[Unknown]: New Brand
+What is the name of your organization?
+[Unknown]: Medic Mobile
+What is the name of your City or Locality?
+[Unknown]: San Fran... ...
+Is CN=Unknown, OU=New Brand, O=Medic Mobile, L=San Francisco, ST=CA, C=US correct?
+[no]: y
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 9,125 days
+for: CN=Unknown, OU=New Brand, O=Medic Mobile, L=San Francisco, ST=CA, C=US
+[Storing new_brand.keystore]
+... ...
+####################################### Secrets! #######################################
+# #
+# The following environment variables needs to be added to the CI environment #
+# (Github Actions), and to your local environment if you also want #
+# to sign APK or AAB files locally: #
+# #
+export ANDROID_KEYSTORE_PASSWORD_NEW_BRAND=dd8668...
+export ANDROID_KEY_PASSWORD_NEW_BRAND=dd8668...
+export ANDROID_SECRETS_IV_NEW_BRAND=88d9c2dea7a9...
+export ANDROID_SECRETS_KEY_NEW_BRAND=2824d02d2bc221f5844b8fe1d928211dcbbc...
+export ANDROID_KEYSTORE_PATH_NEW_BRAND=new_brand.keystore
+export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
+#
+# The file secrets/secrets-new_brand.tar.gz.enc was created and has to be added to the git
+# repository (don't worry, it's encrypted with some of the keys above). #
+# NOTE: *keep the environment variables secret !!* #
+# #
+########################################### End of Secrets ###################################
+&lt;/code>&lt;/pre>&lt;p>The &lt;em>Secrets!&lt;/em> section at the end is as important as the &lt;code>secrets/secrets-new_brand.tar.gz.enc&lt;/code> file generated, because as it says above, it needs to be configured in CI.&lt;/p>
+&lt;p>Use a safe channel to send the environment variables to the manager in charge, like a password manager, and keep them locally at least for testing, storing in a script file that is safe in your computer.&lt;/p>
+&lt;p>About the file &lt;code>secrets/secrets-new_brand.tar.gz.enc&lt;/code>, as the last paragraph in the console says: &lt;em>has to be added to the git repository (don&amp;rsquo;t worry, it&amp;rsquo;s encrypted with some of the keys above)&lt;/em>.&lt;/p>
+&lt;p>If you want to start over because some of the parameters were wrong, just execute &lt;code>make org=new_brand keyrm-all&lt;/code> to clean all the files generated. Once committed the &lt;code>.enc&lt;/code> file, you can delete the uncompressed and unencrypted version with &lt;code>make org=new_brand keyrm&lt;/code>, it will delete the &lt;code>new_brand.keystore&lt;/code>, &lt;code>new_brand_private_key.pepk&lt;/code>, and the unencrypted &lt;code>.tar.gz&lt;/code> files, that are safer kept in the &lt;code>.tar.gz.enc&lt;/code> file.&lt;/p>
+&lt;h3 id="4-test-locally-the-keystore">4. Test locally the keystore&lt;/h3>
+&lt;p>&lt;strong>Want to check the keystore?&lt;/strong> here are a few things you must test before upload to the repo:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>To decrypt the content like CI does to sign the app, execute: &lt;code>make org=new_brand keydec&lt;/code>, it will decrypt and decompress the files removed in the step above. Remember that the environment variables printed in the console needs to be loaded in the CLI. Note that all the variables above end with the suffix &lt;code>_NEW_BRAND&lt;/code>, as the id of the app that we pass through the &lt;code>org&lt;/code> argument in lowercase, but if Make found the same variables defined without the prefix, they take precedence over the suffix ones.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Execute &lt;code>make org=new_brand keyprint&lt;/code> to see the certificate content, like the org name, the certificate fingerprints, etc.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Sign your app! try locally to build the app with the certificate. To create the Webview versions of the .apk files: &lt;code>make org=new_brand flavor=New_brandWebview assemble&lt;/code>. The &amp;ldquo;release&amp;rdquo; files signed should be placed in &lt;code>build/outputs/apk/new_brandWebview/release/&lt;/code>. To ensure the files were signed with the right signature execute &lt;code>make keyprint-apk&lt;/code>, it will check the certificate of the first apk file under the &lt;code>build/&lt;/code> folder:&lt;/p>
+&lt;pre>&lt;code>$ make keyprint-apk
+apksigner verify -v --print-certs build/outputs/apk/new_brandWebview/release/cht-android-SNAPSHOT-new_brand-webview-armeabi-v7a-release.apk
+... ...
+Verified using v2 scheme (APK Signature Scheme v2): true
+... ...
+Signer #1 certificate DN: CN=Unknown, OU=New Brand, O=Medic Mobile, L=San Francisco, ST=CA, C=US
+Signer #1 certificate SHA-256 digest: 7f072b...
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;/ol>
+&lt;p>Also do the same for the bundle format: build and verify, despite the AAB are not useful for local development. In our example, execute first &lt;code>make org=new_brand flavor=New_brandWebview bundle&lt;/code>, and then &lt;code>make keyprint-bundle&lt;/code> to see the signature of one of the &lt;code>.aab&lt;/code> files generated.&lt;/p>
+&lt;p>Because the files generated here are signed with the same key that you are going to use in CI, and the files produced in CI will be uploaded to the Play Store later, any file generated locally following the steps above will be compatible with any installation made from the Play Store, means that if a user install the app from the Play Store, and then we want to replace the installation with an alpha version generated in CI or a local version generated in dev environment, it will work without requiring the user to uninstall the app and lost the data.&lt;/p>
+&lt;h3 id="5-release-the-new-flavor">5. Release the new flavor&lt;/h3>
+&lt;p>Once you have your pull request approved in the cht-android repo, it&amp;rsquo;s recommended to create an alpha version before merge it to master and do the final release.&lt;/p>
+&lt;p>Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/#new-flavor-release">Release&lt;/a> page, where it&amp;rsquo;s explained the different stages and instructions for releasing. The last section &lt;em>&amp;ldquo;New flavor release&amp;rdquo;&lt;/em> has special instructions of how to release a new brand.&lt;/p>
+&lt;h3 id="6-publish-the-app">6. Publish the app&lt;/h3>
+&lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p></description></item></channel></rss>

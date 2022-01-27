@@ -1,0 +1,69 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing Updates to Applications and Content</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/</link><description>Recent content in Managing Updates to Applications and Content on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/updates/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Moving Contacts within the Hierarchy</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/moving-contacts/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/updates/moving-contacts/</guid><description>
+&lt;p>Contacts are organized into a hierarchy. It is not straight-forward to move contacts from one position in the hierarchy to another because many copies of this hierarchy exist. Use the &lt;code>move-contacts&lt;/code> action in &lt;a href="https://github.com/medic/cht-conf">&lt;code>cht-conf&lt;/code>&lt;/a> to assign a new parent to contacts. This command will move the specified contact, all the contacts under that contact, and all reports created by any of those contacts. This action will download all documents that need to be updated, update the lineages within those documents, and then save the updated documents on your local disk. To commit those changes to the database, run the &lt;code>upload-docs&lt;/code> action.&lt;/p>
+&lt;p>&lt;strong>Offline users who have contacts removed from their visible hierarchy will not automatically see those contacts disappear. The contact remains on the user&amp;rsquo;s device. Any updates made to the contact (or any reports created for that contact) will &lt;a href="https://github.com/medic/cht-core/issues/5701">silently fail to sync&lt;/a>. These users must be encouraged to clear cache and resync!&lt;/strong>&lt;/p>
+&lt;p>Also impactful, but less serious - this script can cause significant amounts of changes to the database and offline users who have contacts moved into their visible hierarchy may experience lengthy and bandwidth-intensive synchronizations.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Parameter&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>contacts&lt;/td>
+&lt;td>Comma delimited list of contact IDs which will be moved&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>parent&lt;/td>
+&lt;td>ID of the new parent which will be assigned to the provided contacts&lt;/td>
+&lt;td>Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>docDirectoryPath&lt;/td>
+&lt;td>This action outputs files to local disk at this destination&lt;/td>
+&lt;td>No. Default &lt;code>json-docs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Some constraints when moving contacts:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Allowed Parents&lt;/strong> - When moving contacts on WebApp &amp;gt;v3.7, your chosen parent must be listed as a valid parent for the contact as defined in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">configuration for place hierarchy&lt;/a>. For WebApp &amp;lt;v3.7, the default hierarchy is enforced.&lt;/li>
+&lt;li>&lt;strong>Circular Hierarchy&lt;/strong> - Nobody&amp;rsquo;s parent can ever be themself or their child.&lt;/li>
+&lt;li>&lt;strong>Primary Contacts&lt;/strong> - Primary contacts must be a descendant of the place for which they are the primary contact. You may need to select a new primary contact for a place through the WebApp if you&amp;rsquo;d like to move a primary contact to a new place in the hierarchy.&lt;/li>
+&lt;li>&lt;strong>Minification&lt;/strong> - Due to contact &amp;ldquo;minification&amp;rdquo; (#2635) which was implemented in v2.13, this script should not be used for versions prior to v2.13.&lt;/li>
+&lt;/ul>
+&lt;h3 id="examples">Examples&lt;/h3>
+&lt;p>Move the contacts with the id &lt;code>contact_1&lt;/code> and &lt;code>contact_2&lt;/code> to have the parent &lt;code>parent_id&lt;/code>. The changes will be in the local folder &lt;code>my_folder&lt;/code> only for review. Run the second command to upload the changes after review.&lt;/p>
+&lt;pre>&lt;code>cht --instance= move-contacts -- --contacts=contact_1,contact_2 --parent=parent_id --docDirectoryPath=my_folder
+cht --local upload-docs -- --docDirectoryPath=my_folder
+&lt;/code>&lt;/pre>
+&lt;p>Move the contact with the id &lt;code>contact_1&lt;/code> to the top of the hierarchy (no parent).&lt;/p>
+&lt;pre>&lt;code>cht --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Update Collect Forms Remotely</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</guid><description>
+&lt;p>To do over the air Medic Collect form updates via HTTP rather than sending APKs which have a long manual install process, follow the steps below:&lt;/p>
+&lt;ol>
+&lt;li>Have your xls forms ready in the folder.&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>They should use underscore as name separators. e.g form_name.xlsx&lt;/li>
+&lt;li>They should have &lt;code>form_id&lt;/code> and &lt;code>name&lt;/code> properties in the settings&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="xform_name_settings.png" alt="Name property">&lt;/p>
+&lt;ol>
+&lt;li>Upload the forms to the instance using &lt;code>cht-conf&lt;/code> Using the &lt;code>upload-collect-forms&lt;/code> &lt;a href="https://github.com/medic/cht-conf/blob/master/src/cli/supported-actions.js">action&lt;/a> as shown below.&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code>cht --instance=user:pass@instancename.app.medicmobile.org upload-collect-forms
+&lt;/code>&lt;/pre>&lt;ol start="3">
+&lt;li>Go to the Collect App. Delete All forms then go to &lt;code>Get Blank Form&lt;/code> and select all the forms you need.&lt;/li>
+&lt;/ol>
+&lt;h1 id="troubleshooting">Troubleshooting&lt;/h1>
+&lt;p>When you go to &lt;code>Get Blank Forms&lt;/code> and instead of getting a list of the forms available, you get a pop-up error which has a portion of this message instead&lt;/p>
+&lt;pre>&lt;code>...OpenRosa Version 1.0 standard: Forms list entry 1 is missing one or more tags: formId, name or downloadUrl
+&lt;/code>&lt;/pre>&lt;p>This means you probably uploaded a XLS file without a &lt;code>name&lt;/code> or &lt;code>form_id&lt;/code> property. To find out which form is missing that, use this command:&lt;/p>
+&lt;pre>&lt;code>curl -vvvv -H &amp;quot;x-openrosa-version: 1&amp;quot; http://user:pass@host:port/api/v1/forms
+&lt;/code>&lt;/pre>&lt;p>Should bring a list like this one&lt;/p>
+&lt;p>&lt;img src="xform_list.png" alt="Xform List">&lt;/p>
+&lt;p>Go through the list and see which form has a missing &lt;code>&amp;lt;name&amp;gt;&lt;/code> or &lt;code>&amp;lt;formID&amp;gt;&lt;/code> property. Add it and reupload the forms using &lt;code>cht-conf&lt;/code> again.&lt;/p></description></item></channel></rss>
