@@ -1,12 +1,46 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Debugging Applications</title><link>https://docs.communityhealthtoolkit.org/apps/guides/debugging/</link><description>Recent content in Debugging Applications on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/debugging/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Obtaining Logs</title><link>https://docs.communityhealthtoolkit.org/apps/guides/debugging/obtaining-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/debugging/obtaining-logs/</guid><description>
 &lt;p>There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p>
-&lt;h2 id="browser-logs">Browser logs&lt;/h2>
-&lt;p>To check if there are relevant logs open up the developer console. The shortcut is probably COMMAND+ALT+I on MacOS, or CTRL+ALT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p>
-&lt;h2 id="server-logs">Server logs&lt;/h2>
-&lt;p>The easiest way is to use &lt;code>cht-logs&lt;/code>, a tool that comes with &lt;a href="https://github.com/medic/cht-conf">&lt;code>cht-conf&lt;/code>&lt;/a>:&lt;/p>
-&lt;pre>&lt;code>cht-logs anInstance gardener
-&lt;/code>&lt;/pre>&lt;p>See &lt;a href="https://github.com/medic/cht-conf#user-content-fetching-logs">cht-logs documentation&lt;/a> for more details.&lt;/p>
-&lt;p>This will download logs to your current directory. You will need to look through these logs to work out what is relevant.&lt;/p></description></item><item><title>Apps: Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/apps/guides/debugging/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/debugging/replicating-production-data-locally/</guid><description>
+&lt;h2 id="on-a-laptop-or-desktop">On a laptop or desktop&lt;/h2>
+&lt;p>To check if there are relevant logs open up the developer console in your browser. The shortcut is probably COMMAND+OPTION+I on MacOS, or CTRL+SHIFT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p>
+&lt;h2 id="on-a-phone">On a phone&lt;/h2>
+&lt;p>There are two types of logs updated by Android devices depending on what information is needed. If you trying to get either of the logs from a device for the first time you need to set it up for USB debugging.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Enable USB debugging on the phone. This varies from phone to phone, but here is the &lt;a href="https://developer.android.com/studio/debug/dev-options#enable">official Android documentation&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Connect your phone by USB to the computer.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>On your phone, you will see a popup &lt;em>&amp;ldquo;Allow USB debugging. The computer&amp;rsquo;s RSA fingerprint&amp;hellip;&amp;quot;&lt;/em>, click &lt;em>&amp;ldquo;OK&amp;rdquo;&lt;/em>.&lt;/p>
+&lt;p>&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/debugging/images/allow_usb_debugging.png" alt="Allow USB debugging">&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="browser-logs">Browser logs&lt;/h3>
+&lt;p>Now that you&amp;rsquo;ve enabled USB debugging on the phone you can access the dev console on the phone via USB from your desktop browser. This allows the same level of debugging and inspection you have on a desktop browser, but from your phone&amp;rsquo;s browser in the CHT app. Follow the &lt;a href="https://developer.chrome.com/docs/devtools/remote-debugging/webviews/#open_a_webview_in_devtools">official Android documentation&lt;/a> to access the console.&lt;/p>
+&lt;h3 id="android-logs">Android logs&lt;/h3>
+&lt;p>The Android log is written to from the cht-android wrapper which captures errors like application crashes or failing integrations between Android apps.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>To install the &lt;code>adb&lt;/code> command, follow the instructions under the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/development-setup/#debug-tool-adb">Development Environment &amp;gt; Debug tool adb&lt;/a> section.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Within a command line session, write the following command: &lt;code>adb start-server&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To check if your phone is properly connected, write the command &lt;code>adb devices&lt;/code>. This will list the devices connected.&lt;/p>
+&lt;p>&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/debugging/images/adb_devices.png" alt="ADB Devices">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Type the command &lt;code>adb logcat &amp;gt; phone.log&lt;/code> to get the android logs in the file &lt;code>phone.log&lt;/code>. The log will be written to the &lt;code>phone.log&lt;/code> file as long as this command is running. You can stop the recording at any time pressing &lt;em>Ctrl+C&lt;/em>. Now if you reproduce the error on the phone you can look for any useful information being written to the &lt;code>phone.log&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>This will get all the logs from the device, not just logs for the app you want to debug. You can pass arguments to &lt;code>adb&lt;/code> to only get the logs you want.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">$ adb logcat MedicMobile:V AndroidRuntime:E chromium:V &lt;span style="color:#4e9a06">&amp;#39;*:S&amp;#39;&lt;/span> &amp;gt; phone.log
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Alternatively you can use &lt;code>grep&lt;/code> to filter the logs down to only those from the relevant app.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">$ adb logcat &lt;span style="color:#000;font-weight:bold">|&lt;/span> grep MedicMobile &amp;gt; phone.log
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="on-the-server">On the server&lt;/h2>
+&lt;p>Some unexpected errors are caught and stored in &lt;code>feedback&lt;/code> docs and stored on the phone and later synced to CouchDB on the server. To access these, look for docs in the &lt;code>medic-user-{username}-meta&lt;/code> or &lt;code>medic-users-meta&lt;/code> databases. This is particularly useful to debug issues where you do not have physical access to the device. More information is available under &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/database/">Managing Databases&lt;/a>.&lt;/p></description></item><item><title>Apps: Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/apps/guides/debugging/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/debugging/replicating-production-data-locally/</guid><description>
 &lt;p>Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p>
 &lt;ul>
 &lt;li>Copy the data from an instance to a local CouchDB database&lt;/li>
