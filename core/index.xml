@@ -5,9 +5,9 @@
 &lt;h3 id="couchdb">CouchDB&lt;/h3>
 &lt;p>A free and open source NoSQL database we use to store all our data, configuration, and even the application code. CouchDB is really good at replication which is the process of sending the data to another database and back again. See more at the &lt;a href="http://couchdb.apache.org">CouchDB&lt;/a> site.&lt;/p>
 &lt;h3 id="api">api&lt;/h3>
-&lt;p>A NodeJS service which runs on the server as a wrapper around CouchDB. It provides security and APIs for browsers and integrations. It also includes a custom implementation of filtered replication to allow it to support more concurrent users. See more at the &lt;a href="https://github.com/medic/medic/tree/master/api">Medic API site&lt;/a> on Github.&lt;/p>
+&lt;p>A NodeJS service which runs on the server as a wrapper around CouchDB. It provides security and APIs for browsers and integrations. It also includes a custom implementation of filtered replication to allow it to support more concurrent users. See more at the &lt;a href="https://github.com/medic/cht-core/tree/master/api">Medic API site&lt;/a> on Github.&lt;/p>
 &lt;h3 id="sentinel">sentinel&lt;/h3>
-&lt;p>Another NodeJS service running on the server, sentinel performs actions called transitions every time a document in CouchDB is added or modified. Some examples are validations, generating scheduled messages, automatic responses, creating patients, and sending alerts. See more at the &lt;a href="https://github.com/medic/medic/tree/master/sentinel">Medic Sentinel site&lt;/a> on Github.&lt;/p>
+&lt;p>Another NodeJS service running on the server, sentinel performs actions called transitions every time a document in CouchDB is added or modified. Some examples are validations, generating scheduled messages, automatic responses, creating patients, and sending alerts. See more at the &lt;a href="https://github.com/medic/cht-core/tree/master/sentinel">Medic Sentinel site&lt;/a> on Github.&lt;/p>
 &lt;h3 id="postgresql">PostgreSQL&lt;/h3>
 &lt;p>A free and open source SQL database that we use for analytics queries for display in tools like klipfolio. We created a library called &lt;a href="https://github.com/medic/couch2pg">couch2pg&lt;/a> to replicate data from CouchDB into PostgreSQL. See more at the &lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a> site.&lt;/p>
 &lt;h2 id="client-side">Client side&lt;/h2>
@@ -802,7 +802,7 @@ determine if a transition has run.&lt;/p>
 &lt;h2 id="adding-new-keys">Adding new keys&lt;/h2>
 &lt;p>In order to trace the addition of new terms and also updates to existing translations,
 the default translation file (messages-en.properties) must be updated directly.
-Our GitHub repo provides with a &lt;a href="https://github.com/medic/medic/tree/master/scripts/poe">command line tool (CLI)&lt;/a> to
+Our GitHub repo provides with a &lt;a href="https://github.com/medic/cht-core/tree/master/scripts/poe">command line tool (CLI)&lt;/a> to
 import updates into the POEditor app.
 If you don&amp;rsquo;t have an API token, please contact a Medic developer. Please do not disclose this API token to anyone else.&lt;/p>
 &lt;h3 id="translating-static-text">Translating static text&lt;/h3>
@@ -849,7 +849,7 @@ If you don&amp;rsquo;t have an API token, please contact a Medic developer. Plea
 &lt;/ul>
 &lt;h2 id="steps">Steps&lt;/h2>
 &lt;ol>
-&lt;li>&lt;code>git checkout master &amp;amp;&amp;amp; git pull&lt;/code> - get the latest code&lt;/li>
+&lt;li>Checkout and pull the latest default branch - get the latest code&lt;/li>
 &lt;li>&lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code> - make a branch&lt;/li>
 &lt;/ol>
 &lt;p>Then for each folder go through these steps.&lt;/p>
@@ -1150,9 +1150,9 @@ tests/nodeunit/unit/kujua-sms/validate.js
 git log --oneline --name-only --follow --all -- &amp;quot;$i&amp;quot; | \
 egrep -v -e '^[0-9A-Fa-f]+\s'; \
 done | sort | uniq &amp;gt; all-files
-&lt;/code>&lt;/pre>&lt;p>In the following commands I assume the branch we are working on is &lt;code>master&lt;/code>, but this could easily be applied to any branch.&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>In the following commands I assume the branch we are working on is &lt;code>main&lt;/code>, but this could easily be applied to any branch.&lt;/p>
 &lt;p>Take a note of your original commit count.&lt;/p>
-&lt;pre>&lt;code>$ git rev-list master | wc -l
+&lt;pre>&lt;code>$ git rev-list main | wc -l
 6844
 &lt;/code>&lt;/pre>&lt;p>Run the filter on the current branch, this might take a little while:&lt;/p>
 &lt;pre>&lt;code>git filter-branch -f --prune-empty --index-filter '\
@@ -1179,7 +1179,7 @@ tests/nodeunit/unit/kujua-sms/validate.js tests/smsparser.js \
 views/lib/smsparser.js \
 ' -- --all
 &lt;/code>&lt;/pre>&lt;p>Nice, less commits!&lt;/p>
-&lt;pre>&lt;code>$ git rev-list master | wc -l
+&lt;pre>&lt;code>$ git rev-list main | wc -l
 461
 &lt;/code>&lt;/pre>&lt;p>Peruse git log a bit and do a few spot checks to see if things look right. The commit hashes have been rewritten and should only include commits where the files listed above were affected.&lt;/p>
 &lt;pre>&lt;code>$ git log
@@ -1210,14 +1210,14 @@ Checking object directories: 100% (256/256), done.
 Checking objects: 100% (2064/2064), done.
 &lt;/code>&lt;/pre>&lt;p>Look Ma, I&amp;rsquo;m all cleaned up!&lt;/p>
 &lt;pre>&lt;code>$ git for-each-ref
-dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/master
+dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/main
 $ git rev-list --all | wc -l
 461
 $ du -hs .git
 384K .git
 &lt;/code>&lt;/pre>&lt;p>Maybe have a play now and make sure things look right to you. Then publish your new repo!&lt;/p>
 &lt;pre>&lt;code>$ git remote add origin git@github.com:medic/medic-smsparser.git
-$ git push origin master
+$ git push origin main
 &lt;/code>&lt;/pre>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>

@@ -21,7 +21,7 @@
 &lt;/ul>
 &lt;h2 id="steps">Steps&lt;/h2>
 &lt;ol>
-&lt;li>&lt;code>git checkout master &amp;amp;&amp;amp; git pull&lt;/code> - get the latest code&lt;/li>
+&lt;li>Checkout and pull the latest default branch - get the latest code&lt;/li>
 &lt;li>&lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code> - make a branch&lt;/li>
 &lt;/ol>
 &lt;p>Then for each folder go through these steps.&lt;/p>
@@ -148,9 +148,9 @@ tests/nodeunit/unit/kujua-sms/validate.js
 git log --oneline --name-only --follow --all -- &amp;quot;$i&amp;quot; | \
 egrep -v -e '^[0-9A-Fa-f]+\s'; \
 done | sort | uniq &amp;gt; all-files
-&lt;/code>&lt;/pre>&lt;p>In the following commands I assume the branch we are working on is &lt;code>master&lt;/code>, but this could easily be applied to any branch.&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>In the following commands I assume the branch we are working on is &lt;code>main&lt;/code>, but this could easily be applied to any branch.&lt;/p>
 &lt;p>Take a note of your original commit count.&lt;/p>
-&lt;pre>&lt;code>$ git rev-list master | wc -l
+&lt;pre>&lt;code>$ git rev-list main | wc -l
 6844
 &lt;/code>&lt;/pre>&lt;p>Run the filter on the current branch, this might take a little while:&lt;/p>
 &lt;pre>&lt;code>git filter-branch -f --prune-empty --index-filter '\
@@ -177,7 +177,7 @@ tests/nodeunit/unit/kujua-sms/validate.js tests/smsparser.js \
 views/lib/smsparser.js \
 ' -- --all
 &lt;/code>&lt;/pre>&lt;p>Nice, less commits!&lt;/p>
-&lt;pre>&lt;code>$ git rev-list master | wc -l
+&lt;pre>&lt;code>$ git rev-list main | wc -l
 461
 &lt;/code>&lt;/pre>&lt;p>Peruse git log a bit and do a few spot checks to see if things look right. The commit hashes have been rewritten and should only include commits where the files listed above were affected.&lt;/p>
 &lt;pre>&lt;code>$ git log
@@ -208,14 +208,14 @@ Checking object directories: 100% (256/256), done.
 Checking objects: 100% (2064/2064), done.
 &lt;/code>&lt;/pre>&lt;p>Look Ma, I&amp;rsquo;m all cleaned up!&lt;/p>
 &lt;pre>&lt;code>$ git for-each-ref
-dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/master
+dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/main
 $ git rev-list --all | wc -l
 461
 $ du -hs .git
 384K .git
 &lt;/code>&lt;/pre>&lt;p>Maybe have a play now and make sure things look right to you. Then publish your new repo!&lt;/p>
 &lt;pre>&lt;code>$ git remote add origin git@github.com:medic/medic-smsparser.git
-$ git push origin master
+$ git push origin main
 &lt;/code>&lt;/pre>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
