@@ -1155,132 +1155,7 @@ Signer #1 certificate SHA-256 digest: 7f072b...
 &lt;p>Once you have your pull request approved in the cht-android repo, it&amp;rsquo;s recommended to create an alpha version before merge it to master and do the final release.&lt;/p>
 &lt;p>Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/#new-flavor-release">Release&lt;/a> page, where it&amp;rsquo;s explained the different stages and instructions for releasing. The last section &lt;em>&amp;ldquo;New flavor release&amp;rdquo;&lt;/em> has special instructions of how to release a new brand.&lt;/p>
 &lt;h3 id="6-publish-the-app">6. Publish the app&lt;/h3>
-&lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p></description></item><item><title>Core: Using Git</title><link>https://docs.communityhealthtoolkit.org/core/guides/using-git/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/using-git/</guid><description>
-&lt;p>New to Git or need a refesher?&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://git-scm.com/docs/gittutorial">A tutorial introduction to Git&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://git-scm.com/docs/gittutorial-2">A tutorial introduction to Git: part two&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://git-scm.com/docs/gitcore-tutorial">A Git core tutorial for developers&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>If you&amp;rsquo;re on Unix, these are also likely installed as man pages:&lt;/p>
-&lt;pre>&lt;code>man gittutorial
-man gittutorial-2
-man gitcore-tutorial
-&lt;/code>&lt;/pre>&lt;p>For more reading, &lt;a href="https://git-scm.com/book">Pro Git&lt;/a> is available online, and
-&lt;a href="https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain">Chapter 10: Git Internals&lt;/a>
-is quite helpful.&lt;/p>
-&lt;p>Published a commit by mistake? GitHub has a decent writeup on that:&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://help.github.com/articles/removing-sensitive-data-from-a-repository/">Removing sensitive data from a repository&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;h2 id="how-to-extract-a-module-from-an-existing-repo">How To Extract a Module From an Existing Repo&lt;/h2>
-&lt;p>The following are the steps I used for creating &lt;a href="https://github.com/medic/medic-smsparser">medic-smsparser&lt;/a> based off medic.&lt;/p>
-&lt;p>First git clone using a URL scheme rather than plain file system path otherwise
-you will get hard links instead of a copy.&lt;/p>
-&lt;pre>&lt;code>git clone git@github.com:medic/medic.git
-&lt;/code>&lt;/pre>&lt;p style="text-align:center">or&lt;/p>
-&lt;pre>&lt;code>git clone file:///home/linus/dev/medic
-&lt;/code>&lt;/pre>&lt;p>Then compile a list of files you are interested in. If you only have a single directory
-you need then read about the &lt;code>--subdirectory-filter&lt;/code> option of
-&lt;code>filter-branch&lt;/code>. In this how-to I&amp;rsquo;m using a set of files:&lt;/p>
-&lt;pre>&lt;code>$ cat files
-packages/kujua-sms/kujua-sms/validate.js
-packages/kujua-sms/views/lib/javarosa_parser.js
-packages/kujua-sms/views/lib/mp_parser.js
-packages/kujua-sms/views/lib/smsparser.js
-packages/kujua-sms/views/lib/textforms_parser.js
-packages/kujua-sms/kujua-sms/utils.js
-tests/nodeunit/form_definitions.js
-tests/nodeunit/unit/kujua-sms/smsparser.js
-tests/nodeunit/unit/kujua-sms/smsparser_compact_textform.js
-tests/nodeunit/unit/kujua-sms/textforms_parser.js
-tests/nodeunit/unit/kujua-sms/validate.js
-&lt;/code>&lt;/pre>&lt;p>Next query the git history for any file renames by using &lt;code>--follow&lt;/code>:&lt;/p>
-&lt;pre>&lt;code>for i in `cat files`; do \
-git log --oneline --name-only --follow --all -- &amp;quot;$i&amp;quot; | \
-egrep -v -e '^[0-9A-Fa-f]+\s'; \
-done | sort | uniq &amp;gt; all-files
-&lt;/code>&lt;/pre>&lt;p>In the following commands I assume the branch we are working on is &lt;code>main&lt;/code>, but this could easily be applied to any branch.&lt;/p>
-&lt;p>Take a note of your original commit count.&lt;/p>
-&lt;pre>&lt;code>$ git rev-list main | wc -l
-6844
-&lt;/code>&lt;/pre>&lt;p>Run the filter on the current branch, this might take a little while:&lt;/p>
-&lt;pre>&lt;code>git filter-branch -f --prune-empty --index-filter '\
-git rm --cached -r -q -- . ; \
-git reset -q $GIT_COMMIT -- \
-lib/utils.js \
-packages/kujua-sms-import/kujua-sms-import/smsparser.js \
-packages/kujua-sms-import/views/lib/smsparser.js \
-packages/kujua-sms/kujua-sms/utils.js \
-packages/kujua-sms/kujua-sms/validate.js \
-packages/kujua-sms/tests/kujua-sms/smsparser.js \
-packages/kujua-sms/tests/kujua-sms/smsparser_compact_textform.js \
-packages/kujua-sms/tests/kujua-sms/textforms_parser.js \
-packages/kujua-sms/tests/kujua-sms/validate.js \
-packages/kujua-sms/views/lib/javarosa_parser.js \
-packages/kujua-sms/views/lib/mp_parser.js \
-packages/kujua-sms/views/lib/smsparser.js \
-packages/kujua-sms/views/lib/textforms_parser.js \
-tests/nodeunit/form_definitions.js \
-tests/nodeunit/unit/kujua-sms/smsparser.js \
-tests/nodeunit/unit/kujua-sms/smsparser_compact_textform.js \
-tests/nodeunit/unit/kujua-sms/textforms_parser.js \
-tests/nodeunit/unit/kujua-sms/validate.js tests/smsparser.js \
-views/lib/smsparser.js \
-' -- --all
-&lt;/code>&lt;/pre>&lt;p>Nice, less commits!&lt;/p>
-&lt;pre>&lt;code>$ git rev-list main | wc -l
-461
-&lt;/code>&lt;/pre>&lt;p>Peruse git log a bit and do a few spot checks to see if things look right. The commit hashes have been rewritten and should only include commits where the files listed above were affected.&lt;/p>
-&lt;pre>&lt;code>$ git log
-$ git show d3b2be79
-&lt;/code>&lt;/pre>&lt;p>But if we query on all refs (branches/tags) our rev list is still large, hrm&amp;hellip;&lt;/p>
-&lt;pre>&lt;code>$ git rev-list --all | wc -l
-7664
-&lt;/code>&lt;/pre>&lt;p>Local repo is also still larger than expected.&lt;/p>
-&lt;pre>&lt;code>$ du -hs .git
-41M .git
-&lt;/code>&lt;/pre>&lt;p>How many branches and tags do we have? Yikes, we&amp;rsquo;ve been busy.&lt;/p>
-&lt;pre>&lt;code>$ git for-each-ref | wc -l
-183
-&lt;/code>&lt;/pre>&lt;p>Ok, we still have some work to do, lots of refs/tags/branches still holding on to
-trees!&lt;/p>
-&lt;p>First order of business is to say goodbye to the origin remote, we no longer call that home.&lt;/p>
-&lt;pre>&lt;code>git remote rm origin
-rm -rf .git/refs/original/ .git/refs/remotes/ .git/*_HEAD .git/logs/
-&lt;/code>&lt;/pre>&lt;p>Now delete all related branches and tags:&lt;/p>
-&lt;pre>&lt;code>git for-each-ref --format=&amp;quot;%(refname)&amp;quot; refs/original/ refs/tags | \
-xargs -n1 git update-ref -d
-&lt;/code>&lt;/pre>&lt;p>One ferocious garbage collection incantation:&lt;/p>
-&lt;pre>&lt;code>$ git -c gc.reflogExpire=0 -c gc.reflogExpireUnreachable=0 -c gc.rerereresolved=0 \
--c gc.rerereunresolved=0 -c gc.pruneExpire=now gc --aggressive
-&lt;/code>&lt;/pre>&lt;p>A basic check shows no errors:&lt;/p>
-&lt;pre>&lt;code>$ git fsck --full
-Checking object directories: 100% (256/256), done.
-Checking objects: 100% (2064/2064), done.
-&lt;/code>&lt;/pre>&lt;p>Look Ma, I&amp;rsquo;m all cleaned up!&lt;/p>
-&lt;pre>&lt;code>$ git for-each-ref
-dbcc2677aa56c40fbf83d72e6e413b86d3b2be79 commit refs/heads/main
-$ git rev-list --all | wc -l
-461
-$ du -hs .git
-384K .git
-&lt;/code>&lt;/pre>&lt;p>Maybe have a play now and make sure things look right to you. Then publish your new repo!&lt;/p>
-&lt;pre>&lt;code>$ git remote add origin git@github.com:medic/medic-smsparser.git
-$ git push origin main
-&lt;/code>&lt;/pre>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-&lt;p>Once you understand a little about git internals, have a look at &lt;code>git-filter-branch&lt;/code> manual (see also the checklist at the bottom):&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://git-scm.com/docs/git-filter-branch">git-filter-branch - Rewrite branches&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>Ferocious GC&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="http://stackoverflow.com/questions/1904860/how-to-remove-unreferenced-blobs-from-my-git-repo/">How to remove unreferenced blobs from my git repo&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>Need to update the &lt;code>rm -rf&lt;/code> command used there, the &lt;code>git update-ref -d&lt;/code> that comes after takes care of most of that except the &lt;code>refs/logs&lt;/code> part. Will try next time.&lt;/p>
-&lt;/div></description></item><item><title>Core: Using NPM</title><link>https://docs.communityhealthtoolkit.org/core/guides/using-npm/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/using-npm/</guid><description>
+&lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p></description></item><item><title>Core: Using NPM</title><link>https://docs.communityhealthtoolkit.org/core/guides/using-npm/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/using-npm/</guid><description>
 &lt;h2 id="npm-orgs">npm Orgs&lt;/h2>
 &lt;p>We use npm Orgs to organize our npm packages. It provides a centralized way
 to manage a team&amp;rsquo;s published npm packages and permissions. Here are some
@@ -2920,4 +2795,9 @@ Scheduled Tasks
 &lt;h3 id="lhs-list-doesnt-update-out-of-page-items">LHS list doesn&amp;rsquo;t update &amp;ldquo;out of page&amp;rdquo; items&lt;/h3>
 &lt;p>LiveList and Search webapp services previously did not support sorting items by fields/values that are likely to change (e.g. by last visited date). Now, when the list is multiple pages long and it&amp;rsquo;s not entirely loaded, if an existent item receives a change that would push it lower than the current number of loaded items, it will refresh and move to appropriate position in the list. [&lt;a href="https://github.com/medic/medic-webapp/issues/4782">#4782).&lt;/a>]&lt;/p>
 &lt;h3 id="there-are-view-generation-errors">There are view generation errors&lt;/h3>
-&lt;p>[&lt;a href="https://github.com/medic/medic-webapp/issues/4612">#4612&lt;/a>]&lt;/p></description></item></channel></rss>
+&lt;p>[&lt;a href="https://github.com/medic/medic-webapp/issues/4612">#4612&lt;/a>]&lt;/p></description></item><item><title>Core: 2.18.1 release notes</title><link>https://docs.communityhealthtoolkit.org/core/releases/2.18.1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/releases/2.18.1/</guid><description>
+&lt;h2 id="whats-new">What&amp;rsquo;s New&lt;/h2>
+&lt;h3 id="count-two-visits-on-the-same-day-as-one-visit">Count two visits on the same day as one visit&lt;/h3>
+&lt;p>If a family is visited twice on the same day it now only counts as one visit in UHC mode. [&lt;a href="https://github.com/medic/medic-webapp/issues/4897">#4897&lt;/a>]&lt;/p>
+&lt;h3 id="inputs-group-not-saved-when-its-relevance-is-set-to-false">Inputs group not saved when its relevance is set to false&lt;/h3>
+&lt;p>Form inputs are now always saved on the reports even when they are marked as not relevant to help with analytics and editing forms. [&lt;a href="https://github.com/medic/medic-webapp/issues/4875">#4875&lt;/a>]&lt;/p></description></item></channel></rss>
