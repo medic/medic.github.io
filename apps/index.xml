@@ -1115,10 +1115,21 @@ Content-Type: application/json; charset=utf-8
 }
 ]
 &lt;/code>&lt;/pre>&lt;h3 id="post-apiv1users">POST /api/v1/users&lt;/h3>
-&lt;p>Create a new user with a place and a contact.&lt;/p>
+&lt;p>Create new users with a place and a contact.&lt;/p>
+&lt;p>Creating multiple users at once by passing an array of users was introduced in version 3.15.&lt;br>
+All users need to meet the following requirements before any of them are created:&lt;/p>
+&lt;ul>
+&lt;li>All required fields are filled in&lt;/li>
+&lt;li>The password is at least 8 characters long and difficult to guess&lt;/li>
+&lt;li>The phone number is valid when &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/token_login/">&lt;code>token_login&lt;/code>&lt;/a> is enabled&lt;/li>
+&lt;/ul>
+&lt;p>Users are created in parallel and the creation is not aborted even if one of the users fails to be created.&lt;/p>
+&lt;p>Passing a single user in the request&amp;rsquo;s body will return a single object whereas
+passing an array of users will return an array of objects as shown in the examples below.&lt;/p>
 &lt;h4 id="permissions-4">Permissions&lt;/h4>
-&lt;p>&lt;code>can_create_users&lt;/code>, &lt;code>can_create_places&lt;/code>, &lt;code>can_create_people&lt;/code>&lt;/p>
+&lt;p>&lt;code>can_create_users&lt;/code>&lt;/p>
 &lt;h4 id="examples-9">Examples&lt;/h4>
+&lt;h5 id="create-one-user">Create one user&lt;/h5>
 &lt;p>Create a new user that can authenticate with a username of &amp;ldquo;mary&amp;rdquo; and password
 of &amp;ldquo;secret&amp;rdquo; that can submit reports and view or modify records associated to
 their place. The place is created in the background and automatically linked
@@ -1155,11 +1166,136 @@ Content-Type: application/json
 &amp;quot;rev&amp;quot;: &amp;quot;1-c3b82a0b47cfe68edd9284c89bebbae4&amp;quot;
 }
 }
+&lt;/code>&lt;/pre>&lt;h5 id="create-many-users">Create many users&lt;/h5>
+&lt;p>Create two new users that can authenticate with a username and a password
+that can submit reports and view or modify records associated to their place.
+The place is created in the background and automatically linked to the contact.&lt;/p>
+&lt;pre>&lt;code>POST /api/v1/users
+Content-Type: application/json
+[
+{
+&amp;quot;password&amp;quot;: &amp;quot;secret&amp;quot;,
+&amp;quot;username&amp;quot;: &amp;quot;mary&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district-manager&amp;quot;,
+&amp;quot;place&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Mary's Area&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: &amp;quot;d14e1c3d557761320b13a77e7806e8f8&amp;quot;
+},
+&amp;quot;contact&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Mary Anyango&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2868917046&amp;quot;
+}
+},
+{
+&amp;quot;password&amp;quot;: &amp;quot;secret&amp;quot;,
+&amp;quot;username&amp;quot;: &amp;quot;bob&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;district-manager&amp;quot;,
+&amp;quot;place&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Bob's Area&amp;quot;,
+&amp;quot;type&amp;quot;: &amp;quot;health_center&amp;quot;,
+&amp;quot;parent&amp;quot;: &amp;quot;d14e1c3d557761320b13a77e7806e8f8&amp;quot;
+},
+&amp;quot;contact&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;Bob Johnson&amp;quot;,
+&amp;quot;phone&amp;quot;: &amp;quot;+2868194607&amp;quot;
+}
+}
+]
+&lt;/code>&lt;/pre>&lt;pre>&lt;code>HTTP/1.1 200
+Content-Type: application/json
+[
+{
+&amp;quot;contact&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;65416b8ceb53ff88ac1847654501aeb3&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-0b74d219ae13137c1a06f03a0a52e187&amp;quot;
+},
+&amp;quot;user-settings&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-6ac1d36b775143835f4af53f9895d7ae&amp;quot;
+},
+&amp;quot;user&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-c3b82a0b47cfe68edd9284c89bebbae4&amp;quot;
+}
+},
+{
+&amp;quot;contact&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;8d8a741c1cb441058e29a60ab7596bf2&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-acbc31712fd105eae3cd0806cd20a8f4&amp;quot;
+},
+&amp;quot;user-settings&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:bob&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-d8629838127accd531043f845c416ef6&amp;quot;
+},
+&amp;quot;user&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:bob&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-5eac2542c801ba6b518728f53d9276a0&amp;quot;
+}
+}
+]
 &lt;/code>&lt;/pre>&lt;h4 id="errors-1">Errors&lt;/h4>
-&lt;p>Response if the username already exists:&lt;/p>
-&lt;pre>&lt;code>HTTP/1.1 409 Conflict
-Content-Type: text/plain
-Document update conflict.
+&lt;h5 id="response-when-the-username-already-exists">Response when the username already exists&lt;/h5>
+&lt;pre>&lt;code>HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;quot;code&amp;quot;: 400,
+&amp;quot;error&amp;quot;: {
+&amp;quot;message&amp;quot;: &amp;quot;Username \&amp;quot;mary\&amp;quot; already taken.&amp;quot;,
+&amp;quot;translationKey&amp;quot;: &amp;quot;username.taken&amp;quot;,
+&amp;quot;translationParams&amp;quot;: {
+&amp;quot;username&amp;quot;: &amp;quot;mary&amp;quot;
+}
+}
+}
+&lt;/code>&lt;/pre>&lt;h5 id="response-when-users-are-missing-required-fields">Response when users are missing required fields&lt;/h5>
+&lt;pre>&lt;code>HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;quot;code&amp;quot;: 400,
+&amp;quot;error&amp;quot;: &amp;quot;Missing required fields:\n\Missing fields username, password, type or roles for user at index 0\nMissing fields password, type or roles for user at index 1&amp;quot;,
+&amp;quot;details&amp;quot;: {
+&amp;quot;failingIndexes&amp;quot;: [
+{
+&amp;quot;fields&amp;quot;: [
+&amp;quot;username&amp;quot;,
+&amp;quot;password&amp;quot;,
+&amp;quot;type or roles&amp;quot;
+],
+&amp;quot;index&amp;quot;: 0
+},
+{
+&amp;quot;fields&amp;quot;: [
+&amp;quot;password&amp;quot;,
+&amp;quot;type or roles&amp;quot;
+],
+&amp;quot;index&amp;quot;: 1
+}
+]
+}
+}
+&lt;/code>&lt;/pre>&lt;h5 id="response-when-some-users-failed-to-be-created">Response when some users failed to be created&lt;/h5>
+&lt;pre>&lt;code>HTTP/1.1 200
+Content-Type: application/json
+[
+{
+&amp;quot;contact&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;65416b8ceb53ff88ac1847654501aeb3&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-0b74d219ae13137c1a06f03a0a52e187&amp;quot;
+},
+&amp;quot;user-settings&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-6ac1d36b775143835f4af53f9895d7ae&amp;quot;
+},
+&amp;quot;user&amp;quot;: {
+&amp;quot;id&amp;quot;: &amp;quot;org.couchdb.user:mary&amp;quot;,
+&amp;quot;rev&amp;quot;: &amp;quot;1-c3b82a0b47cfe68edd9284c89bebbae4&amp;quot;
+}
+},
+{
+&amp;quot;error&amp;quot;: &amp;quot;Failed to find place.&amp;quot;
+}
+]
 &lt;/code>&lt;/pre>&lt;h3 id="post-apiv1usersusername">POST /api/v1/users/{{username}}&lt;/h3>
 &lt;p>Allows you to change property values on a user account. Properties listed above
 are supported except for &lt;code>contact.parent&lt;/code>. Creating or modifying people
