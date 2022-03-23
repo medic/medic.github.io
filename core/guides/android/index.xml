@@ -143,7 +143,10 @@ If distributing AABs via the Play Store, upload all AABs and it will automatical
 &lt;/ol>
 &lt;h2 id="new-flavor-release">New flavor release&lt;/h2>
 &lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
-&lt;p>If the release only contains a new flavor but is based on the last version, tag it with the same version that the last one plus a number suffix separated with a &lt;code>-&lt;/code>, e.g. if the last version was &lt;code>v1.2.3&lt;/code>, tag it as &lt;code>v1.2.3-1&lt;/code>. In this case there is no need to publish again the reference apps in the Play Store, or to announce the release in the forum if isn&amp;rsquo;t relevant.&lt;/p></description></item><item><title>Core: Publishing</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</guid><description>
+&lt;p>The new flavor should have branched off from the &lt;a href="https://github.com/medic/cht-android/releases">last stable release&lt;/a> in CHT Android repository, for example, if the latest stable release is &lt;code>v1.2.3&lt;/code> and the branch name is &lt;code>v1.2.3-new-brand&lt;/code>, then check out the tag and create a branch using the following command:&lt;/p>
+&lt;pre>&lt;code>git checkout v1.2.3 -b v1.2.3-new-brand
+&lt;/code>&lt;/pre>&lt;p>Add the flavor and make a pull request to the release branch. Once it has been approved, &lt;code>squash and merge&lt;/code> the pull request, tag the commit with the same version as the last one and add a number suffix separated with a dash character (&lt;code>-&lt;/code>), e.g. if the last version was &lt;code>v1.2.3&lt;/code>, tag it as &lt;code>v1.2.3-1&lt;/code>. In this case, it&amp;rsquo;s not necessary to publish again the reference apps in Play Store or to announce the release in the forum, if not relevant.
+Finally, make sure this commit is backported to the repository&amp;rsquo;s main branch.&lt;/p></description></item><item><title>Core: Publishing</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/publishing/</guid><description>
 &lt;p>Once &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/">released&lt;/a> the app, there are many different ways to publish the binaries for installation.&lt;/p>
 &lt;h3 id="google-play-store">Google Play Store&lt;/h3>
 &lt;p>The Play Store has the advantage of being installed on all Android phones by default. This makes it very easy for users to install your app, which makes it the approach we recommend for most applications.&lt;/p>
@@ -179,11 +182,11 @@ New apps cannot longer be uploaded with the APK format in the Play Store. Apps c
 &lt;p>There are several providers to choose from with a range of features and prices so it is recommend to do your own research and pick the one that&amp;rsquo;s right for you.&lt;/p></description></item><item><title>Core: Building CHT Android Flavors</title><link>https://docs.communityhealthtoolkit.org/core/guides/android/branding/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/guides/android/branding/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This tutorial will take you through building a CHT Android Application off the existing wrapper.&lt;/p>
-&lt;p>The cht-android application is a thin wrapper to load the CHT Core Framework web application in a WebView.&lt;/p>
+&lt;p>The CHT Android application is a thin wrapper to load the CHT Core Framework web application in a WebView.&lt;/p>
 &lt;p>You will be adding a new android flavor based off the &lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>.&lt;/p>
 &lt;/div>
 &lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
-&lt;p>The CHT Android is a native Android container for the Community Health Toolkit (CHT). The repo contains &amp;ldquo;flavored&amp;rdquo; configurations, where each &amp;ldquo;flavor&amp;rdquo; or &amp;ldquo;brand&amp;rdquo; is an app. All apps share the same code and features, but can be customized, hard-coding a specific CHT deployment and have a partner specific logo and display name.&lt;/p>
+&lt;p>The CHT Android is a native Android container for the Community Health Toolkit (CHT). The repository contains &amp;ldquo;flavored&amp;rdquo; configurations, where each &amp;ldquo;flavor&amp;rdquo; or &amp;ldquo;brand&amp;rdquo; is an app. All apps share the same code and features, but can be customized, hard-coding a specific CHT deployment and have a partner specific logo and display name.&lt;/p>
 &lt;h2 id="add-a-new-brand">Add a new Brand&lt;/h2>
 &lt;p>Adding a new &lt;em>&amp;ldquo;brand&amp;rdquo;&lt;/em> or &lt;em>&amp;ldquo;flavor&amp;rdquo;&lt;/em> requires the following steps:&lt;/p>
 &lt;ol>
@@ -234,8 +237,12 @@ New apps cannot longer be uploaded with the APK format in the Play Store. Apps c
 &lt;p>Each branded app has an identifier (&lt;em>id&lt;/em>) that is used to identify and configure it in different parts of the source code and when invoking some commands. In the instructions below we will use as example the id &lt;strong>&lt;code>new_brand&lt;/code>&lt;/strong>.&lt;/p>
 &lt;ol>
 &lt;li>
+&lt;p>Check out the tag from the &lt;a href="https://github.com/medic/cht-android/releases">last stable release&lt;/a> in CHT Android repository and create a branch, for example, if the latest stable release is &lt;code>v0.11.0&lt;/code> and the branch name is &lt;code>v0.11.0-new-brand&lt;/code>, then the command is:&lt;/p>
+&lt;pre>&lt;code>git checkout v0.11.0 -b v0.11.0-new-brand
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
 &lt;p>Add &lt;code>productFlavors { &amp;lt;new_brand&amp;gt; { ... } }&lt;/code> in &lt;a href="https://github.com/medic/cht-android/blob/master/build.gradle">build.gradle&lt;/a>, e.g.:&lt;/p>
-&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-groovy" data-lang="groovy"> &lt;span style="color:#000">new_brand&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-groovy" data-lang="groovy">&lt;span style="color:#000">new_brand&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>
 &lt;span style="color:#000">dimension&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;brand&amp;#39;&lt;/span>
 &lt;span style="color:#000">applicationId&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;org.medicmobile.webapp.mobile.new_brand&amp;#39;&lt;/span>
 &lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
@@ -275,7 +282,7 @@ New apps cannot longer be uploaded with the APK format in the Play Store. Apps c
 &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PATH&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>new_brand.keystore&lt;span style="color:#f8f8f8;text-decoration:underline">
 &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEYSTORE_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEYSTORE_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
 &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ANDROID_KEY_PASSWORD&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>${{&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>secrets.ANDROID_KEY_PASSWORD_NEW_BRAND&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>}}&lt;span style="color:#f8f8f8;text-decoration:underline">
-&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The variables in the &lt;code>env&lt;/code> sections point to a keystore and the passwords to unlock the keystore that will be generated in the following steps, but it&amp;rsquo;s important to follow the name convention, in the example all the variables that are configured in Github Actions end with the suffix &lt;code>_NEW_BRAND&lt;/code>, these variables need to be added in the cht-android repo settings by a manager of Medic.&lt;/p>
+&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The variables in the &lt;code>env&lt;/code> sections point to a keystore and the passwords to unlock the keystore that will be generated in the following steps, but it&amp;rsquo;s important to follow the name convention, in the example all the variables that are configured in Github Actions end with the suffix &lt;code>_NEW_BRAND&lt;/code>, these variables need to be added in the CHT Android repository settings by a manager of Medic.&lt;/p>
 &lt;/li>
 &lt;/ol>
 &lt;h3 id="3-generate-a-new-keystore">3. Generate a new keystore&lt;/h3>
@@ -328,7 +335,7 @@ export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
 &lt;p>About the file &lt;code>secrets/secrets-new_brand.tar.gz.enc&lt;/code>, as the last paragraph in the console says: &lt;em>has to be added to the git repository (don&amp;rsquo;t worry, it&amp;rsquo;s encrypted with some of the keys above)&lt;/em>.&lt;/p>
 &lt;p>If you want to start over because some of the parameters were wrong, just execute &lt;code>make org=new_brand keyrm-all&lt;/code> to clean all the files generated. Once committed the &lt;code>.enc&lt;/code> file, you can delete the uncompressed and unencrypted version with &lt;code>make org=new_brand keyrm&lt;/code>, it will delete the &lt;code>new_brand.keystore&lt;/code>, &lt;code>new_brand_private_key.pepk&lt;/code>, and the unencrypted &lt;code>.tar.gz&lt;/code> files, that are safer kept in the &lt;code>.tar.gz.enc&lt;/code> file.&lt;/p>
 &lt;h3 id="4-test-locally-the-keystore">4. Test locally the keystore&lt;/h3>
-&lt;p>&lt;strong>Want to check the keystore?&lt;/strong> here are a few things you must test before upload to the repo:&lt;/p>
+&lt;p>&lt;strong>Want to check the keystore?&lt;/strong> here are a few things you must test before upload to the repository:&lt;/p>
 &lt;ol>
 &lt;li>
 &lt;p>To decrypt the content like CI does to sign the app, execute: &lt;code>make org=new_brand keydec&lt;/code>, it will decrypt and decompress the files removed in the step above. Remember that the environment variables printed in the console needs to be loaded in the CLI. Note that all the variables above end with the suffix &lt;code>_NEW_BRAND&lt;/code>, as the id of the app that we pass through the &lt;code>org&lt;/code> argument in lowercase, but if Make found the same variables defined without the prefix, they take precedence over the suffix ones.&lt;/p>
@@ -350,7 +357,12 @@ Signer #1 certificate SHA-256 digest: 7f072b...
 &lt;p>Also do the same for the bundle format: build and verify, despite the AAB are not useful for local development. In our example, execute first &lt;code>make org=new_brand flavor=New_brand bundle&lt;/code>, and then &lt;code>make keyprint-bundle&lt;/code> to see the signature of one of the &lt;code>.aab&lt;/code> files generated.&lt;/p>
 &lt;p>Because the files generated here are signed with the same key that you are going to use in CI, and the files produced in CI will be uploaded to the Play Store later, any file generated locally following the steps above will be compatible with any installation made from the Play Store, means that if a user install the app from the Play Store, and then we want to replace the installation with an alpha version generated in CI or a local version generated in dev environment, it will work without requiring the user to uninstall the app and lost the data.&lt;/p>
 &lt;h3 id="5-release-the-new-flavor">5. Release the new flavor&lt;/h3>
-&lt;p>Once you have your pull request approved in the cht-android repo, it&amp;rsquo;s recommended to create an alpha version before merge it to master and do the final release.&lt;/p>
-&lt;p>Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/#new-flavor-release">Release&lt;/a> page, where it&amp;rsquo;s explained the different stages and instructions for releasing. The last section &lt;em>&amp;ldquo;New flavor release&amp;rdquo;&lt;/em> has special instructions of how to release a new brand.&lt;/p>
+&lt;p>Releasing a new flavor requires the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Make a pull request to the release branch in the CHT Android repository.&lt;/li>
+&lt;li>Once approved it&amp;rsquo;s recommended to create an alpha version to do final tests.&lt;/li>
+&lt;li>Merge the pull request.&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/releasing/#new-flavor-release">Release the flavor&lt;/a>.&lt;/li>
+&lt;/ol>
 &lt;h3 id="6-publish-the-app">6. Publish the app&lt;/h3>
 &lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p></description></item></channel></rss>
