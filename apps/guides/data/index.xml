@@ -204,7 +204,88 @@ done
 &lt;/code>&lt;/pre>&lt;p>Load the data into the loop:&lt;/p>
 &lt;pre>&lt;code>tail -n+2 /tmp/data | COUCH_URL=https://admin:secret@myproject.app.medicmobile.org \
 users-bulk-load # tail skips header row
-&lt;/code>&lt;/pre></description></item><item><title>Apps: CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</guid><description>
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Detecting and fixing data on the wrong server</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/fixing-data-in-wrong-location/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/fixing-data-in-wrong-location/</guid><description>
+&lt;p>After &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/onboarding/">onboarding CHWs&lt;/a>, sometimes data ends up on the wrong CHT instance. There&amp;rsquo;s some passive and active actions you can take to help deal with this situation.&lt;/p>
+&lt;h2 id="monitoring">Monitoring&lt;/h2>
+&lt;p>Monitoring is a good way to see if CHWs are sending forms to the wrong CHT server. By catching such a problem early, it may be easy to fix manually which avoids more laborious fixes on the command line for admins.&lt;/p>
+&lt;h3 id="manual-device-checks">Manual device checks&lt;/h3>
+&lt;p>Supervisors can actively monitor CHWs as they register their first household. If each CHW is given a deadline to do this, the Supervisor can follow up promptly with CHWs who have not met the deadline.&lt;/p>
+&lt;h3 id="centralized-database-checks">Centralized database checks&lt;/h3>
+&lt;p>From an administrative perspective, passive monitoring can be done by querying the Postgres instance that &lt;a href="https://github.com/medic/cht-couch2pg/">couch2pg&lt;/a> is populating. If &lt;code>2020-09-14&lt;/code> was the date to stop use the training instance, this SQL query would show CHWs using the wrong instance after &lt;code>2020-09-14&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">with forms as &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+doc &lt;span style="color:#8f5902;font-style:italic">#&amp;gt;&amp;gt; &amp;#39;{fields,inputs,user,contact_id}&amp;#39; as chw_id,&lt;/span>
+count&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>*&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span> as n_forms
+from
+couchdb
+where to_timestamp&lt;span style="color:#ce5c00;font-weight:bold">((&lt;/span>doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;reported_date&amp;#39;&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>::bigint / 1000&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span> &amp;gt; &lt;span style="color:#4e9a06">&amp;#39;2020-09-14 00:00:00&amp;#39;&lt;/span>
+group by &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>
+&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>, chw_names as &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;_id&amp;#39;&lt;/span> as chw_id,
+doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;name&amp;#39;&lt;/span> as chw_name
+from couchdb
+where doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;role&amp;#39;&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;chw&amp;#39;&lt;/span>
+and doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;name&amp;#39;&lt;/span> not like &lt;span style="color:#4e9a06">&amp;#39;ASC%&amp;#39;&lt;/span>
+&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+n.chw_name,
+f.n_forms
+from
+forms f
+left join
+chw_names n
+using&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>chw_id&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+order by n_forms desc&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A limitation of this technique is that CHWs who have not synchronized their device will not show up. In this case, a supervisor proactively checking per above is a better failsafe.&lt;/p>
+&lt;h3 id="cht-based-supervisor-tasks">CHT based supervisor tasks&lt;/h3>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/apps/features/supervision/#supervisor-tasks">Tasks for supervisors&lt;/a> can also be used for the CHWs that report to them. This can be used to trigger a task when a CHW hasn&amp;rsquo;t submitted a task within a given period on production.&lt;/p>
+&lt;h2 id="remediation">Remediation&lt;/h2>
+&lt;p>In the case that production data has been entered into a training instance, care must be used to ensure data is not lost or overwritten. These steps assume you&amp;rsquo;re on a Linux command line and have jq, curl and cat installed. The task is to carefully download all docs created after a certain date on a training, clean up extra docs not needed and then upload them to a production instance:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Set the aliases and environment variables:&lt;/p>
+&lt;pre>&lt;code>alias ts='date -u +&amp;quot;%Y-%m-%dT%H:%M:%SZ&amp;quot;'
+alias curlj=&amp;quot;curl -H 'content-type:application/json'&amp;quot;
+alias curljz=&amp;quot;curl --compressed -H 'content-type:application/json'&amp;quot;
+export COUCH_URL=https://admin:pass@dev.example.org
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Ensure affected CHWs have synced their devices to the development instance one last time. If they have been offline for some time and gathered production data, signing out or deleting the app before synchronizing may result in lost data.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Find the date when CHWs should have started using production. Convert this to epoch with milliseconds. For example if the time was &amp;ldquo;Tue, 01 Dec 2020 09:36:50 GMT&amp;rdquo; then the epoch would be &amp;ldquo;1606815410000&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Using Fauxton, create a view to show all documents created after this date:&lt;/p>
+&lt;pre>&lt;code>function (doc) {
+if(doc.reported_date &amp;gt; 1606815410000) {
+emit(doc._id, 1);
+}
+}
+&lt;/code>&lt;/pre>&lt;p>&lt;img src="create.view.png" alt="Creating a view in Fauxton">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Download the UUIDs of the documents in the view, and convert it to raw format (uuids-2.txt):&lt;/p>
+&lt;pre>&lt;code>curl &amp;quot;$COUCH_URL/medic/_design/temp/_view/temp1&amp;quot; &amp;gt; uuids-1.txt
+cat uuids-1.txt | jq -r '.rows[].id' &amp;gt; uuids-2.txt
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Download all the matching docs to docs.json:&lt;/p>
+&lt;pre>&lt;code>cat uuids-2.txt | jq --raw-input --slurp '{keys: split(&amp;quot;\n&amp;quot;) }' | curljz -d@- &amp;quot;$COUCH_URL/medic/_all_docs?include_docs=true&amp;quot; | jq '{docs: [ .rows[] | select(.doc).doc ]}' &amp;gt; docs.json
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Change the fields by deleting &amp;ldquo;_rev&amp;rdquo; field and also &amp;ldquo;_attachments&amp;rdquo; if uploading in a different instance. This can be carefully done by manually editing the JSON locally before uploading.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Change the COUCH_URL to be your production instance by setting another export:&lt;/p>
+&lt;pre>&lt;code>export COUCH_URL=http://admin:pass@app.example.org
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Upload the docs, for example, the following command adds a field (updated=true) to the docs and uploads them:&lt;/p>
+&lt;pre>&lt;code>cat docs.json | jq '{&amp;quot;docs&amp;quot;:[ .docs[] | .updated = true ]}' | curljz -d@- $COUCH_URL/medic/_bulk_docs &amp;gt; results.json
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;/ol></description></item><item><title>Apps: CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</guid><description>
 &lt;p>Impact monitoring is an essential part of both the Community Health Toolkit and Medic&amp;rsquo;s processes and ethos. We are committed to harnessing data to:&lt;/p>
 &lt;ol>
 &lt;li>Support our partners in data-driven operational and strategic decision making&lt;/li>
