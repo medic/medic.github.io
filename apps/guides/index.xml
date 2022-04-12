@@ -7,21 +7,19 @@ The suggestions in this guide should be assessed and adapted as needed to benefi
 &lt;h2 id="setting-up-a-training-app">Setting up a training app&lt;/h2>
 &lt;p>A separate Android App can be created for training, which would point to a CHT instance dedicated to training. The training instance should have the same configuration as the production instance, and have users created for training. To differentiate the Android app used for training from the production one, create a duplicate of &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/branding/">your flavor&lt;/a> and modify the following aspects&lt;/p>
 &lt;ul>
-&lt;li>
-&lt;p>&lt;strong>App ID&lt;/strong>: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code>applicationId&lt;/code>. If you want to prevent having both the training and production apps installed at the same time keep these values the same.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>CHT Instance&lt;/strong>: Set the &lt;code>app_host&lt;/code> string to be the URL of your training instance, otherwise it will in effect be the same as using the production app.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Launcher icons&lt;/strong>: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>App name&lt;/strong>: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code>[TRAINING] CHW App&lt;/code> would be better than &lt;code>CHW App [TRAINING VERSION]&lt;/code>, since the latter may only display as &lt;code>CHW App...&lt;/code>.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Border &amp;amp; Message&lt;/strong>: Consider adding a distinctive border and message when using the training app. This might be done in a more automated way in future versions of CHT Android, and in the meantime can be &lt;a href="https://github.com/medic/cht-android/commit/8d077ed08dc3889ef1f4e3bad7231931bca55d87">modeled after this example&lt;/a>.&lt;/p>
-&lt;p>&lt;img src="border.png" alt="CHT with border">&lt;/p>
+&lt;li>&lt;figure class="right col-6 col-lg-4">&lt;a href="training-app.png">
+&lt;img src="training-app.png"
+alt="CHT training app with border and message"/> &lt;/a>
+&lt;/figure>
+&lt;strong>Border &amp;amp; Message&lt;/strong>: Consider adding a distinctive border and message when using the training app. This can be done by setting the build config field &lt;code>IS_TRAINING_APP&lt;/code> to &lt;code>true&lt;/code>, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L212-L216">&lt;code>build.gradle&lt;/code>&lt;/a> for the training version of the Gamma app.&lt;/li>
+&lt;li>&lt;strong>CHT Instance&lt;/strong>: In your flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file set the &lt;code>app_host&lt;/code> string to be the URL of your training instance, as seen in the &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L3">Gamma Training app&lt;/a>. If left the same as the production app both training and production data will end up in your production instance.&lt;/li>
+&lt;li>&lt;strong>Launcher icons&lt;/strong>: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/li>
+&lt;li>&lt;strong>App name&lt;/strong>: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code>CHW App [TRAINING VERSION]&lt;/code> may display as &lt;code>CHW App...&lt;/code> so it would be better to use &lt;code>[TRAINING] CHW App&lt;/code>. The app name is set in the flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L4">the Gamma training app&lt;/a>.&lt;/li>
+&lt;li>&lt;strong>App ID&lt;/strong>: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code>applicationId&lt;/code>, as seen &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L214">in &lt;code>build.gradle&lt;/code> for the Gamma training app&lt;/a>.
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Keeping the &lt;code>applicationId&lt;/code> values the same will make it impossible to have both the training and production apps installed at the same time on a device. If you have a way to install the production app after the training is complete then you may choose to do this to prevent users from using the wrong app.
+&lt;/div>
 &lt;/li>
 &lt;/ul>
 &lt;h2 id="switching-from-training-to-production-app">Switching from training to production app&lt;/h2>
