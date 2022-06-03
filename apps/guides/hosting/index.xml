@@ -320,7 +320,7 @@ Containers that are already set up will lose all data when following the steps b
 &lt;/ul></description></item><item><title>Apps: App Developer Hosting</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
-&lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without loosing any data while doing so. To do development on the CHT core itself, see the &lt;a href="https://github.com/medic/cht-core/blob/master/DEVELOPMENT.md">development guide&lt;/a>.&lt;/p>
+&lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without loosing any data while doing so. To do development on the CHT core itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/">development guide&lt;/a>.&lt;/p>
 &lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
 &lt;/div>
 &lt;h2 id="getting-started">Getting started&lt;/h2>
@@ -363,7 +363,151 @@ Containers that are already set up will lose all data when following the steps b
 &lt;li>&lt;a href="https://127.0.0.1">https://127.0.0.1&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://127.0.0.2:8443">https://127.0.0.2:8443&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;p>This would result in the domains being &lt;code>127.0.0.1&lt;/code> and &lt;code>127.0.0.2&lt;/code> from the CHT&amp;rsquo;s perspective.&lt;/p></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
+&lt;p>This would result in the domains being &lt;code>127.0.0.1&lt;/code> and &lt;code>127.0.0.2&lt;/code> from the CHT&amp;rsquo;s perspective.&lt;/p></description></item><item><title>Apps: CHT Core Developer Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>This guide assumes you are a CHT Core developer wanting to run the CHT Core from source code to make commits to the &lt;a href="https://github.com/medic/cht-core">public GitHub repository&lt;/a>. To set up a your environment for developing apps, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/">app guide&lt;/a>.&lt;/p>
+&lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
+&lt;/div>
+&lt;h2 id="the-happy-path-installation">The Happy Path Installation&lt;/h2>
+&lt;p>This CHT Core developer guide will have you install NodeJS, npm, Grunt and CouchDB (via Docker) on your local workstation. These instructions should work verbatim on Ubuntu 18-22, but will need tweaks for MacOS (via &lt;code>brew&lt;/code>) or Windows (via WSL2).&lt;/p>
+&lt;h3 id="install-nodejs-npm-grunt-and-docker">Install NodeJS, npm, grunt and Docker&lt;/h3>
+&lt;p>First, update your current Ubuntu packages and install some supporting tools via &lt;code>apt&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
+sudo apt -y install xsltproc curl uidmap jq python2 git
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then install &lt;code>nvm&lt;/code>, add it to your path and install NodeJS 12:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$0&lt;/span>
+. ~/.&lt;span style="color:#000">$0&lt;/span>rc
+nvm install &lt;span style="color:#0000cf;font-weight:bold">12&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now let&amp;rsquo;s ensure NodeJS 12 and npm 6 were installed. This should output version 12.x.x for NodeJS and 6.x.x for &lt;code>npm&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">node -v &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm -v
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>With NodeJS out of the way, let&amp;rsquo;s install &lt;code>grunt&lt;/code> via &lt;code>npm&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">npm install -g grunt-cli
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install Docker:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">curl -fsSL get.docker.com -o get-docker.sh &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sh get-docker.sh
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>It&amp;rsquo;s easier if you don&amp;rsquo;t always have to run &lt;code>sudo&lt;/code> for all your Docker calls, so let&amp;rsquo;s set that up:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">dockerd-rootless-setuptool.sh install
+&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export PATH=/usr/bin:&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#000">$0&lt;/span>rc
+&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export DOCKER_HOST=unix:///run/user/1000/docker.sock&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#000">$0&lt;/span>rc
+. ~/.&lt;span style="color:#000">$0&lt;/span>rc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In order for Docker to boot correctly, restart entire machine, which will complete the &amp;ldquo;Install&amp;rdquo; Section:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">sudo reboot
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="couchdb-setup-in-docker">CouchDB Setup in Docker&lt;/h3>
+&lt;p>Before we get started, let&amp;rsquo;s run the simple &lt;code>hello-world&lt;/code> Docker container. This will ensure docker is working as expected and output &amp;ldquo;Hello from Docker!&amp;rdquo; as well as some other intro text:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">docker run hello-world
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now that we know Docker is set up, let&amp;rsquo;s start our CouchDB container. Note this will run in the background and store its data in &lt;code>/home/YOUR-USER/cht-docker&lt;/code>. The login for your CHT instance will be &lt;code>medic&lt;/code> and the password will be &lt;code>password&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v ~/cht-docker/local.d:/opt/couchdb/data -v ~/cht-docker/local.d:/opt/couchdb/etc/local.d apache/couchdb:2
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s ensure CouchDB is set up with a test &lt;code>curl&lt;/code> call. This should show &amp;ldquo;nonode@nohost&amp;rdquo; in JSON:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">curl -X GET &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_membership&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Every time you run any &lt;code>grunt&lt;/code> or &lt;code>node&lt;/code> commands, it will expect &lt;code>COUCH_NODE_NAME&lt;/code> and &lt;code>COUCH_URL&lt;/code> environment variables to be set:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_NODE_NAME=nonode@nohost&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#000">$0&lt;/span>rc
+&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_URL=http://medic:password@localhost:5984/medic&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#000">$0&lt;/span>rc
+. ~/.&lt;span style="color:#000">$0&lt;/span>rc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>To ensure these to exports and sourcing your rc file worked, echo the values back out. You should see &lt;code>nonode@nohost&lt;/code> and &lt;code>http://medic:password@localhost:5984/medic&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_URL&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="cht-core-cloning-and-setup">CHT Core Cloning and Setup&lt;/h3>
+&lt;p>Clone the main CHT Core repo from GitHub and change directories into it:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">git clone https://github.com/medic/cht-core ~/cht-core
+&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install dependencies and perform other setup tasks via an &lt;code>npm&lt;/code> command. Note this command may take many minutes. Be patient!&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">npm ci
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>We need to harden couch with a &lt;code>grunt&lt;/code> call, required even in development:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">grunt secure-couchdb
+curl -X PUT &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_node/&lt;/span>&lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span>&lt;span style="color:#4e9a06">/_config/httpd/WWW-Authenticate&amp;#34;&lt;/span> -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;Basic realm=\&amp;#34;administrator\&amp;#34;&amp;#34;&amp;#39;&lt;/span> -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
+&lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development. In the first terminal, run:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be &lt;strong>very&lt;/strong> patient until you see:&lt;/p>
+&lt;blockquote>
+&lt;p>&amp;ldquo;Waiting&amp;hellip;&amp;rdquo;&lt;/p>
+&lt;/blockquote>
+&lt;p>Then in a 2nd terminal run:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt dev-api
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Finally, in a 3rd terminal run:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt dev-sentinel
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>That&amp;rsquo;s it! Now when you edit code in your IDE, it will automatically reload. You can see the CHT running locally here: &lt;a href="http://localhost:5988/">http://localhost:5988/&lt;/a>&lt;/p>
+&lt;p>When you&amp;rsquo;re done with development you can &lt;code>ctrl + c&lt;/code> in the three terminals and stop the CouchDB container with &lt;code>docker stop medic-couchdb&lt;/code>. When you want to resume development later, run &lt;code>docker start medic-couchdb&lt;/code> and re-run the three terminal commands.&lt;/p>
+&lt;h2 id="other-path-troubleshooting">Other Path Troubleshooting&lt;/h2>
+&lt;p>If you weren&amp;rsquo;t able to follow &lt;a href="#the-happy-path-installation">the happy path above&lt;/a>, here are some details about the developer install that may help you troubleshoot what went wrong.&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;p>If you had issues with following the above steps, check out these links for how to install the prerequisites on your specific platform:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://nodejs.org/">Node.js 12.x&lt;/a> &amp;amp; &lt;a href="https://npmjs.com/">npm 6.x.x&lt;/a> - Both of which we recommend installing [via &lt;code>nvm&lt;/code>](&lt;a href="https://npmjs.com/">npm 6.x.x&lt;/a>)&lt;/li>
+&lt;li>&lt;a href="https://gruntjs.com/using-the-cli">grunt cli&lt;/a>&lt;/li>
+&lt;li>&lt;a href="http://www.sagehill.net/docbookxsl/InstallingAProcessor.html">xsltproc&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.python.org/downloads/">python 2.7&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/">Docker&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.couchdb.org/en/2.3.1/install/index.html">CouchDB&lt;/a> - OS package instead of in Docker - you &lt;strong>MUST&lt;/strong> use CouchDB 2.x! We still strongly recommend using Docker.&lt;/li>
+&lt;/ul>
+&lt;h3 id="couchdb-on-docker-details">CouchDB on Docker Details&lt;/h3>
+&lt;p>Breaking down the command from &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/#couchdb-setup-in-docker">the above section&lt;/a>, here&amp;rsquo;s a generic version that doesn&amp;rsquo;t include hard coded paths:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v &amp;lt;data path&amp;gt;:/opt/couchdb/data -v &amp;lt;config path&amp;gt;:/opt/couchdb/etc/local.d apache/couchdb:2
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Parts of the command:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>--name&lt;/code> creates a container called &lt;code>medic-couchdb&lt;/code>. You can name it whatever you want, but this is how you refer to it later&lt;/li>
+&lt;li>&lt;code>-e&lt;/code> sets an environment variable inside the container. Two are set here, for a user and password for the initial admin user.&lt;/li>
+&lt;li>&lt;code>-v&lt;/code> maps where couchdb stores data to your local file system to ensure persistence without depending on the container, using the path &lt;em>before&lt;/em> the &lt;code>:&lt;/code> (the path after the colon is the internal path inside the docker image). This should be somewhere you have write access to, and want this data to be stored. The second mounted volume is for the couch configuration, which will retain settings if your container is removed. This is especially important after running the command to secure the instance (done in steps below).&lt;/li>
+&lt;li>&lt;code>apache/couchdb:2&lt;/code> will install the latest package for CouchDB 2.x&lt;/li>
+&lt;/ul>
+&lt;p>Once this downloads and starts, you will need to &lt;a href="http://localhost:5984/_utils/#/setup">initialise CouchDB&lt;/a> as noted in &lt;a href="https://docs.couchdb.org/en/2.3.1/setup/index.html#setup">their install instructions&lt;/a>.&lt;/p>
+&lt;p>You can use &lt;code>docker stop medic-couchdb&lt;/code> to stop it and &lt;code>docker start medic-couchdb&lt;/code> to start it again. Remember that you&amp;rsquo;ll need to start it whenever you restart your OS, which might not be the case if you use a normal OS package. &lt;code>docker rm medic-couchdb&lt;/code> will totally remove the container.&lt;/p>
+&lt;p>Medic recommends you familiarise yourself with other Docker commands to make docker image and container management clearer.&lt;/p>
+&lt;h3 id="required-environment-variables">Required environment variables&lt;/h3>
+&lt;p>Medic needs the following environment variables to be declared:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>COUCH_URL&lt;/code>: the full authenticated url to the &lt;code>medic&lt;/code> DB. Locally this would be &lt;code>http://myadminuser:myadminpass@localhost:5984/medic&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH_NODE_NAME&lt;/code>: the name of your CouchDB&amp;rsquo;s node. The Docker image default is &lt;code>nonode@nohost&lt;/code>. Other installations may use &lt;code>couchdb@127.0.0.1&lt;/code>. You can find out by querying &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#membership">CouchDB&amp;rsquo;s membership API&lt;/a>&lt;/li>
+&lt;li>(optionally) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined we use &lt;code>5988&lt;/code>&lt;/li>
+&lt;li>(optionally) &lt;code>CHROME_BIN&lt;/code>: only required if &lt;code>grunt unit&lt;/code> or &lt;code>grunt e2e&lt;/code> complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
+&lt;/ul>
+&lt;p>How to permanently define environment variables depends on your OS and shell (e.g. for bash you can put them &lt;code>~/.bashrc&lt;/code>). You can temporarily define them with &lt;code>export&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>nonode@nohost
+&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_URL&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>http://myadminuser:myadminpass@localhost:5984/medic
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tests">Tests&lt;/h2>
+&lt;p>Refer to &lt;a href="https://github.com/medic/cht-core/blob/master/TESTING.md">the testing doc&lt;/a> in the GitHub repo.&lt;/p>
+&lt;h2 id="nginx-local-ip">nginx-local-ip&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/nginx-local-ip">&lt;code>nginx-local-ip&lt;/code>&lt;/a> is a local proxy that keeps all traffic local, and runs without latency or throttling. If sharing your local CHT instance is not required, it is the recommended method to add a valid SSL certificate (rather than &lt;code>ngrok&lt;/code> or similar).&lt;/p>
+&lt;ol>
+&lt;li>Clone the repo: &lt;code>git clone https://github.com/medic/nginx-local-ip.git&lt;/code>&lt;/li>
+&lt;li>&lt;code>cd&lt;/code> into the new directory: &lt;code>cd nginx-local-ip&lt;/code>&lt;/li>
+&lt;li>Assuming your IP is &lt;code>192.168.0.3&lt;/code>, start &lt;code>nginx-local-ip&lt;/code> to connect to:
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>APP_URL=http://192.168.0.3:5988 docker compose up&lt;/code> and then access it at &lt;a href="https://192-168-0-3.my.local-ip.co/">https://192-168-0-3.my.local-ip.co/&lt;/a>&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, the ports are remapped, so execute &lt;code>HTTP=8080 HTTPS=8443 APP_URL=https://192.168.0.3 docker compose up&lt;/code> and then access it at &lt;a href="https://192-168-0-3.my.local-ip.co:8443/">https://192-168-0-3.my.local-ip.co:8443/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The HTTP/HTTPS ports (&lt;code>80&lt;/code>/&lt;code>443&lt;/code>) need to accept traffic from the IP address of your host machine and your local webapp port (e.g. &lt;code>5988&lt;/code>) needs to accept traffic from the IP address of the &lt;code>nginx-local-ip&lt;/code> container (on the Docker network). If you are using the UFW firewall (in a Linux environment) you can allow traffic on these ports with the following commands:&lt;/li>
+&lt;/ol>
+&lt;p>(Since local IP addresses can change over time, ranges are used in these rules so that the firewall configuration does not have to be updated each time a new address is assigned.)&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">$ sudo ufw allow proto tcp from 192.168.0.0/16 to any port 80,443
+$ sudo ufw allow proto tcp from 172.16.0.0/16 to any port &lt;span style="color:#0000cf;font-weight:bold">5988&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="remote-proxies">Remote Proxies&lt;/h2>
+&lt;p>&lt;code>ngrok&lt;/code> and &lt;code>pagekite&lt;/code> are remote proxies that route local traffic between your client and the CHT via a remote SSL terminator. While easy and handy, they introduce latency and are sometimes throttled. Always use &lt;code>nginx-local-ip&lt;/code> when you need a TLS certificate and only use these when you need to share your dev instance.&lt;/p>
+&lt;h3 id="ngrok">ngrok&lt;/h3>
+&lt;ol>
+&lt;li>Create an &lt;a href="https://ngrok.com/">ngrok account&lt;/a>, download and install the binary, then link your computer to your ngrok account.&lt;/li>
+&lt;li>Start &lt;code>ngrok&lt;/code> to connect to:
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>./ngrok http 5988&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>./ngrok http 443&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Access the app using the https address shown (e.g. &lt;code>https://YOUR-NGROK-NAME.ngrok.io&lt;/code>, replacing &lt;code>YOUR-NGROK-NAME&lt;/code> with what you signed up with).&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>Note:&lt;/strong> The service worker cache preload sometimes fails due to connection throttling (thereby causing an &lt;code>ngrok&lt;/code> failure at startup).&lt;/p>
+&lt;h3 id="pagekite">pagekite&lt;/h3>
+&lt;ol>
+&lt;li>Create a &lt;a href="https://pagekite.net/signup/">pagekite account&lt;/a>, download and install the python script.&lt;/li>
+&lt;li>Start pagekite (be sure to replace &lt;code>YOUR-PAGEKIT-NAME&lt;/code> with the URL you signed up for) to connect to:&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>python pagekite.py 5988 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>python pagekite.py 443 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;ol>
+&lt;li>Access the app using the https address shown (e.g. &lt;code>https://YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>).&lt;/li>
+&lt;/ol></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
 &lt;h2 id="requirements">Requirements&lt;/h2>
 &lt;ul>
 &lt;li>Installed CHT-Core 3.x via either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">Self Hosted&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">EC2&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">Local Setup&lt;/a>, but must use &lt;code>docker-compose&lt;/code>.&lt;/li>
