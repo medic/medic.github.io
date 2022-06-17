@@ -1129,32 +1129,74 @@ A handy tool for converting Gregorian dates to Bikram Sambat is available &lt;a 
 &amp;lt;data id=&amp;quot;myform&amp;quot; prefix=&amp;quot;J1!FORM_CODE!&amp;quot; delimiter=&amp;quot;#&amp;quot;&amp;gt;
 ...
 &lt;/code>&lt;/pre>&lt;p>Note that &lt;code>FORM_CODE&lt;/code> should be replaced with the form code as defined in the JSON forms version of the form. If the form code is &lt;code>ABCD&lt;/code> the prefix value would be &lt;code>J1!ABCD!&lt;/code>, resulting in &lt;code>prefix=&amp;quot;J1!ABCD!&amp;quot;&lt;/code>. In case you are curious, the &lt;code>J1&lt;/code> lets the CHT server know that version 1 of the JavaRosa parser should be used on the incoming SMS.&lt;/p></description></item><item><title>Apps: contact</title><link>https://docs.communityhealthtoolkit.org/apps/reference/forms/contact/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/forms/contact/</guid><description>
-&lt;p>Contact forms are used for the creation and editing of each contact. The type associated to people is &lt;code>person&lt;/code>, and there are three types of places corresponding to levels in the app: &lt;code>district_hospital&lt;/code> &amp;gt; &lt;code>health_center&lt;/code> &amp;gt; &lt;code>clinic&lt;/code>. The display names for the place levels can be changed via &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/translations/">custom translations&lt;/a>, and wherever they are defined in the contact forms. Each contact type has its own XForm where it defines the fields that it wants to store/edit for the contact:&lt;/p>
-&lt;pre>&lt;code>- /forms/contact/person-create.xml
-- /forms/contact/person-edit.xml
-- /forms/contact/clinic-create.xml
-- /forms/contact/clinic-edit.xml
-- /forms/contact/health_center-create.xml
-- /forms/contact/health_center-edit.xml
-- /forms/contact/district_hospital-create.xml
-- /forms/contact/district_hospital-edit.xml
-&lt;/code>&lt;/pre>
-&lt;p>To create the above XForm files it is recommended to use XLSForms. Also, if the contact forms will be similar for all places, you can use a &lt;code>PLACE_TYPE-create.xlsx&lt;/code> file for creation, a &lt;code>PLACE_TYPE-edit.xlsx&lt;/code> for editing, and have &lt;code>cht-conf&lt;/code> generate the individual forms. For this you would also need &lt;code>forms/contact/places.json&lt;/code>, where you would define the place names. From the XLSForm you can refer to the place type with &lt;code>PLACE_TYPE&lt;/code>, and the place name with &lt;code>PLACE_NAME&lt;/code>. You can even use the place type for conditional behaviour in the form. The base files needed would therefore be:&lt;/p>
-&lt;pre>&lt;code>- /forms/contact/person-create.xlsx
-- /forms/contact/person-edit.xlsx
-- /forms/contact/PLACE_TYPE-create.xlsx
-- /forms/contact/PLACE_TYPE-edit.xlsx
-- /forms/contact/places.json
-&lt;/code>&lt;/pre>
-&lt;p>Here is an example of a &lt;code>places.json&lt;/code> files:&lt;/p>
-&lt;pre>&lt;code>{
-&amp;quot;clinic&amp;quot;: &amp;quot;Village Clinic&amp;quot;,
-&amp;quot;health_center&amp;quot;: &amp;quot;Health Center&amp;quot;,
-&amp;quot;district_hospital&amp;quot;: &amp;quot;District Hospital&amp;quot;
-}
-&lt;/code>&lt;/pre>
+&lt;p>Contact forms are used to create and edit contacts (persons and places). Each contact-type should ideally have two forms; one for creation, and another for editing.&lt;/p>
+&lt;p>These forms are stored in the &lt;code>forms/contact&lt;/code> sub-folder of the project config directory. The naming convention used should be &lt;code>&amp;lt;contact_type_id-{create|edit}&amp;gt;.xlsx&lt;/code>.&lt;/p>
+&lt;h2 id="form-details">Form details&lt;/h2>
+&lt;h3 id="survey-sheet">Survey sheet&lt;/h3>
+&lt;p>To collect information about the contact, use a top-level group with the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">id of the contact_type&lt;/a> as the &lt;code>name&lt;/code> of the group (e.g. &lt;code>person&lt;/code> when adding or editing a person contact). Information in this group will be saved to the contact&amp;rsquo;s document in the database.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label::en&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>person&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>parent&lt;/td>
+&lt;td>Parent Id&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>type&lt;/td>
+&lt;td>Contact Type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>Full Name&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The &lt;code>parent&lt;/code>, &lt;code>type&lt;/code>, and &lt;code>name&lt;/code> fields are mandatory on forms that are adding contacts. &lt;code>parent&lt;/code> will be automatically populated with the id of the parent contact. &lt;code>type&lt;/code> will be automatically set to the contact_type id when saving the new contact.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Edit forms&lt;/h4>
+For edit forms, the name of the top-level group should still match the contact_type id of the contact, but only the relevant fields for editing need to be specified in the form.
+&lt;/div>
+&lt;h3 id="settings-sheet">Settings sheet&lt;/h3>
+&lt;p>The &lt;code>form_id&lt;/code> should follow the pattern &lt;code>contact:CONTACT_TYPE_ID:ACTION&lt;/code> where CONTACT_TYPE_ID is the contact_type id for the contact and ACTION is &lt;code>create&lt;/code> or &lt;code>edit&lt;/code>. (e.g. &lt;code>contact:clinic:create&lt;/code>)&lt;/p>
+&lt;h3 id="properties">Properties&lt;/h3>
+&lt;p>Starting in cht-core release 3.10, we can now configure property files in contact forms to show or hide them based on an expression or permission as specified in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#formsappform_namepropertiesjson">app form schema&lt;/a>.&lt;/p>
+&lt;h2 id="generic-contact-forms">Generic contact forms&lt;/h2>
+&lt;p>If your place contact forms are similar across all levels of your specified project hierarchy, you can templatise the form creation process. You will need to create the following files in &lt;code>forms/contact&lt;/code>: &lt;code>place-types.json&lt;/code>, &lt;code>PLACE_TYPE-create.xlsx&lt;/code> and &lt;code>PLACE_TYPE-edit.xlsx&lt;/code>.&lt;/p>
+&lt;p>&lt;code>place-types.json&lt;/code> maps the place contact_type id to a human-readable description that will be shown on the app&amp;rsquo;s user interface.&lt;/p>
+&lt;p>Both &lt;code>PLACE_TYPE-create.xlsx&lt;/code> and &lt;code>PLACE_TYPE-edit.xlsx&lt;/code> will contain two placeholder values &lt;code>PLACE_TYPE&lt;/code> and &lt;code>PLACE_NAME&lt;/code> which will be replaced by the keys and values specified in &lt;code>place-types.json&lt;/code> respectively during form conversion. Also, copies of the different place-type forms will be created (if they don&amp;rsquo;t exist) during the form conversion process with &lt;code>PLACE_TYPE&lt;/code> being replaced with the keys specified in &lt;code>place-types.json&lt;/code>.&lt;/p>
 &lt;p>Convert and build the contact forms into your application using the &lt;code>convert-contact-forms&lt;/code> and &lt;code>upload-contact-forms&lt;/code> actions in &lt;code>cht-conf&lt;/code>.&lt;/p>
 &lt;blockquote>
 &lt;p>&lt;code>cht --local convert-contact-forms upload-contact-forms&lt;/code>&lt;/p>
 &lt;/blockquote>
-&lt;p>Starting in cht-core release 3.10, we can now configure property files in contact forms to show or hide them based on an expression or permission as specified in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#formsappform_namepropertiesjson">app form schema&lt;/a>.&lt;/p></description></item></channel></rss>
+&lt;p>For examples on how to structure the above files you can have a look at the sample configurations in CHT-core: &lt;a href="https://github.com/medic/cht-core/tree/master/config/default/forms/contact">default&lt;/a> and &lt;a href="https://github.com/medic/cht-core/tree/master/config/standard/forms/contact">standard&lt;/a>.&lt;/p>
+&lt;h2 id="creating-person-and-place-contacts-in-the-same-form">Creating person and place contacts in the same form&lt;/h2>
+&lt;p>Contact forms for creating a place can also optionally create one or more person-type documents. One of these person contacts can be linked to the created place as the primary contact.&lt;/p>
+&lt;p>Below is a simple structure of a place form showing all the necessary components.&lt;/p>
+&lt;p>&lt;img src="place-contact-form-survey.png" alt="Place forms survey sheet">&lt;/p>
+&lt;p>Section 1 is similar to what has been described earlier for person forms.&lt;/p>
+&lt;p>Section 2 specifies the contact that will be linked to the place being created. &lt;code>parent&lt;/code>, &lt;code>type&lt;/code> and &lt;code>contact_type&lt;/code> and &lt;code>name&lt;/code> are mandatory. This also applies to the place-type definition in section 4. &lt;code>contact&lt;/code> on the other hand is not mandatory for the successful creation of a place. It is usually more convenient to create a place and its primary contact at the same time.&lt;/p>
+&lt;p>You can also create additional contacts linked to the place being created when you have a structure similar to that shown in section 3.&lt;/p></description></item></channel></rss>
