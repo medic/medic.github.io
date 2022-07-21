@@ -94,6 +94,12 @@
 &lt;li>&lt;a href="#get-apiv1users-doc-count">GET /api/v1/users-doc-count&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
+&lt;li>&lt;a href="#credentials">Credentials&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#put-apiv1credentials">PUT /api/v1/credentials&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#3x-api">3.x API&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;/ul>
 &lt;/nav>
 &lt;div class="alert alert-primary" role="alert">
@@ -924,8 +930,8 @@ will be undefined.&lt;/p>
 &lt;p>When creating or updating a user, sending a truthy value for the field &lt;code>token_login&lt;/code> will enable Login by SMS for this user.
 This action resets the user&amp;rsquo;s password to an unknown string and generates a complex 64 character token, that is used to generate a token-login URL.
 The URL is sent to the user&amp;rsquo;s phone number by SMS, along with another (configurable) SMS that can contain additional information.
-Accessing this link, before its expiration time, will log the user in directly - without the need of any other credentials.&lt;br>
-The link can only be accessed once, the token becomes invalid after being used for one login.&lt;br>
+Accessing this link, before its expiration time, will log the user in directly - without the need of any other credentials.
+The link can only be accessed once, the token becomes invalid after being used for one login.
 The token expires in 24 hours, after which logging in is only possible by either generating a new token, or disabling &lt;code>token_login&lt;/code> and manually setting a password.&lt;/p>
 &lt;p>The SMS messages are stored in a doc of a new type &lt;code>login_token&lt;/code>. These docs cannot be viewed as reports from the webapp, and can only be edited by admins, but their messages are visible in the Admin Message Queue page.&lt;/p>
 &lt;p>To disable login by SMS for a user, update the user sending &lt;code>token_login&lt;/code> with a &lt;code>false&lt;/code> value.
@@ -1032,7 +1038,7 @@ Content-Type: application/json; charset=utf-8
 ]
 &lt;/code>&lt;/pre>&lt;h3 id="post-apiv1users">POST /api/v1/users&lt;/h3>
 &lt;p>Create new users with a place and a contact.&lt;/p>
-&lt;p>Creating multiple users at once by passing an array of users was introduced in version 3.15.&lt;br>
+&lt;p>Creating multiple users at once by passing an array of users was introduced in version 3.15.
 All users need to meet the following requirements before any of them are created:&lt;/p>
 &lt;ul>
 &lt;li>All required fields are filled in&lt;/li>
@@ -1389,7 +1395,7 @@ Content-Type: application/json
 ]
 &lt;/code>&lt;/pre>&lt;h2 id="monitoring">Monitoring&lt;/h2>
 &lt;h3 id="get-apiv1monitoring">GET /api/v1/monitoring&lt;/h3>
-&lt;p>&lt;em>Deprecated in 3.12.x in favor of &lt;a href="#get-apiv2monitoring">/api/v2/monitoring&lt;/a>&lt;/em>&lt;br>
+&lt;p>&lt;em>Deprecated in 3.12.x in favor of &lt;a href="#get-apiv2monitoring">/api/v2/monitoring&lt;/a>&lt;/em>
 Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
 &lt;h4 id="permissions-8">Permissions&lt;/h4>
 &lt;p>No permissions required.&lt;/p>
@@ -1771,7 +1777,7 @@ Used to retrieve a range of metrics about the instance. While the output is huma
 &lt;p>Completes a staged upgrade. Throws a &lt;code>404&lt;/code> if there is no upgrade in the staged position.&lt;/p>
 &lt;h2 id="hydrate">Hydrate&lt;/h2>
 &lt;p>Accepts a JSON array of document uuids and returns fully hydrated documents, in the same order in which they were requested.
-When documents are not found, an entry with the missing uuid and an error is added instead.&lt;br>
+When documents are not found, an entry with the missing uuid and an error is added instead.
 Supports both GET and POST.
 Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p>
 &lt;h3 id="get-apiv1hydrate">GET api/v1/hydrate&lt;/h3>
@@ -1940,7 +1946,24 @@ Content-Type: application/json
 &amp;quot;count&amp;quot;: 58
 }
 }
-&lt;/code>&lt;/pre></description></item><item><title>Apps: forms/</title><link>https://docs.communityhealthtoolkit.org/apps/reference/forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/forms/</guid><description/></item><item><title>Apps: resources/</title><link>https://docs.communityhealthtoolkit.org/apps/reference/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/resources/</guid><description>
+&lt;/code>&lt;/pre>&lt;h2 id="credentials">Credentials&lt;/h2>
+&lt;p>Securely store credentials for authentication with third party systems such as SMS aggregators and HMIS. Certain CHT services rely on these credentials when enabled.&lt;/p>
+&lt;h3 id="put-apiv1credentials">PUT /api/v1/credentials&lt;/h3>
+&lt;p>&lt;em>Added in 4.0.0&lt;/em>&lt;/p>
+&lt;p>Provide the credential key as a URL parameter and the password in the request body, for example, to set a credential with key &amp;ldquo;mykey&amp;rdquo; and password &amp;ldquo;my pass&amp;rdquo; use the following command.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">curl -X PUT -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: text/plain&amp;#34;&lt;/span> https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/api/v1/credentials/mykey -d &lt;span style="color:#4e9a06">&amp;#39;my pass&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="3x-api">3.x API&lt;/h3>
+&lt;p>For 3.x deployments credentials are stored in &lt;a href="https://docs.couchdb.org/en/stable/api/server/configuration.html">CouchDB configuration&lt;/a> in a custom &lt;code>medic-credentials&lt;/code> section.&lt;/p>
+&lt;p>To add the credential to the admin config you need to PUT the value using curl, for example, to set a credential with key &amp;ldquo;mykey&amp;rdquo; and password &amp;ldquo;my pass&amp;rdquo; use the following command.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/_local/_config/medic-credentials/mykey -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;my pass&amp;#34;&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>You can also add it via Fauxton:&lt;/p>
+&lt;ul>
+&lt;li>Navigate to the Config screen at &lt;code>https://&amp;lt;domain&amp;gt;/_utils/#/_config&lt;/code>&lt;/li>
+&lt;li>Click &lt;code>Add Option&lt;/code>&lt;/li>
+&lt;li>The &lt;code>Section&lt;/code> should be &lt;code>medic-credentials&lt;/code>, the &lt;code>Name&lt;/code> should be (in this example) &lt;code>mykey&lt;/code> and the value should be the password&lt;/li>
+&lt;li>Click &lt;code>Create&lt;/code>&lt;/li>
+&lt;li>You should then be able to see your credential in the list of configuration shown&lt;/li>
+&lt;/ul></description></item><item><title>Apps: forms/</title><link>https://docs.communityhealthtoolkit.org/apps/reference/forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/forms/</guid><description/></item><item><title>Apps: resources/</title><link>https://docs.communityhealthtoolkit.org/apps/reference/resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/resources/</guid><description>
 &lt;h2 id="icons">Icons&lt;/h2>
 &lt;p>Apps can be customized by defining the icons to use for tasks, targets, and contacts.&lt;/p>
 &lt;p>Add icons to the &lt;code>resources&lt;/code> folder, and include them by name in the &lt;code>resources.json&lt;/code> file as the following example:&lt;/p>

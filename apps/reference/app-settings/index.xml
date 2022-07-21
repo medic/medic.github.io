@@ -500,9 +500,9 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;path&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;/api/v1/referral&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Here &lt;code>password_key&lt;/code> is a key used to find the password in CouchDB&amp;rsquo;s node-based configuration. See Credentials section below.&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Here &lt;code>password_key&lt;/code> is a key used to find the password in CHT credentials. For more information about how to store credentials, refer to the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api#put-apiv1credentials">API documentation&lt;/a>.&lt;/p>
 &lt;p>If you don&amp;rsquo;t provide an authentication parameter then the request will be sent without authentication.&lt;/p>
-&lt;p>As of 3.9, the &lt;code>header&lt;/code> type is also supported, which sends authentication credentials via a HTTP request header: &lt;code>Authorization: '&amp;lt;value&amp;gt;'&lt;/code>. The value is set in the CouchDB configuration, and referred to by the &lt;code>value_key&lt;/code>, similarly to the &lt;code>password_key&lt;/code>. The value must match the credentials needed for the third party tool, and is generally formatted as &lt;code>&amp;lt;type&amp;gt; &amp;lt;credentials&amp;gt;&lt;/code>. For instance, to send data to RapidPro, the value in the configuration would be set to the complete RapidPro API Token: eg &lt;code>Token 123456789abcdef&lt;/code>.&lt;/p>
+&lt;p>As of 3.9, the &lt;code>header&lt;/code> type is also supported, which sends authentication credentials via a HTTP request header: &lt;code>Authorization: '&amp;lt;value&amp;gt;'&lt;/code>. The value is set in CHT credentials configuration, and referred to by the &lt;code>value_key&lt;/code>, similarly to the &lt;code>password_key&lt;/code>. The value must match the credentials needed for the third party tool, and is generally formatted as &lt;code>&amp;lt;type&amp;gt; &amp;lt;credentials&amp;gt;&lt;/code>. For instance, to send data to RapidPro, the value in the configuration would be set to the complete RapidPro API Token: eg &lt;code>Token 123456789abcdef&lt;/code>.&lt;/p>
 &lt;p>Header auth example:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;destination&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
@@ -584,33 +584,6 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;li>However, in &lt;code>expr&lt;/code> you &lt;strong>do&lt;/strong> need to handle this situation: &lt;code>doc.foo &amp;amp;&amp;amp; doc.foo.bar &amp;amp;&amp;amp; doc.foo.bar.smang&lt;/code>&lt;/li>
 &lt;li>If any of your &lt;code>expr&lt;/code> expressions throw an exception (for example because you didn&amp;rsquo;t handle potentially &lt;code>undefined&lt;/code> properties as noted above) your push will fail&lt;/li>
 &lt;li>If any of your &lt;code>path&lt;/code> declarations result in an &lt;code>undefined&lt;/code> value and you have not also declared that property optional your push will fail&lt;/li>
-&lt;/ul>
-&lt;h2 id="credentials">Credentials&lt;/h2>
-&lt;p>To securely store credentials, we&amp;rsquo;ll be using CouchDB&amp;rsquo;s &lt;a href="https://docs.couchdb.org/en/stable/api/server/configuration.html">config storage&lt;/a>, as this is a convenient location that only CouchDB administrators can access.&lt;/p>
-&lt;p>Passwords are stored under the &lt;code>medic-credentials&lt;/code> section, under the key declared in config.&lt;/p>
-&lt;p>In the following example:&lt;/p>
-&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;destination&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;base_url&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;https://example.com&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;auth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;basic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;username&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;admin&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;password_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;example.com&amp;#34;&lt;/span>
-&lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;span style="color:#204a87;font-weight:bold">&amp;#34;path&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;/api/v1/referral&amp;#34;&lt;/span>
-&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>We have our key configured to &lt;code>example.com&lt;/code>. This means that in CouchDB&amp;rsquo;s admin config we would expect to find a password at &lt;code>medic-credentials/example.com&lt;/code>.&lt;/p>
-&lt;p>To add the credential to the admin config you need to either &lt;a href="https://docs.couchdb.org/en/stable/api/server/configuration.html#put--_node-node-name-_config-section-key">PUT the value using curl&lt;/a> or similar:&lt;/p>
-&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-sh" data-lang="sh">curl -X PUT https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;domain&amp;gt;/_node/couchdb@127.0.0.1/_config/medic-credentials/example.com -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;the-real-password&amp;#34;&amp;#39;&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>(Note that &lt;code>couchdb@127.0.0.1&lt;/code> is the local node name, and may be different for you depending on your setup.)&lt;/em>&lt;/p>
-&lt;p>You can also add it via Fauxton:&lt;/p>
-&lt;ul>
-&lt;li>Navigate to &lt;a href="http://localhost:5984/_utils/#/_config">the Config screen&lt;/a>&lt;/li>
-&lt;li>Click &lt;code>Add Option&lt;/code>&lt;/li>
-&lt;li>The &lt;code>Section&lt;/code> should be &lt;code>medic-credentials&lt;/code>, the &lt;code>Name&lt;/code> should be (in this example) &lt;code>example.com&lt;/code> and the value should be the password&lt;/li>
-&lt;li>Click &lt;code>Create&lt;/code>&lt;/li>
-&lt;li>You should then be able to see your credential in the list of configuration shown\&lt;/li>
 &lt;/ul>
 &lt;h2 id="how-outbound-messages-are-sent">How Outbound messages are sent&lt;/h2>
 &lt;p>Send semantics have changed over the course of developing this feature, and are important to understand for your deployment to be successful.&lt;/p>
