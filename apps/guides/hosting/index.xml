@@ -355,15 +355,317 @@ Containers that are already set up will lose all data when following the steps b
 &lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code>. Then start the second project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and project name as shown above.&lt;/p>
 &lt;p>To run projects concurrently, instead of cancelling the first one, open a second terminal and start the second project.&lt;/p>
 &lt;p>To read more about how &lt;code>docker-compose&lt;/code> works, be sure to read the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#helpful-docker-commands">helpful docker-compose commands&lt;/a> page.&lt;/p>
-&lt;h2 id="cookie-collisions">Cookie collisions&lt;/h2>
-&lt;p>The CHT stores its cookies based on the domain. This means if you&amp;rsquo;re running two concurrent instances on &lt;code>https://localhost&lt;/code> and &lt;code>https://localhost:8443&lt;/code>, the CHT would store the cookie under the same &lt;code>localhost&lt;/code> domain. When logging out of one instance, you would get logged out of both and other consistencies.&lt;/p>
-&lt;p>To avoid this collision of cookies, you can use different IP addresses to access the instances. This works because the IPs that are available to reference &lt;code>localhost&lt;/code> are actually a &lt;code>/8&lt;/code> netmask, meaning &lt;a href="https://en.wikipedia.org/wiki/Localhost#Name_resolution">there are 16 million addresses&lt;/a> to choose from!&lt;/p>
-&lt;p>Using the above two configurations, these URLs could work to avoid the cookie colission:&lt;/p>
+&lt;h2 id="cht-docker-helper">CHT Docker Helper&lt;/h2>
+&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts builds on the &lt;code>docker-compose-developer.yml&lt;/code> and &lt;code>.env&lt;/code> files used above by helping start CHT instances with a simple text based GUI:&lt;/p>
+&lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;ldquo;Successfully started my_first_project&amp;rdquo; message is shown and denotes the login is &amp;ldquo;medic&amp;rdquo; and the password is &amp;ldquo;password&amp;rdquo;.">&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;h4 id="os">OS&lt;/h4>
+&lt;p>This script has been heavily tested on Ubuntu and should work very well there. It has been lightly tested on WSL2 on Windows 10 and macOS (x86, not Apple silicon like M1 etc.) - both should likely work as well.&lt;/p>
+&lt;h4 id="software">Software&lt;/h4>
+&lt;p>The script will check and require these commands. All but &lt;code>docker&lt;/code> and &lt;code>docker-compose&lt;/code> should be installed by default on Ubuntu:&lt;/p>
 &lt;ul>
-&lt;li>&lt;a href="https://127.0.0.1">https://127.0.0.1&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://127.0.0.2:8443">https://127.0.0.2:8443&lt;/a>&lt;/li>
+&lt;li>awk&lt;/li>
+&lt;li>curl&lt;/li>
+&lt;li>cut&lt;/li>
+&lt;li>dirname&lt;/li>
+&lt;li>docker (At least version 20.x)&lt;/li>
+&lt;li>docker-compose (At least version 1.27)&lt;/li>
+&lt;li>file&lt;/li>
+&lt;li>grep&lt;/li>
+&lt;li>head&lt;/li>
+&lt;li>nc&lt;/li>
+&lt;li>tail&lt;/li>
+&lt;li>tr&lt;/li>
+&lt;li>wc&lt;/li>
 &lt;/ul>
-&lt;p>This would result in the domains being &lt;code>127.0.0.1&lt;/code> and &lt;code>127.0.0.2&lt;/code> from the CHT&amp;rsquo;s perspective.&lt;/p></description></item><item><title>Apps: CHT Core Developer Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</guid><description>
+&lt;p>Optionally you can install &lt;code>jq&lt;/code> so that the script can parse JSON and tell you which version of the CHT is running.&lt;/p>
+&lt;h4 id="docker-compose-file-and-helper-scripts">Docker compose file and helper scripts&lt;/h4>
+&lt;p>An up-to-date clone of &lt;a href="https://github.com/medic/cht-core/">cht-core&lt;/a> has everything you need including:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker-compose-developer.yml&lt;/code>&lt;/li>
+&lt;li>&lt;code>cht-docker-compose.sh&lt;/code>&lt;/li>
+&lt;li>&lt;code>docker-status.sh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="using">Using&lt;/h3>
+&lt;h4 id="syntax">Syntax&lt;/h4>
+&lt;p>The helper script is run by calling &lt;code>./cht-docker-compose.sh&lt;/code>. It accepts one required and one optional arguments:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-e | --env-file&lt;/code> - path to the environment file. Required&lt;/li>
+&lt;li>&lt;code>-d | --docker_action&lt;/code> - docker action to run: &lt;code>up&lt;/code>, &lt;code>down&lt;/code> or &lt;code>destory&lt;/code>. Optional, defaults to &lt;code>up&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="nomenclature">Nomenclature&lt;/h4>
+&lt;p>Docker containers, networks and volumes are always named after the project you&amp;rsquo;re using. So if your project is called &lt;code>my_first_project&lt;/code>, you will see:&lt;/p>
+&lt;ul>
+&lt;li>Two containers: &lt;code>my_first_project_medic-os_1&lt;/code> and &lt;code>my_first_project_haproxy_1&lt;/code>&lt;/li>
+&lt;li>One storage volume: &lt;code>my_first_project_medic-data&lt;/code>&lt;/li>
+&lt;li>One network: &lt;code>my_first_project_medic-net&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="first-run">First Run&lt;/h4>
+&lt;p>These steps assume:&lt;/p>
+&lt;ul>
+&lt;li>the first project is &lt;code>my_first_project&lt;/code>&lt;/li>
+&lt;li>one &lt;code>.env_docker&lt;/code> environment file per project&lt;/li>
+&lt;li>&lt;code>my_first_project&lt;/code> and &lt;code>cht-core&lt;/code> directories are next to each other in the same parent directory&lt;/li>
+&lt;li>you have Internet connectivity (&lt;em>See &lt;a href="#booting-with-no-connectivity">booting with no connectivity&lt;/a>&lt;/em>)&lt;/li>
+&lt;/ul>
+&lt;p>Follow these steps to create your first developer instance. You can create as many as you&amp;rsquo;d like:&lt;/p>
+&lt;ol>
+&lt;li>create &lt;code>./my_first_project/.env_docker&lt;/code> with the contents:
+&lt;pre>&lt;code>COMPOSE_PROJECT_NAME=my_first_project
+CHT_HTTP=8080
+CHT_HTTPS=8443
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>Change into the &lt;code>docker-help&lt;/code> directory: &lt;code>cd ./cht-core/scripts/docker-helper/&lt;/code>&lt;/li>
+&lt;li>Run the helper script and specify your &lt;code>.env_docker&lt;/code> file:
+&lt;pre>&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>Your CHT instance will be started when you see the text:
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">Successfully started project my_first_project
+&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h4 id="second-run">Second Run&lt;/h4>
+&lt;p>When you&amp;rsquo;re done with an instance, be sure to shut it down:&lt;/p>
+&lt;pre>&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker -d down
+&lt;/code>&lt;/pre>&lt;p>All information will be saved, and it should be quick to start for the Nth time.&lt;/p>
+&lt;p>To start an existing instance again, just run the command from the &amp;ldquo;First Run&amp;rdquo; section:&lt;/p>
+&lt;pre>&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker
+&lt;/code>&lt;/pre>&lt;p>This command is safe to run as many times as you&amp;rsquo;d like if you forget the state of your project&amp;rsquo;s Docker containers.&lt;/p>
+&lt;h4 id="last-run">Last Run&lt;/h4>
+&lt;p>When you&amp;rsquo;re done with a project and want to completely destroy it, run &lt;code>destroy&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker -d destroy
+&lt;/code>&lt;/pre>&lt;p>&lt;em>&lt;strong>NOTE&lt;/strong>&lt;/em> - Be sure you want to run &lt;code>destroy&lt;/code>. The script will &lt;em>not&lt;/em> prompt &amp;ldquo;are you sure?&amp;rdquo; and it will just delete all your project&amp;rsquo;s data.&lt;/p>
+&lt;h3 id="troubleshooting">Troubleshooting&lt;/h3>
+&lt;p>The main issue you&amp;rsquo;re likely to run into is that the CHT doesn&amp;rsquo;t correctly start up, the very reason this script was created. If the script either hangs on one step, or fails to start and quits after 5 tries, try these steps:&lt;/p>
+&lt;ol>
+&lt;li>Ensure your Internet is working.&lt;/li>
+&lt;li>Destroy everything by using the &lt;code>-d destroy&lt;/code> &lt;a href="#syntax">option&lt;/a>. While this will delete any data, if you can&amp;rsquo;t start the CHT instance, you won&amp;rsquo;t be loosing any data you care about ;). This will delete the containers and volumes. Then run &lt;code>-d up&lt;/code> and try again.&lt;/li>
+&lt;li>Quit apps that may be causing a high load on your computer. Possibly consider rebooting and running nothing else. In one instance this helped!&lt;/li>
+&lt;/ol>
+&lt;p>If you still get stuck review the items below as possible issues you may find workarounds to. If none of these work, see the debug file which is always output in the same directory as your &lt;code>env_file&lt;/code>. File a ticket in this repository and attach this log file. To read more about the contents of the &lt;code>cht-docker-compose.log&lt;/code> see &lt;a href="#cht-docker-composelog">the CHT Docker Compose Log section&lt;/a>.&lt;/p>
+&lt;h4 id="running-without-the-ip-utility">Running without the &lt;code>ip&lt;/code> utility&lt;/h4>
+&lt;p>If you&amp;rsquo;re on macOS, or other OS without the &lt;code>ip&lt;/code> utility, your IP address will always show as &lt;code>127.0.0.1&lt;/code>. You can not connect to this IP from a mobile client on your LAN because it always references the host it&amp;rsquo;s on, not a foreign host.&lt;/p>
+&lt;p>To work around this, you can find out your IP on your LAN and just replace the &lt;code>127-0-0-1&lt;/code> part of the &lt;code>https://127-0-0-1.my.local-ip.co:8443&lt;/code> URL to be your IP address. So if your local IP was &lt;code>192.168.0.22&lt;/code> your URL would be &lt;code>https://192-168-0-22.my.local-ip.co:8443&lt;/code>.&lt;/p>
+&lt;h4 id="booting-with-no-connectivity">Booting with no connectivity&lt;/h4>
+&lt;p>This script can work without connectivity after the initial boot. However, it needs connectivity to do DNS lookups for the *.my.local-ip.co URLs. To work around this, when you have no connectivity, add an entry in your &lt;code>/etc/hosts&lt;/code> for the URL showing up in the script. For example, if you&amp;rsquo;re seeing &lt;code>https://127-0-0-1.my.local-ip.co:8443&lt;/code> as your IP, add this line to the top of your &lt;code>/etc/hosts&lt;/code> file.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">127.0.0.1 127-0-0-1.my.local-ip.co
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>&lt;strong>NOTE&lt;/strong>&lt;/em> - You need connectivity on the initial boot of the VM to connect to &lt;code>staging.dev.medicmobile.org&lt;/code> to download the base version of the CHT. As well, certificates for &lt;code>*.my.local-ip.co&lt;/code> are downloaded. Subsequent boots do not require connectivity as long as you do not run &lt;code>destroy&lt;/code>.&lt;/p>
+&lt;h4 id="port-conflicts">Port conflicts&lt;/h4>
+&lt;p>If you have two &lt;code>.env_docker&lt;/code> files that have the same ports or re-use the same project name, bad things will happen. Don&amp;rsquo;t do this.&lt;/p>
+&lt;p>Medic recommends setting up unique project names and unique ports for each project. Commit these &lt;code>.env_docker&lt;/code> files to your app config&amp;rsquo;s revision control so all app developers use the same &lt;code>.env_docker&lt;/code> files.&lt;/p>
+&lt;h4 id="slow-downloads-and-wait-periods">Slow downloads and wait periods&lt;/h4>
+&lt;p>During testing on an Internet connection with high latency (&amp;gt;1000ms) and packet loss, this script had trouble booting the CHT instance because it was taking too long to download the assets from &lt;code>staging.dev.medicmobile.org&lt;/code>. Each version is about 38 MB.&lt;/p>
+&lt;p>To account for this, the wait time is multiplied times the boot iteration for each time it reboots. It starts at 100 seconds and then 200, 300, 400 up to the fifth time it will wait 500 seconds.&lt;/p>
+&lt;h4 id="too-many-containers">Too many containers&lt;/h4>
+&lt;p>If you&amp;rsquo;re on a resource constrained computer, like a very old or very slow laptop, be sure to watch the total number of containers you&amp;rsquo;re running. More than one or two projects (2 or 4 containers) and you may notice a slow-down. You can use the &lt;code>./docker-status.sh&lt;/code> script if you forgot which projects you have running:&lt;/p>
+&lt;p>&lt;img src="docker-status.png" alt="The docker-status.sh script showing 4 sections. The top section lists the running CHT containers, their IP, their mapped ports and the state (running time). The second section found on the left is a list of docker networks. The third section is on the top right and lists downloaded docker images. The furth section on the bottom right, shows docker volumes">&lt;/p>
+&lt;p>A word of caution though - for now this script doesn&amp;rsquo;t scale well if you have 10s of containers and volumes. Content &lt;a href="https://user-images.githubusercontent.com/1608415/137566806-e13b765e-4f95-48be-82e7-c8e6351e14b7.mp4">can scroll off the screen&lt;/a> and seem confusing!&lt;/p>
+&lt;h4 id="output-on-macos-is-too-narrow">Output on macOS is too narrow&lt;/h4>
+&lt;p>There&amp;rsquo;s a known bug with the bash library we&amp;rsquo;re using that causes it to always render at 80 characters wide. &lt;a href="https://github.com/metal3d/bashsimplecurses/issues/51#issuecomment-905914780">The fix is&lt;/a> to use &lt;code>brew&lt;/code> to run a more recent version of &lt;code>ncurses&lt;/code>.&lt;/p>
+&lt;h4 id="device--does-not-exist-and-curl-6-could-not-resolve-host-errors">&amp;ldquo;Device '&amp;rsquo; does not exist&amp;rsquo;&amp;rdquo; and &amp;ldquo;curl: (6) Could not resolve host&amp;rdquo; errors&lt;/h4>
+&lt;p>If you see either of these errors, you&amp;rsquo;re very likely off-line such that you effectively cannot reach the Internet. The script will not work as is. See the &amp;ldquo;Booting with no connectivity&amp;rdquo; section above for work-arounds.&lt;/p>
+&lt;h4 id="resetting-everything">Resetting everything&lt;/h4>
+&lt;p>If you REALLY get stuck and want to destroy &lt;em>&lt;strong>ALL&lt;/strong>&lt;/em> docker containers/volumes/networks, even those not started by this script, run this (but be &lt;em>&lt;strong>extra&lt;/strong>&lt;/em> sure that&amp;rsquo;s what you want to do):&lt;/p>
+&lt;pre>&lt;code>docker stop $(docker ps -q)&amp;amp;&amp;amp;docker system prune&amp;amp;&amp;amp;docker volume prune
+&lt;/code>&lt;/pre>&lt;h3 id="cht-docker-composelog">cht-docker-compose.log&lt;/h3>
+&lt;p>This log will be output every time you call the script. It will be created and appended to in the directory where you specified your environment file (&lt;code>-e PATH/TO/env_file&lt;/code>).&lt;/p>
+&lt;p>There are three types of lines in this file. The first line will always be the Start line: &lt;code>item=&amp;quot;start&amp;quot;&lt;/code>. Then there will be a Status line: &lt;code>item=&amp;quot;status&amp;quot;&lt;/code>. Finally, there will be two lines, one for each docker container: &lt;code>item=&amp;quot;docker_logs&amp;quot;&lt;/code>.&lt;/p>
+&lt;h4 id="shared-head">Shared head&lt;/h4>
+&lt;p>All lines start with a date, PID and count:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>(none - first item)&lt;/td>
+&lt;td>value from &lt;code>date&lt;/code> command with &lt;code>DAY DATE MONTH YEAR TIME AM/PM&lt;/code>&lt;/td>
+&lt;td>&lt;code>Fri 15 Oct 2021 02:19:30 PM&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>pid&lt;/code>&lt;/td>
+&lt;td>process ID of the shell script. Will always be an integer&lt;/td>
+&lt;td>&lt;code>398399&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>count&lt;/code>&lt;/td>
+&lt;td>how many times the shell script has looped internally&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--start">item = &lt;code>start&lt;/code>&lt;/h4>
+&lt;p>When you first call the script, a line is output with generic information about the project. This is only shown once per call:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>start&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>URL&lt;/code>&lt;/td>
+&lt;td>the full URL of the instance, with port&lt;/td>
+&lt;td>&lt;code>https://192-168-68-17.my.local-ip.co:443&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>IP&lt;/code>&lt;/td>
+&lt;td>the IP address of the instance&lt;/td>
+&lt;td>&lt;code>192.168.68.17&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_https&lt;/code>&lt;/td>
+&lt;td>port used for &lt;code>https&lt;/code>&lt;/td>
+&lt;td>&lt;code>443&lt;/code> or &lt;code>8443&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_http&lt;/code>&lt;/td>
+&lt;td>port used for &lt;code>http&lt;/code>&lt;/td>
+&lt;td>&lt;code>80&lt;/code> or &lt;code>8080&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>project_name&lt;/code>&lt;/td>
+&lt;td>The user specified project name. This will be used in docker container and volume names&lt;/td>
+&lt;td>&lt;code>helper_test&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>total_containers&lt;/code>&lt;/td>
+&lt;td>Total docker containers running on the host. Useful for catching high load scenarios. Healthy is under &lt;code>10&lt;/code>.&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--status">item = &lt;code>status&lt;/code>&lt;/h4>
+&lt;p>For each internal loop of the script, each one taking 1-5 seconds, a status line is output:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>status&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CHT_count&lt;/code>&lt;/td>
+&lt;td>number of CHT contianers running for this project. Healthy is &lt;code>2&lt;/code>&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_stat&lt;/code>&lt;/td>
+&lt;td>Status of the &lt;code>https&lt;/code> port. Healhty is &lt;code>open&lt;/code>&lt;/td>
+&lt;td>&lt;code>open&lt;/code> or &lt;code>closed&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>http_code&lt;/code>&lt;/td>
+&lt;td>If the &lt;code>https&lt;/code> port is open by the web server, what &lt;code>HTTP&lt;/code> response code is returned for a &lt;code>GET&lt;/code>. Healthy is &lt;code>200&lt;/code>. If you see &lt;code>000&lt;/code>, &lt;a href="#booting-with-no-connectivity">see workarounds&lt;/a>.&lt;/td>
+&lt;td>&lt;code>200&lt;/code> or &lt;code>404&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ssl_verify&lt;/code>&lt;/td>
+&lt;td>If the &lt;code>https&lt;/code> port is open by the web server, is the valid &lt;code>local-ip.co&lt;/code> certificate installed. Healthy is &lt;code>yes&lt;/code>&lt;/td>
+&lt;td>&lt;code>yes&lt;/code> or &lt;code>no&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>reboot_count&lt;/code>&lt;/td>
+&lt;td>How many times &lt;code>docker restart&lt;/code> has been called. Max is &lt;code>5&lt;/code>&lt;/td>
+&lt;td>&lt;code>3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>docker_call&lt;/code>&lt;/td>
+&lt;td>The docker action call to the script&lt;/td>
+&lt;td>&lt;code>up&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>last_msg&lt;/code>&lt;/td>
+&lt;td>Last message the user was shown&lt;/td>
+&lt;td>&lt;code>Running &amp;quot;down&amp;quot; then &amp;quot;up&amp;quot;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>load_now&lt;/code>&lt;/td>
+&lt;td>Load average for the past minute. Healthy can vary, but should be &amp;lt; &lt;code>10&lt;/code>&lt;/td>
+&lt;td>&lt;code>2.66&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>*_haproxy_1&lt;/code>&lt;/td>
+&lt;td>Name of container based on &lt;code>project_name&lt;/code>. Showing the &amp;ldquo;has booted&amp;rdquo; status, healthy is &lt;code>true&lt;/code>&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>*_medic-os_1&lt;/code>&lt;/td>
+&lt;td>Name of container based on &lt;code>project_name&lt;/code>. Showing the &amp;ldquo;has booted&amp;rdquo; status, healthy is &lt;code>true&lt;/code>&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--docker_logs">item = &lt;code>docker_logs&lt;/code>&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>docker_logs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>container&lt;/code>&lt;/td>
+&lt;td>Container name based on &lt;code>project_name&lt;/code>&lt;/td>
+&lt;td>&lt;code>helper_test_medic-os_1&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>processes&lt;/code>&lt;/td>
+&lt;td>Number of process running in the container. Medic OS should have 60-90, Nginx 4-10&lt;/td>
+&lt;td>&lt;code>64&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>last_log&lt;/code>&lt;/td>
+&lt;td>Result from calling &lt;code>docker logs&lt;/code> on the container. Will never have &lt;code>&amp;quot;&lt;/code> in them and date may differ from start of line date&lt;/td>
+&lt;td>&lt;code>[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="sample">Sample&lt;/h4>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-shell" data-lang="shell">Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;start&amp;#34;&lt;/span> &lt;span style="color:#000">URL&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;https://192-168-68-17.my.local-ip.co:443&amp;#34;&lt;/span> &lt;span style="color:#000">IP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;192.168.68.17&amp;#34;&lt;/span> &lt;span style="color:#000">port_https&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;443&amp;#34;&lt;/span> &lt;span style="color:#000">port_http&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;80&amp;#34;&lt;/span> &lt;span style="color:#000">project_name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test&amp;#34;&lt;/span> &lt;span style="color:#000">total_containers&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_medic-os_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;64&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_haproxy_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;4&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Oct 15 21:30:20 576ca039cd88 haproxy[25]: 172.20.0.3,200,GET,/medic/_design/medic,-,medic,&amp;#39;-&amp;#39;,21703,5,21402,&amp;#39;curl/7.68.0&amp;#39;&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;status&amp;#34;&lt;/span> &lt;span style="color:#000">CHT_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">port_stat&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;open&amp;#34;&lt;/span> &lt;span style="color:#000">http_code&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;200&amp;#34;&lt;/span> &lt;span style="color:#000">ssl_verify&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;yes&amp;#34;&lt;/span> &lt;span style="color:#000">reboot_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;0&amp;#34;&lt;/span> &lt;span style="color:#000">docker_call&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;up&amp;#34;&lt;/span> &lt;span style="color:#000">last_msg&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Initializing&amp;#34;&lt;/span> &lt;span style="color:#000">load_now&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2.66&amp;#34;&lt;/span> &lt;span style="color:#000">helper_test_haproxy_1&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span> helper_test_medic-os_1&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_medic-os_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;67&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_haproxy_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;4&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Oct 15 21:30:27 576ca039cd88 haproxy[25]: 172.20.0.3,200,GET,/medic/_design/medic,-,medic,&amp;#39;-&amp;#39;,21703,5,21402,&amp;#39;curl/7.68.0&amp;#39;&amp;#34;&lt;/span>
+Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;status&amp;#34;&lt;/span> &lt;span style="color:#000">CHT_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">port_stat&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;open&amp;#34;&lt;/span> &lt;span style="color:#000">http_code&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;200&amp;#34;&lt;/span> &lt;span style="color:#000">ssl_verify&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;yes&amp;#34;&lt;/span> &lt;span style="color:#000">reboot_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;0&amp;#34;&lt;/span> &lt;span style="color:#000">docker_call&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;up&amp;#34;&lt;/span> &lt;span style="color:#000">last_msg&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34; :) &amp;#34;&lt;/span> &lt;span style="color:#000">load_now&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2.69&amp;#34;&lt;/span> &lt;span style="color:#000">helper_test_haproxy_1&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span> helper_test_medic-os_1&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="cookie-collisions">Cookie collisions&lt;/h2>
+&lt;p>The CHT stores its cookies based on the domain. This means if you&amp;rsquo;re running two concurrent instances on &lt;code>https://192-168-68-40.my.local-ip.co:8443&lt;/code> and &lt;code>https://192-168-68-40.my.local-ip.co:8440&lt;/code> (note different ports), the CHT would write the cookie under the same &lt;code>192-168-68-40.my.local-ip.co&lt;/code> domain. When logging out of one instance, you would get logged out of both and other consistencies.&lt;/p>
+&lt;p>To avoid this collision of cookies, you can use different IP addresses to access the instances. This works because of two reasons:&lt;/p>
+&lt;ol>
+&lt;li>the TLS certificate being used is valid for any subdomain of &lt;code>*.my.local-ip.co&lt;/code>. Further, the URL always resolves to the IP passed in the &lt;code>*&lt;/code> section, so you can use any IP&lt;/li>
+&lt;li>the IPs that are available to reference your &lt;code>localhost&lt;/code> are actually a &lt;code>/8&lt;/code> netmask, meaning &lt;a href="https://en.wikipedia.org/wiki/Localhost#Name_resolution">there are 16 million addresses&lt;/a> to choose from!&lt;/li>
+&lt;/ol>
+&lt;p>Using the above two reasons, these URLs could work to avoid the cookie collision:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>https://127-0-0-1.my.local-ip.co:8443&lt;/code>&lt;/li>
+&lt;li>&lt;code>https://127-0-0-2.my.local-ip.co:8440&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>This would result in the domains being &lt;code>127.0.0.1&lt;/code> and &lt;code>127.0.0.2&lt;/code> from the CHT&amp;rsquo;s perspective. When using a mobile device for testing, you&amp;rsquo;re limited to use the LAN ip output in the helper and can not use the &lt;code>127.x.x.x&lt;/code> IPs.&lt;/p></description></item><item><title>Apps: CHT Core Developer Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
 &lt;p>This guide assumes you are a CHT Core developer wanting to run the CHT Core from source code to make commits to the &lt;a href="https://github.com/medic/cht-core">public GitHub repository&lt;/a>. To set up a your environment for developing apps, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/">app guide&lt;/a>.&lt;/p>
