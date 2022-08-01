@@ -28,15 +28,15 @@
 &lt;p>If you install Android Studio it&amp;rsquo;s still recommended to download and setup the command line tools separately to be able to use them without the IDE.&lt;/p>
 &lt;p>The binary folder of the command also need to be added to the &lt;code>$PATH&lt;/code>, and &lt;code>$ANDROID_HOME&lt;/code> pointing to the root of the SDK. Moreover, the SDK requires to be stored in the &lt;code>$ANDROID_HOME&lt;/code> and inside a folder called &lt;code>latest&lt;/code>.&lt;/p>
 &lt;p>Here are the steps from the command line you can follow to install the CLI tools once downloaded the zip file:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$ mkdir -p Android/Sdk/cmdline-tools
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$ unzip commandlinetools-linux-7583922_latest.zip
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$ mv cmdline-tools/ Android/Sdk/cmdline-tools/latest/
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mkdir -p Android/Sdk/cmdline-tools
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>unzip commandlinetools-linux-7583922_latest.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mv cmdline-tools/ Android/Sdk/cmdline-tools/latest/
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then, to add the environment variables required, you can add the following to your &lt;code>~/.bashrc&lt;/code> file:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">ANDROID_HOME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000">$HOME&lt;/span>&lt;span style="color:#4e9a06">/Android/Sdk&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">:&lt;/span>&lt;span style="color:#000">$ANDROID_HOME&lt;/span>&lt;span style="color:#4e9a06">/cmdline-tools/latest/bin&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="debug-tool-adb">Debug tool &lt;code>adb&lt;/code>&lt;/h3>
 &lt;p>Old SDK distributions used to have it pre-packaged, now you have to install it separately. Once installed SDK following the steps above, you can install the latest version of &lt;code>adb&lt;/code> with:&lt;/p>
-&lt;pre tabindex="0">&lt;code>$ sdkmanager --install platform-tools
+&lt;pre tabindex="0">&lt;code>sdkmanager --install platform-tools
 &lt;/code>&lt;/pre>&lt;p>If you also installed Android Studio you can use the &lt;a href="https://developer.android.com/studio/intro/update#sdk-manager">SDK Manager&lt;/a> instead.&lt;/p>
 &lt;p>Finally edit again the &lt;code>$PATH&lt;/code> environment variable to add the adb path: &lt;code>$ANDROID_HOME/platform-tools&lt;/code>.&lt;/p>
 &lt;h3 id="apksigner">&lt;code>apksigner&lt;/code>&lt;/h3>
@@ -52,7 +52,7 @@
 &lt;p>See the &lt;a href="https://github.com/medic/cht-android/blob/master/Makefile">Makefile&lt;/a> for more details.&lt;/p>
 &lt;h3 id="build-and-assemble">Build and assemble&lt;/h3>
 &lt;p>To build and assemble the apps within the console use:&lt;/p>
-&lt;pre>&lt;code>$ make assemble
+&lt;pre>&lt;code>make assemble
 &lt;/code>&lt;/pre>
 &lt;p>The command above builds and assembles the &lt;em>debug&lt;/em> and &lt;em>release&lt;/em> APKs of the apps, and for the CHT-Android project the Unbranded flavor is built and assembled by default.&lt;/p>
 &lt;p>Each APK will be generated and stored in &lt;code>build/outputs/apk/[flavor]/[debug|release]/&lt;/code>, for example after assembling the &lt;em>Medicmobilegamma&lt;/em> flavor with &lt;code>make flavor=Medicmobilegamma assemble&lt;/code>, the &lt;em>release&lt;/em> versions of the APKs generated are stored in &lt;code>build/outputs/apk/medicmobilegamma/release/&lt;/code>.&lt;/p>
@@ -297,7 +297,7 @@ New apps cannot longer be uploaded with the APK format in the Play Store. Apps c
 &lt;/ul>
 &lt;p>Don&amp;rsquo;t worry to follow all the name conventions and how to generate these files, you can create all them in one step: the new keystore, the passwords and the PEPK file with &lt;code>make org=new_brand keygen&lt;/code>.&lt;/p>
 &lt;p>Executing the command will check that you have the necessary tooling installed, and ask you the information about the certificate like the organization name, organization unit, etc. The command also takes care of picking random passwords that meet the security requirements, and then compresses the key files and finally encrypt the &lt;code>.tar.gz&lt;/code> file into the &lt;code>.enc&lt;/code> file. At the end of the execution, the script will also show the list of environment variables that you have to setup in CI (Github Actions) and locally in order to sign the apps with the new keystore. Below is an example of executing it to create the keystore for our &amp;ldquo;new_brand&amp;rdquo;:&lt;/p>
-&lt;pre tabindex="0">&lt;code>$ make org=new_brand keygen
+&lt;pre tabindex="0">&lt;code>make org=new_brand keygen
 Verifying the following executables are in the $PATH: java keytool openssl ...
 keytool -genkey -storepass dd8668... -v -keystore new_brand.keystore -alias medicmobile -keyalg RSA -keysize 2048 -validity 9125
 What is your first and last name?
@@ -347,7 +347,7 @@ export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
 &lt;/li>
 &lt;li>
 &lt;p>Sign your app! try locally to build the app with the certificate. To create the .apk files run: &lt;code>make org=new_brand flavor=New_brand assemble&lt;/code>. The &amp;ldquo;release&amp;rdquo; files signed should be placed in &lt;code>build/outputs/apk/new_brand/release/&lt;/code>. To ensure the files were signed with the right signature execute &lt;code>make keyprint-apk&lt;/code>, it will check the certificate of the first apk file under the &lt;code>build/&lt;/code> folder:&lt;/p>
-&lt;pre tabindex="0">&lt;code>$ make keyprint-apk
+&lt;pre tabindex="0">&lt;code>make keyprint-apk
 apksigner verify -v --print-certs build/outputs/apk/new_brand/release/cht-android-SNAPSHOT-new_brand-arm64-v8a-release.apk
 ... ...
 Verified using v2 scheme (APK Signature Scheme v2): true
