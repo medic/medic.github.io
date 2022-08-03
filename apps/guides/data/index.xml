@@ -162,49 +162,121 @@ For example:&lt;/p>
 &lt;li>a deeply hydrated &lt;code>patient&lt;/code>, if the report has a &lt;code>patient_id&lt;/code>/&lt;code>patient_uuid&lt;/code>&lt;/li>
 &lt;li>a deeply hydrated &lt;code>place&lt;/code>, if the report has a &lt;code>place_id&lt;/code>&lt;/li>
 &lt;/ul></description></item><item><title>Apps: How to bulk load users</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/users-bulk-load/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/users-bulk-load/</guid><description>
+&lt;p>This quick guide will walk you through the steps of:&lt;/p>
+&lt;ol>
+&lt;li>Populating a spreadsheet to with the users you want to import. Uses Google Sheets.&lt;/li>
+&lt;li>Upload the new users using the Admin UI in the CHT.&lt;/li>
+&lt;li>Handling any errors that may have occurred during import.&lt;/li>
+&lt;li>When done, you will have created new users, new contacts and new places, all of which are correctly associated in CouchDB with the correct UUIDs.&lt;/li>
+&lt;/ol>
 &lt;div class="pageinfo pageinfo-primary">
-&lt;p>This guide shows how to script the user creation process using the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/">CHT API&lt;/a> directly. User creation can also be scripted using the &lt;a href="https://github.com/medic/cht-conf">&lt;code>cht-conf&lt;/code> tool&lt;/a>, which is detailed in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/csv-to-docs/">CSV-to-Docs guide&lt;/a>.&lt;/p>
+&lt;p>This guide shows how to import users from a spreadsheet from within the Admin Console.
+User creation can be scripted using the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#post-apiv2users">CHT API&lt;/a> directly or
+using the &lt;a href="https://github.com/medic/cht-conf">&lt;code>cht-conf&lt;/code> tool&lt;/a>, which is detailed in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/csv-to-docs/">CSV-to-Docs guide&lt;/a>.&lt;/p>
+&lt;p>The features on this page apply only to CHT 3.16.0 and later and assumes you&amp;rsquo;re using Google Drive to manage your spreadsheets.&lt;/p>
 &lt;/div>
-&lt;p>First, using the webapp, create the top level places/facilities like
-districts/branches that the users will belong to. Save the UUIDs of these
-places in a spreadsheet with their names.&lt;/p>
-&lt;p>Then use curl against the users API to create the user, place and contact. In
-this example the place and contact.parent are the same so we&amp;rsquo;re creating
-&lt;code>demo*&lt;/code> users that can manage records associated to a specific place.&lt;/p>
-&lt;p>Create a comma separated data file like /tmp/data:&lt;/p>
-&lt;pre tabindex="0">&lt;code>Name,Phone,Branch Name,Branch UUID,Username,Password
-Gary Gnu,48839938,Iganga Branch,54cc7-accd-e1cf9-ef203,demo01,keratejevu
-Dianna Dempsey,4999393,Meru Branch,54cc1-1a7a-ccddd-e1203,demo02,duwuradixu
-&lt;/code>&lt;/pre>&lt;p>Create a script like &lt;code>users-bulk-load&lt;/code> and edit it to include the district:&lt;/p>
-&lt;pre tabindex="0">&lt;code>#!/bin/sh
-PHONE_PREFIX=+256
-#DISTRICT=5627c50f05a75003fe51685c596fefee
-COUCH_URL=${COUCH_URL-http://admin:secret@localhost:5988}
-LANG=en # no language prompt, please.
-KNOWN=true # no tour, please.
-IFS=$&amp;#39;,&amp;#39; # comma delimited
-while IFS=$IFS read name phone district uuid username password; do \
-curl -v -H &amp;#39;content-type:application/json&amp;#39; -d &amp;#39;{
-&amp;#34;username&amp;#34;:&amp;#34;&amp;#39;&amp;#34;$username&amp;#34;&amp;#39;&amp;#34;,
-&amp;#34;password&amp;#34;:&amp;#34;&amp;#39;&amp;#34;$password&amp;#34;&amp;#39;&amp;#34;,
-&amp;#34;type&amp;#34;:&amp;#34;district-manager&amp;#34;,
-&amp;#34;place&amp;#34;: {
-&amp;#34;name&amp;#34;: &amp;#34;&amp;#39;&amp;#34;$name Area&amp;#34;&amp;#39;&amp;#34;,
-&amp;#34;type&amp;#34;: &amp;#34;health_center&amp;#34;,
-&amp;#34;parent&amp;#34;: &amp;#34;&amp;#39;&amp;#34;$uuid&amp;#34;&amp;#39;&amp;#34;
-},
-&amp;#34;language&amp;#34;:&amp;#34;&amp;#39;&amp;#34;$LANG&amp;#34;&amp;#39;&amp;#34;,
-&amp;#34;known&amp;#34;:&amp;#39;&amp;#34;$KNOWN&amp;#34;&amp;#39;,
-&amp;#34;contact&amp;#34;:{
-&amp;#34;name&amp;#34;:&amp;#34;&amp;#39;&amp;#34;$name&amp;#34;&amp;#39;&amp;#34;,
-&amp;#34;phone&amp;#34;: &amp;#34;&amp;#39;&amp;#34;$PHONE_PREFIX$phone&amp;#34;&amp;#39;&amp;#34;
-}
-}&amp;#39; &amp;#34;$COUCH_URL/api/v1/users&amp;#34;;
-done
-&lt;/code>&lt;/pre>&lt;p>Load the data into the loop:&lt;/p>
-&lt;pre tabindex="0">&lt;code>tail -n+2 /tmp/data | COUCH_URL=https://admin:secret@myproject.app.medicmobile.org \
-users-bulk-load # tail skips header row
-&lt;/code>&lt;/pre></description></item><item><title>Apps: Detecting and fixing production data on training instances</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</guid><description>
+&lt;h2 id="spreadsheet-instructions">Spreadsheet Instructions&lt;/h2>
+&lt;p>We have made available a spreadsheet compatible with the &lt;code>default&lt;/code> configuration of the CHT and we will be using it as an example in the instructions below.
+&lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy">Click here&lt;/a> to make a copy of the spreadsheet in Google Sheets.&lt;/p>
+&lt;h3 id="spreadsheet">Spreadsheet&lt;/h3>
+&lt;p>Before using the bulk user upload, please familiarize yourself with the spreadsheet used to manage the users before importing to the CHT.
+Specifically, there are three sections to the sheet:&lt;/p>
+&lt;p>&lt;img src="users-spreadsheet.png" alt="bulk user import spreadsheet with areas labeled">&lt;/p>
+&lt;h4 id="spreadsheet-area-1">&lt;strong>Spreadsheet Area 1&lt;/strong>&lt;/h4>
+&lt;p>Copy in error messages here after importing. There are three fields:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>import.status:excluded&lt;/code>: This field can have three values. Over time, they should all be &lt;code>imported&lt;/code> or &lt;code>skipped&lt;/code> as you will have processed all users on the list:
+&lt;ol type="a">
+&lt;li>&lt;code>imported&lt;/code> - This user has already been successfully imported&lt;/li>
+&lt;li>&lt;code>skipped&lt;/code> - This user was skipped&lt;/li>
+&lt;li>&lt;code>error&lt;/code> - There was an error importing see import.message:excluded field for more information&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>import.message:excluded&lt;/code>: The status of the last import. For example, &lt;code>Imported successfully&lt;/code> or &lt;code>Username 'mrjones' already taken&lt;/code>&lt;/li>
+&lt;li>&lt;code>import.username:excluded&lt;/code>: Use this column to ensure you&amp;rsquo;re matching the response with the correct user in the contact.username to the right&lt;/li>
+&lt;/ol>
+&lt;h4 id="spreadsheet-area-2">&lt;strong>Spreadsheet Area 2&lt;/strong>&lt;/h4>
+&lt;p>Enter all data here. Data will be automatically copied for you to columns in area 3.&lt;/p>
+&lt;h4 id="spreadsheet-area-3">&lt;strong>Spreadsheet Area 3&lt;/strong>&lt;/h4>
+&lt;p>Do not edit or enter data here. All columns are automatically populated by the spreadsheet logic.
+While this is needed to create a user, it is intentionally not editable and you will see this error when you try to edit data:&lt;/p>
+&lt;p>&lt;img src="users-spreadsheet-warning.png" alt="bulk user import spreadsheet warning">&lt;/p>
+&lt;p>Do not edit column headers in row 1. They are needed by the CHT to identify which data is in it. Changing the names will result in errors or missing data in the CHT.&lt;/p>
+&lt;h3 id="passwords">Passwords&lt;/h3>
+&lt;p>Passwords are automatically generated by the spreadsheet. Use caution when editing rows marked as &lt;code>imported&lt;/code> in the Import.status:excluded column.
+For example, if a user was imported two weeks ago and the token_login is set to &lt;code>TRUE&lt;/code> and then back to &lt;code>FALSE&lt;/code>,
+the password will be regenerated and thus be different from the one the user is using to login.
+If a change is made, you can use Google Sheets history (&amp;ldquo;File&amp;rdquo; -&amp;gt; &amp;ldquo;Version History&amp;rdquo;) to retrieve the old value.&lt;/p>
+&lt;h2 id="importing-users">Importing Users&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Create a copy of &lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy">this spreadsheet&lt;/a>.
+Give it a good name and note its location in Google Drive. You will always come back to your copy of this Sheet whenever you want to add a set of users.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Copy the &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo; worksheets so that you have a set of the pair per level of your hierarchy.
+If your hierarchy was &amp;ldquo;Central -&amp;gt; Supervisor -&amp;gt; CHW&amp;rdquo;, you would have 3 pairs (6 worksheets total). Be sure each worksheet is named accurately.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Open the spreadsheet and populate your list of parent places that you&amp;rsquo;d like to use for your users.
+In this example the &amp;ldquo;Penda Ouedraogo&amp;rdquo; place has gotten an updated UUID starting with &amp;ldquo;bcc&amp;rdquo;
+&lt;img src="importing-users-populate-parents-places.png" alt="populate your list of parent places">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the users you would like to create
+&lt;img src="importing-users-entering-data.png" alt="entering data into the spreadsheet">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Export spreadsheet into CSV
+&lt;img src="importing-users-export-csv.png" alt="export spreadsheet into CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Access the &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/admin/">Admin Console&lt;/a> of your instance, go to &amp;ldquo;Users&amp;rdquo;, click &amp;ldquo;Import from file&amp;rdquo; and select your CSV file you just exported
+&lt;img src="importing-users-import-csv.png" alt="import CSV into CHT">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Be patient during import (testing showed ~0.4 seconds per record up to 500 records)
+&lt;img src="importing-users-import-progress.png" alt="progress feedback during CSV import">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Download the status file
+&lt;img src="importing-users-download-status-file.png" alt="download the status file">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Transfers errors back into spreadsheet. Make sure you copy all three columns A, B and C.
+The usernames in column C must match those in column D of the original spreadsheet.
+&lt;img src="importing-users-transfer-errors.png" alt="transfers errors back into spreadsheet">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Fix the errors and export to CSV
+&lt;img src="importing-users-fix-errors.png" alt="fix errors and export to CSV">
+&lt;br />
+&lt;br />
+&lt;img src="importing-users-export-csv.png" alt="export spreadsheet into CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Import the fixed CSV, noting already import rows are skipped
+&lt;img src="importing-users-import-fixed-csv.png" alt="import the fixed CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Deliver credentials to phone or to CHW, using care to not overshare the login and password&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="adding-new-places">Adding new places&lt;/h2>
+&lt;p>Over time, new places will be added to different levels of the hierarchy.
+You will need to manually add these new places to the spreadsheet so that you can add users to the new places.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Navigate in the CHT to the new site. In this case, it is &amp;ldquo;Site Dieco&amp;rdquo; that has been added (item 1). Copy the 36 character UUID from the URL (item 2).
+&lt;img src="adding-places-cht-new-site.png" alt="navigate in the CHT to the new site">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Open your existing Google Spreadsheet with your users. Find the hierarchy level you added your new site.
+In this case &amp;ldquo;Site Dieco&amp;rdquo; is a CHW place, so we&amp;rsquo;ll go to the &amp;ldquo;contact.c62_chw_VLOOKUP&amp;rdquo; worksheet.
+Add some new rows at the bottom (item 1), enter the new place name in column A (item 2) and paste the UUID in column B (item 3)
+&lt;img src="adding-places-existing-spreadsheet.png" alt="open your existing spreadsheet">&lt;/p>
+&lt;/li>
+&lt;/ol></description></item><item><title>Apps: Detecting and fixing production data on training instances</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</guid><description>
 &lt;p>After &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/onboarding/">onboarding CHWs&lt;/a>, sometimes data ends up on the wrong CHT instance. There are some passive and active actions you can take to help deal with this situation.&lt;/p>
 &lt;h2 id="monitoring">Monitoring&lt;/h2>
 &lt;p>Monitoring is a good way to see if CHWs are sending forms to the wrong CHT server. By catching such a problem early, it may be easy to fix manually which avoids more laborious fixes on the command line for admins.&lt;/p>
