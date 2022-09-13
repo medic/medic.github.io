@@ -818,7 +818,123 @@ CHT_HTTPS=8443
 &lt;/ul>
 &lt;ol>
 &lt;li>Access the app using the https address shown (e.g. &lt;code>https://YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>).&lt;/li>
-&lt;/ol></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
+&lt;/ol></description></item><item><title>Apps: Monitoring and alerting on the CHT</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide applies to all production instances of the CHT including &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">self hosted&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">AWS hosted&lt;/a>. It also works with &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/">app developer&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/">CHT core developer&lt;/a> setups if you’re looking to test how it works or develop monitoring tools.
+&lt;/div>
+&lt;p>While this guide does not detail exactly how to set up monitoring and alerting, it will outline the items you should monitor and alert on. At a later date we&amp;rsquo;ll deploy an opinionated guide on which software and services to use when doing real world hosting.&lt;/p>
+&lt;p>Each deployment will experience different stresses on its resources. Be sure to tune the alerting levels in the case of an outage so that you may avoid it in the future. Any thresholds for alerts, and even what is alerted on, is just a guideline, not a garuntee of uptime.&lt;/p>
+&lt;h2 id="monitoring-vs-alerting">Monitoring vs Alerting&lt;/h2>
+&lt;p>Monitoring allows CHT admins to see statistics about their server, often over time. This can be helpful when you want to be aware of growth in your deployment (eg number of active users or number of reports per region). It should not be assumed that these will be checked regularly enough to notice a problem, for example a spike in number of feedback documents.&lt;/p>
+&lt;p>Alerting is a push mechanism designed to notify users who can act on the alert. These can go over SMS, email, Slack, WhatsApp or any other channel to notify the right users.&lt;/p>
+&lt;p>The process of setting up monitoring and alerting should be done together. Monitoring sets the baseline and then alerting tells admins when the metric has gone beyond the baseline to a critical state. Certain metrics, like uptime for example, likely do not need to have a monitoring visualization on a dashboard, but the monitoring system should still be the authority to send an alert to denote when the service has restarted unexpectedly.&lt;/p>
+&lt;h2 id="outside-the-cht">Outside the CHT&lt;/h2>
+&lt;p>Be sure to monitor important items that the CHT depends on in order to be healthy. You should alert when any of these are close to their maximum (disk space) or minimum (days left of valid TLS certificate):&lt;/p>
+&lt;ul>
+&lt;li>Domain expiration with registrar&lt;/li>
+&lt;li>TLS certificate expiration&lt;/li>
+&lt;li>Disk &amp;amp; swap space&lt;/li>
+&lt;li>CPU utilization&lt;/li>
+&lt;li>Memory utilization&lt;/li>
+&lt;li>Network utilization&lt;/li>
+&lt;li>Process count&lt;/li>
+&lt;li>OS Uptime&lt;/li>
+&lt;/ul>
+&lt;h2 id="inside-the-cht">Inside the CHT&lt;/h2>
+&lt;p>The &lt;a href="(/apps/reference/api/#get-apiv2monitoring)">monitoring API&lt;/a> was added in 3.9.0 and does not require any authentication and so can easily be used with third party tools as they do not need a CHT user account.&lt;/p>
+&lt;p>All metrics need to be monitored over time so that you can easily see longitudinal patterns when debugging an outage or slow down.&lt;/p>
+&lt;h3 id="specific-of-monitoring">Specific of monitoring&lt;/h3>
+&lt;h4 id="explosive-growth">Explosive Growth&lt;/h4>
+&lt;p>Many of the values in the monitoring API do not mean much in isolation. For example if an instance has 10,714,278 feedback docs, is that bad? If it&amp;rsquo;s years old and has thousands of users, then this is normal. If it is 4 months old and has 100 users, this is a dire problem!&lt;/p>
+&lt;p>You should monitor these metrics for unexpected growth as measured by percent change over 24 hours. Ideally this can be subjectively calculated when it is more than 5% growth than the prior day. They&amp;rsquo;re marked as &lt;code>growth&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="non-zero-values">Non-Zero Values&lt;/h4>
+&lt;p>Other values should always be zero, and you should alert when they are not. You may opt to alert only when they are non-zero for more than 24 hours. These are marked as &lt;code>non-zero&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="zero-or-near-zero-values">Zero or Near Zero Values&lt;/h4>
+&lt;p>Finally, these values should always be &lt;em>not&lt;/em> zero, and you should alert when are zero or very close to it. You may opt to alert only when they are zero for more than 24 hours. They&amp;rsquo;re marked with &lt;code>zero&lt;/code> below.&lt;/p>
+&lt;h4 id="elements-types-and-samples">Elements, types and samples&lt;/h4>
+&lt;p>The names below are extrapolated from the paths in the JSON returned by the API and should be easy to find when viewing the Monitoring API URL on your CHT instance:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Example Value&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Conflict Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>23,318&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>16,254,271&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>1.4366029665729645&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>15,756,449&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.388733774539664&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>535&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.356411021364134&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Meta Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,761,549&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Feedback Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,714,368&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Due&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>3,807&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Failed&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outbound Push Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Sentinel Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Date Uptime&lt;/td>
+&lt;td>&lt;code>zero&lt;/code>&lt;/td>
+&lt;td>1,626,508.148&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Apps: SSL Cert Install</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/ssl-cert-install/</guid><description>
 &lt;h2 id="requirements">Requirements&lt;/h2>
 &lt;ul>
 &lt;li>Installed CHT-Core 3.x via either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">Self Hosted&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">EC2&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">Local Setup&lt;/a>, but must use &lt;code>docker-compose&lt;/code>.&lt;/li>
