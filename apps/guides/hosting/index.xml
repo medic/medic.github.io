@@ -321,15 +321,19 @@ Containers that are already set up will lose all data when following the steps b
 &lt;/ul></description></item><item><title>Apps: App Developer Hosting</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
+This guide will only work with CHT 3.x instances. It will be updated to work with 4.x instances at a later date.
+&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
 &lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without loosing any data while doing so. To do development on the CHT core itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/">development guide&lt;/a>.&lt;/p>
 &lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
 &lt;/div>
 &lt;h2 id="getting-started">Getting started&lt;/h2>
 &lt;p>Be sure to meet the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">CHT hosting requirements&lt;/a> first. As well, if any other &lt;code>medic-os&lt;/code> instances using &lt;a href="https://github.com/medic/cht-core/blob/master/docker-compose.yml">the main &lt;code>docker-compose.yml&lt;/code> file&lt;/a> are running locally, stop them otherwise port, storage volume and container name conflicts may occur.&lt;/p>
 &lt;p>After meeting these requirements, download the developer YAML file in the directory you want to store them:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -o docker-compose-developer.yml https://raw.githubusercontent.com/medic/cht-core/master/docker-compose-developer.yml
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -o docker-compose-developer-3.x-only.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To start the first developer CHT instance, run &lt;code>docker-compose&lt;/code> and specify the file that was just download:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f docker-compose-developer.yml up
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f docker-compose-developer-3.x-only.yml up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This may take some minutes to fully start depending on the speed of the Internet connection and speed of the bare-metal host. This is because docker needs to download all the storage layers for all the containers and the CHT needs to run the first run set up. After downloads and setup has completed, the CHT should be accessible on &lt;a href="https://localhost">https://localhost&lt;/a>.&lt;/p>
 &lt;p>When connecting to a new dev CHT instance for the first time, an error will be shown, &amp;ldquo;Your connection is not private&amp;rdquo; (see &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/privacy.error.png">screenshot&lt;/a>). To get past this, click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
 &lt;h2 id="running-the-nth-cht-instance">Running the Nth CHT instance&lt;/h2>
@@ -340,7 +344,7 @@ Containers that are already set up will lose all data when following the steps b
 &lt;li>project to for the docker compose call (&lt;code>-p PROJECT&lt;/code>)&lt;/li>
 &lt;/ul>
 &lt;p>Assuming you want to start a new project called &lt;code>the_second&lt;/code> and start the instance on &lt;code>HTTP&lt;/code> port &lt;code>8081&lt;/code> and &lt;code>HTTPS&lt;/code> port &lt;code>8443&lt;/code>, this would be the command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span> &lt;span style="color:#000">CHT_HTTPS&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8443&lt;/span> docker-compose -p the_second -f docker-compose-developer.yml up
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span> &lt;span style="color:#000">CHT_HTTPS&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8443&lt;/span> docker-compose -p the_second -f docker-compose-developer-3.x-only.yml up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The second instance is now accessible at &lt;a href="https://localhost:8443">https://localhost:8443&lt;/a>.&lt;/p>
 &lt;h2 id="the-env-file">The &lt;code>.env&lt;/code> file&lt;/h2>
 &lt;p>Often times it&amp;rsquo;s convenient to use revision control, like GitHub, to store and publish changes in a CHT app. A nice compliment to this is to store the specifics on how to run the &lt;code>docker-compose&lt;/code> command for each app. By using a shared &lt;code>docker-compose&lt;/code> configuration for all developers on the same app, it avoids any port collisions and enables all developers to have a unified configuration.&lt;/p>
@@ -351,13 +355,13 @@ Containers that are already set up will lose all data when following the steps b
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTPS&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8443&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now it&amp;rsquo;s easy to boot this environment by specifying which &lt;code>.env&lt;/code> file to use:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose --env-file ../the_second/.env-docker-compose -f docker-compose-developer.yml up
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose --env-file ../the_second/.env-docker-compose -f docker-compose-developer-3.x-only.yml up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="switching--concurrent-projects">Switching &amp;amp; concurrent projects&lt;/h2>
 &lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code>. Then start the second project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and project name as shown above.&lt;/p>
 &lt;p>To run projects concurrently, instead of cancelling the first one, open a second terminal and start the second project.&lt;/p>
 &lt;p>To read more about how &lt;code>docker-compose&lt;/code> works, be sure to read the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#helpful-docker-commands">helpful docker-compose commands&lt;/a> page.&lt;/p>
 &lt;h2 id="cht-docker-helper">CHT Docker Helper&lt;/h2>
-&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts builds on the &lt;code>docker-compose-developer.yml&lt;/code> and &lt;code>.env&lt;/code> files used above by helping start CHT instances with a simple text based GUI:&lt;/p>
+&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts builds on the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> and &lt;code>.env&lt;/code> files used above by helping start CHT instances with a simple text based GUI:&lt;/p>
 &lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;amp;ldquo;Successfully started my_first_project&amp;amp;rdquo; message is shown and denotes the login is &amp;amp;ldquo;medic&amp;amp;rdquo; and the password is &amp;amp;ldquo;password&amp;amp;rdquo;.">&lt;/p>
 &lt;h3 id="prerequisites">Prerequisites&lt;/h3>
 &lt;h4 id="os">OS&lt;/h4>
@@ -383,7 +387,7 @@ Containers that are already set up will lose all data when following the steps b
 &lt;h4 id="docker-compose-file-and-helper-scripts">Docker compose file and helper scripts&lt;/h4>
 &lt;p>An up-to-date clone of &lt;a href="https://github.com/medic/cht-core/">cht-core&lt;/a> has everything you need including:&lt;/p>
 &lt;ul>
-&lt;li>&lt;code>docker-compose-developer.yml&lt;/code>&lt;/li>
+&lt;li>&lt;code>docker-compose-developer-3.x-only.yml&lt;/code>&lt;/li>
 &lt;li>&lt;code>cht-docker-compose.sh&lt;/code>&lt;/li>
 &lt;li>&lt;code>docker-status.sh&lt;/code>&lt;/li>
 &lt;/ul>
