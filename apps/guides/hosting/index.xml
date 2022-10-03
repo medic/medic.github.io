@@ -204,6 +204,10 @@ See the &lt;a href="https://github.com/medic/cht-couch2pg/blob/main/README.md">c
 &lt;li>Please see the second-half of &amp;ldquo;Increasing disk size&amp;rdquo; reference above&lt;/li>
 &lt;li>Setup a TLS cert &amp;amp; DNS registration&lt;/li>
 &lt;/ul></description></item><item><title>Apps: Self Hosting</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide will only work with CHT 3.x instances. It will be updated to work with 4.x instances at a later date.
+&lt;/div>
 &lt;p>Whether run on bare-metal or in a cloud provider, the Community Health Toolkit (CHT) core framework has been packaged into a docker container to make it portable and easy to install. It is available from &lt;a href="https://hub.docker.com/r/medicmobile/medic-os">dockerhub&lt;/a>. To learn more how to work with docker you could follow the tutorial &lt;a href="https://docker-curriculum.com/#getting-started">here&lt;/a> and the cheat sheet &lt;a href="https://www.docker.com/sites/default/files/d8/2019-09/docker-cheat-sheet.pdf">here&lt;/a>.&lt;/p>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
@@ -211,14 +215,14 @@ Before continuing, ensure all &lt;a href="https://docs.communityhealthtoolkit.or
 &lt;/div>
 &lt;h2 id="installing-with-a-compose-file">Installing with a compose file&lt;/h2>
 &lt;p>The CHT containers are installed using &lt;a href="https://docs.docker.com/compose/reference/overview/">docker compose&lt;/a> so that you can run multiple containers as a single service.&lt;/p>
-&lt;p>Start by choosing the location where you would like to save your compose configuration file. Then create the &lt;code>docker-compose.yml&lt;/code> file by &lt;code>cd&lt;/code>ing into the correct directory and running:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -s -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/docker-compose.yml
+&lt;p>Start by choosing the location where you would like to save your compose configuration file. Then create the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> file by &lt;code>cd&lt;/code>ing into the correct directory and running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -s -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The install requires an admin password that it will configure in the database. You need to provide this externally as an environment variable. Before you run the compose file, you need to export this variable as shown below.&lt;/p>
 &lt;p>&lt;code>export DOCKER_COUCHDB_ADMIN_PASSWORD=myAwesomeCHTAdminPassword&lt;/code>&lt;/p>
-&lt;p>You can then run &lt;code>docker-compose&lt;/code> in the folder where you put your compose &lt;code>docker-compose.yml&lt;/code> file. To start, run it interactively to see all the logs on screen and be able to stop the containers with &lt;code>ctrl&lt;/code> + &lt;code>c&lt;/code>:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose up
+&lt;p>You can then run &lt;code>docker-compose&lt;/code> in the folder where you put your compose &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> file. To start, run it interactively to see all the logs on screen and be able to stop the containers with &lt;code>ctrl&lt;/code> + &lt;code>c&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose -f docker-compose-developer-3.x-only.yml up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If there are no errors, stop the containers with &lt;code>ctrl&lt;/code> + &lt;code>c&lt;/code> and then run it detached with &lt;code>-d&lt;/code>:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose up -d
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose -f docker-compose-developer-3.x-only.yml up -d
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note In certain shells, &lt;code>docker-compose&lt;/code> may not interpolate the admin password that was exported in &lt;code>DOCKER_COUCHDB_ADMIN_PASSWORD&lt;/code>. Check if this is the case by searching the logs in the medic-os dockers instance. If the &lt;code>docker logs medic-os&lt;/code> command below returns a user and password, then the export above failed, and you should use this user and password to complete the installation:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker logs medic-os &lt;span style="color:#000;font-weight:bold">|&lt;/span>grep &lt;span style="color:#4e9a06">&amp;#39;New CouchDB Admin&amp;#39;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Info: New CouchDB Administrative User: medic
@@ -242,13 +246,13 @@ Before continuing, ensure all &lt;a href="https://docs.communityhealthtoolkit.or
 &lt;/li>
 &lt;li>
 &lt;p>Clean data volume:&lt;code>docker volume rm medic-data&lt;/code>&lt;/p>
-&lt;p>Note: Running &lt;code>docker-compose -f docker-compose.yml down -v&lt;/code> would do all the above 3 steps&lt;/p>
+&lt;p>Note: Running &lt;code>docker-compose -f docker-compose-developer-3.x-only.yml down -v&lt;/code> would do all the above 3 steps&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>Prune system: &lt;code>docker system prune&lt;/code>&lt;/p>
 &lt;/li>
 &lt;/ol>
-&lt;p>After following the above commands, you can re-run docker-compose up and create a clean install: &lt;code>docker-compose -f docker-compose.yml up -d&lt;/code>&lt;/p>
+&lt;p>After following the above commands, you can re-run docker-compose up and create a clean install: &lt;code>docker-compose -f docker-compose-developer-3.x-only.yml up -d&lt;/code>&lt;/p>
 &lt;h3 id="port-conflicts">Port Conflicts&lt;/h3>
 &lt;p>In case you are already running services on HTTP(80) and HTTPS(443),you will have to either remap ports to the medic-os container or stop the services using those ports.&lt;/p>
 &lt;p>To find out which service is using a conflicting port: On Linux:&lt;/p>
@@ -266,9 +270,9 @@ Before continuing, ensure all &lt;a href="https://docs.communityhealthtoolkit.or
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#0000cf;font-weight:bold">8080&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">80&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#0000cf;font-weight:bold">444&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">443&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Turn off and remove all existing containers that were started:&lt;/p>
-&lt;p>&lt;code>sudo docker-compose -f /path/to/docker-compose.yml down&lt;/code>&lt;/p>
+&lt;p>&lt;code>sudo docker-compose -f /path/to/docker-compose-developer-3.x-only.yml down&lt;/code>&lt;/p>
 &lt;p>Bring Up the containers in detached mode with the new forwarded ports.&lt;/p>
-&lt;p>&lt;code>sudo docker-compose -f /path/to/docker-compose.yml up -d&lt;/code>&lt;/p>
+&lt;p>&lt;code>sudo docker-compose -f /path/to/docker-compose-developer-3.x-only.yml up -d&lt;/code>&lt;/p>
 &lt;p>Note: You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.&lt;/p>
 &lt;h2 id="data-storage--persistence">Data storage &amp;amp; persistence&lt;/h2>
 &lt;div class="alert alert-primary" role="alert">
@@ -329,7 +333,7 @@ This guide will only work with CHT 3.x instances. It will be updated to work wit
 &lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
 &lt;/div>
 &lt;h2 id="getting-started">Getting started&lt;/h2>
-&lt;p>Be sure to meet the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">CHT hosting requirements&lt;/a> first. As well, if any other &lt;code>medic-os&lt;/code> instances using &lt;a href="https://github.com/medic/cht-core/blob/master/docker-compose.yml">the main &lt;code>docker-compose.yml&lt;/code> file&lt;/a> are running locally, stop them otherwise port, storage volume and container name conflicts may occur.&lt;/p>
+&lt;p>Be sure to meet the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">CHT hosting requirements&lt;/a> first. As well, if any other &lt;code>medic-os&lt;/code> instances using &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml">the main &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> file&lt;/a> are running locally, stop them otherwise port, storage volume and container name conflicts may occur.&lt;/p>
 &lt;p>After meeting these requirements, download the developer YAML file in the directory you want to store them:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -o docker-compose-developer-3.x-only.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To start the first developer CHT instance, run &lt;code>docker-compose&lt;/code> and specify the file that was just download:&lt;/p>
