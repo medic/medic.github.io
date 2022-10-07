@@ -81,7 +81,347 @@ cht --local upload-docs -- --docDirectoryPath=my_folder
 &lt;/code>&lt;/pre>
 &lt;p>Move the contact with the id &lt;code>contact_1&lt;/code> to the top of the hierarchy (no parent).&lt;/p>
 &lt;pre>&lt;code>cht --local move-contacts upload-docs -- --contacts=contact_1 --parent=root
-&lt;/code>&lt;/pre></description></item><item><title>Apps: Update Collect Forms Remotely</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</guid><description>
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Preparing to upgrade to CHT 4.0</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/preparing-for-4.0/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/updates/preparing-for-4.0/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide applies to both self-hosted and Medic hosted deployments.
+&lt;/div>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>Medic uses &lt;a href="https://en.wikipedia.org/wiki/Semver#Semantic_versioning">Semantic Versioning&lt;/a> (aka &amp;ldquo;SemVer&amp;rdquo;) which means that the CHT upgrade from the major 3.x version to the 4.x version denotes there are breaking changes. The key to a successful upgrade will be to understand and plan for these breaking changes. Aside from the Docker hosting infrastructure (out of scope for this prep document), the two breaking changes are around CHT Android and Enketo.&lt;/p>
+&lt;p>While CHT 4.0 has not been released yet, the effort to be prepared can be quite time consuming, especially for large deployments that may need to do handset upgrades in a worst case. The sooner deployments start preparing for the upgrade, the easier it will be when it comes to the upgrade itself. Conveniently, all device and Android app changes to prepare for 4.x are backwards compatible with 3.x. Prepare now, so you will be ready to upgrade sooner than later!&lt;/p>
+&lt;h2 id="cht-android-v100">CHT Android v1.0.0+&lt;/h2>
+&lt;p>This change is straightforward in that CHT 4.x no longer supports versions &lt;em>before&lt;/em> &lt;code>1.0.0&lt;/code>, so deployments need to update their Play Store app. As of this writing, &lt;a href="https://github.com/medic/cht-android/">CHT Android&lt;/a> is at &lt;code>1.0.4&lt;/code>. Please see the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/android/">Android docs&lt;/a> on how to update your app and release it. Note that Google&amp;rsquo;s Play Store can often have delays which deployments have no control over. Again, the sooner you start, the better.&lt;/p>
+&lt;h3 id="versions-in-use">Versions in use&lt;/h3>
+&lt;p>After you have published your app, you need to instruct your users to check the Play Store for upgrades. You can then check &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">CHT Telemetry&lt;/a> to see what CHT Android versions are in use. Assuming you have &lt;a href="https://github.com/medic/couch2pg">couch2pg set up&lt;/a> to pull in your CouchDB data to a PostgreSQL database, this query will list Android versions &lt;code>count&lt;/code>s for the current year, broken out by &lt;code>month&lt;/code>, &lt;code>year&lt;/code> and &lt;code>version&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">SELECT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">concat&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,year}&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;-&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#000">lpad&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,month}&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">2&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;0&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">))&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">telemetry_month&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht_android_version&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">count&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">distinct&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,user}&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">))&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">count_distinct_users&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">count&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">distinct&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,deviceId}&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">))&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">count_distinct_devices&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">count&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">*&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">count_telemetry&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">FROM&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">couchdb_users_meta&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">WHERE&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{type}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;telemetry&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AND&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,year}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">to_char&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">current_date&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;yyyy&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">GROUP&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">BY&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">telemetry_month&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht_android_version&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">ORDER&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">BY&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">telemetry_month&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">DESC&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht_android_version&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">DESC&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">NULLS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">LAST&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that each user can submit many telemetry docs (&lt;code>count_telemetry&lt;/code>), so the query breaks out users (&lt;code>count_distinct_users&lt;/code>) and devices (&lt;code>count_distinct_devices&lt;/code>) for the given month. This means that telemetry counts will be higher than the number of active users. As well, early in the current month, many users may not have had a chance to synchronize their telemetry data yet. For example, this report was run on the 5th of October, so the counts for all three tables are low. Refer to prior months in this case.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+In some cases users are accessing the system via the &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/pwa/">progressive web app (PWA)&lt;/a> or are online users. We see the &lt;code>cht_android_version&lt;/code> field is empty in this case.
+&lt;/div>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>telemetry_month&lt;/th>
+&lt;th>cht_android_version&lt;/th>
+&lt;th>count_distinct_users&lt;/th>
+&lt;th>count_distinct_devices&lt;/th>
+&lt;th>count_telemetry&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>2022-10&lt;/td>
+&lt;td>v0.8.0-xwalk&lt;/td>
+&lt;td>8&lt;/td>
+&lt;td>8&lt;/td>
+&lt;td>12&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-10&lt;/td>
+&lt;td>v0.8.0-webview&lt;/td>
+&lt;td>140&lt;/td>
+&lt;td>140&lt;/td>
+&lt;td>244&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-10&lt;/td>
+&lt;td>v0.4.34&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-10&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>10&lt;/td>
+&lt;td>10&lt;/td>
+&lt;td>12&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-09&lt;/td>
+&lt;td>v0.8.0-xwalk&lt;/td>
+&lt;td>17&lt;/td>
+&lt;td>18&lt;/td>
+&lt;td>139&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-09&lt;/td>
+&lt;td>v0.8.0-webview&lt;/td>
+&lt;td>350&lt;/td>
+&lt;td>351&lt;/td>
+&lt;td>3255&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-09&lt;/td>
+&lt;td>v0.5.0&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>8&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-09&lt;/td>
+&lt;td>v0.4.34&lt;/td>
+&lt;td>24&lt;/td>
+&lt;td>24&lt;/td>
+&lt;td>69&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-09&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>64&lt;/td>
+&lt;td>61&lt;/td>
+&lt;td>143&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-08&lt;/td>
+&lt;td>v0.8.0-xwalk&lt;/td>
+&lt;td>27&lt;/td>
+&lt;td>30&lt;/td>
+&lt;td>181&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-08&lt;/td>
+&lt;td>v0.8.0-webview&lt;/td>
+&lt;td>365&lt;/td>
+&lt;td>376&lt;/td>
+&lt;td>3169&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-08&lt;/td>
+&lt;td>v0.5.0&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>12&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-08&lt;/td>
+&lt;td>v0.4.34&lt;/td>
+&lt;td>25&lt;/td>
+&lt;td>25&lt;/td>
+&lt;td>92&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2022-08&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>81&lt;/td>
+&lt;td>86&lt;/td>
+&lt;td>158&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="active-user-counts">Active user counts&lt;/h3>
+&lt;p>You can check the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#monitoring">monitoring API&lt;/a> with &lt;code>curl&lt;/code> to check active users for the last &lt;code>30&lt;/code> days. Remember that the users can send a telemetry report once per day, so this active user count will be less than the counts from the query above.&lt;/p>
+&lt;p>We&amp;rsquo;ll &lt;a href="https://stedolan.github.io/jq/">use &lt;code>jq&lt;/code> to filter&lt;/a> out the unrelated metrics. Be sure to replace &lt;code>CHT-URL-HERE&lt;/code> with your production CHT URL:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -s https://CHT-URL-HERE/api/v2/monitoring&lt;span style="color:#4e9a06">\?&lt;/span>connected_user_interval&lt;span style="color:#4e9a06">\=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">30&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> jq &lt;span style="color:#4e9a06">&amp;#39;. | {connected_users}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This call will show the JSON with active users for the last 30 days:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;connected_users&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;count&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="users-in-need-of-upgrade">Users in need of upgrade&lt;/h3>
+&lt;p>In the above table we can see there&amp;rsquo;s 4 users in the most recent month that are on version &lt;code>v0.11.0-webview&lt;/code>. Let&amp;rsquo;s find their username so we can follow up with them directly. This query is hard coded for the current year (&lt;code>2022&lt;/code>), the current month (&lt;code>3&lt;/code>) and the version &lt;code>v0.11.0-webview&lt;/code>. Be sure to update the query to fit your needs according to which month, year and version you need to search for:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">distinct&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,user}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">user&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht_android_version&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">from&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">couchdb_users_meta&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">where&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{type}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;telemetry&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">is&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">not&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">null&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,year}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">to_char&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">current_date&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;yyyy&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,month}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">to_char&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">current_date&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;FMMM&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;v0.11.0-webview&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this case only one user is found:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>user&lt;/th>
+&lt;th>cht_android_version&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>adj&lt;/td>
+&lt;td>v0.11.0-webview&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>A twist on this query is to remove the version filter. Do not remove the year and month filter as you will get duplicate values for users who have upgraded over time:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">distinct&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,user}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">user&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">as&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht_android_version&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">from&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">couchdb_users_meta&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">where&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{type}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;telemetry&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{device,deviceInfo,app,version}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">is&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">not&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">null&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,year}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">to_char&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">current_date&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;yyyy&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">and&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">#&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;{metadata,month}&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">to_char&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">current_date&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;FMMM&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This will give a list of every user and the version they&amp;rsquo;re running as of the current month and year:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>user&lt;/th>
+&lt;th>cht_android_version&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>moh-west-chw-1&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-12&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-14&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-3&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-3&lt;/td>
+&lt;td>v1.0.1-5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-4&lt;/td>
+&lt;td>v1.0.1-5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-5&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-6&lt;/td>
+&lt;td>v1.0.1-5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-7&lt;/td>
+&lt;td>v1.0.1-5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>moh-west-chw-8&lt;/td>
+&lt;td>v1.0.1-4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>adj&lt;/td>
+&lt;td>v0.11.0-webview&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="cht-conf">CHT Conf&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/cht-conf/">CHT Conf&lt;/a> has been upgraded to be aware of forms written to work in CHT 3.x that may not work in CHT 4.x. Upgrading, can help you identify forms in need of fixing when pushing to dev instances as outlined below.&lt;/p>
+&lt;p>To upgrade app, run &lt;code>npm update cht-conf&lt;/code>&lt;/p>
+&lt;h2 id="enketo">Enketo&lt;/h2>
+&lt;p>CHT 4.0 &lt;a href="https://github.com/medic/cht-core/pull/7256">upgrades the version of Enketo&lt;/a> used to render forms. This upgrade provides a ton of bug fixes and enhancements (particularly around ODK spec compliance) which will make the forms experience in the CHT even better! (For example, we now have proper support for &lt;code>repeat&lt;/code>s with a dynamic length, including the various XPath functions necessary to take full advantage of this functionality!) That being said, it does introduce a few changes which may affect the way your forms function (or even cause some forms to fail to load at all).&lt;/p>
+&lt;h3 id="manual-testing">Manual testing&lt;/h3>
+&lt;p>You can also manually test your forms on a non-prod CHT instance. It is possible to test your forms against the new Enekto changes without having to uplift your non-prod CHT instance to the new 4.0 architecture.&lt;/p>
+&lt;p>An easy way of doing this is to use the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/app-developer/#cht-docker-helper">CHT Docker Helper&lt;/a> to deploy a 3.x CHT instance. After you have your dev instance up and running, upgrade to the &lt;code>7786-fix-report-label&lt;/code> branch:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Log in as an Admin and go to the admin section, choose upgrades:&lt;/p>
+&lt;p>&lt;img src="admin-upgrades.png" alt="CHT Admin - Upgrade Section">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Expand the “Pre-releases” section by clicking on it and scroll down to the &lt;code>7786-fix-report-label&lt;/code> branch and click “Install” on the right:&lt;/p>
+&lt;p>&lt;img src="select-branch.png" alt="CHT Admin - Selecting the 7786-fix-report-label to upgrade to">&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>After pushing your app config (see &amp;ldquo;CHT Conf&amp;rdquo; above), you can proceed to go through each of your forms in a browser and on a device to ensure there&amp;rsquo;s no errors.&lt;/p>
+&lt;h3 id="notable-changes-to-form-behavior">Notable changes to form behavior&lt;/h3>
+&lt;h4 id="xpath-expressions">XPath expressions&lt;/h4>
+&lt;ul>
+&lt;li>Proper syntax in XPath expressions is more strictly enforced (e.g. parameters passed to the &lt;code>concat&lt;/code> function must be separated by commas)&lt;/li>
+&lt;li>The behavior of expressions referencing &lt;em>invalid XPath paths&lt;/em> (both absolute and relative) has changed. Previously, an invalid XPath path (one pointing to a non-existent node) was evaluated as being equivalent to an empty string. So, &lt;code>/invalid/xpath/path = ''&lt;/code> would evaluate to &lt;code>true&lt;/code>. Now that expression will evaluate to &lt;code>false&lt;/code> since invalid XPath paths are no longer considered equivalent to empty strings.
+&lt;ul>
+&lt;li>Validation has been added to &lt;code>cht-conf&lt;/code> that can detect many invalid XPath paths and will provide an error when trying to upload a form.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The value returned for an &lt;em>unanswered&lt;/em> number question, when referenced from an XPath expression, has changed from &lt;code>0&lt;/code> to &lt;code>NaN&lt;/code>. This can affect existing logic comparing number values to &lt;code>0&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h4 id="layout">Layout&lt;/h4>
+&lt;ul>
+&lt;li>The &lt;code>horizontal&lt;/code> and &lt;code>horizontal-compact&lt;/code> appearances are now deprecated (a warning will be displayed by cht-conf when uploading to the server). The &lt;code>columns&lt;/code>, &lt;code>columns-pack&lt;/code>, and &lt;code>columns-n&lt;/code> appearances should be used instead. See &lt;a href="https://docs.getodk.org/form-question-types/#select-widget-with-columns-pack-appearance">the documentation&lt;/a> for more details.&lt;/li>
+&lt;li>&lt;a href="https://docs.getodk.org/form-styling/#markdown">Markdown syntax&lt;/a> is now supported for all question labels (and not just &lt;code>note&lt;/code> fields).&lt;/li>
+&lt;/ul>
+&lt;h4 id="updated-xpath-functions">Updated XPath functions&lt;/h4>
+&lt;ul>
+&lt;li>The &lt;code>format-date&lt;/code> and &lt;code>format-date-time&lt;/code> functions no longer accept month values that are &lt;code>&amp;lt;= 0&lt;/code> (e.g. &lt;code>1984-00-23&lt;/code>). This is notable because some patterns for calculating dates based on an offset of a certain amount of years/months relied on this functionality (e.g. birth date).
+&lt;ul>
+&lt;li>See the details below regarding the new &lt;code>add-date&lt;/code> function for a cleaner way of calculating dates based on an offset.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The behavior of the &lt;code>today&lt;/code> function has changed to return the current date at &lt;em>midnight&lt;/em> in the current timezone instead of at the &lt;em>current time&lt;/em>. To get the current date &lt;em>and current time&lt;/em> use the &lt;code>now&lt;/code> function.&lt;/li>
+&lt;li>&lt;code>decimal-date-time&lt;/code>:
+&lt;ul>
+&lt;li>The behavior of this function has changed with regard to the default timezone used when calculating the decimal value of a date that does not include any timezone information. &lt;em>(Note that the values from basic &lt;code>date&lt;/code> questions do NOT include time zone information.)&lt;/em> Previously, the timezone used in the calculation for dates with no timezone information was UTC. Now, the user&amp;rsquo;s current timezone will be used.
+&lt;ul>
+&lt;li>Practically speaking, this means it is no longer safe to assume that the output from &lt;code>decimal-date-time&lt;/code>, for a value from a basic &lt;code>date&lt;/code> question, will be a whole number. Now it is likely that a &lt;em>decimal value&lt;/em> will be returned (with the numbers after the decimal point representing the offset of the user&amp;rsquo;s timezone from UTC).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Previously this function would accept various string parameters (e.g. date strings with various formats) as input. Now, the only string values it will only accept are ones formatted according to ISO 8601 (e.g. &lt;code>2022-10-03&lt;/code>).
+&lt;ul>
+&lt;li>Strings containing date values should be parsed with the &lt;a href="https://docs.getodk.org/form-operators-functions/#date">&lt;code>date&lt;/code> function&lt;/a> before calling &lt;code>decimal-date-time&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="new-xpath-functions">New XPath functions&lt;/h4>
+&lt;ul>
+&lt;li>Custom CHT functions:
+&lt;ul>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#add-date">&lt;code>add-date&lt;/code>&lt;/a> - Adds the provided number of years/months/days/hours/minutes to a date value.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ODK Functions:
+&lt;ul>
+&lt;li>Repeats and other node sets:
+&lt;ul>
+&lt;li>&lt;a href="https://docs.getodk.org/form-operators-functions/#position">&lt;code>position&lt;/code>&lt;/a> - Returns the current iteration index within a repeat group.&lt;/li>
+&lt;li>&lt;a href="https://docs.getodk.org/form-operators-functions/#count">&lt;code>count&lt;/code>/&lt;code>count-non-empty&lt;/code>&lt;/a> - Returns the number of elements in a repeat group.
+&lt;ul>
+&lt;li>Now is re-calculated when the size of the &lt;code>repeat&lt;/code> changes&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://docs.getodk.org/form-operators-functions/#once">&lt;code>once&lt;/code>&lt;/a> - Returns the value of the given expression if the question&amp;rsquo;s value is empty. Otherwise, returns the current value of the question.&lt;/li>
+&lt;li>&lt;a href="https://docs.getodk.org/form-operators-functions/#checklist">&lt;code>checklist&lt;/code>/&lt;code>weighted-checklist&lt;/code>&lt;/a> - Returns &lt;code>True&lt;/code> when the required number of affirmative responses is given.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="known-issues">Known issues&lt;/h4>
+&lt;ul>
+&lt;li>The answer to a non-relevant question &lt;a href="https://github.com/medic/cht-core/issues/7674">is not immediately cleared&lt;/a> when the question becomes non-relevant and is still provided to XPath expressions that reference the question. When the form is submitted, the non-relevant answers will be cleared and any dependent XPath expressions will be re-evaluated.
+&lt;ul>
+&lt;li>This behavior applies both to questions that were answered and later became non-relevant as well as to questions which have configured default values.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="community-cht-upgrade-helper">Community cht-upgrade-helper&lt;/h4>
+&lt;p>An unofficial &lt;a href="https://github.com/jkuester/cht-upgrade-helper">cht-upgrade-helper&lt;/a> utility has been created by a community member that can help flag form elements that should be manually reviewed before upgrading to &lt;code>4.0.0&lt;/code>. It is not officially supported by Medic and is provided as-is.&lt;/p></description></item><item><title>Apps: Update Collect Forms Remotely</title><link>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/updates/collect-forms-update/</guid><description>
 &lt;p>To do over the air Medic Collect form updates via HTTP rather than sending APKs which have a long manual install process, follow the steps below:&lt;/p>
 &lt;ol>
 &lt;li>Have your xls forms ready in the folder.&lt;/li>
