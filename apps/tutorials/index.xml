@@ -126,23 +126,20 @@ To set all possible variables or store the variables in configuration file, foll
 &lt;/li>
 &lt;/ul>
 &lt;br clear="all">
-&lt;hr></description></item><item><title>Apps: CHT Local Environment Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</guid><description>
+&lt;hr></description></item><item><title>Apps: CHT 4.x Local Environment Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
-&lt;p>This tutorial will take you through setting up a local environment to build and test CHT applications on CHT version 3.9.0. This includes setting up the necessary tools to download and run the CHT public docker image as well as a command line interface tool to manage and build CHT apps.&lt;/p>
+&lt;p>This tutorial will take you through setting up a local environment to build and test CHT applications on CHT version 4.x. This includes setting up the necessary tools to download and run the CHT public docker image as well as a command line interface tool to manage and build CHT apps.&lt;/p>
 &lt;p>By the end of the tutorial you should be able to:&lt;/p>
 &lt;ul>
 &lt;li>View the login page to CHT webapp on localhost&lt;/li>
 &lt;li>Upload default settings to localhost&lt;/li>
 &lt;/ul>
 &lt;/div>
-&lt;ul>
-&lt;li>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
-This guide will only work with CHT 3.x instances. It will be updated to work with 4.x instances at a later date.
+This guide will only work with CHT 4.x instances. See the
+&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/">3.x App Developer Hosting&lt;/a> for setting up comparable 3.x instances.
 &lt;/div>
-&lt;/li>
-&lt;/ul>
 &lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
 &lt;p>The &lt;em>CHT Core Framework&lt;/em> makes it faster to build full-featured, scalable digital health apps by providing a foundation developers can build on. These apps can support most languages, are &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/offline-first/">Offline-First&lt;/a>, and work on basic phones (via SMS), smartphones, tablets, and computers.&lt;/p>
 &lt;p>&lt;em>CHT Project Configurer&lt;/em> also known as &lt;em>&lt;strong>cht-conf&lt;/strong>&lt;/em> is command-line interface tool to manage and configure CHT apps.&lt;/p>
@@ -159,16 +156,20 @@ This guide will only work with CHT 3.x instances. It will be updated to work wit
 &lt;/ul>
 &lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
 &lt;p>Now that you have the dependent tools and software installed, you are ready to set up your CHT local environment.&lt;/p>
-&lt;h3 id="1-create-docker-composeyml">1. Create docker-compose.yml&lt;/h3>
-&lt;p>Open your terminal and navigate to your working folder. Run the command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This will create a copy of the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> file from &lt;code>cht-core&lt;/code>.&lt;/p>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-You can also copy the content of the docker-compose.yml file from this &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml">link&lt;/a>.
-&lt;/div>
-&lt;p>Run the following command inside the directory that you saved the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code>:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f docker-compose-developer-3.x-only.yml up
+&lt;h3 id="1-create-docker-compose-files">1. Create Docker compose files&lt;/h3>
+&lt;p>Open your terminal and run these commands which will create a directory, download the three Docker Compose files and prepare the evironment variables file. You should just be able select all and paste on a command line:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/cht-local-setup/data/couch
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-local-setup
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./data/cht-4-core.yml https://staging.dev.medicmobile.org/_couch/builds/medic%3Amedic%3Amaster/docker-compose%2Fcht-core.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./data/cht-4-couch.yml https://staging.dev.medicmobile.org/_couch/builds/medic%3Amedic%3Amaster/docker-compose%2Fcht-couchdb.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o cht-upgrader.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; ~/cht-local-setup/env &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">DOCKER_CONFIG_PATH=~/cht-local-setup
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_DATA=~/cht-local-setup/data/couch
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">CHT_COMPOSE_PATH=~/cht-local-setup/data
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_USER=medic
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_PASSWORD=password
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Run the following command to start your CHT instance using Docker Compose:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f ~/cht-local-setup/cht-upgrader.yml --env-file ~/cht-local-setup/env up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;figure class="right col-6 col-lg-8">&lt;a href="medic-login.png">
 &lt;img src="medic-login.png"/> &lt;/a>
@@ -238,15 +239,13 @@ This step will erase the default Maternal &amp;amp; Newborn Health Reference App
 &lt;img src="local-ip.TLS.png"/> &lt;/a>
 &lt;/figure>
 &lt;p>With the blank project deployed to your CHT instance, you&amp;rsquo;re ready to start writing your first app. A big part of authoring an app is testing it on a mobile device, likely using the unbranded version of &lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>. In order to test in the APK, your CHT instance needs a valid TLS certificate which the default docker version does not have.&lt;/p>
-&lt;p>To install a valid certificate, open a terminal in the &lt;code>cht-core&lt;/code> directory. Ensure the &lt;code>medic-os&lt;/code> container is running and make this call:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./scripts/add-local-ip-certs-to-docker.sh
+&lt;p>To install a valid certificate, open a terminal in the &lt;code>cht-core&lt;/code> directory. Ensure the CHT instance is running and make this call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./scripts/add-local-ip-certs-to-docker-4.x.sh cht_nginx_1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To see what a before and after looks like, note the screenshot to the left which uses &lt;code>curl&lt;/code> to test the certificate validity.&lt;/p>
 &lt;p>The output of &lt;code>add-local-ip-certs-to-docker.sh&lt;/code> looks like this:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span>Debug: Service &amp;#39;medic-core/nginx&amp;#39; exited with status 143
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Info: Service &amp;#39;medic-core/nginx&amp;#39; restarted successfully
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Success: Finished restarting services in package &amp;#39;medic-core&amp;#39;
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span>cht_nginx_1
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>If no errors output above, certificates successfully installed.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>If just container name is shown above, a fresh local-ip.co certificate was downloaded.
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The IP of your computer is used in the URL of the CHT instance now. For example if your IP is &lt;code>192.168.68.40&lt;/code> then the CHT URL with a valid TLS certificate is &lt;code>192-168-68-40.my.local-ip.co&lt;/code>. See the &lt;a href="http://local-ip.co/">local-ip.co&lt;/a> site to read more about these free to use certificates.&lt;/p>
 &lt;p>When using &lt;code>cht-conf&lt;/code> you can now drop the use of &lt;code>--accept-self-signed-certs&lt;/code>. Further, update the URL to be based on your IP. Using the example IP above, this would be &lt;code>--url=https://medic:password@192-168-68-40.my.local-ip.co&lt;/code>. As well, you can now use this URL to test with the CHT Android app.&lt;/p>
 &lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
