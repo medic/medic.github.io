@@ -1,1 +1,92 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: App Developer Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without losing any data while doing so. To do development on the CHT Core Framework itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/core-developer/">development guide&lt;/a>.&lt;/p>
+&lt;p>To deploy the CHT 3.x in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/ec2-setup-guide/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">Self hosting&lt;/a>. 4.x production hosting guides are coming soon!&lt;/p>
+&lt;/div>
+&lt;h2 id="getting-started">Getting started&lt;/h2>
+&lt;p>Be sure to meet the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">CHT hosting requirements&lt;/a> first. To avoid conflicts, ensure that all other CHT 4.x instances are stopped. To stop ALL containers, you can use&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps -q&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>After meeting these requirements, create a directory and download the developer YAML files in the directory you want to store them. This example uses &lt;code>~/cht-4-app-developer&lt;/code> as the directory:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir ~/cht-4-app-developer &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">cd&lt;/span> ~/cht-4-app-developer
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>You should now have 3 compose files which we can check with &lt;code>ls&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>ls
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht-core.yml cht-couchdb.yml docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To start the first developer CHT instance, run &lt;code>docker-compose&lt;/code>, prepending the needed environment variables:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_COMPOSE_PROJECT_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>app-devl &lt;span style="color:#000">COUCHDB_SECRET&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>foo &lt;span style="color:#000">DOCKER_CONFIG_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span> &lt;span style="color:#000">COUCHDB_DATA&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span>/couchd &lt;span style="color:#000">CHT_COMPOSE_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span> &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This may take some minutes to fully start depending on the speed of the internet connection and speed of the host. This is because docker needs to download all the storage layers for all the containers and the CHT needs to run the first run set up. After downloads and setup has completed, the CHT should be accessible on &lt;a href="https://localhost">https://localhost&lt;/a>. You can log in with username &lt;code>medic&lt;/code> and password &lt;code>password&lt;/code>.&lt;/p>
+&lt;p>When connecting to a new dev CHT instance for the first time, an error will be shown, &amp;ldquo;Your connection is not private&amp;rdquo; (see &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/privacy.error.png">screenshot&lt;/a>). To get past this, click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
+&lt;h2 id="running-the-nth-cht-instance">Running the Nth CHT instance&lt;/h2>
+&lt;p>After running the first instance of the CHT, it&amp;rsquo;s easy to run as many more as are needed. This is achieved by specifying different:&lt;/p>
+&lt;ul>
+&lt;li>port for &lt;code>HTTP&lt;/code> redirects (&lt;code>CHT_HTTP&lt;/code>)&lt;/li>
+&lt;li>port for &lt;code>HTTPS&lt;/code> traffic (&lt;code>NGINX_HTTP_PORT&lt;/code>)&lt;/li>
+&lt;li>directory for storing the compose files and CouchDB files&lt;/li>
+&lt;/ul>
+&lt;p>Assuming you want to start a new project called &lt;code>the_second&lt;/code> and start the instance on &lt;code>HTTP&lt;/code> port &lt;code>8081&lt;/code> and &lt;code>HTTPS&lt;/code> port &lt;code>8443&lt;/code>, we would first create a new directory and download the same files:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir ~/the_second &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">cd&lt;/span> ~/the_second
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then, we would use the same &lt;code>docker-compose&lt;/code> command as above, but this time specify the ports:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">NGINX_HTTP_PORT&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span> &lt;span style="color:#000">NGINX_HTTPS_PORT&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8444&lt;/span> &lt;span style="color:#000">CHT_COMPOSE_PROJECT_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>app-devl &lt;span style="color:#000">COUCHDB_SECRET&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>foo &lt;span style="color:#000">DOCKER_CONFIG_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span> &lt;span style="color:#000">COUCHDB_DATA&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span>/couchd &lt;span style="color:#000">CHT_COMPOSE_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">PWD&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span> &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The second instance is now accessible at &lt;a href="https://localhost:8444">https://localhost:8444&lt;/a> and again using username &lt;code>medic&lt;/code> and password &lt;code>password&lt;/code> to login.&lt;/p>
+&lt;h2 id="the-env-file">The &lt;code>.env&lt;/code> file&lt;/h2>
+&lt;p>Often times it&amp;rsquo;s convenient to use revision control, like GitHub, to store and publish changes in a CHT app. A nice compliment to this is to store the specifics on how to run the &lt;code>docker-compose&lt;/code> command for each app. By using a shared &lt;code>docker-compose&lt;/code> configuration for all developers on the same app, it avoids any port collisions and enables all developers to have a unified configuration.&lt;/p>
+&lt;p>Using the above &lt;code>the_second&lt;/code> sample project, we can create a file &lt;code>~/the_second/.env&lt;/code> with this contents:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">NGINX_HTTP_PORT&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">NGINX_HTTPS_PORT&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8444&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_COMPOSE_PROJECT_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>second
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_SECRET&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>foo
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">DOCKER_CONFIG_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>./
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_DATA&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>./couchd
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_COMPOSE_PATH&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>./
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now it&amp;rsquo;s easy to boot this environment:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/the_second
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="switching--concurrent-projects">Switching &amp;amp; concurrent projects&lt;/h2>
+&lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code> and &lt;code>stop&lt;/code> all the project&amp;rsquo;s services:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker stop second_api_1 second_cht-upgrade-service_1 second_couchdb_1 second_haproxy_1 second_healthcheck_1 second_nginx_1 second_sentinel_1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Alternately, you can stop ALL containers (even non-CHT ones!) with &lt;code>docker kill $(docker ps -q)&lt;/code>. Then start the other CHT project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and other environment variables as shown above.&lt;/p>
+&lt;p>To run projects concurrently open a second terminal and start the second project so you don&amp;rsquo;t have to cancel and &lt;code>stop&lt;/code> the first project. Remember to avoid port conflicts!&lt;/p>
+&lt;p>To read more about how &lt;code>docker-compose&lt;/code> works, be sure to read the &lt;a href="https://docs.communityhealthtoolkit.org/core/guides/docker-setup/#helpful-docker-commands">helpful docker-compose commands&lt;/a> page.&lt;/p>
+&lt;h2 id="cht-docker-helper-for-4x">CHT Docker Helper for 4.x&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>CHT Docker Helper for CHT 4.x is in Beta. Please use with care!&lt;/p>
+&lt;p>To use a stable version with CHT 3.x, see the earlier &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/#cht-docker-helper">CHT Docker Helper page&lt;/a>&lt;/p>
+&lt;/div>
+&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts downloads 3 compose files and builds an &lt;code>.env&lt;/code> file used above. This greatly eases starting your first CHT instance with a simple text based GUI:&lt;/p>
+&lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;amp;ldquo;Successfully started my_first_project&amp;amp;rdquo; message is shown and denotes the login is &amp;amp;ldquo;medic&amp;amp;rdquo; and the password is &amp;amp;ldquo;password&amp;amp;rdquo;.">&lt;/p>
+&lt;p>This script brings a lot of benefits with it:&lt;/p>
+&lt;ul>
+&lt;li>You only have to download one bash script&lt;/li>
+&lt;li>It has been tested to work on Windows, macOS and Linux&lt;/li>
+&lt;li>All compose files and images will be downloaded automatically for you&lt;/li>
+&lt;li>All networks, storage volumes and containers will be created&lt;/li>
+&lt;li>A valid TLS certificate will be installed, allowing you to easily test on with CHT Android natively on a mobile device&lt;/li>
+&lt;/ul>
+&lt;p>Currently, the CHT Docker Helper for 4.0 is in beta, and comes with some caveats:&lt;/p>
+&lt;ul>
+&lt;li>it is not yet available in &lt;code>master&lt;/code>&lt;/li>
+&lt;li>it does not account for port conflicts, so you need to manually resolve them yourself by editing the &lt;code>*.env&lt;/code> files&lt;/li>
+&lt;li>upgrades are not yet supported&lt;/li>
+&lt;li>concurrently running multiple instances is not yet supported&lt;/li>
+&lt;/ul>
+&lt;p>To get started using it:&lt;/p>
+&lt;ol>
+&lt;li>Clone the &lt;a href="https://github.com/medic/cht-core/">CHT Core&lt;/a> repo&lt;/li>
+&lt;li>Checkout the &lt;code>7852-cht-4.x-docker-helper&lt;/code> branch&lt;/li>
+&lt;li>&lt;code>cd&lt;/code> into the &lt;code>cht-core/scripts/docker-helper-4.x/&lt;/code> directory&lt;/li>
+&lt;li>Run the script with &lt;code>./cht-docker-compose.sh&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>Here is a video of the beta version being run on 8 Nov 2022. The video references &lt;code>lazydocker&lt;/code> which is &lt;a href="https://github.com/jesseduffield/lazydocker">a great way&lt;/a> to monitor and control your local docker environment:&lt;/p>
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+&lt;iframe src="https://www.youtube.com/embed/-x9zr8R2hP4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
+&lt;/div>
+&lt;hr></description></item></channel></rss>
