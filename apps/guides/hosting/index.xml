@@ -57,10 +57,10 @@ Skip this step if you&amp;rsquo;re following the &lt;a href="https://docs.commun
 &lt;/div>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
-These steps apply to both 3.x and 4.x CHT core development
+These steps apply to both 3.x and 4.x CHT core development, unless stated otherwise.
 &lt;/div>
 &lt;h2 id="the-happy-path-installation">The Happy Path Installation&lt;/h2>
-&lt;p>This CHT Core developer guide will have you install NodeJS, npm, Grunt and CouchDB (via Docker) on your local workstation. These instructions should work verbatim on Ubuntu 18-22 (see &lt;a href="#ubuntu-1804">Ubuntu 18 note&lt;/a>), but will need tweaks for MacOS (via &lt;code>brew&lt;/code>) or Windows (via WSL2).&lt;/p>
+&lt;p>This CHT Core developer guide will have you install NodeJS, npm, Grunt and CouchDB (via Docker) on your local workstation. These instructions should work verbatim on Ubuntu 18-22 (see &lt;a href="#ubuntu-1804">Ubuntu 18 note&lt;/a>), but will need tweaks for MacOS (via &lt;code>brew&lt;/code>, see &lt;a href="#macos--123">MacOS &amp;gt; 12.3 note&lt;/a>) or Windows (via WSL2).&lt;/p>
 &lt;h3 id="install-nodejs-npm-grunt-and-docker">Install NodeJS, npm, grunt and Docker&lt;/h3>
 &lt;p>First, update your current Ubuntu packages and install some supporting tools via &lt;code>apt&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
@@ -86,7 +86,9 @@ These steps apply to both 3.x and 4.x CHT core development
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="couchdb-setup-in-docker">CouchDB Setup in Docker&lt;/h3>
 &lt;p>Before we get started, let&amp;rsquo;s run the simple &lt;code>hello-world&lt;/code> Docker container. This will ensure docker is working as expected and output &amp;ldquo;Hello from Docker!&amp;rdquo; as well as some other intro text:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run hello-world
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now that we know Docker is set up, let&amp;rsquo;s start our CouchDB container. Note this will run in the background and store its data in &lt;code>/home/YOUR-USER/cht-docker&lt;/code>. The login for your CHT instance will be &lt;code>medic&lt;/code> and the password will be &lt;code>password&lt;/code>:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now that we know Docker is set up, let&amp;rsquo;s start our CouchDB container.&lt;/p>
+&lt;h4 id="couchdb-setup-in-cht-3x">CouchDB Setup in CHT 3.x&lt;/h4>
+&lt;p>Note this will run in the background and store its data in &lt;code>/home/YOUR-USER/cht-docker&lt;/code>. The login for your CHT instance will be &lt;code>medic&lt;/code> and the password will be &lt;code>password&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v ~/cht-docker/local.d:/opt/couchdb/data -v ~/cht-docker/local.d:/opt/couchdb/etc/local.d apache/couchdb:2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s ensure CouchDB is set up with a test &lt;code>curl&lt;/code> call. This should show &amp;ldquo;nonode@nohost&amp;rdquo; in JSON:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -X GET &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_membership&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq
@@ -96,15 +98,23 @@ These steps apply to both 3.x and 4.x CHT core development
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#000">$0&lt;/span>rc
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To ensure these to exports and sourcing your rc file worked, echo the values back out. You should see &lt;code>nonode@nohost&lt;/code> and &lt;code>http://medic:password@localhost:5984/medic&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_URL&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>You need to harden CouchDB with a &lt;code>grunt&lt;/code> call, required even in development:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grunt secure-couchdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_node/&lt;/span>&lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span>&lt;span style="color:#4e9a06">/_config/httpd/WWW-Authenticate&amp;#34;&lt;/span> -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;Basic realm=\&amp;#34;administrator\&amp;#34;&amp;#34;&amp;#39;&lt;/span> -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-setup-in-cht-4x">CouchDB Setup in CHT 4.x&lt;/h4>
+&lt;p>Create a &lt;code>docker-compose.yml&lt;/code> file under the &lt;code>couchdb&lt;/code> folder.&lt;/p>
+&lt;p>Copy the content of the CouchDB &lt;code>docker-compose&lt;/code> file from the of the CHT release version you are trying to run locally. For example, this is &lt;a href="https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose%2Fcht-couchdb-clustered.yml">the file&lt;/a> for the most recent build.&lt;/p>
+&lt;p>Startup CouchDB:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> couchdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="cht-core-cloning-and-setup">CHT Core Cloning and Setup&lt;/h3>
 &lt;p>Clone the main CHT Core repo from GitHub and change directories into it:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-core ~/cht-core
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install dependencies and perform other setup tasks via an &lt;code>npm&lt;/code> command. Note this command may take many minutes. Be patient!&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm ci
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>We need to harden couch with a &lt;code>grunt&lt;/code> call, required even in development:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grunt secure-couchdb
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_node/&lt;/span>&lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span>&lt;span style="color:#4e9a06">/_config/httpd/WWW-Authenticate&amp;#34;&lt;/span> -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;Basic realm=\&amp;#34;administrator\&amp;#34;&amp;#34;&amp;#39;&lt;/span> -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you encounter conflicting dependencies, run the following command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm ci --legacy-peer-deps
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
 &lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development. In the first terminal, run:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt
@@ -165,7 +175,7 @@ These steps apply to both 3.x and 4.x CHT core development
 &lt;ul>
 &lt;li>&lt;code>COUCH_URL&lt;/code>: the full authenticated url to the &lt;code>medic&lt;/code> DB. Locally this would be &lt;code>http://myadminuser:myadminpass@localhost:5984/medic&lt;/code>&lt;/li>
 &lt;li>&lt;code>COUCH_NODE_NAME&lt;/code>: the name of your CouchDB&amp;rsquo;s node. The Docker image default is &lt;code>nonode@nohost&lt;/code>. Other installations may use &lt;code>couchdb@127.0.0.1&lt;/code>. You can find out by querying &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#membership">CouchDB&amp;rsquo;s membership API&lt;/a>&lt;/li>
-&lt;li>(optionally) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined we use &lt;code>5988&lt;/code>&lt;/li>
+&lt;li>(optionally) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined, the port defaults to &lt;code>5988&lt;/code>&lt;/li>
 &lt;li>(optionally) &lt;code>CHROME_BIN&lt;/code>: only required if &lt;code>grunt unit&lt;/code> or &lt;code>grunt e2e&lt;/code> complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
 &lt;/ul>
 &lt;p>How to permanently define environment variables depends on your OS and shell (e.g. for bash you can put them &lt;code>~/.bashrc&lt;/code>). You can temporarily define them with &lt;code>export&lt;/code>:&lt;/p>
