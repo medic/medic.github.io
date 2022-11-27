@@ -1,21 +1,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Overview of CHT Components</title><link>https://docs.communityhealthtoolkit.org/core/overview/</link><description>Recent content in Overview of CHT Components on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/core/overview/index.xml" rel="self" type="application/rss+xml"/><item><title>Core: Architecture of CHT Instances</title><link>https://docs.communityhealthtoolkit.org/core/overview/architecture/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/architecture/</guid><description>
 &lt;h2 id="overview">Overview&lt;/h2>
-&lt;p>&lt;img src="../../img/architecture.png" alt="Architecture of a CHT project">&lt;/p>
-&lt;h2 id="server-side">Server side&lt;/h2>
-&lt;h3 id="couchdb">CouchDB&lt;/h3>
-&lt;p>A free and open source NoSQL database we use to store all our data, configuration, and even the application code. CouchDB is really good at replication which is the process of sending the data to another database and back again. See more at the &lt;a href="http://couchdb.apache.org">CouchDB&lt;/a> site.&lt;/p>
-&lt;h3 id="api">api&lt;/h3>
-&lt;p>A NodeJS service which runs on the server as a wrapper around CouchDB. It provides security and APIs for browsers and integrations. It also includes a custom implementation of filtered replication to allow it to support more concurrent users. See more at the &lt;a href="https://github.com/medic/cht-core/tree/master/api">CHT Core API repo&lt;/a> on Github.&lt;/p>
-&lt;h3 id="sentinel">sentinel&lt;/h3>
+&lt;p>&lt;img src="architecture.png" alt="Architecture of a CHT project">&lt;/p>
+&lt;h2 id="server">Server&lt;/h2>
+&lt;h3 id="cht-core-framework">CHT Core Framework&lt;/h3>
+&lt;p>The cht-core product is the primary component of the CHT. The server comes with authentication, role based authorization, data security, and a range of protected data access endpoints. Read more detail in &lt;a href="https://github.com/medic/cht-core">cht-core GitHub repository&lt;/a>.&lt;/p>
+&lt;h4 id="api">API&lt;/h4>
+&lt;p>A NodeJS service which runs on the server and provides security and APIs for browsers and integrations. It also includes a custom implementation of filtered replication to allow it to support more concurrent users. See more at the &lt;a href="https://github.com/medic/cht-core/tree/master/api">CHT Core API repo&lt;/a> on Github.&lt;/p>
+&lt;h4 id="sentinel">Sentinel&lt;/h4>
 &lt;p>Another NodeJS service running on the server, sentinel performs actions called transitions every time a document in CouchDB is added or modified. Some examples are validations, generating scheduled messages, automatic responses, creating patients, and sending alerts. See more at the &lt;a href="https://github.com/medic/cht-core/tree/master/sentinel">CHT Core Sentinel repo&lt;/a> on Github.&lt;/p>
-&lt;h3 id="postgresql">PostgreSQL&lt;/h3>
-&lt;p>A free and open source SQL database that we use for analytics queries for display in tools like klipfolio. We created a library called &lt;a href="https://github.com/medic/couch2pg">couch2pg&lt;/a> to replicate data from CouchDB into PostgreSQL. See more at the &lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a> site.&lt;/p>
-&lt;h2 id="client-side">Client side&lt;/h2>
-&lt;h3 id="cht-core">cht-core&lt;/h3>
-&lt;p>&lt;a href="https://github.com/medic/cht-core">cht-core&lt;/a> is composed of the following web applications:&lt;/p>
+&lt;h4 id="couchdb">CouchDB&lt;/h4>
+&lt;p>A free and open source NoSQL database used as the primary store for all app data and configuration. This can be multiple instances clustered together for additional scalability. CouchDB is really good at replication which is the process of sending the data to another database and back again, which makes it ideal for replicating data to the phone for offline access. See more at the &lt;a href="http://couchdb.apache.org">CouchDB&lt;/a> site.&lt;/p>
+&lt;h4 id="nginx">NGINX&lt;/h4>
+&lt;p>&lt;a href="https://www.nginx.com/">NGINX&lt;/a> provides SSL termination and routes requests to API.&lt;/p>
+&lt;h4 id="haproxy">HAProxy&lt;/h4>
+&lt;p>&lt;a href="http://www.haproxy.org/">HAProxy&lt;/a> provides audit logging for any request that makes it to CouchDB so any data access or modification can be validated at a later date.&lt;/p>
+&lt;h3 id="cht-upgrade-service">CHT Upgrade Service&lt;/h3>
+&lt;p>The CHT Upgrade Service is used within the CHT to update individual Docker containers when an upgrade is requested. Read more detail in the &lt;a href="https://github.com/medic/cht-upgrade-service/">cht-upgrade-service GitHub repository&lt;/a>.&lt;/p>
+&lt;h3 id="cht-sync">CHT Sync&lt;/h3>
+&lt;p>A suite of tools for extracting and normalizing data from the Core Framework&amp;rsquo;s CouchDB, and rendering the data in analytics dashboards to visualize key data for a CHT deployment. Read more detail in &lt;a href="https://github.com/medic/cht-sync">cht-sync GitHub repository&lt;/a>.&lt;/p>
+&lt;h4 id="logstash-and-postgrest">Logstash and PostgREST&lt;/h4>
+&lt;p>&lt;a href="https://www.elastic.co/logstash/">Logstash&lt;/a> streams data from CouchDB and forwards it to &lt;a href="https://postgrest.org/en/stable/">PostgREST&lt;/a> which provides REST endpoints to store the data in the PostreSQL database.&lt;/p>
+&lt;h4 id="postgresql">PostgreSQL&lt;/h4>
+&lt;p>A free and open source SQL database used for analytics queries. See more at the &lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a> site.&lt;/p>
+&lt;h4 id="dbt">DBT&lt;/h4>
+&lt;p>&lt;a href="https://www.getdbt.com/">DBT&lt;/a> is used to ingest raw JSON data from the postgres database and normalize it into a relational schema to make it much easier to query.&lt;/p>
+&lt;h4 id="superset">Superset&lt;/h4>
+&lt;p>&lt;a href="https://superset.apache.org/">Apache Superset&lt;/a> is a free an open source platform for creating data dashboards.&lt;/p>
+&lt;h2 id="client">Client&lt;/h2>
+&lt;h3 id="cht-core-framework-1">CHT Core Framework&lt;/h3>
+&lt;p>The CHT Core Framework provides two web applications: the &lt;a href="#cht-web-application">CHT Web App&lt;/a> for care teams and program staff, and &lt;a href="#app-management">App Management&lt;/a> for program administrators.&lt;/p>
 &lt;h4 id="cht-web-application">CHT Web Application&lt;/h4>
-&lt;p>The CHT Web Application is used by Community Health Workers and provides a large variety of &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/">features&lt;/a>.&lt;/p>
-&lt;p>View the source code in &lt;a href="https://github.com/medic/cht-core/tree/master/webapp">our GitHub repository&lt;/a>.&lt;/p>
+&lt;p>The CHT Web Application is used by Community Health Workers and provides a large variety of &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/">features&lt;/a>. View the source code in &lt;a href="https://github.com/medic/cht-core/tree/master/webapp">our GitHub repository&lt;/a>.&lt;/p>
 &lt;h5 id="technology">Technology&lt;/h5>
 &lt;p>The CHT Web Application is &lt;a href="https://angular.io/guide/rx-library">reactive&lt;/a>, responsive and a single page application built with &lt;a href="https://angular.io/">Angular&lt;/a> and &lt;a href="https://ngrx.io">NgRx&lt;/a> frameworks. Additionally, it uses the following technology:&lt;/p>
 &lt;table>
