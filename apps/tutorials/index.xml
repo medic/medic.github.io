@@ -158,18 +158,19 @@ This guide will only work with CHT 4.x instances. See the
 &lt;p>Now that you have the dependent tools and software installed, you are ready to set up your CHT local environment.&lt;/p>
 &lt;h3 id="1-create-docker-compose-files">1. Create Docker compose files&lt;/h3>
 &lt;p>Open your terminal and run these commands which will create a directory, download the three Docker Compose files and prepare the evironment variables file. You should just be able select all and paste on a command line:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/cht-local-setup/data/couch
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/cht-local-setup/couch-data/ &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p ~/cht-local-setup/core-couch/ &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p ~/cht-local-setup/upgrade/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-local-setup
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./data/cht-4-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose%2Fcht-core.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./data/cht-4-couch.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose%2Fcht-couchdb.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o cht-upgrader.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; ~/cht-local-setup/env &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">DOCKER_CONFIG_PATH=~/cht-local-setup
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_DATA=~/cht-local-setup/data/couch
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">CHT_COMPOSE_PATH=~/cht-local-setup/data
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./core-couch/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:master/docker-compose/cht-core.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./core-couch/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:master/docker-compose/cht-couchdb.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./upgrade/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; ~/cht-local-setup/upgrade/.env &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">DOCKER_CONFIG_PATH=~/cht-local-setup/core-couch/
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_DATA=~/cht-local-setup/data/couch-data
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">CHT_COMPOSE_PATH=~/cht-local-setup/core-couch/
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_USER=medic
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_PASSWORD=password
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">EOF&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Run the following command to start your CHT instance using Docker Compose:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f ~/cht-local-setup/cht-upgrader.yml --env-file ~/cht-local-setup/env up
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-local-setup/upgrade/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;figure class="right col-6 col-lg-8">&lt;a href="medic-login.png">
 &lt;img src="medic-login.png"/> &lt;/a>
