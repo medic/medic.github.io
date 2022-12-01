@@ -58,33 +58,98 @@
 &lt;h2 id="cht-docker-helper-for-4x">CHT Docker Helper for 4.x&lt;/h2>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
-&lt;p>CHT Docker Helper for CHT 4.x is in Beta. Please use with care!&lt;/p>
-&lt;p>To use a stable version with CHT 3.x, see the earlier &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/#cht-docker-helper">CHT Docker Helper page&lt;/a>&lt;/p>
+This is for CHT 4.x. To use a CHT 3.x version, see the earlier &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/#cht-docker-helper">CHT Docker Helper page&lt;/a>
 &lt;/div>
-&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts downloads 3 compose files and builds an &lt;code>.env&lt;/code> file used above. This greatly eases starting your first CHT instance with a simple text based GUI:&lt;/p>
+&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts downloads 3 compose files and builds an &lt;code>.env&lt;/code> file used above. This greatly eases starting your first CHT instance with a simple text based GUI which works on Windows (WSL2), macOS (both x86 and Apple Silicon) and Linux.&lt;/p>
 &lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;amp;ldquo;Successfully started my_first_project&amp;amp;rdquo; message is shown and denotes the login is &amp;amp;ldquo;medic&amp;amp;rdquo; and the password is &amp;amp;ldquo;password&amp;amp;rdquo;.">&lt;/p>
 &lt;p>This script brings a lot of benefits with it:&lt;/p>
 &lt;ul>
 &lt;li>You only have to download one bash script&lt;/li>
-&lt;li>It has been tested to work on Windows, macOS and Linux&lt;/li>
 &lt;li>All compose files and images will be downloaded automatically for you&lt;/li>
 &lt;li>All networks, storage volumes and containers will be created&lt;/li>
 &lt;li>A valid TLS certificate will be installed, allowing you to easily test on with CHT Android natively on a mobile device&lt;/li>
+&lt;li>An unused port is automatically chosen for you when creating a new project. No more manually looking at your existing &lt;code>.env&lt;/code> files!&lt;/li>
 &lt;/ul>
-&lt;p>Currently, the CHT Docker Helper for 4.0 is in beta, and comes with some caveats:&lt;/p>
-&lt;ul>
-&lt;li>it is not yet available in &lt;code>master&lt;/code>&lt;/li>
-&lt;li>it does not account for port conflicts, so you need to manually resolve them yourself by editing the &lt;code>*.env&lt;/code> files&lt;/li>
-&lt;li>upgrades are not yet supported&lt;/li>
-&lt;li>concurrently running multiple instances is not yet supported&lt;/li>
-&lt;/ul>
+&lt;h3 id="installing">Installing&lt;/h3>
 &lt;p>To get started using it:&lt;/p>
 &lt;ol>
 &lt;li>Clone the &lt;a href="https://github.com/medic/cht-core/">CHT Core&lt;/a> repo&lt;/li>
-&lt;li>Checkout the &lt;code>7852-cht-4.x-docker-helper&lt;/code> branch&lt;/li>
-&lt;li>&lt;code>cd&lt;/code> into the &lt;code>cht-core/scripts/docker-helper-4.x/&lt;/code> directory&lt;/li>
-&lt;li>Run the script with &lt;code>./cht-docker-compose.sh&lt;/code>&lt;/li>
+&lt;li>When you want to check for updates, just run &lt;code>git pull orign&lt;/code> in the &lt;code>cht-core&lt;/code> directory.&lt;/li>
 &lt;/ol>
+&lt;p>If you want a more stand-alone version, you can &lt;code>curl&lt;/code> the bash script directly, but you can&amp;rsquo;t use &lt;code>git&lt;/code> to easily update it then:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper-4.x/cht-docker-compose.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="usage">Usage&lt;/h3>
+&lt;p>Always run the script from the directory where it lives. If you launch it from a different directory, relative paths will fail:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Do&lt;/th>
+&lt;th>Don&amp;rsquo;t&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>./cht-docker-compose.sh&lt;/code>&lt;/td>
+&lt;td>&lt;code>./docker-helper-4.x/cht-docker-compose.sh&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="launching">Launching&lt;/h4>
+&lt;p>Run the script with:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./cht-docker-compose.sh
+&lt;/code>&lt;/pre>&lt;p>The first time you run, you will be prompted to create a new project. Here&amp;rsquo;s what that looks like:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./cht-docker-compose.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Would you like to initialize a new project &lt;span style="color:#ce5c00;font-weight:bold">[&lt;/span>y/N&lt;span style="color:#ce5c00;font-weight:bold">]&lt;/span>? y
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>How &lt;span style="color:#204a87;font-weight:bold">do&lt;/span> you want to name the project? &lt;span style="color:#0000cf;font-weight:bold">4&lt;/span> OH The First
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Downloading compose files ... &lt;span style="color:#204a87;font-weight:bold">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Creating network &lt;span style="color:#4e9a06">&amp;#34;4_oh_the_first-cht-net&amp;#34;&lt;/span> with the default driver
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Creating my_first_cht_project-dir_cht-upgrade-service_1 ... &lt;span style="color:#204a87;font-weight:bold">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Starting project &lt;span style="color:#4e9a06">&amp;#34;4_oh_the_first&amp;#34;&lt;/span>. First run takes a &lt;span style="color:#204a87;font-weight:bold">while&lt;/span>. Will try &lt;span style="color:#204a87;font-weight:bold">for&lt;/span> up to five minutes........
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> --------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Success! &lt;span style="color:#4e9a06">&amp;#34;4_oh_the_first&amp;#34;&lt;/span> is &lt;span style="color:#204a87">set&lt;/span> up:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> https://127-0-0-1.my.local-ip.co:10444/ &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>CHT&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> https://127-0-0-1.my.local-ip.co:10444/_utils/ &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>Fauxton&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Login: medic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Password: password
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> --------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Start existing project
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ./cht-docker-compose.sh ENV-FILE.env
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Stop and keep project:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ./cht-docker-compose.sh ENV-FILE.env stop
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Stop and destroy all project data:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ./cht-docker-compose.sh ENV-FILE.env destroy
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Have a great day!
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you have many existing projects, you can specify them to launch them directly. If you had a project called &lt;code>4_oh_the_first&lt;/code> you would run:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./cht-docker-compose.sh 4_oh_the_first.env
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="stopping">Stopping&lt;/h4>
+&lt;p>When you&amp;rsquo;re done with a project, it&amp;rsquo;s good to stop all the containers to reduce load on your computer. Do this by specifying the project and the &lt;code>down&lt;/code> command. This command will simply stop the active Docker containers, and not delete any data. Using our existing example &lt;code>4_oh_the_first&lt;/code> project, you would call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./cht-docker-compose.sh 4_oh_the_first.env down
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="destroying">Destroying&lt;/h4>
+&lt;p>When you want to &lt;strong>permanently delete all files and all data&lt;/strong> for a project, specify the project and the &lt;code>destroy&lt;/code> command. Using our existing example &lt;code>4_oh_the_first&lt;/code> project, you would call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./cht-docker-compose.sh 4_oh_the_first.env destroy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be sure you want to do this, there is no &amp;ldquo;are you sure?&amp;rdquo; prompt and it will delete all your data.&lt;/p>
+&lt;p>Also note that this command will use the &lt;code>sudo&lt;/code> command when deleting the CouchDB data, so it may prompt for your password.&lt;/p>
+&lt;h3 id="file-locations">File locations&lt;/h3>
+&lt;p>The bash script keeps files in two places:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>*.env&lt;/code> files&lt;/strong> - the same directory as the bash script.&lt;/li>
+&lt;li>&lt;strong>&lt;code>~/medic/cht-docker/&lt;/code> files&lt;/strong> - in your home directory, a sub-directory is created for each project. Within each project directory, a &lt;code>compose&lt;/code> directory has the two compose files and the &lt;code>couch&lt;/code> directory has the CouchDB datafiles.&lt;/li>
+&lt;/ul>
+&lt;p>While you can manually remove any of these, it&amp;rsquo;s best to use the &lt;code>destroy&lt;/code> command above to ensure all related data files are deleted too.&lt;/p>
+&lt;h3 id="video">Video&lt;/h3>
 &lt;p>Here is a video of the beta version being run on 8 Nov 2022. The video references &lt;code>lazydocker&lt;/code> which is &lt;a href="https://github.com/jesseduffield/lazydocker">a great way&lt;/a> to monitor and control your local docker environment:&lt;/p>
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/-x9zr8R2hP4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
