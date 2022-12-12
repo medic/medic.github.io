@@ -730,4 +730,124 @@ If you don&amp;rsquo;t have an API token, please contact a Medic developer. Plea
 &lt;p>To be done &lt;em>only&lt;/em> by updating messages-en.properties and importing to POEditor through the CLI tool.&lt;/p>
 &lt;h2 id="exporting-changes-from-poeditor-to-github">Exporting changes from POEditor to GitHub&lt;/h2>
 &lt;p>To be done &lt;em>only&lt;/em> by exporting all translations through the CLI tool.
-If you don&amp;rsquo;t have an API token, please contact a Medic developer. Please do not disclose this API token to anyone else.&lt;/p></description></item></channel></rss>
+If you don&amp;rsquo;t have an API token, please contact a Medic developer. Please do not disclose this API token to anyone else.&lt;/p></description></item><item><title>Core: Docker Image Setup</title><link>https://docs.communityhealthtoolkit.org/core/overview/docker-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/docker-setup/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide will only work with CHT 3.x instances. It will be updated to work with 4.x instances at a later date.
+&lt;/div>
+&lt;p>This document helps to download and run the public docker image for CHT applications.&lt;/p>
+&lt;h2 id="install-docker">Install Docker&lt;/h2>
+&lt;p>Please be sure &lt;code>docker&lt;/code> and &lt;code>docker-compose&lt;/code> are &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#docker">installed&lt;/a>.&lt;/p>
+&lt;h2 id="use-docker-compose">Use Docker-Compose:&lt;/h2>
+&lt;p>In the location you would like to host your configuration files, create a file &lt;code>docker-compose-developer-3.x-only.yml&lt;/code>:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Use the &lt;code>curl&lt;/code> command line tool:&lt;/p>
+&lt;pre tabindex="0">&lt;code>curl https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Alternately, if you do not have &lt;code>curl&lt;/code>, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml">right click this link&lt;/a> and choose &amp;ldquo;Save link as&amp;hellip;&amp;rdquo; and specify the correct location to save.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>Export a password for admin user named &lt;code>medic&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>export DOCKER_COUCHDB_ADMIN_PASSWORD=&amp;lt;random_pw&amp;gt;
+&lt;/code>&lt;/pre>&lt;h3 id="launch-docker-compose-containers">Launch docker-compose containers&lt;/h3>
+&lt;p>Inside the directory that you saved the above &lt;code>docker-compose-developer-3.x-only.yml&lt;/code>, run:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker-compose -f docker-compose-developer-3.x-only.yml up
+&lt;/code>&lt;/pre>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+In certain shells, docker-compose may not interpolate the admin password that was exported above. In that case, your admin user had a password automatically generated. Note the &lt;code>New CouchDB Administrative User&lt;/code> and &lt;code>New CouchDB Administrative Password&lt;/code> in the output terminal. You can retrieve these via running &lt;code>docker logs medic-os&lt;/code> and searching the terminal.
+&lt;/div>
+&lt;p>Once containers are setup, please run the following command from your host terminal:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker exec -it medic-os /bin/bash -c &amp;#34;sed -i &amp;#39;s/--install=3.9.0/--complete-install/g&amp;#39; /srv/scripts/horticulturalist/postrun/horticulturalist&amp;#34;
+docker exec -it medic-os /bin/bash -c &amp;#34;/boot/svc-stop medic-core openssh &amp;amp;&amp;amp; /boot/svc-stop medic-rdbms &amp;amp;&amp;amp; /boot/svc-stop medic-couch2pg&amp;#34;
+&lt;/code>&lt;/pre>&lt;p>The first command fixes a postrun script for horticulturalist to prevent unique scenarios of re-install.
+The second command stops extra services that you will not need.&lt;/p>
+&lt;h3 id="visit-your-project">Visit your project&lt;/h3>
+&lt;p>Open a browser to: &lt;a href="https://localhost">https://localhost&lt;/a>&lt;/p>
+&lt;p>You will have to click to through the SSL Security warning. Click Advanced -&amp;gt; Continue to site.&lt;/p>
+&lt;p>Read about &lt;a href="https://docs.communityhealthtoolkit.org/apps/">CHT Applications&lt;/a> to build and deploy your app.&lt;/p>
+&lt;h3 id="delete--re-install">Delete &amp;amp; Re-Install&lt;/h3>
+&lt;p>Stop containers:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker-compose down&lt;/code> or &lt;code>docker stop medic-os &amp;amp;&amp;amp; docker stop haproxy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Remove containers:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker-compose rm&lt;/code> or &lt;code>docker rm medic-os &amp;amp;&amp;amp; docker rm haproxy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Clean data volume:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker volume rm medic-data&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>After following the above three commands, you can re-run &lt;code>docker-compose -f docker-compose-developer-3.x-only.yml up&lt;/code> and create a fresh install (no previous data present)&lt;/p>
+&lt;h2 id="port-conflicts">Port Conflicts&lt;/h2>
+&lt;p>In case you are already running services on HTTP(80) and HTTPS(443), you will have to map new ports to the &lt;code>medic-os&lt;/code> container.&lt;/p>
+&lt;p>Turn down and remove all existing containers that were started:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker-compose down &amp;amp;&amp;amp; docker-compose rm&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>To find out which service is using a conflicting port:
+On Linux:&lt;/p>
+&lt;pre tabindex="0">&lt;code>sudo netstat -plnt | grep &amp;#39;:&amp;lt;port&amp;gt;&amp;#39;
+&lt;/code>&lt;/pre>&lt;p>On Mac (10.10 and above):&lt;/p>
+&lt;pre tabindex="0">&lt;code>sudo lsof -iTCP -sTCP:LISTEN -n -P | grep &amp;#39;:&amp;lt;port&amp;gt;&amp;#39;
+&lt;/code>&lt;/pre>&lt;p>You can either kill the service which is occupying HTTP/HTTPS ports, or run the container with forwarded ports that are free.
+Stop your containers and relaunch with different ports. Here it&amp;rsquo;s shown launching them with ports &lt;code>8080&lt;/code> and &lt;code>8443&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>CHT_HTTP=8080 CHT_HTTPS=8443 docker-compose up
+&lt;/code>&lt;/pre>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.
+&lt;/div>
+&lt;h2 id="helpful-docker-commands">Helpful Docker commands&lt;/h2>
+&lt;h3 id="restart-services">Restart services&lt;/h3>
+&lt;p>&lt;code>/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;&lt;/code>&lt;/p>
+&lt;p>See &lt;a href="https://github.com/medic/medic-os#user-content-service-management-scripts">medic-os docs&lt;/a> for more.&lt;/p>
+&lt;h3 id="viewing-logs-inside-medic-os">Viewing logs inside &lt;code>medic-os&lt;/code>&lt;/h3>
+&lt;p>To view logs, first run this to access a shell in the &lt;code>medic-os&lt;/code> container:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker exec -it medic-os /bin/bash&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>View CouchDB logs:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>less /srv/storage/medic-core/couchdb/logs/startup.log&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>View &lt;code>medic-api&lt;/code> logs:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>less /srv/storage/medic-api/logs/medic-api.log&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>View &lt;code>medic-sentinel&lt;/code> logs:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>less /srv/storage/medic-sentinel/logs/medic-sentinel.log&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="viewing-default-stderrstdout-logs">Viewing default stderr/stdout logs&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>sudo docker logs medic-os&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo docker logs haproxy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="clean-up">Clean Up&lt;/h3>
+&lt;p>List running containers:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker ps&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>List all available docker containers with their status&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker ps -a&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Stop container&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker stop &amp;lt;container_id&amp;gt;/&amp;lt;container_name&amp;gt;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Start container&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker start &amp;lt;container_id&amp;gt;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>List all stopped containers&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo docker ps -f &amp;quot;status=exited&amp;quot;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="prune-entire-docker-system">Prune entire Docker system&lt;/h3>
+&lt;p>Use this &lt;code>prune&lt;/code> command when unable to launch the containers and need to restart from a clean slate. &lt;strong>WARNING:&lt;/strong> This will delete all your unused images, containers, networks and volumes &lt;strong>including those not related to CHT&lt;/strong>.&lt;/p>
+&lt;p>&lt;code>docker system prune -a --volumes&lt;/code>&lt;/p></description></item></channel></rss>
