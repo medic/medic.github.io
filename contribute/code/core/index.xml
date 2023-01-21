@@ -191,7 +191,8 @@ These steps apply to both 3.x and 4.x CHT core development, unless stated otherw
 &lt;h2 id="steps">Steps&lt;/h2>
 &lt;ol>
 &lt;li>Checkout and pull the latest default branch - get the latest code&lt;/li>
-&lt;li>&lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code> - make a branch&lt;/li>
+&lt;li>Make a branch: &lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code>&lt;/li>
+&lt;li>Take a look at the current &lt;a href="https://github.com/medic/cht-core/issues?q=is%3Aissue+is%3Aopen+label%3A%22Upgrade+dependencies%22">list of upgrade related issues&lt;/a>, so you don&amp;rsquo;t rediscover known problems.&lt;/li>
 &lt;/ol>
 &lt;p>Then for each folder go through these steps.&lt;/p>
 &lt;ol>
@@ -228,16 +229,39 @@ grep &amp;#39;&amp;#34;jquery&amp;#34;&amp;#39; ./webapp/node_modules/enketo-cor
 &lt;p>Make sure the version of &lt;code>api/enketo-xslt&lt;/code> is the same as &lt;code>webapp/enketo-core/enketo-transformer/enketo-xslt&lt;/code>.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Don&amp;rsquo;t update &lt;code>lodash/core&lt;/code> since 4.17.21 is failing, this is an &lt;a href="https://github.com/lodash/lodash/issues/4904">open issue&lt;/a> in their repository.&lt;/p>
+&lt;p>Don&amp;rsquo;t update &lt;code>lodash&lt;/code> to version &lt;code>4.17.21&lt;/code>. If you do so, the runtime issue highlighted below will appear when importing &lt;code>lodash/core&lt;/code> in Admin app:&lt;/p>
+&lt;pre tabindex="0">&lt;code>UnhandledPromiseRejectionWarning: TypeError: stack.get is not a function
+at equalObjects (/home/user/app/node_modules/lodash/core.js:1303:28)
+at baseIsEqualDeep (/home/user/app/node_modules/lodash/core.js:729:18)
+at baseIsEqual (/home/user/app/node_modules/lodash/core.js:664:12)
+at Function.isEqual (/home/user/app/node_modules/lodash/core.js:2660:12)
+at estimateCurrentScheduleDimLevel.then.dimLevel (/home/user/app/src/Devices/SmartLight/NASLightDevice.ts:642:24)
+&lt;/code>&lt;/pre>&lt;p>The issue on the code is here:&lt;/p>
+&lt;pre tabindex="0">&lt;code>if (!_.isEqual(oldProfileConfig, newProfileConfig)) {
+this.setProfileConfig(newProfileConfig);
+}
+&lt;/code>&lt;/pre>&lt;p>There was an &lt;a href="https://github.com/lodash/lodash/issues/4904">open issue&lt;/a> in the lodash repository but got deleted (reason unknown). There&amp;rsquo;s &lt;a href="https://github.com/lodash/lodash/issues/4945">another reported issue&lt;/a> explaining the problem, however it hasn&amp;rsquo;t been resolved yet.
+The stable version for now is: &lt;code>4.17.19&lt;/code>&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Don&amp;rsquo;t update &lt;code>helmet&lt;/code> since it is not supporting NodeJS 8 anymore. Its minimum is NodeJS 10+.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>If you have trouble upgrading any other dependency and you think it&amp;rsquo;ll be challenging to fix it then raise a new issue to upgrade just that dependency. Don&amp;rsquo;t hold up all the other upgrades you&amp;rsquo;ve made.&lt;/p>
+&lt;p>If you have trouble upgrading any other dependency and you think it&amp;rsquo;ll be challenging to fix it then raise a new issue with &lt;code>Upgrade dependencies&lt;/code> tag, to upgrade just that dependency. Don&amp;rsquo;t hold up all the other upgrades you&amp;rsquo;ve made.&lt;/p>
 &lt;/li>
 &lt;/ul>
 &lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
+&lt;h3 id="angular-exception">Angular exception&lt;/h3>
+&lt;p>When upgrading Webapp&amp;rsquo;s Angular, you might get the following exception:&lt;/p>
+&lt;pre tabindex="0">&lt;code>Running &amp;#34;exec:build-webapp&amp;#34; (exec) task
+________________________________________
+An unhandled exception occured: Class extends value undefined is not a constructor or null
+see &amp;#34;/private/var/folders/tx/lskdwi/T/ng-23kdi/angular-errors.log&amp;#34; for further details.
+&amp;gt;&amp;gt; Exited with code: 127
+&lt;/code>&lt;/pre>&lt;p>This error is thrown by the Webpack&amp;rsquo;s subresource integrity. It&amp;rsquo;s likely that &lt;code>@angular/compiler&lt;/code>, &lt;code>@angular-devkit/build-angular&lt;/code> or &lt;code>@angular-builders/custom-webpack&lt;/code> aren&amp;rsquo;t resolved properly in the &lt;code>package-lock.json&lt;/code>.&lt;/p>
+&lt;p>To fix it, uninstall these 3 dependencies and then install them again in this order:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>@angular/compiler&lt;/code>&lt;/li>
+&lt;li>&lt;code>@angular-devkit/build-angular&lt;/code>&lt;/li>
+&lt;li>&lt;code>@angular-builders/custom-webpack&lt;/code>&lt;/li>
+&lt;/ol>
 &lt;h3 id="npm-errno--17">npm errno -17&lt;/h3>
 &lt;p>If &lt;code>npm ci&lt;/code> errors with &amp;ldquo;errno -17&amp;rdquo; in shared-libs you may need to manually remove the nested dependencies from the package-lock.json. This needs move investigation to work out why this is happening.&lt;/p>
 &lt;h3 id="select2-is-not-a-function">select2 is not a function&lt;/h3>
