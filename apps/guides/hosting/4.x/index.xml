@@ -1,4 +1,414 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: App Developer Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>The clustered multi-node hosting described below is only recommended for deployments that need extreme performance gains. These gains will greatly increase the complexity of troubleshooting and decrease the ease ongoing maintenance.&lt;/p>
+&lt;p>Instead, we recommended most deployment go with the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/">single node hosting&lt;/a>.&lt;/p>
+&lt;p>As well, there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">self hosted guide for 3.x&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;h3 id="about-clustered-deployments">About clustered deployments&lt;/h3>
+&lt;p>In a clustered CHT setup, there are multiple CouchDB nodes responding to users. The ability to &lt;a href="https://en.wikipedia.org/wiki/Horizontal_scaling#Horizontal_(scale_out)_and_vertical_scaling_(scale_up)">horizontally scale&lt;/a> a CHT instance was added in version CHT 4.0.0. In this document we set up a three node CouchDB cluster. We require all three CouchDB nodes to be running and healthy before installing the CHT. Our healthcheck service determines the health of the CouchDB nodes and turns off the CHT if any single node is not functional.&lt;/p>
+&lt;h3 id="nodes">Nodes&lt;/h3>
+&lt;ul>
+&lt;li>CHT Core (1x) - Core functionality of the CHT including API and sentinel&lt;/li>
+&lt;li>CouchDB (3x) - 3 node CouchDB cluster&lt;/li>
+&lt;/ul>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;h3 id="servers">Servers&lt;/h3>
+&lt;p>Provision four Ubuntu servers (22.04 as of this writing) that meet our &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">hosting requirements&lt;/a> including installing Docker and Docker Compose on all of them. This guide assumes you&amp;rsquo;re using the &lt;code>ubuntu&lt;/code> user, with a home directory of &lt;code>/home/ubuntu&lt;/code> and that it &lt;a href="https://askubuntu.com/a/477554">has &lt;code>sudo-less&lt;/code> access to Docker&lt;/a>.&lt;/p>
+&lt;h3 id="network">Network&lt;/h3>
+&lt;p>Make sure the following ports are open for all nodes:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>7946 TCP/UDP&lt;/code> - For Docker communication amongst nodes&lt;/li>
+&lt;li>&lt;code>2377 TCP&lt;/code> - Docker cluster management communication&lt;/li>
+&lt;li>&lt;code>4789 UDP&lt;/code> - Docker overlay network traffic&lt;/li>
+&lt;li>&lt;code>ICMP&lt;/code> - For ping&lt;/li>
+&lt;/ul>
+&lt;p>As a security measure, be sure to restrict the IP addresses of the four nodes only to be able to connect to these ports.&lt;/p>
+&lt;h2 id="create-an-overlay-network">Create an Overlay Network&lt;/h2>
+&lt;p>To set up a private network that only the four nodes can use, we&amp;rsquo;ll use &lt;code>docker swarm&lt;/code>&amp;rsquo;s overlay network feature. You&amp;rsquo;ll first need to initialize the swarm on the CHT Core node and then join the swarm on each of the three CouchDB nodes.&lt;/p>
+&lt;h3 id="cht-core-node">CHT Core node&lt;/h3>
+&lt;p>Initialize swarm mode by running:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker swarm init
+&lt;/code>&lt;/pre>&lt;p>This will output:&lt;/p>
+&lt;div class="highlight">&lt;div style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Swarm initialized: current node &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>ca7z1v4tm9q4kf9uimreqoauj&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span> is now a manager.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>To add a worker to this swarm, run the following command:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> docker swarm join --token &amp;lt;very-long-token-value&amp;gt; &amp;lt;main-server-private-ip&amp;gt;:2377
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>To add a manager to this swarm, run &lt;span style="color:#4e9a06">&amp;#39;docker swarm join-token manager&amp;#39;&lt;/span> and follow the instructions. &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;p>Then create overlay network by calling:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker network create --driver=overlay --attachable cht-overlay
+&lt;/code>&lt;/pre>&lt;h3 id="couchdb-nodes">CouchDB nodes&lt;/h3>
+&lt;p>On each of these three CouchDB nodes run the &lt;code>docker swarm join&lt;/code> command given to you in &lt;a href="#cht-core-node">line 4 above in &amp;ldquo;CHT Core node&amp;rdquo;&lt;/a>:&lt;/p>
+&lt;pre>&lt;code>docker swarm join --token &amp;lt;very-long-token-value&amp;gt; &amp;lt;main-server-private-ip&amp;gt;:2377`
+&lt;/code>&lt;/pre>
+&lt;h3 id="confirm-swarm">Confirm swarm&lt;/h3>
+&lt;p>Back on the CHT Core node, run &lt;code>docker node ls&lt;/code> and ensure you see 4 nodes listed as &lt;code>STATUS&lt;/code> of &lt;code>Ready&lt;/code> and &lt;code>AVAILABILITY&lt;/code> of &lt;code>Active&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>ID HOSTNAME STATUS AVAILABILITY MANAGER STATUS ENGINE VERSION
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>zolpxb5jpej8yiq9gcyv2nrdj * cht-core Ready Active Leader 20.10.23
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>y9giir8c3ydifxvwozs3sn8vw couchdb1 Ready Active 20.10.23
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mi3vj0prd76djbvxms43urqiv couchdb2 Ready Active 20.10.23
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>kcpxlci3jjjtm6xjz7v50ef7k couchdb3 Ready Active 20.10.23
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="cht-core-installation">CHT Core installation&lt;/h2>
+&lt;p>Create the following directory structure:&lt;/p>
+&lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
+|-- compose/
+|-- certs/
+|-- couchdb/
+|-- upgrade-service/
+&lt;/code>&lt;/pre>&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol>
+&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
+&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
+&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
+&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
+&lt;/ol>
+&lt;h3 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h3>
+&lt;p>Prepare an &lt;code>.env&lt;/code> file by running this code:&lt;/p>
+&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
+couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
+CHT_COMPOSE_PROJECT_NAME=cht
+DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
+CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
+COUCHDB_USER=medic
+COUCHDB_PASSWORD=${couchdb_password}
+COUCHDB_SERVERS=couchdb.1,couchdb.2,couchdb.3
+EOF
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;h3 id="download-compose-files">Download compose files&lt;/h3>
+&lt;p>The following 2 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="compose-file-modifications">Compose file modifications&lt;/h4>
+&lt;p>At the end of each compose file, ensure the 2 &lt;code>networks:&lt;/code> sections (1 in &lt;code>compose/cht-core.yml&lt;/code> and 1 in &lt;code>upgrade-service/docker-compose.yml&lt;/code>) look like this by adding three lines:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-net&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">${CHT_NETWORK:-cht-net}&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-overlay&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">driver&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">external&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>For all 6 services in the compose files (5 in &lt;code>compose/cht-core.yml&lt;/code> and 1 in &lt;code>upgrade-service/docker-compose.yml&lt;/code>), update the &lt;code>networks:&lt;/code> section to look like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="tls-certificates">TLS Certificates&lt;/h3>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This section has the first use of &lt;code>docker compose&lt;/code>. This should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command&lt;/code>.
+&lt;/div>
+&lt;p>To ensure the needed docker volume is created, start the CHT Core services, which will intentionally all fail as the CouchDB nodes don&amp;rsquo;t exist. We&amp;rsquo;ll then ensure they&amp;rsquo;re all stopped with the &lt;code>docker kill&lt;/code> at the end. Note that this command has will &lt;code>sleep 120&lt;/code> (wait for 2 minutes) in hopes of&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sleep &lt;span style="color:#0000cf;font-weight:bold">120&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps --quiet&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>With docker volume having been created, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">TLS Certificates page&lt;/a> for how to import your certificates on the CHT Core node.&lt;/p>
+&lt;h2 id="couchdb-installation-on-3-nodes">CouchDB installation on 3 nodes&lt;/h2>
+&lt;p>Now that CHT Core is installed, we need to install CouchDB on the three nodes. Be sure all 3 nodes &lt;a href="#prerequisites">meet the prerequisites&lt;/a> before proceeding.&lt;/p>
+&lt;h3 id="prepare-environment-variables-file-1">Prepare Environment Variables file&lt;/h3>
+&lt;p>First, &lt;strong>on the CHT Core node&lt;/strong>, get your CouchDB password with this command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now, &lt;strong>on all 3 CouchDB nodes&lt;/strong>, create an &lt;code>.env&lt;/code> file by running this code. You&amp;rsquo;ll need to replace &lt;code>PASSWORD-FROM-ABOVE&lt;/code> so it is the same on all three nodes:&lt;/p>
+&lt;pre tabindex="0">&lt;code>mkdir -p /home/ubuntu/cht/srv
+uuid=$(uuidgen)
+couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+cat &amp;gt; /home/ubuntu/cht/.env &amp;lt;&amp;lt; EOF
+CHT_COMPOSE_PROJECT_NAME=cht
+COUCHDB_SECRET=${couchdb_secret}
+COUCHDB_DATA=/home/ubuntu/cht/couchdb
+COUCHDB_USER=medic
+COUCHDB_PASSWORD=PASSWORD-FROM-ABOVE
+COUCHDB_UUID=${uuid}
+EOF
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;h4 id="couchdb-node-1">CouchDB Node 1&lt;/h4>
+&lt;p>Create &lt;code>/home/ubuntu/cht/docker-compose.yml&lt;/code> on Node 1. It is the master node of the cluster and has different &lt;code>environment:&lt;/code> settings than Node 2 and 3, note &lt;code>CLUSTER_PEER_IPS&lt;/code> on line 15 for example:&lt;/p>
+&lt;div class="highlight">&lt;div style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;3.9&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">couchdb.1&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">./srv:/opt/couchdb/data&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-credentials:/opt/couchdb/etc/local.d/&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">environment&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_USER=${COUCHDB_USER:-admin}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_PASSWORD=${COUCHDB_PASSWORD:?COUCHDB_PASSWORD must be set}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_SECRET=${COUCHDB_SECRET}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_UUID=${COUCHDB_UUID}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;SVC_NAME=${SVC1_NAME:-couchdb.1}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;CLUSTER_PEER_IPS=couchdb.2,couchdb.3&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_LOG_LEVEL=${COUCHDB_LOG_LEVEL:-error}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">logging&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">driver&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;local&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">options&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">max-size&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;${LOG_MAX_SIZE:-50m}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">max-file&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;${LOG_MAX_FILES:-20}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">restart&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">always&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-credentials&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-net&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">${CHT_NETWORK:-cht-net}&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-overlay&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">driver&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">external&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;h4 id="couchdb-node-2-and-node-3">CouchDB Node 2 and Node 3&lt;/h4>
+&lt;p>Create a file &lt;code>/home/ubuntu/cht/docker-compose.yml&lt;/code> on Node 2 and 3 with this contents:&lt;/p>
+&lt;div class="highlight">&lt;div style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+&lt;table style="border-spacing:0;padding:0;margin:0;border:0;">&lt;tr>&lt;td style="vertical-align:top;padding:0;margin:0;border:0;">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+&lt;/span>&lt;span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;3.9&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">couchdb.2&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">./srv:/opt/couchdb/data&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">environment&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_USER=${COUCHDB_USER:-admin}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_PASSWORD=${COUCHDB_PASSWORD:?COUCHDB_PASSWORD must be set}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_SECRET=${COUCHDB_SECRET}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_UUID=${COUCHDB_UUID}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;SVC_NAME=couchdb.2&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_LOG_LEVEL=${COUCHDB_LOG_LEVEL:-error}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;COUCHDB_SYNC_ADMINS_NODE=${COUCHDB_SYNC_ADMINS_NODE:-couchdb.1}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">logging&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">driver&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;local&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">options&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">max-size&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;${LOG_MAX_SIZE:-50m}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">max-file&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;${LOG_MAX_FILES:-20}&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">restart&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">always&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-credentials&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-net&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">${CHT_NETWORK:-cht-net}&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht-overlay&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">driver&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">overlay&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">external&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;h4 id="couchdb-node-3">CouchDB Node 3&lt;/h4>
+&lt;p>On just CouchDB Node 3, change the 3rd and 12th line to be &lt;code>couchdb.3&lt;/code> in the &lt;code>/home/ubuntu/cht/docker-compose.yml&lt;/code> file you created above.&lt;/p>
+&lt;h2 id="starting-services">Starting Services&lt;/h2>
+&lt;h3 id="couchdb-nodes-1">CouchDB Nodes&lt;/h3>
+&lt;ol>
+&lt;li>
+&lt;p>On each of the three CouchDB nodes starting with node 3, then 2 then 1. Be sure to wait until &lt;code>docker-compose&lt;/code> is finished running and has returned you to the command prompt before continuing to the next node:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Watch the logs and wait for everything to be up and running. You can run this on each node to watch the logs:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose logs --follow
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Nodes 2 and 3 should show output like &lt;code>couchdb is ready&lt;/code> after node 1 has started.&lt;/p>
+&lt;p>Node 1 will show this when it has added all nodes:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cht-couchdb.1-1 &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;ok&amp;#34;&lt;/span>:true&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht-couchdb.1-1 &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;all_nodes&amp;#34;&lt;/span>:&lt;span style="color:#ce5c00;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.1&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.2&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.3&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">]&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;cluster_nodes&amp;#34;&lt;/span>:&lt;span style="color:#ce5c00;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.1&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.2&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;couchdb@couchdb.3&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">]}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="cht-core">CHT Core&lt;/h3>
+&lt;p>Now that CouchDB is running on all the nodes, start the CHT Core:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To follow the progress tail the log of the upgrade service container by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose logs --follow
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To make sure everything is running correctly, call &lt;code>docker ps&lt;/code> and make sure that 6 CHT containers show:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>8c1c22d526f3 public.ecr.aws/s5s3h4s7/cht-nginx:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/docker-entrypoint.…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 0.0.0.0:80-&amp;gt;80/tcp, :::80-&amp;gt;80/tcp, 0.0.0.0:443-&amp;gt;443/tcp, :::443-&amp;gt;443/tcp cht_nginx_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f7b596be2721 public.ecr.aws/s5s3h4s7/cht-api:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /api/dock…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5988/tcp cht_api_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>029cd86ac721 public.ecr.aws/s5s3h4s7/cht-sentinel:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /sentinel…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_sentinel_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>61ee1e0b377b public.ecr.aws/s5s3h4s7/cht-haproxy-healthcheck:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/sh -c \&amp;#34;/app/ch…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_healthcheck_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>87415a2d91ea public.ecr.aws/s5s3h4s7/cht-haproxy:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/entrypoint.sh -f /…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5984/tcp cht_haproxy_1 cht_couchdb_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>d01343658f3f public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest &lt;span style="color:#4e9a06">&amp;#34;node /app/src/index…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes upgrade-service-cht-upgrade-service-1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This should show related to the CHT core are running&lt;/p>
+&lt;ul>
+&lt;li>cht_nginx&lt;/li>
+&lt;li>cht_api&lt;/li>
+&lt;li>cht_sentinel&lt;/li>
+&lt;li>cht_healthcheck&lt;/li>
+&lt;li>cht_haproxy&lt;/li>
+&lt;li>cht-upgrade-service&lt;/li>
+&lt;/ul>
+&lt;p>Take note of the &lt;code>STATUS&lt;/code> column and make sure no errors are displayed. If any container is restarting or mentioning any other error, check the logs using the &lt;code>docker logs &amp;lt;container-name&amp;gt;&lt;/code> command.&lt;/p>
+&lt;p>If all has gone well, &lt;code>nginx&lt;/code> should now be listening at both port 80 and port 443. Port 80 has a permanent redirect to port 443, so you can only access the CHT using https.&lt;/p>
+&lt;p>To login as the medic user in the web app, you can find your password with this command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="upgrades">Upgrades&lt;/h2>
+&lt;p>Upgrades are completely manual for the clustered setup right now. You have to go into each of the docker compose files and modify the image tag and take containers down and restart them.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Single CouchDB Node</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This for a single node CHT 4.x instance and is the recommended solution for most deployments. While not recommended, if you want a more powerful setup, check out &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the 4.x multi-node install docs&lt;/a>. As well, there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">self hosted guide for CHT 3.x&lt;/a>.
+&lt;/div>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;p>Be sure you have followed &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the requirements document&lt;/a> including installing Docker and Docker Compose. This guide assumes you&amp;rsquo;re using the &lt;code>ubuntu&lt;/code> user and that it &lt;a href="https://askubuntu.com/a/477554">has &lt;code>sudo-less&lt;/code> access to Docker&lt;/a>.&lt;/p>
+&lt;h2 id="directory-structure">Directory Structure&lt;/h2>
+&lt;p>Create the following directory structure:&lt;/p>
+&lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
+|-- compose/
+|-- certs/
+|-- couchdb/
+|-- upgrade-service/
+&lt;/code>&lt;/pre>&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol>
+&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
+&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
+&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
+&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
+&lt;/ol>
+&lt;h2 id="download-required-docker-compose-files">Download required docker-compose files&lt;/h2>
+&lt;p>The following 3 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h2>
+&lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
+&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
+couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
+CHT_COMPOSE_PROJECT_NAME=cht
+COUCHDB_SECRET=${couchdb_secret}
+DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
+COUCHDB_DATA=/home/ubuntu/cht/couchdb
+CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
+COUCHDB_USER=medic
+COUCHDB_PASSWORD=${couchdb_password}
+COUCHDB_UUID=${uuid}
+EOF
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;h2 id="launch-containers">Launch containers&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This section has the first use of &lt;code>docker compose&lt;/code>. This should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command.&lt;/code>.
+&lt;/div>
+&lt;p>To start your CHT instance, run the following&lt;/p>
+&lt;pre tabindex="0">&lt;code>cd /home/ubuntu/cht/upgrade-service
+docker compose up --detached
+&lt;/code>&lt;/pre>&lt;p>Docker will start the upgrade service, which in turn pulls the required images and starts all the services as defined by the compose files in &lt;code>/home/ubuntu/cht/compose&lt;/code>.&lt;/p>
+&lt;p>To follow the progress tail the log of the upgrade service container by running this:&lt;/p>
+&lt;p>&lt;code>docker logs -f upgrade-service_cht-upgrade-service_1&lt;/code>&lt;/p>
+&lt;p>To make sure everything is running correctly, call &lt;code>docker ps&lt;/code> and make sure that 7 CHT containers show:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>8c1c22d526f3 public.ecr.aws/s5s3h4s7/cht-nginx:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/docker-entrypoint.…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 0.0.0.0:80-&amp;gt;80/tcp, :::80-&amp;gt;80/tcp, 0.0.0.0:443-&amp;gt;443/tcp, :::443-&amp;gt;443/tcp cht_nginx_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f7b596be2721 public.ecr.aws/s5s3h4s7/cht-api:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /api/dock…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5988/tcp cht_api_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>029cd86ac721 public.ecr.aws/s5s3h4s7/cht-sentinel:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /sentinel…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_sentinel_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>61ee1e0b377b public.ecr.aws/s5s3h4s7/cht-haproxy-healthcheck:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/sh -c \&amp;#34;/app/ch…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_healthcheck_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>87415a2d91ea public.ecr.aws/s5s3h4s7/cht-haproxy:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/entrypoint.sh -f /…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5984/tcp cht_haproxy_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>58454457467a public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;tini -- /docker-ent…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 4369/tcp, 5984/tcp, 9100/tcp cht_couchdb_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>d01343658f3f public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest &lt;span style="color:#4e9a06">&amp;#34;node /app/src/index…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes upgrade-service-cht-upgrade-service-1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This should show related to the CHT core are running&lt;/p>
+&lt;ul>
+&lt;li>cht_nginx&lt;/li>
+&lt;li>cht_api&lt;/li>
+&lt;li>cht_sentinel&lt;/li>
+&lt;li>cht_couchdb&lt;/li>
+&lt;li>cht_healthcheck&lt;/li>
+&lt;li>cht_haproxy&lt;/li>
+&lt;li>cht-upgrade-service&lt;/li>
+&lt;/ul>
+&lt;p>Take note of the &lt;code>STATUS&lt;/code> column and make sure no errors are displayed there. If any container is restarting or mentioning any other error, check the logs using the &lt;code>docker logs &amp;lt;container-name&amp;gt;&lt;/code> command.&lt;/p>
+&lt;p>If all has gone well, nginx should now be listening at both port 80 and port 443. Port 80 has a permanent redirect to port 443, so you can only access the CHT using https.&lt;/p>
+&lt;p>To login as the &lt;code>medic&lt;/code> user in the web app, you can find your password with this command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tls-certificates">TLS Certificates&lt;/h2>
+&lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">TLS Certificates page&lt;/a> for how to import your certificates.&lt;/p>
+&lt;h2 id="upgrades">Upgrades&lt;/h2>
+&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p></description></item><item><title>Apps: App Developer Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
 &lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without losing any data while doing so. To do development on the CHT Core Framework itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/">development guide&lt;/a>.&lt;/p>
@@ -154,4 +564,52 @@ This is for CHT 4.x. To use a CHT 3.x version, see the earlier &lt;a href="https
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/hrcy8JlJP9M" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
-&lt;hr></description></item></channel></rss>
+&lt;hr></description></item><item><title>Apps: Adding TLS certificates in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/</guid><description>
+&lt;p>To load your certificates into your CHT instance, we&amp;rsquo;ll be creating an interstitial container called &lt;code>cht-temp-tls&lt;/code> which will enable you to copy your local certificate files into the native docker volume.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;p>You have two files locally on your workstation in the directory you&amp;rsquo;re currently in:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>key.pem&lt;/code> - the private key for your TLS certificate&lt;/li>
+&lt;li>&lt;code>chain.pem&lt;/code> - both the public and any interstitial keys concatenated into one file&lt;/li>
+&lt;/ul>
+&lt;p>Also, be sure you have started your CHT instance once and all your volumes are created.&lt;/p>
+&lt;h3 id="loading-the-certificate">Loading the certificate&lt;/h3>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;code>docker compose&lt;/code> should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command&lt;/code>.
+&lt;/div>
+&lt;ol>
+&lt;li>
+&lt;p>Find the name of your &lt;code>cht-ssl&lt;/code> volume with this call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker volume ls --filter &lt;span style="color:#4e9a06">&amp;#34;name=cht_&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> grep cht-ssl
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>It is very likely that &lt;code>cht_cht-ssl&lt;/code> is the name of our &lt;code>cht-ssl&lt;/code> volume.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Using the volume name found in step 1, start a container called &lt;code>temp&lt;/code> which allow us to copy files into the docker volume:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d --rm --name temp -v cht_cht-ssl:/etc/nginx/private/ alpine tail -f /dev/null
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Copy the two pem files into the volume via the temporary container:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker cp key.pem temp:/etc/nginx/private/.
+docker cp cert.pem temp:/etc/nginx/private/.
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Stop the &lt;code>temp&lt;/code> container:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> temp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites">prerequisites&lt;/a>.&lt;/p></description></item><item><title>Apps:</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</guid><description>
+&lt;p>Create the following directory structure:&lt;/p>
+&lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
+|-- compose/
+|-- certs/
+|-- couchdb/
+|-- upgrade-service/
+&lt;/code>&lt;/pre>&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol>
+&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
+&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
+&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
+&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
+&lt;/ol></description></item></channel></rss>
