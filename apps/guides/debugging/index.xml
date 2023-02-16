@@ -193,4 +193,53 @@ RequestHeader set X-Forwarded-Proto &amp;#34;https&amp;#34;
 &lt;li>&lt;code>127.0.0.1&lt;/code> - Host to send forwarded traffic to. In this case, your local machine.&lt;/li>
 &lt;li>&lt;code>5988&lt;/code> - Local port where traffic from step one will be sent. In this case, your instance of the CHT&lt;/li>
 &lt;li>&lt;code>cht.domain.com&lt;/code> - Public domain where you have an SSH account and we&amp;rsquo;ll attach port &lt;code>8081&lt;/code> to from step 1.&lt;/li>
-&lt;/ol></description></item></channel></rss>
+&lt;/ol></description></item><item><title>Apps: Sharing 4.x Logs</title><link>https://docs.communityhealthtoolkit.org/apps/guides/debugging/sharing-4.x-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/debugging/sharing-4.x-logs/</guid><description>
+&lt;p>CHT 4.x moves from a monolithic container MedicOS to discrete containers, each service hosting one service of the CHT. When troubleshooting an issue with your CHT instance, it can be hard to list each container, see it&amp;rsquo;s status, gather up logs for each container and then share all this information with Medic or other support staff. To ease this pain, a script was written which automates the process.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;p>This assumes you&amp;rsquo;re running CHT 4.x have access to the command line on the server where it&amp;rsquo;s running locally or via SSH. While the script will work with CHT 3.x instances, the amount of logs that a &lt;code>docker logs&lt;/code> call yields isn&amp;rsquo;t very helpful. To see more about CHT 3.x logs, see &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#viewing-logs-inside-medic-os">&amp;ldquo;Viewing logs inside &lt;code>medic-os&lt;/code>&amp;rdquo;&lt;/a>&lt;/p>
+&lt;p>This guide also assumes you have the &lt;a href="https://github.com/medic/cht-core/">CHT Core repo checked out&lt;/a> so that you have a copy of the &lt;code>compress_and_archive_docker_logs.sh&lt;/code> script. If you do not have it checked out, you can manually create a local copy with this &lt;code>curl&lt;/code> command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">curl -o compress_and_archive_docker_logs.sh https://raw.githubusercontent.com/medic/cht-core/master/scripts/compress_and_archive_docker_logs.sh&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#000">chmod +x compress_and_archive_docker_logs.sh&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="calling-the-script">Calling the script&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>Be aware of two important features of this script:&lt;/p>
+&lt;ul>
+&lt;li>It will get logs for ALL docker containers running, even if they&amp;rsquo;re not part of the CHT&lt;/li>
+&lt;li>Logs on production CHT instances will contain PII/PHI and should be handled with care&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;p>The script takes no arguments and can be called from anywhere on your system as long as you specify the full path to the script. Here it&amp;rsquo;s being called from with in the &lt;code>cht-core/scripts&lt;/code> directory:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./compress_and_archive_docker_logs.sh
+&lt;/code>&lt;/pre>&lt;p>Depending on this volume of your logs, this may take a while. This is what the output of the script is when it&amp;rsquo;s completed:&lt;/p>
+&lt;pre tabindex="0">&lt;code>Wait while the script gathers stats and logs about the CHT containers.
+Be patient, this might take a moment...
+Done!
+/home/cht-user/.medic/support_logs/cht-docker-logs-2023-02-14T15.04.45-08.00.tar.gz
+NOTE: Please remove the file when done as it may contain PII/PHI.
+&lt;/code>&lt;/pre>&lt;p>The files are saved in your home directory (&lt;code>/home/cht-user/&lt;/code> in this case) and are timestamped with the creation date and timezone offset (&lt;code>2023-02-14T15.04.45-08.00&lt;/code>).&lt;/p>
+&lt;p>You can now share this &lt;code>tar.gz&lt;/code> file with support staff as needed. Again, be careful with it as &lt;strong>it will contain PII/PHI if you ran this against a production instance&lt;/strong>.&lt;/p>
+&lt;h2 id="archive-contents">Archive contents&lt;/h2>
+&lt;p>First, let&amp;rsquo;s look at the running containers when we called the script by calling &lt;code>docker ps --format '{{.Names}}'&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>new_project_nginx_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project_sentinel_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project_api_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project_haproxy_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project_couchdb_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project_healthcheck_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>new_project-dir-cht-upgrade-service-1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now if we uncompress the tarball created above and list the contents, it should look very similar when we call &lt;code>cd ~/.medic/support_logs&amp;amp;&amp;amp;tar xzvf cht-docker-logs-2023-02-14T15.04.45-08.00.tar.gz&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker_ps.log
+docker_stats.log
+new_project-dir-cht-upgrade-service-1.log
+new_project_api_1.log
+new_project_couchdb_1.log
+new_project_haproxy_1.log
+new_project_healthcheck_1.log
+new_project_nginx_1.log
+new_project_sentinel_1.log
+&lt;/code>&lt;/pre>&lt;p>There&amp;rsquo;s one file per container, each with the logs from that container. As well there&amp;rsquo;s two other files:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker_ps.log&lt;/code> - the output of &lt;code>docker ps&lt;/code>&lt;/li>
+&lt;li>&lt;code>docker_stats.log&lt;/code> - the output of &lt;code>docker stats&lt;/code>&lt;/li>
+&lt;/ul></description></item></channel></rss>
