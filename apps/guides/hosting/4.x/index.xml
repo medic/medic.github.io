@@ -1,4 +1,85 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/</link><description>Recent content in 4.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Self Hosting in CHT 4.x - Single CouchDB Node</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This for a single node CHT 4.x instance and is the recommended solution for most deployments. While not recommended, if you want a more powerful setup, check out &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the 4.x multi-node install docs&lt;/a>. As well, there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">self hosted guide for CHT 3.x&lt;/a>.
+&lt;/div>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;p>Be sure you have followed &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the requirements document&lt;/a> including installing Docker and Docker Compose. This guide assumes you&amp;rsquo;re using the &lt;code>ubuntu&lt;/code> user and that it &lt;a href="https://askubuntu.com/a/477554">has &lt;code>sudo-less&lt;/code> access to Docker&lt;/a>.&lt;/p>
+&lt;h2 id="directory-structure">Directory Structure&lt;/h2>
+&lt;p>Create the following directory structure:&lt;/p>
+&lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
+|-- compose/
+|-- certs/
+|-- couchdb/
+|-- upgrade-service/
+&lt;/code>&lt;/pre>&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol>
+&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
+&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
+&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
+&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
+&lt;/ol>
+&lt;h2 id="download-required-docker-compose-files">Download required docker-compose files&lt;/h2>
+&lt;p>The following 3 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h2>
+&lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
+&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
+couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
+cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
+CHT_COMPOSE_PROJECT_NAME=cht
+COUCHDB_SECRET=${couchdb_secret}
+DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
+COUCHDB_DATA=/home/ubuntu/cht/couchdb
+CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
+COUCHDB_USER=medic
+COUCHDB_PASSWORD=${couchdb_password}
+COUCHDB_UUID=${uuid}
+EOF
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;h2 id="launch-containers">Launch containers&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This section has the first use of &lt;code>docker compose&lt;/code>. This should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command.&lt;/code>.
+&lt;/div>
+&lt;p>To start your CHT instance, run the following&lt;/p>
+&lt;pre tabindex="0">&lt;code>cd /home/ubuntu/cht/upgrade-service
+docker compose up --detach
+&lt;/code>&lt;/pre>&lt;p>Docker will start the upgrade service, which in turn pulls the required images and starts all the services as defined by the compose files in &lt;code>/home/ubuntu/cht/compose&lt;/code>.&lt;/p>
+&lt;p>To follow the progress tail the log of the upgrade service container by running this:&lt;/p>
+&lt;p>&lt;code>docker logs -f upgrade-service_cht-upgrade-service_1&lt;/code>&lt;/p>
+&lt;p>To make sure everything is running correctly, call &lt;code>docker ps&lt;/code> and make sure that 7 CHT containers show:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>8c1c22d526f3 public.ecr.aws/s5s3h4s7/cht-nginx:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/docker-entrypoint.…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 0.0.0.0:80-&amp;gt;80/tcp, :::80-&amp;gt;80/tcp, 0.0.0.0:443-&amp;gt;443/tcp, :::443-&amp;gt;443/tcp cht_nginx_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f7b596be2721 public.ecr.aws/s5s3h4s7/cht-api:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /api/dock…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5988/tcp cht_api_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>029cd86ac721 public.ecr.aws/s5s3h4s7/cht-sentinel:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /sentinel…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_sentinel_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>61ee1e0b377b public.ecr.aws/s5s3h4s7/cht-haproxy-healthcheck:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/sh -c \&amp;#34;/app/ch…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_healthcheck_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>87415a2d91ea public.ecr.aws/s5s3h4s7/cht-haproxy:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/entrypoint.sh -f /…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5984/tcp cht_haproxy_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>58454457467a public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;tini -- /docker-ent…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 4369/tcp, 5984/tcp, 9100/tcp cht_couchdb_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>d01343658f3f public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest &lt;span style="color:#4e9a06">&amp;#34;node /app/src/index…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes upgrade-service-cht-upgrade-service-1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This should show related to the CHT core are running&lt;/p>
+&lt;ul>
+&lt;li>cht_nginx&lt;/li>
+&lt;li>cht_api&lt;/li>
+&lt;li>cht_sentinel&lt;/li>
+&lt;li>cht_couchdb&lt;/li>
+&lt;li>cht_healthcheck&lt;/li>
+&lt;li>cht_haproxy&lt;/li>
+&lt;li>cht-upgrade-service&lt;/li>
+&lt;/ul>
+&lt;p>Take note of the &lt;code>STATUS&lt;/code> column and make sure no errors are displayed there. If any container is restarting or mentioning any other error, check the logs using the &lt;code>docker logs &amp;lt;container-name&amp;gt;&lt;/code> command.&lt;/p>
+&lt;p>If all has gone well, nginx should now be listening at both port 80 and port 443. Port 80 has a permanent redirect to port 443, so you can only access the CHT using https.&lt;/p>
+&lt;p>To login as the &lt;code>medic&lt;/code> user in the web app, you can find your password with this command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tls-certificates">TLS Certificates&lt;/h2>
+&lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">TLS Certificates page&lt;/a> for how to import your certificates.&lt;/p>
+&lt;h2 id="upgrades">Upgrades&lt;/h2>
+&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-multiple-nodes/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
 &lt;p>The clustered multi-node hosting described below is only recommended for deployments that need extreme performance gains. These gains will greatly increase the complexity of troubleshooting and decrease the ease ongoing maintenance.&lt;/p>
@@ -232,88 +313,7 @@ EOF
 &lt;p>To login as the medic user in the web app, you can find your password with this command:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="upgrades">Upgrades&lt;/h2>
-&lt;p>Upgrades are completely manual for the clustered setup right now. You have to go into each of the docker compose files and modify the image tag and take containers down and restart them.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Single CouchDB Node</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/</guid><description>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-This for a single node CHT 4.x instance and is the recommended solution for most deployments. While not recommended, if you want a more powerful setup, check out &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the 4.x multi-node install docs&lt;/a>. As well, there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">self hosted guide for CHT 3.x&lt;/a>.
-&lt;/div>
-&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
-&lt;p>Be sure you have followed &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">the requirements document&lt;/a> including installing Docker and Docker Compose. This guide assumes you&amp;rsquo;re using the &lt;code>ubuntu&lt;/code> user and that it &lt;a href="https://askubuntu.com/a/477554">has &lt;code>sudo-less&lt;/code> access to Docker&lt;/a>.&lt;/p>
-&lt;h2 id="directory-structure">Directory Structure&lt;/h2>
-&lt;p>Create the following directory structure:&lt;/p>
-&lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
-|-- compose/
-|-- certs/
-|-- couchdb/
-|-- upgrade-service/
-&lt;/code>&lt;/pre>&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span style="color:#ce5c00;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol>
-&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
-&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
-&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
-&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
-&lt;/ol>
-&lt;h2 id="download-required-docker-compose-files">Download required docker-compose files&lt;/h2>
-&lt;p>The following 3 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h2>
-&lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
-&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
-couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
-couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
-cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
-CHT_COMPOSE_PROJECT_NAME=cht
-COUCHDB_SECRET=${couchdb_secret}
-DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
-COUCHDB_DATA=/home/ubuntu/cht/couchdb
-CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
-COUCHDB_USER=medic
-COUCHDB_PASSWORD=${couchdb_password}
-COUCHDB_UUID=${uuid}
-EOF
-&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
-&lt;h2 id="launch-containers">Launch containers&lt;/h2>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-This section has the first use of &lt;code>docker compose&lt;/code>. This should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command.&lt;/code>.
-&lt;/div>
-&lt;p>To start your CHT instance, run the following&lt;/p>
-&lt;pre tabindex="0">&lt;code>cd /home/ubuntu/cht/upgrade-service
-docker compose up --detach
-&lt;/code>&lt;/pre>&lt;p>Docker will start the upgrade service, which in turn pulls the required images and starts all the services as defined by the compose files in &lt;code>/home/ubuntu/cht/compose&lt;/code>.&lt;/p>
-&lt;p>To follow the progress tail the log of the upgrade service container by running this:&lt;/p>
-&lt;p>&lt;code>docker logs -f upgrade-service_cht-upgrade-service_1&lt;/code>&lt;/p>
-&lt;p>To make sure everything is running correctly, call &lt;code>docker ps&lt;/code> and make sure that 7 CHT containers show:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>8c1c22d526f3 public.ecr.aws/s5s3h4s7/cht-nginx:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/docker-entrypoint.…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 0.0.0.0:80-&amp;gt;80/tcp, :::80-&amp;gt;80/tcp, 0.0.0.0:443-&amp;gt;443/tcp, :::443-&amp;gt;443/tcp cht_nginx_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f7b596be2721 public.ecr.aws/s5s3h4s7/cht-api:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /api/dock…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5988/tcp cht_api_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>029cd86ac721 public.ecr.aws/s5s3h4s7/cht-sentinel:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/bash /sentinel…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_sentinel_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>61ee1e0b377b public.ecr.aws/s5s3h4s7/cht-haproxy-healthcheck:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/bin/sh -c \&amp;#34;/app/ch…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes cht_healthcheck_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>87415a2d91ea public.ecr.aws/s5s3h4s7/cht-haproxy:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;/entrypoint.sh -f /…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 5984/tcp cht_haproxy_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>58454457467a public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1 &lt;span style="color:#4e9a06">&amp;#34;tini -- /docker-ent…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes 4369/tcp, 5984/tcp, 9100/tcp cht_couchdb_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>d01343658f3f public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest &lt;span style="color:#4e9a06">&amp;#34;node /app/src/index…&amp;#34;&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">17&lt;/span> minutes ago Up &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span> minutes upgrade-service-cht-upgrade-service-1
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This should show related to the CHT core are running&lt;/p>
-&lt;ul>
-&lt;li>cht_nginx&lt;/li>
-&lt;li>cht_api&lt;/li>
-&lt;li>cht_sentinel&lt;/li>
-&lt;li>cht_couchdb&lt;/li>
-&lt;li>cht_healthcheck&lt;/li>
-&lt;li>cht_haproxy&lt;/li>
-&lt;li>cht-upgrade-service&lt;/li>
-&lt;/ul>
-&lt;p>Take note of the &lt;code>STATUS&lt;/code> column and make sure no errors are displayed there. If any container is restarting or mentioning any other error, check the logs using the &lt;code>docker logs &amp;lt;container-name&amp;gt;&lt;/code> command.&lt;/p>
-&lt;p>If all has gone well, nginx should now be listening at both port 80 and port 443. Port 80 has a permanent redirect to port 443, so you can only access the CHT using https.&lt;/p>
-&lt;p>To login as the &lt;code>medic&lt;/code> user in the web app, you can find your password with this command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tls-certificates">TLS Certificates&lt;/h2>
-&lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">TLS Certificates page&lt;/a> for how to import your certificates.&lt;/p>
-&lt;h2 id="upgrades">Upgrades&lt;/h2>
-&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p></description></item><item><title>Apps: App Developer Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</guid><description>
+&lt;p>Upgrades are completely manual for the clustered setup right now. You have to go into each of the docker compose files and modify the image tag and take containers down and restart them.&lt;/p></description></item><item><title>Apps: App Developer Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/</guid><description>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
 &lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without losing any data while doing so. To do development on the CHT Core Framework itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/">development guide&lt;/a>.&lt;/p>
@@ -503,7 +503,129 @@ docker cp cert.pem temp:/etc/nginx/private/.
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> temp
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;/ol>
-&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites">prerequisites&lt;/a>.&lt;/p></description></item><item><title>Apps:</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</guid><description>
+&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites">prerequisites&lt;/a>.&lt;/p></description></item><item><title>Apps: Viewing server logs in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</guid><description>
+&lt;p>CHT 4.x has the following services running via Docker and each can have its logs queried:&lt;/p>
+&lt;ul>
+&lt;li>nginx&lt;/li>
+&lt;li>sentinel&lt;/li>
+&lt;li>api&lt;/li>
+&lt;li>haproxy&lt;/li>
+&lt;li>couchdb&lt;/li>
+&lt;li>healthcheck&lt;/li>
+&lt;li>upgrade-service&lt;/li>
+&lt;/ul>
+&lt;p>First, find the actual names of the containers with the &lt;code>docker ps --format '{{.Names}}'&lt;/code> command which should show something like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht_nginx_1
+cht_sentinel_1
+cht_api_1
+cht_haproxy_1
+cht_healthcheck_1
+cht_couchdb_1
+upgrade-service-cht-upgrade-service-1
+&lt;/code>&lt;/pre>&lt;p>You can then use the &lt;code>docker logs&lt;/code> command to view the logs of any given container. For example, if we call &lt;code>docker logs cht_nginx_1&lt;/code> it will show ALL the logs from that container. To show only the last 5 lines, you can use the &lt;code>--tail&lt;/code> flag to specify the number of lines like this &lt;code>docker logs cht_nginx_1 --tail 5&lt;/code>. The result will look like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>10.131.161.1 - - [15/Feb/2023:21:08:35 +0000] &amp;#34;GET /medic/_changes?feed=longpoll&amp;amp;heartbeat=10000&amp;amp;since=115-g1AAAAH5eJyF0LENwjAQBVCLRIAEFBTMgESBCA0lrACJBzgnRXSKoKJmClaAxEswRZbIDCTHZ4GzXPzCT-d_rowx8zIqzDK_3fOycKdkf9jucJIKVyMybmVtxhQp6E-s23jfME00B-LdUWQIOBBxmJkG3gXJHHtfM8WaA2ncQ6RnGmsOZLjG5mLtk2mmSKAUCPHGSkxT3dZAiK_IR28A1AMhzta2wbko2iJe3ndMC92iaIfAzwrTmn8as5aY&amp;amp;limit=25 HTTP/1.1&amp;#34; 499 0 &amp;#34;https://10-131-161-159.my.local-ip.co/&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 +0000] &amp;#34;GET /medic-user-medic-meta/_changes?include_docs=true&amp;amp;feed=longpoll&amp;amp;heartbeat=10000&amp;amp;since=13-g1AAAAH5eJyF0LENwkAMhWETKGkoWIICERpKWAESD3BOiugUQUXNFKwAiZdgiiyRGUjMY4FYV_zFfbJ8VxPRspqXtCpu96Iq5ZTuD9sdTlrjKgkka-Y8htkE-hOWjWrrOBCVo9noOBATzMwcB5JLVG0cB9LKw2xwHMh4XdCF-TktgTIg5I0nubYBQr5mnxiSaTsAIWfmzp2LRTvkpdq7Fov2CH7WYOMP5CCWMg&amp;amp;limit=25 HTTP/1.1&amp;#34; 499 0 &amp;#34;https://10-131-161-159.my.local-ip.co/&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 +0000] &amp;#34;GET /fontawesome-webfont.woff2 HTTP/1.1&amp;#34; 304 0 &amp;#34;https://10-131-161-159.my.local-ip.co/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 +0000] &amp;#34;GET /fonts/NotoSans-Bold.ttf HTTP/1.1&amp;#34; 304 0 &amp;#34;https://10-131-161-159.my.local-ip.co/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 +0000] &amp;#34;GET /fonts/NotoSans-Regular.ttf HTTP/1.1&amp;#34; 200 221787 &amp;#34;https://10-131-161-159.my.local-ip.co/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0
+&lt;/code>&lt;/pre>&lt;p>Sometimes you may want to search the logs for a specific string. To search, use the pipe (&lt;code>|&lt;/code>) and &lt;code>grep&lt;/code> commands to do this. Here we search for all the times HA Proxy thought CouchDB wasn&amp;rsquo;t reachable (&lt;code>DOWN&lt;/code>) with this call &lt;code>docker logs cht_haproxy_1 2&amp;gt;&amp;amp;1 | grep 'DOWN'&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>&amp;lt;145&amp;gt;Feb 15 20:52:06 haproxy[25]: Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 208ms. 0 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.
+[WARNING] 045/205206 (25) : Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 208ms. 0 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.
+[WARNING] 045/205601 (25) : Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 207ms. 0 active and 0 backup servers left. 5 sessions active, 0 requeued, 0 remaining in queue.
+&amp;lt;145&amp;gt;Feb 15 20:56:01 haproxy[25]: Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 207ms. 0 active and 0 backup servers left. 5 sessions active, 0 requeued, 0 remaining in queue.
+&lt;/code>&lt;/pre>&lt;p>If you want to watch the logs for a specific container in real time, you can use the &lt;code>--follow&lt;/code> flag. This command would watch the requests come into API in realtime: &lt;code>docker logs cht_api_1 --follow&lt;/code>. It&amp;rsquo;s nice to couple this with the &lt;code>--tail&lt;/code> command so you only see the last 5 lines of the existing logs before watching for new lines with &lt;code>docker logs cht_api_1 --follow --tail 5&lt;/code> which would show this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>RES d17d71f5-2dcb-4ebb-bb0e-7874b3000570 10.131.161.1 - GET /medic/_design/medic-client/_view/reports_by_subject?keys=%5B%22557e79b8-2d99-4bd1-a4d6-a44491d483d8%22%5D HTTP/1.0 200 - 12.452 ms
+RES e43c5d7f-4e32-433a-a96d-ef991f4298a3 10.131.161.1 - GET /medic/_design/medic/_view/doc_summaries_by_id?keys=%5B%22557e79b8-2d99-4bd1-a4d6-a44491d483d8%22%5D HTTP/1.0 200 - 31.226 ms
+REQ c656ecc7-e6af-4564-ad63-2cab2c42844a 10.131.161.1 - GET /medic/_all_docs?include_docs=true&amp;amp;startkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%22&amp;amp;endkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%EF%BF%B0%22 HTTP/1.0
+RES c656ecc7-e6af-4564-ad63-2cab2c42844a 10.131.161.1 - GET /medic/_all_docs?include_docs=true&amp;amp;startkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%22&amp;amp;endkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%EF%BF%B0%22 HTTP/1.0 200 - 11.153 ms
+2023-02-15 21:54:49 DEBUG: Checking for a configured outgoing message service
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Backups in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/backups/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/backups/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide is about backups in CHT 4.x - there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/#backup">self hosted guide for 3.x&lt;/a> which includes backups for 3.x.
+&lt;/div>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>As CHT 4.x uses a container per service, the only data that needs to be backed up is:&lt;/p>
+&lt;ul>
+&lt;li>CouchDB database&lt;/li>
+&lt;li>Docker Compose and &lt;code>.env&lt;/code> files&lt;/li>
+&lt;li>TLS certificates&lt;/li>
+&lt;/ul>
+&lt;p>This is because Docker containers are inherently stateless so all the important binaries are already stored in &lt;a href="https://gallery.ecr.aws/s5s3h4s7/">CHT&amp;rsquo;s Docker images&lt;/a>. Docker Compose files, including the &lt;code>.env&lt;/code> file, store all of your deployment&amp;rsquo;s configuration. Finally, the TLS certificates should be backed up to reduce recovery time.&lt;/p>
+&lt;p>How to backup each of these three pieces of data is covered below.&lt;/p>
+&lt;p>Therefore, you do &lt;strong>not&lt;/strong> need to back up the docker images for:&lt;/p>
+&lt;ul>
+&lt;li>nginx&lt;/li>
+&lt;li>sentinel&lt;/li>
+&lt;li>api&lt;/li>
+&lt;li>haproxy&lt;/li>
+&lt;li>couchdb&lt;/li>
+&lt;li>healthcheck&lt;/li>
+&lt;li>upgrade-service&lt;/li>
+&lt;/ul>
+&lt;h2 id="assumptions">Assumptions&lt;/h2>
+&lt;p>This guide assumes you have an Ubuntu server running CHT 4.x in Docker as described in our &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/">Self Hosting in CHT 4.x - Single CouchDB Node&lt;/a> guide. If you run &lt;code>docker ps --format '{{.Names}}'&lt;/code> you should see something like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht_nginx_1
+cht_sentinel_1
+cht_api_1
+cht_haproxy_1
+cht_healthcheck_1
+cht_couchdb_1
+upgrade-service-cht-upgrade-service-1
+&lt;/code>&lt;/pre>&lt;p>If you run &lt;code>docker volume ls&lt;/code> you should see something like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>DRIVER VOLUME NAME
+local cht_cht-credentials
+local cht_cht-ssl
+&lt;/code>&lt;/pre>&lt;p>&lt;strong>Note&lt;/strong> - In the volumes listed above, there is no volume for CouchDB data. This is because the compose file declares this as a &lt;a href="https://docs.docker.com/storage/bind-mounts/">bind mount&lt;/a>. Bind mounts use the host file system directly and do not show up in &lt;code>docker volume ls&lt;/code> calls. It&amp;rsquo;s therefore assumed your CouchDB data location is declared in &lt;code>/home/ubuntu/cht/upgrade-service/.env&lt;/code> which sets it with &lt;code>COUCHDB_DATA=/home/ubuntu/cht/couchdb&lt;/code>.&lt;/p>
+&lt;p>You should have SSH access to the server with &lt;code>root&lt;/code> access.&lt;/p>
+&lt;h3 id="backup-software">Backup software&lt;/h3>
+&lt;p>It&amp;rsquo;s assumed you are using which ever tool you&amp;rsquo;re familiar with which might include &lt;a href="https://rsync.samba.org/examples.html">rsync&lt;/a>, &lt;a href="https://borgbackup.readthedocs.io/en/stable/">borg&lt;/a>, &lt;a href="https://duplicity.gitlab.io/">duplicity&lt;/a> or other solution. The locations of the backups should follow the 3-2-1 rule:&lt;/p>
+&lt;blockquote>
+&lt;p>There should be at least 3 copies of the data, stored on 2 different types of storage media, and one copy should be kept offsite, in a remote location. &lt;em>- &lt;a href="https://en.wikipedia.org/wiki/Backup">Wikipedia&lt;/a>&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;p>Duplicity has the handy benefit of offering built in encryption using &lt;a href="https://gnupg.org/">GPG&lt;/a>. Consider using this if you don&amp;rsquo;t have an existing solution for encrypted backups.&lt;/p>
+&lt;h2 id="couchdb">CouchDB&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+CouchDB backups, by necessity, will have PII and PHI. They should be safely stored to prevent unauthorized access including encrypting backups.
+&lt;/div>
+&lt;p>Assuming your CouchDB is stored in &lt;code>/home/ubuntu/cht/couchdb&lt;/code>, you should use these steps to back it up:&lt;/p>
+&lt;ol>
+&lt;li>While you don&amp;rsquo;t need to stop CouchDB to back it up, ensure you follow best practices to back it up. See the &lt;a href="https://docs.couchdb.org/en/stable/maintenance/backups.html">CouchDB site&lt;/a> for more info. Note that Medic recommends NOT using replication for backup.&lt;/li>
+&lt;li>It is strongly recommended you encrypt your backups given the sensitivity of the contents. Do this now before copying the backup files to their long term location.&lt;/li>
+&lt;li>Backup the CouchDB files using the &lt;a href="#backup-software">software specified above&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;h2 id="docker-compose-files">Docker Compose files&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+The &lt;code>.env&lt;/code> file contains cleartext passwords. It should be safely stored to prevent unauthorized access.
+&lt;/div>
+&lt;p>All compose files, and the corresponding &lt;code>.env&lt;/code> file, are in these three locations:&lt;/p>
+&lt;ul>
+&lt;li>/home/ubuntu/cht/compose/*.yml&lt;/li>
+&lt;li>/home/ubuntu/cht/upgrade-service/*.yml&lt;/li>
+&lt;li>/home/ubuntu/cht/upgrade-service/.env&lt;/li>
+&lt;/ul>
+&lt;p>While all three of these are trivial to recreate by downloading them again, they may change over time so should be archived with your CouchDB data. Further, when there&amp;rsquo;s been a critical failure of a production CHT instance, you want to be sure to make the restore process as speedy as possible.&lt;/p>
+&lt;p>As all of these files are only read when Docker first loads a service, you can simply copy them whenever you want without stopping any of the CHT services. They should be copied with the same frequency and put in the same location as the CouchDB data using the &lt;a href="#backup-software">backup software specified above&lt;/a>.&lt;/p>
+&lt;h2 id="tls-certificates">TLS certificates&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+The &lt;code>.key&lt;/code> file is the private key for TLS certificate. It should be safely stored to prevent unauthorized access.
+&lt;/div>
+&lt;p>Like the compose files, the TLS certificate files can easily be regenerated or re-downloaded from your Certificate Authority, like Let&amp;rsquo;s Encrypt for example. However, you want to have a backup of the at the ready to ease the restore process.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Copy the cert and key files from the nginx container:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker cp cht_nginx_1:/etc/nginx/private/key.pem .
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker cp cht_nginx_1:/etc/nginx/private/cert.pem .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Back the up to the same location and frequency as the CouchDB data using the &lt;a href="#backup-software">backup software specified above&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="testing-backups">Testing backups&lt;/h2>
+&lt;p>A backup that isn&amp;rsquo;t tested, is effectively not a backup. For a backup to be successful, a complete restore from all locations in the 3-2-1 plan need to be fully tested and documented as to how a restore works. The more practiced and better documented the restore process, the less downtime a production CHT instance will have after data loss.&lt;/p></description></item><item><title>Apps:</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/_partial_docker_directories/</guid><description>
 &lt;p>Create the following directory structure:&lt;/p>
 &lt;pre tabindex="0">&lt;code>|-- /home/ubuntu/cht/
 |-- compose/
