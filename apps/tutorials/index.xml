@@ -2891,28 +2891,31 @@ medic-person.svg
 &lt;p>This tutorial takes you through testing the various configurable components of CHT applications using &lt;a href="http://docs.communityhealthtoolkit.org/cht-conf-test-harness/">&lt;code>cht-conf-test-harness&lt;/code>&lt;/a>.&lt;/p>
 &lt;/div>
 &lt;h2 id="prerequisites">Prerequisites&lt;/h2>
-&lt;ul>
-&lt;li>Complete these tutorials:
+&lt;p>Complete the following tutorials:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/app-forms/">Building App Forms&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/tasks-1/">Building A Simple Task&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/targets/">Building Target Widgets&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/contact-summary/">Building Contact Summary&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;/ul>
+&lt;h2 id="importance-of-testing-your-application">Importance of testing your application&lt;/h2>
+&lt;hr>
+&lt;p>Testing your CHT application is important as it ensures you are consistently maintaining your application and defining implementation requirements. Testing also helps the user make better architectural decisions, optimizes the forms, tasks and other components of the application. Although it may seem tedious, testing your application ensures that you quickly discover issues that are introduced with changes or newer commits.&lt;/p>
 &lt;h2 id="cht-application-testing">CHT Application Testing&lt;/h2>
 &lt;hr>
-&lt;p>CHT applications are greatly configurable. Depending on the number and the complexity of the app components, it can take huge time and effort to test them manually. Some components, such as tasks, behave differently over time and are particularly difficult to test. As the project evolves, the configuration is often updated with new components, and changes are made to the existing components. After each change, you need to test not only the new components but also the old ones to make sure that the app works correctly. To facilitate the testing process, app builders are encouraged to write automated tests for their app using &lt;a href="http://docs.communityhealthtoolkit.org/cht-conf-test-harness/">cht-conf-test-harness&lt;/a>.&lt;/p>
-&lt;p>Using &lt;code>cht-conf-test-harness&lt;/code> (also simply referred as &lt;code>harness&lt;/code>), you can write tests and run them with &lt;a href="https://mochajs.org/">Mocha&lt;/a> testing framework to test the behavior of different components in a CHT application. You can use the &lt;a href="https://www.chaijs.com/">chai library&lt;/a> or other assertion libraries.&lt;/p>
-&lt;h2 id="preparing">Preparing&lt;/h2>
-&lt;p>Writing tests for CHT apps requires a good understanding of the project workflows and requirements. It is encouraged that the tests be written as part of the app-building process. To test using the harness, there are a few things you need to set up first:&lt;/p>
+&lt;p>CHT applications are greatly configurable. Depending on the number and complexity of app components, it can take a lot of time and effort to test the components manually. Some components, such as tasks, behave differently over time and are particularly challenging to test. As the project evolves, the configuration is often updated with new components and changes are made to the existing components. After each change, you need to test not only the new components, but also the old ones to make sure that the app works as expected. To facilitate the testing process, app builders are encouraged to write automated tests for their app using &lt;a href="http://docs.communityhealthtoolkit.org/cht-conf-test-harness/">cht-conf-test-harness&lt;/a>.&lt;/p>
+&lt;p>Because it may be complicated to test with a real application, &lt;code>cht-conf-test-harness&lt;/code> (also simply referred as &lt;code>harness&lt;/code>), provides a platform that simulates the CHT application instance.&lt;/p>
+&lt;p>Using &lt;code>cht-conf-test-harness&lt;/code>, you can write tests and run them with &lt;a href="https://mochajs.org/">Mocha&lt;/a> testing framework to test the behavior of different components in a CHT application. You can also use &lt;a href="https://www.chaijs.com/">chai library&lt;/a> or other assertion libraries.&lt;/p>
+&lt;h2 id="preparation">Preparation&lt;/h2>
+&lt;p>Writing tests for CHT apps requires a good understanding of the project workflows and requirements. To test using the harness, there are a few things you need to set up:&lt;/p>
 &lt;ol>
 &lt;li>
-&lt;p>From the previous tutorials, you should have a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">functioning CHT instance with &lt;code>cht-conf&lt;/code> installed locally&lt;/a> and a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/#3-create-and-upload-a-blank-project">project folder set up&lt;/a>.&lt;/p>
+&lt;p>From the previous tutorials, you should have a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">functioning CHT instance with &lt;code>cht-conf&lt;/code> installed locally&lt;/a> and a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/#3-create-and-upload-a-blank-project">project folder set up&lt;/a>.
+&lt;code>cht-conf&lt;/code> which is short for CHT app configurer, is a command-line interface tool used to manage and configure your CHT apps. It is used for backup, conversion, validation, uploading and other actions which can be found by running &lt;code>cht --help&lt;/code>.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>If your &lt;code>package.json&lt;/code> file does not already have them, add &lt;code>cht-conf-test-harness&lt;/code>, &lt;code>chai&lt;/code>, and &lt;code>mocha&lt;/code> by running this in your command-line:&lt;/p>
+&lt;p>Ensure your &lt;code>package.json&lt;/code> file has the required libraries. A &lt;code>package.json&lt;/code> file is used to record important metadata about a project and defines functional attributes that npm uses to install dependencies and run scripts. This file should be at the root of your project folder.
+If your &lt;code>package.json&lt;/code> file does not already have them, add &lt;code>cht-conf-test-harness&lt;/code>, &lt;code>chai&lt;/code>, and &lt;code>mocha&lt;/code> by running this in your command-line:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm install --save cht-conf-test-harness chai mocha
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;li>
@@ -2934,29 +2937,41 @@ medic-person.svg
 &lt;tbody>
 &lt;tr>
 &lt;td>&lt;code>npm run test&lt;/code>&lt;/td>
-&lt;td>Compiles the app settings, converts the forms, then runs the tests (preferred solution).&lt;/td>
+&lt;td>Compiles the app settings, converts the forms,then runs the tests (preferred solution).&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>npm run unittest&lt;/code>&lt;/td>
-&lt;td>Only runs the tests.&lt;/td>
+&lt;td>Only runs the unit tests.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;p>You can also run the test on a specific form by defining a test under the scripts section.&lt;/p>
+&lt;p>For example, to run the test on the &lt;code>death.spec.js&lt;/code> file, define the test as &lt;code>death-form-unit-test: &amp;quot;mocha test/forms/death.spec.js --timeout 20000&amp;quot;&lt;/code>. Then run:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span> npm run death-form-unit-test
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>npm also supports a shorter alias as &lt;code>npm test&lt;/code>. There are recommended conventions on how to arrange tests by splitting into unit tests and integration tests so that each of them can be run independently. This can be best illustrated by &lt;a href="https://github.com/medic/cht-pih-malawi-app">this project code&lt;/a>.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Create a folder in the project root where you keep the tests. You can name the folder yourself. For convenience, here it is named as &lt;code>test&lt;/code>.&lt;/p>
+&lt;p>Create a folder in the project root where you keep the tests. You can name the folder yourself. In this case it is named &amp;rsquo;test&amp;rsquo;.
+&lt;figure class="col-9 col-lg-12">&lt;a href="test-folder-placement.png">
+&lt;img src="test-folder-placement.png"/> &lt;/a>
+&lt;/figure>
+&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Create a file &lt;code>harness.defaults.json&lt;/code> at the root of your project. This is the default configuration file for the harness. Here you can specify the default user, preloaded contacts and reports, and add other settings. Here&amp;rsquo;s an &lt;a href="https://github.com/medic/cht-conf-test-harness/blob/master/harness.defaults.json.example">example&lt;/a> file to get you started. You can read more about it &lt;a href="https://docs.communityhealthtoolkit.org/cht-conf-test-harness/global.html#HarnessInputs">here&lt;/a>.&lt;/p>
+&lt;p>Create a file &lt;code>harness.defaults.json&lt;/code> at the root of your project. This is the default configuration file for the harness. Here you can specify the default user, preloaded contacts and reports, and add other settings. Here&amp;rsquo;s an &lt;a href="https://github.com/medic/cht-conf-test-harness/blob/master/harness.defaults.json.example">example&lt;/a> file to get you started. You can read more about it &lt;a href="https://docs.communityhealthtoolkit.org/cht-conf-test-harness/global.html#HarnessInputs">here&lt;/a>.
+&lt;figure class="col-9 col-lg-12">&lt;a href="harness-json-file-placement.png">
+&lt;img src="harness-json-file-placement.png"/> &lt;/a>
+&lt;/figure>
+&lt;/p>
 &lt;/li>
 &lt;/ol>
 &lt;h2 id="writing-a-test-for-cht-app">Writing a test for CHT App&lt;/h2>
-&lt;p>Start by adding a file where a group of related tests are written. For example, in the default config, all tests for the pregnancy form are in the &lt;a href="https://github.com/medic/cht-core/blob/master/config/default/test/forms/pregnancy.spec.js">pregnancy.spec.js&lt;/a> file.&lt;/p>
+&lt;p>Start by adding a file where a group of related tests are written. For example, in the default config, all tests for the pregnancy form are in the &lt;a href="https://github.com/medic/cht-core/blob/master/config/default/test/forms/pregnancy.spec.js">pregnancy.spec.js&lt;/a> file. The common naming pattern for CHT applications test files is &lt;code>filename.spec.js&lt;/code>. In JavaScript testing, &lt;code>spec&lt;/code> is short for specifications which refers to technical details of a given application, that must be fulfilled.&lt;/p>
 &lt;p>Let&amp;rsquo;s introduce some important sections from a typical test file:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">TestRunner&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">require&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;cht-conf-test-harness&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">harness&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">new&lt;/span> &lt;span style="color:#000">TestRunner&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>You get an instance of &lt;code>harness&lt;/code> and the same instance is used throughout the test file.&lt;/p>
-&lt;p>You can also pass parameters to the &lt;code>TestRunner()&lt;/code> when instantiating:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In the example above, we define values &lt;code>TestRunner&lt;/code> and &lt;code>harness&lt;/code>. You get an instance of &lt;code>harness&lt;/code> and the same instance is used throughout the test file.
+You can also pass parameters to the &lt;code>TestRunner()&lt;/code> when instantiating:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic">// For detailed console logs
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">harness&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">new&lt;/span> &lt;span style="color:#000">TestRunner&lt;/span>&lt;span style="color:#000;font-weight:bold">({&lt;/span> &lt;span style="color:#000">verbose&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span> &lt;span style="color:#000;font-weight:bold">});&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Other useful options are:&lt;/p>
@@ -2969,7 +2984,8 @@ medic-person.svg
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">describe&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;PNC form tests&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">before&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">async&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">await&lt;/span> &lt;span style="color:#000">harness&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">start&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span> &lt;span style="color:#000;font-weight:bold">});&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">after&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">async&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">await&lt;/span> &lt;span style="color:#000">harness&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">stop&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span> &lt;span style="color:#000;font-weight:bold">});&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Any logic that you want to execute before and after each test can be placed in the &lt;code>beforeEach()&lt;/code> and &lt;code>afterEach()&lt;/code> hooks. Clear the state of the harness and set the date to a fixed value before each test run:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Any logic that you want to execute before and after each test can be placed in the &lt;code>beforeEach()&lt;/code> and &lt;code>afterEach()&lt;/code> hooks. This section ensures that the harness is reset to default before or after each run.&lt;/p>
+&lt;p>In the example below, the logic is to clear the state of the harness and set the date to &amp;lsquo;2000-01-01&amp;rsquo; before each test run:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">beforeEach&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">async&lt;/span> &lt;span style="color:#000;font-weight:bold">()&lt;/span> &lt;span style="color:#000;font-weight:bold">=&amp;gt;&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">await&lt;/span> &lt;span style="color:#000">harness&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">clear&lt;/span>&lt;span style="color:#000;font-weight:bold">();&lt;/span>
@@ -2997,7 +3013,7 @@ medic-person.svg
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">});&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">});&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In &lt;a href="#assessment-form-test-3">line 3&lt;/a> above, the method &lt;a href="https://docs.communityhealthtoolkit.org/cht-conf-test-harness/Harness.html#fillForm">harness.fillForm()&lt;/a> fills the specified form with the given input (answers).&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In &lt;a href="#assessment-form-test-3">line 4&lt;/a> above, the method &lt;a href="https://docs.communityhealthtoolkit.org/cht-conf-test-harness/Harness.html#fillForm">harness.fillForm()&lt;/a> fills the specified form with the given input (answers).&lt;/p>
 &lt;p>Depending on the form design, the number of inputs to be filled can be large. The inputs are often repeated within a single test or across multiple tests with little or no variation. It is a good idea to keep them in a separate file and refer them from the tests as required. You can also introduce some variations in the inputs using function parameters.&lt;/p>
 &lt;p>Example: &lt;code>form-inputs.js&lt;/code>&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">module&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">exports&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
