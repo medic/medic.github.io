@@ -23,8 +23,8 @@ This for a single node CHT 4.x instance and is the recommended solution for most
 &lt;h2 id="download-required-docker-compose-files">Download required docker-compose files&lt;/h2>
 &lt;p>The following 3 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h2>
 &lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
@@ -168,13 +168,13 @@ DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
 CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
 COUCHDB_USER=medic
 COUCHDB_PASSWORD=${couchdb_password}
-COUCHDB_SERVERS=couchdb.1,couchdb.2,couchdb.3
+COUCHDB_SERVERS=couchdb-1.local,couchdb-2.local,couchdb-3.local
 EOF
 &lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
 &lt;h3 id="download-compose-files">Download compose files&lt;/h3>
 &lt;p>The following 2 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-core.yml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="compose-file-overrides">Compose file overrides&lt;/h4>
 &lt;p>We need to override the &lt;code>networks:&lt;/code> in the two compose files we just created. Create the override file with this code:&lt;/p>
@@ -217,16 +217,16 @@ EOF
 &lt;h4 id="couchdb-node-1">CouchDB Node 1&lt;/h4>
 &lt;p>Create &lt;code>/home/ubuntu/cht/docker-compose.yml&lt;/code> on Node 1 by running this code:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now create the override file to have Node 1 join the &lt;code>cht-net&lt;/code> overlay network we created above. As well, we&amp;rsquo;ll set some &lt;code>services:&lt;/code> specific overrides:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cat &amp;gt; /home/ubuntu/cht/cluster-overrides.yml &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">version: &amp;#39;3.9&amp;#39;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">services:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> couchdb:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb.1
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb-1.local
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> environment:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=${SVC1_NAME:-couchdb.1}&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;CLUSTER_PEER_IPS=couchdb.2,couchdb.3&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=${SVC1_NAME:-couchdb-1.local}&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;CLUSTER_PEER_IPS=couchdb-2.local,couchdb-3.local&amp;#34;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">networks:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> cht-net:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> driver: overlay
@@ -235,15 +235,15 @@ EOF
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-node-2">CouchDB Node 2&lt;/h4>
 &lt;p>Like we did for Node 1, create &lt;code>/home/ubuntu/cht/docker-compose.yml&lt;/code> and the &lt;code>cluster-overrides.yml&lt;/code> file on Node 2 by running this code:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; /home/ubuntu/cht/network-overrides.yml &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; /home/ubuntu/cht/cluster-overrides.yml &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">version: &amp;#39;3.9&amp;#39;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">services:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> couchdb:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb.2
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb-2.local
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> environment:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=couchdb.2&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;COUCHDB_SYNC_ADMINS_NODE=${COUCHDB_SYNC_ADMINS_NODE:-couchdb.1}&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=couchdb-2.local&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;COUCHDB_SYNC_ADMINS_NODE=${COUCHDB_SYNC_ADMINS_NODE:-couchdb-1.local}&amp;#34;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">networks:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> cht-net:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> driver: overlay
@@ -252,15 +252,15 @@ EOF
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-node-3">CouchDB Node 3&lt;/h4>
 &lt;p>Finally, we&amp;rsquo;ll match Node 3 up with the others by running this code:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.0.1/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; /home/ubuntu/cht/cluster-overrides.yml &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">version: &amp;#39;3.9&amp;#39;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">services:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> couchdb:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb.3
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: couchdb-3.local
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> environment:
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=couchdb.3&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;COUCHDB_SYNC_ADMINS_NODE=${COUCHDB_SYNC_ADMINS_NODE:-couchdb.1}&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;SVC_NAME=couchdb-3.local&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - &amp;#34;COUCHDB_SYNC_ADMINS_NODE=${COUCHDB_SYNC_ADMINS_NODE:-couchdb-1.local}&amp;#34;
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">networks:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> cht-net:
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> driver: overlay
