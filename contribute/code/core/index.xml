@@ -59,11 +59,20 @@ These steps apply to both 3.x and 4.x CHT core development, unless stated otherw
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grunt secure-couchdb
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_node/&lt;/span>&lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span>&lt;span style="color:#4e9a06">/_config/httpd/WWW-Authenticate&amp;#34;&lt;/span> -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;Basic realm=\&amp;#34;administrator\&amp;#34;&amp;#34;&amp;#39;&lt;/span> -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-setup-in-cht-4x">CouchDB Setup in CHT 4.x&lt;/h4>
-&lt;p>Create a &lt;code>docker-compose.yml&lt;/code> file under the &lt;code>couchdb&lt;/code> folder.&lt;/p>
-&lt;p>Copy the content of the CouchDB &lt;code>docker-compose&lt;/code> file from the of the CHT release version you are trying to run locally. For example, this is &lt;a href="https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose%2Fcht-couchdb-clustered.yml">the file&lt;/a> for the most recent build.&lt;/p>
-&lt;p>Startup CouchDB:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> couchdb
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up
+&lt;p>Create a &lt;code>docker-compose.yml&lt;/code> and &lt;code>couchdb-override.yml&lt;/code> files under the &lt;code>~/cht-docker&lt;/code> folder with this code:&lt;/p>
+&lt;pre tabindex="0">&lt;code>mkdir -p ~/cht-docker
+curl -s -o ~/cht-docker/docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml
+cat &amp;gt; ~/cht-docker/couchdb-override.yml &amp;lt;&amp;lt; EOF
+version: &amp;#39;3.9&amp;#39;
+services:
+couchdb:
+ports:
+- &amp;#34;5984:5984&amp;#34;
+- &amp;#34;5986:5986&amp;#34;
+EOF
+&lt;/code>&lt;/pre>&lt;p>Now you can start CouchDB. The login for your CHT instance will be &lt;code>medic&lt;/code> and the &lt;code>password&lt;/code> will be password:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-docker
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose -f docker-compose.yml -f couchdb-override.yml up -d
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
 &lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development. In the first terminal, run:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt
