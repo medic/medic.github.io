@@ -68,18 +68,25 @@ See the &lt;a href="https://github.com/medic/cht-couch2pg/blob/main/README.md">c
 &lt;ol>
 &lt;li>
 &lt;p>Restarting processes&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#helpful-docker-commands">How to access container, retrieve logs, restart services&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://github.com/medic/medic-os#user-content-service-management-scripts">MedicOS service management scripts&lt;/a>&lt;/li>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>Also see &lt;a href="https://github.com/medic/medic-os#user-content-service-management-scripts">MedicOS service management scripts&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>
-&lt;p>Investigating logs&lt;/p>
+&lt;p>Investigating logs inside Medic OS&lt;/p>
 &lt;ul>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#helpful-docker-commands">Helpful docker commands&lt;/a> (includes getting shell on containers)&lt;/li>
-&lt;li>Inside container, all appropriate logs can be found in: &lt;code>/srv/storage/&amp;lt;service_name&amp;gt;/logs/*.log&lt;/code>&lt;/li>
+&lt;li>To view logs, first run this to access a shell in the medic-os container: &lt;code>docker exec -it medic-os /bin/bash&lt;/code>&lt;/li>
+&lt;li>View CouchDB logs: &lt;code>less /srv/storage/medic-core/couchdb/logs/startup.log&lt;/code>&lt;/li>
+&lt;li>View medic-api logs: &lt;code>less /srv/storage/medic-api/logs/medic-api.log&lt;/code>&lt;/li>
+&lt;li>View medic-sentinel logs: &lt;code>less /srv/storage/medic-sentinel/logs/medic-sentinel.log&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;/li>
+&lt;li>
+&lt;p>Investigating docker stderr/stdout logs&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span> sudo docker logs medic-os
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sudo docker logs haproxy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;li>
 &lt;p>Upgrading the container&lt;/p>
 &lt;ul>
@@ -94,11 +101,11 @@ See the &lt;a href="https://github.com/medic/cht-couch2pg/blob/main/README.md">c
 &lt;p>The &lt;code>medic-core&lt;/code> directory is where the CHT stores user data. Of key importance is &lt;code>./couchdb/local.in&lt;/code> and &lt;code>./medic-core/couchdb/local.d/&lt;/code> where custom CouchDB configuration is stored.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#use-docker-compose">Change the image tag to the newest image release version&lt;/a>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#use-docker-compose">Change image tag in docker-compose file&lt;/a>&lt;/p>
-&lt;/li>
+&lt;p>Change the image tag to the final Medic OS image release version (&lt;code>cht-3.9.0-rc.2&lt;/code>) in the docker compose file:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">medic-os&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medicmobile/medic-os:cht-3.9.0-rc.2&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;li>
 &lt;p>Launch new containers with appropriate &lt;code>COUCHDB_ADMIN_PASSWORD&lt;/code> &amp;amp; &lt;code>HA_PASSWORD&lt;/code> environment variables&lt;/p>
 &lt;/li>
@@ -272,8 +279,7 @@ Containers that are already set up will lose all data when following the steps b
 &lt;li>CouchDB data files are in &lt;code>/srv/storage/medic-core/couchdb/data&lt;/code> in the &lt;code>medic-os&lt;/code> container.&lt;/li>
 &lt;li>Backing up via replication is discouraged as restored DBs can cause offline users to restart replication from zero. Use file backups instead.&lt;/li>
 &lt;/ul></description></item><item><title>Apps: App Developer Hosting in CHT 3.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/</guid><description>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;div class="pageinfo pageinfo-primary">
 &lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without loosing any data while doing so. To do development on the CHT core itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/">development guide&lt;/a>.&lt;/p>
 &lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
 &lt;/div>
@@ -308,7 +314,6 @@ Containers that are already set up will lose all data when following the steps b
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="switching--concurrent-projects">Switching &amp;amp; concurrent projects&lt;/h2>
 &lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code>. Then start the second project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and project name as shown above.&lt;/p>
 &lt;p>To run projects concurrently, instead of cancelling the first one, open a second terminal and start the second project.&lt;/p>
-&lt;p>To read more about how &lt;code>docker-compose&lt;/code> works, be sure to read the &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/docker-setup/#helpful-docker-commands">helpful docker-compose commands&lt;/a> page.&lt;/p>
 &lt;h2 id="cht-docker-helper">CHT Docker Helper&lt;/h2>
 &lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts builds on the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> and &lt;code>.env&lt;/code> files used above by helping start CHT instances with a simple text based GUI:&lt;/p>
 &lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;amp;ldquo;Successfully started my_first_project&amp;amp;rdquo; message is shown and denotes the login is &amp;amp;ldquo;medic&amp;amp;rdquo; and the password is &amp;amp;ldquo;password&amp;amp;rdquo;.">&lt;/p>
@@ -641,8 +646,7 @@ CHT_HTTPS=8443
 &lt;li>error.log&lt;/li>
 &lt;li>startup.log&lt;/li>
 &lt;/ul></description></item><item><title>Apps: Offline Hosting of CHT 3.x Server</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/offline/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/offline/</guid><description>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;div class="pageinfo pageinfo-primary">
 &lt;p>This guide is not meant for a production CHT instance. Support may be added in the future an offline CHT server in a production environment. Please see the &amp;ldquo;Considerations&amp;rdquo; section below.&lt;/p>
 &lt;p>Proceed only if you have staff familiar with DNS, TLS Certs, DHCP, LAN topology and Linux in general. This is a complex deployment where mistakes are easy to make unless proper training is in place.&lt;/p>
 &lt;/div>
