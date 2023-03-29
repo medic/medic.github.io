@@ -1,4 +1,257 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Step-by-Step Tutorials</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/</link><description>Recent content in Step-by-Step Tutorials on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/tutorials/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Local Couch2pg Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/couch2pg-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/couch2pg-setup/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Step-by-Step Tutorials</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/</link><description>Recent content in Step-by-Step Tutorials on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/tutorials/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Getting started building a CHT app</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This tutorial will take you through setting up a local environment to build and test CHT applications on CHT version 4.x. This includes setting up the necessary tools to download and run the CHT public docker image as well as a command line interface tool to manage and build CHT apps.&lt;/p>
+&lt;p>By the end of the tutorial you should be able to:&lt;/p>
+&lt;ul>
+&lt;li>View the login page to CHT webapp on localhost&lt;/li>
+&lt;li>Upload default settings to localhost&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide will only work with CHT 4.x instances. See the
+&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/">3.x App Developer Hosting&lt;/a> for setting up comparable 3.x instances.
+&lt;/div>
+&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
+16
+&lt;p>The &lt;em>CHT Core Framework&lt;/em> makes it faster to build full-featured, scalable digital health apps by providing a foundation developers can build on. These apps can support most languages, are &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/offline-first/">Offline-First&lt;/a>, and work on basic phones (via SMS), smartphones, tablets, and computers.&lt;/p>
+&lt;p>&lt;a href="https://github.com/medic/cht-conf">&lt;em>CHT Project Configurer&lt;/em>&lt;/a> also known as &lt;em>&lt;strong>cht-conf&lt;/strong>&lt;/em> is command-line interface tool to manage and configure CHT apps.&lt;/p>
+&lt;p>&lt;em>Docker&lt;/em> is a tool designed to make it easier to create, deploy, and run applications by using containers.&lt;/p>
+&lt;p>&lt;em>Containers&lt;/em> allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and deploy it as one package.&lt;/p>
+&lt;h2 id="setup-environment">Setup environment&lt;/h2>
+&lt;p>CHT app development can be done on Linux, macOS, or Windows (using the &lt;a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL2)&lt;/a>).&lt;/p>
+&lt;p>CHT apps can can be built on your local system (with the necessary libraries installed and configured) or they can be built from within VS Code Dev Containers.&lt;/p>
+&lt;p>Before you begin, ensure you have the following tools:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://git-scm.com/downloads">git&lt;/a> or the &lt;a href="https://desktop.github.com/">Github Desktop&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#docker">docker and docker-compose&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;h3 id="installing-docker">Installing Docker&lt;/h3>
+&lt;ul class="nav nav-tabs" id="tabs-0" role="tablist">&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-0-0-tab" data-toggle="tab" href="#tabs-0-0" role="tab"
+aria-controls="tabs-0-0" aria-selected="false">Linux (Ubuntu)&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-0-1-tab" data-toggle="tab" href="#tabs-0-1" role="tab"
+aria-controls="tabs-0-1" aria-selected="false">macOS&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-0-2-tab" data-toggle="tab" href="#tabs-0-2" role="tab"
+aria-controls="tabs-0-2" aria-selected="false">Windows (WSL2)&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-0-content">&lt;div class="tab-body tab-pane fade show active"
+id="tabs-0-0" role="tabpanel" aria-labelled-by="tabs-0-0-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -fsSL get.docker.com -o get-docker.sh &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sh get-docker.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># OPTIONAL: Allow user to run Docker without sudo&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>dockerd-rootless-setuptool.sh install
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export PATH=/usr/bin:&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export DOCKER_HOST=unix:///run/user/1000/docker.sock&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-0-1" role="tabpanel" aria-labelled-by="tabs-0-1-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-0-2" role="tabpanel" aria-labelled-by="tabs-0-2-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;p>Restart your entire machine to finish initializing Docker.&lt;/p>
+&lt;p>After restarting, verify Docker is running as expected. Run the simple &lt;code>hello-world&lt;/code> Docker container. This should output &amp;ldquo;Hello from Docker!&amp;rdquo; as well as some other intro text:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run hello-world
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;h3 id="initialize-project-directory">Initialize project directory&lt;/h3>
+&lt;p>Using the terminal (or the WLS shell on Windows: &lt;em>Start &amp;gt; wsl&lt;/em>), run the following commands to create a new project directory for your CHT app:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/cht-project
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-project
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;hr>
+&lt;h3 id="developing-locally">Developing locally&lt;/h3>
+&lt;p>To build CHT apps on your local system, you need to have some additional tools:&lt;/p>
+&lt;ul class="nav nav-tabs" id="tabs-6" role="tablist">&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-6-0-tab" data-toggle="tab" href="#tabs-6-0" role="tab"
+aria-controls="tabs-6-0" aria-selected="false">Linux (Ubuntu)&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-6-1-tab" data-toggle="tab" href="#tabs-6-1" role="tab"
+aria-controls="tabs-6-1" aria-selected="false">macOS&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-6-2-tab" data-toggle="tab" href="#tabs-6-2" role="tab"
+aria-controls="tabs-6-2" aria-selected="false">Windows (WSL2)&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-6-content">&lt;div class="tab-pane fade show active"
+id="tabs-6-0" role="tabpanel" aria-labelled-by="tabs-6-0-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt -y install python3-pip python3-setuptools python3-wheel xsltproc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Use NVM to install NodeJS:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">16&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;div class="tab-pane fade"
+id="tabs-6-1" role="tabpanel" aria-labelled-by="tabs-6-1-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Uses Homebrew: https://brew.sh/&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew install curl jq pyenv git make node@16 gcc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Python no longer included by default in macOS &amp;gt;12.3&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv install 2.7.18
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv global 2.7.18
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;eval \&amp;#34;\$(pyenv init --path)\&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;div class="tab-pane fade"
+id="tabs-6-2" role="tabpanel" aria-labelled-by="tabs-6-2-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt -y install python3-pip python3-setuptools python3-wheel xsltproc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Use NVM to install NodeJS:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">16&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+&lt;h4 id="pyxform">&lt;code>pyxform&lt;/code>&lt;/h4>
+&lt;p>Using python on your terminal, install &lt;code>pyxform&lt;/code> globally using the command below.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo python -m pip install git+https://github.com/medic/pyxform.git@medic-conf-1.17#egg&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>pyxform-medic
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you encounter the error &lt;code>npm ERR! gyp ERR verb find Python Python is not set&lt;/code> while installing pyxform and are running macOS, see &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/#macos--123">this troubleshooting section&lt;/a>.&lt;/p>
+&lt;h4 id="cht-conf">&lt;code>cht-conf&lt;/code>&lt;/h4>
+&lt;p>Using npm on your terminal, install &lt;code>cht-conf&lt;/code> globally using the command below.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm install -g cht-conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;figure class="right col-6 col-lg-8">&lt;a href="confirm-cht-conf.png">
+&lt;img src="confirm-cht-conf.png"/> &lt;/a>
+&lt;/figure>
+&lt;p>You can confirm that the installation was successful by typing &lt;code>cht&lt;/code> in your terminal.&lt;/p>
+&lt;p>If you have trouble installing &lt;code>cht-conf&lt;/code>, see the application&amp;rsquo;s &lt;a href="https://github.com/medic/cht-conf">GitHub repository&lt;/a> for more information.&lt;/p>
+&lt;p>Using the terminal (or the WLS shell on Windows: &lt;em>Start &amp;gt; wsl&lt;/em>), run the following commands from within your project directory (created above) to bootstrap your new CHT project:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-project
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht initialise-project-layout
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;br clear="all">
+&lt;hr>
+&lt;h3 id="developing-with-vs-code-dev-container">Developing with VS Code Dev Container&lt;/h3>
+&lt;p>If you want to develop CHT apps with VS Code, you can use the &lt;code>cht-app-ide&lt;/code> Docker image as a &lt;a href="https://code.visualstudio.com/docs/devcontainers/containers">Development Container&lt;/a>. This will allow you to use the &lt;code>cht-conf&lt;/code> utility and its associated tech stack from within VS Code (without needing to install dependencies like NodeJS on your host system).&lt;/p>
+&lt;p>&lt;a href="https://code.visualstudio.com/">Install VS Code&lt;/a> if you do not have it already.&lt;/p>
+&lt;p>Using the terminal (or the WLS shell on Windows: &lt;em>Start &amp;gt; wsl&lt;/em>), run the following commands from within your project directory (created above) to download the &lt;code>.devcontainer.json&lt;/code> config file, install the &lt;a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers extension&lt;/a>, and open the project directory in VSCode:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-project
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s https://raw.githubusercontent.com/medic/cht-conf/main/devcontainer.cht-ide/.devcontainer.json &amp;gt; .devcontainer.json
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>code --install-extension ms-vscode-remote.remote-containers
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>code -n .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>When opening VS Code, you may be prompted with the question:&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Do you trust the authors of the files in this folder?&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;p>Choose, &amp;ldquo;Yes, I trust the authors&amp;rdquo;.&lt;/p>
+&lt;p>Open the Command Palette in VS Code (&lt;em>Ctrl+Shift+P&lt;/em> or &lt;em>Cmd+Shift+P&lt;/em>) and select &lt;code>Reopen in Container&lt;/code>. This will open your workspace inside a container based on the &lt;code>cht-ide&lt;/code> image. You can use the &lt;code>cht&lt;/code> commands by opening a terminal in VS Code (&lt;em>Ctrl+Shift+`&lt;/em> or &lt;em>Cmd+Shift+`&lt;/em>). If prompted &amp;ldquo;Do you trust the authors&amp;hellip;&amp;rdquo; choose &amp;ldquo;Trust Folder &amp;amp; Continue&amp;rdquo;.&lt;/p>
+&lt;p>Run the following command in the VS Code terminal to bootstrap your new CHT project:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cht initialise-project-layout
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="terminal-environment">Terminal environment&lt;/h4>
+&lt;p>When opening a terminal in VS Code in a development container, the terminal will be running on the &lt;em>container environment&lt;/em> by default. This is what gives you access to the various &lt;code>cht&lt;/code> commands. However, this also means you do NOT have access, within the default VS Code terminal, to commands from your &lt;em>host environment&lt;/em>. So, for example, you cannot run &lt;code>docker&lt;/code> commands since Docker is not installed inside the container.&lt;/p>
+&lt;p>To open a terminal running on you &lt;em>host environment&lt;/em> in VS Code, open the Command Palette (&lt;em>Ctrl+Shift+P&lt;/em> or &lt;em>Cmd+Shift+P&lt;/em>) and select &lt;code>Create New Integrated Terminal (Local)&lt;/code>. Just remember that you will NOT be able to run &lt;code>cht&lt;/code> commands from this terminal since cht-conf is not installed on your host machine.&lt;/p>
+&lt;h4 id="note-on-connecting-to-a-local-cht-instance">Note on connecting to a local CHT instance&lt;/h4>
+&lt;p>When using &lt;code>cht-conf&lt;/code> within a Docker container to connect to a CHT instance that is running on your local machine (e.g. a development instance), you cannot use the &lt;code>--local&lt;/code> flag or &lt;code>localhost&lt;/code> in your &lt;code>--url&lt;/code> parameter (since these will be interpreted as &amp;ldquo;local to the container&amp;rdquo;).&lt;/p>
+&lt;p>It is recommended to run a local CHT instance using the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/#cht-docker-helper-for-4x">CHT Docker Helper script&lt;/a>. You can connect to the resulting &lt;code>...my.local-ip.co&lt;/code> URL from the Docker container (or the VS Code terminal). (Just make sure the port your CHT instance is hosted on is not blocked by your firewall).&lt;/p>
+&lt;hr>
+&lt;h2 id="deploy-local-cht-instance">Deploy local CHT instance&lt;/h2>
+&lt;p>Now that you have the dependent tools and software installed, you are ready to set up your local CHT environment.&lt;/p>
+&lt;p>Refer to the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/app-developer/">App Developer Hosting Guide&lt;/a> for instructions on how to deploy a local CHT instance.&lt;/p>
+&lt;p>Note that the first time you run your CHT instance it may take a while. In case you run into issues running your docker file, ensure that the following setting in Docker is checked.&lt;/p>
+&lt;blockquote>
+&lt;blockquote>
+&lt;p>Settings &amp;raquo; General &amp;raquo; Use Docker Compose V2&lt;/p>
+&lt;/blockquote>
+&lt;/blockquote>
+&lt;figure class="right col-6 col-lg-8">&lt;a href="medic-login.png">
+&lt;img src="medic-login.png"/> &lt;/a>
+&lt;/figure>
+&lt;p>Once your instance has started, navigate to &lt;a href="https://localhost">https://localhost&lt;/a> with the Google Chrome browser and login with the default username &lt;code>medic&lt;/code> and default password &lt;code>password&lt;/code>.&lt;/p>
+&lt;p>You might get an error &amp;ldquo;Your connection is not private&amp;rdquo; (see &lt;a href="./privacy.error.png">screenshot&lt;/a>). Click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
+&lt;p>If you are using macOS you will not be able to find the &amp;ldquo;Proceed to localhost&amp;rdquo; link in Chrome, to bypass that error just click anywhere on the denial page and type &amp;ldquo;thisisunsafe&amp;rdquo;.&lt;/p>
+&lt;p>This error can be fixed by &lt;a href="#optional-install-valid-tls-certificate">installing a TLS certificate&lt;/a> as described below.&lt;/p>
+&lt;p>If you encounter an error &lt;code>bind: address already in use&lt;/code>, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/#port-conflicts">Port Conflicts section&lt;/a> in the Docker Setup guide.&lt;/p>
+&lt;p>This CHT instance is empty and has no data in it. While you&amp;rsquo;re free to explore and add your own data, in step 3 below we will upload sample data. Proceed to step 2 to install &lt;code>cht-conf&lt;/code> which is needed to upload the test data.&lt;/p>
+&lt;br clear="all">
+&lt;hr>
+&lt;h3 id="upload-test-data">Upload Test Data&lt;/h3>
+&lt;p>By default, the CHT will have the &lt;a href="https://docs.communityhealthtoolkit.org/apps/examples/anc/">Maternal &amp;amp; Newborn Health Reference Application&lt;/a> installed. To upload demo data you can use &lt;code>cht-conf&lt;/code>:&lt;/p>
+&lt;figure class="right col-3 col-lg-6">&lt;a href="test.data.png">
+&lt;img src="test.data.png"/> &lt;/a>
+&lt;/figure>
+&lt;ul>
+&lt;li>Clone &lt;code>cht-core&lt;/code> on your computer using the following command:&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-core.git
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>Navigate your terminal to the &lt;code>cht-core/config/default&lt;/code> directory. This is where the reference application is stored.&lt;/li>
+&lt;li>Run the following &lt;code>cht-conf&lt;/code> command to compile and upload default test data to your local instance:&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@localhost --accept-self-signed-certs csv-to-docs upload-docs
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>With the test data uploaded, log back into your CHT instance and note the &amp;ldquo;Test Health Facility&amp;rdquo; and related data.&lt;/p>
+&lt;br clear="all">
+&lt;hr>
+&lt;h3 id="upload-a-blank-project">Upload a Blank Project&lt;/h3>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This step will erase the default Maternal &amp;amp; Newborn Health Reference Application.
+&lt;/div>
+&lt;p>You can also upload the blank project you created above (via the &lt;code>cht initilise-project-layout&lt;/code> command).&lt;/p>
+&lt;p>Deploy the blank project onto your local test environment with the following command:&lt;/p>
+&lt;ul class="nav nav-tabs" id="tabs-16" role="tablist">&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-16-0-tab" data-toggle="tab" href="#tabs-16-0" role="tab"
+aria-controls="tabs-16-0" aria-selected="false">Local&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-16-1-tab" data-toggle="tab" href="#tabs-16-1" role="tab"
+aria-controls="tabs-16-1" aria-selected="false">Dev Container&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-16-content">&lt;div class="tab-pane fade show active"
+id="tabs-16-0" role="tabpanel" aria-labelled-by="tabs-16-0-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># accept-self-signed-certs bypasses normal SSL certificate verification. This is necessary when connecting to a local CHT instance.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@localhost --accept-self-signed-certs&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;div class="tab-pane fade"
+id="tabs-16-1" role="tabpanel" aria-labelled-by="tabs-16-1-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Requires instance started with CHT Docker Helper (accessible via a my.local-ip.co URL)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@&amp;lt;your-my.local-ip.co-url&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;/div>
+&lt;figure class="right col-6 col-lg-8">&lt;a href="all-actions-completed.png">
+&lt;img src="all-actions-completed.png"/> &lt;/a>
+&lt;/figure>
+&lt;p>If the above command shows an error similar to this one &lt;code>ERROR Error: Webpack warnings when building contact-summary&lt;/code> you will need to install all the dependencies and libraries it needs (by running &lt;code>npm ci&lt;/code>) before trying to upload the configuration again with the &lt;code>cht ...&lt;/code> command.&lt;/p>
+&lt;p>Once you have run the above command it should complete with the message: &lt;code>INFO All actions completed.&lt;/code>.&lt;/p>
+&lt;br clear="all">
+&lt;hr>
+&lt;h3 id="optional-install-valid-tls-certificate">Optional: Install Valid TLS Certificate&lt;/h3>
+&lt;figure class="right col-6 col-lg-8">&lt;a href="local-ip.TLS.png">
+&lt;img src="local-ip.TLS.png"/> &lt;/a>
+&lt;/figure>
+&lt;p>With the blank project deployed to your CHT instance, you&amp;rsquo;re ready to start writing your first app. A big part of authoring an app is testing it on a mobile device, likely using the unbranded version of &lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>. In order to test in the APK, your CHT instance needs a valid TLS certificate which the default docker version does not have.&lt;/p>
+&lt;p>To install a valid certificate, open a terminal in the &lt;code>cht-core&lt;/code> directory. Ensure the CHT instance is running and make this call:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./scripts/add-local-ip-certs-to-docker-4.x.sh cht_nginx_1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If &lt;code>add-local-ip-certs-to-docker-4.x.sh&lt;/code> is not in your scripts directory, be sure to use &lt;code>git&lt;/code> or GitHub Desktop to update your local repository with the latest changes. If you can&amp;rsquo;t update for some reason, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/add-local-ip-certs-to-docker-4.x.sh">download it directly&lt;/a>.&lt;/p>
+&lt;p>To see what a before and after looks like, note the screenshot to the left which uses &lt;code>curl&lt;/code> to test the certificate validity.&lt;/p>
+&lt;p>The output of &lt;code>add-local-ip-certs-to-docker.sh&lt;/code> looks like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span>cht_nginx_1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>If just container name is shown above, a fresh local-ip.co certificate was downloaded.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The IP of your computer is used in the URL of the CHT instance now. For example if your IP is &lt;code>192.168.68.40&lt;/code> then the CHT URL with a valid TLS certificate is &lt;code>192-168-68-40.my.local-ip.co&lt;/code>. See the &lt;a href="http://local-ip.co/">local-ip.co&lt;/a> site to read more about these free to use certificates.&lt;/p>
+&lt;p>When using &lt;code>cht-conf&lt;/code> you can now drop the use of &lt;code>--accept-self-signed-certs&lt;/code>. Further, update the URL to be based on your IP. Using the example IP above, this would be &lt;code>--url=https://medic:password@192-168-68-40.my.local-ip.co&lt;/code>. As well, you can now use this URL to test with the CHT Android app.&lt;/p>
+&lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/cant-upgrade-to-3-8-version/608">How do I upgrade to a higher version of the webapp?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/unable-to-install-core-framework-in-cloud-instance/533">How do I access the instance remotely?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/installing-cht-conf/1593">Error &amp;lsquo;No module named pip&amp;rsquo; when installing cht-conf&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/couchdb-failed-to-start-properly/1683">CouchDB failed to start properly&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/enable-adding-contacts-in-a-blank-project-deployed-onlocal-test-environment-for-cht-instance/1652">Enable adding contacts in a blank project&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Apps: Local Couch2pg Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/couch2pg-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/couch2pg-setup/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This tutorial will take you through setting up a Couch2pg service.&lt;/p>
 &lt;p>By the end of the tutorial you should be able to:&lt;/p>
@@ -126,143 +379,7 @@ To set all possible variables or store the variables in configuration file, foll
 &lt;/li>
 &lt;/ul>
 &lt;br clear="all">
-&lt;hr></description></item><item><title>Apps: CHT 4.x Local Environment Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/</guid><description>
-&lt;div class="pageinfo pageinfo-primary">
-&lt;p>This tutorial will take you through setting up a local environment to build and test CHT applications on CHT version 4.x. This includes setting up the necessary tools to download and run the CHT public docker image as well as a command line interface tool to manage and build CHT apps.&lt;/p>
-&lt;p>By the end of the tutorial you should be able to:&lt;/p>
-&lt;ul>
-&lt;li>View the login page to CHT webapp on localhost&lt;/li>
-&lt;li>Upload default settings to localhost&lt;/li>
-&lt;/ul>
-&lt;/div>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-This guide will only work with CHT 4.x instances. See the
-&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/">3.x App Developer Hosting&lt;/a> for setting up comparable 3.x instances.
-&lt;/div>
-&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
-&lt;p>The &lt;em>CHT Core Framework&lt;/em> makes it faster to build full-featured, scalable digital health apps by providing a foundation developers can build on. These apps can support most languages, are &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/offline-first/">Offline-First&lt;/a>, and work on basic phones (via SMS), smartphones, tablets, and computers.&lt;/p>
-&lt;p>&lt;em>CHT Project Configurer&lt;/em> also known as &lt;em>&lt;strong>cht-conf&lt;/strong>&lt;/em> is command-line interface tool to manage and configure CHT apps.&lt;/p>
-&lt;p>&lt;em>Docker&lt;/em> is a tool designed to make it easier to create, deploy, and run applications by using containers.&lt;/p>
-&lt;p>&lt;em>Containers&lt;/em> allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and deploy it as one package.&lt;/p>
-&lt;h2 id="required-resources">Required Resources&lt;/h2>
-&lt;p>Before you begin, you need to have some useful software and tools that are required for things to work:&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://nodejs.org/en/">nodejs&lt;/a> version 12&lt;/li>
-&lt;li>&lt;a href="https://www.npmjs.com/get-npm">npm&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://git-scm.com/downloads">git&lt;/a> or the &lt;a href="https://desktop.github.com/">Github Desktop&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#docker">docker and docker-compose&lt;/a>.&lt;/li>
-&lt;/ul>
-&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
-&lt;p>Now that you have the dependent tools and software installed, you are ready to set up your CHT local environment.&lt;/p>
-&lt;h3 id="1-create-docker-compose-files">1. Create Docker compose files&lt;/h3>
-&lt;p>Open your terminal and run these commands which will create a directory, download the three Docker Compose files and prepare the evironment variables file. You should just be able select all and paste on a command line:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/cht-local-setup/couch-data/ &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p ~/cht-local-setup/core-couch/ &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p ~/cht-local-setup/upgrade/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-local-setup
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./core-couch/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-core.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./core-couch/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.1.0/docker-compose/cht-couchdb.yml &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> curl -s -o ./upgrade/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; &lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">HOME&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span>/cht-local-setup/upgrade/.env &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">DOCKER_CONFIG_PATH=${HOME}/cht-local-setup/core-couch/
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_DATA=${HOME}/cht-local-setup/data/couch-data
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">CHT_COMPOSE_PATH=${HOME}/cht-local-setup/core-couch/
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_USER=medic
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">COUCHDB_PASSWORD=password
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">EOF&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Run the following command to start your CHT instance using Docker Compose:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-local-setup/upgrade/
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose up
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that the first time you run your CHT instance it may take a while. In case you run into issues running your docker file, ensure that the following setting in Docker is checked.&lt;/p>
-&lt;blockquote>
-&lt;blockquote>
-&lt;p>Settings &amp;raquo; General &amp;raquo; Use Docker Compose V2&lt;/p>
-&lt;/blockquote>
-&lt;/blockquote>
-&lt;figure class="right col-6 col-lg-8">&lt;a href="medic-login.png">
-&lt;img src="medic-login.png"/> &lt;/a>
-&lt;/figure>
-&lt;p>Once the command is finished, navigate to &lt;a href="https://localhost">https://localhost&lt;/a> with the Google Chrome browser and login with the default username &lt;code>medic&lt;/code> and default password &lt;code>password&lt;/code>.&lt;/p>
-&lt;p>You might get an error &amp;ldquo;Your connection is not private&amp;rdquo; (see &lt;a href="./privacy.error.png">screenshot&lt;/a>). Click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
-&lt;p>If you are using Mac you will not be able to find the &amp;ldquo;Proceed to localhost&amp;rdquo; link in Chrome, to bypass that error just click anywhere on the denial page and type &amp;ldquo;thisisunsafe&amp;rdquo;.&lt;/p>
-&lt;p>This error can be fixed in step 5 below.&lt;/p>
-&lt;p>If you encounter an error &lt;code>bind: address already in use&lt;/code>, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/#port-conflicts">Port Conflicts section&lt;/a> in the Docker Setup guide.&lt;/p>
-&lt;p>This CHT instance is empty and has no data in it. While you&amp;rsquo;re free to explore and add your own data, in step 3 below we will upload sample data. Proceed to step 2 to install &lt;code>cht-conf&lt;/code> which is needed to upload the test data.&lt;/p>
-&lt;br clear="all">
-&lt;hr>
-&lt;h3 id="2-install-cht-conf">2. Install cht-conf&lt;/h3>
-&lt;p>Using npm on your terminal, install cht-conf globally using the command below.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm install -g cht-conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Using python on your terminal, install pyxform globally using the command below.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo python -m pip install git+https://github.com/medic/pyxform.git@medic-conf-1.17#egg&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>pyxform-medic
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you encounter the error &lt;code>npm ERR! gyp ERR verb find Python Python is not set&lt;/code> while installing pyxform and are running macOS, see &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/#macos--123">this troubleshooting section&lt;/a>.&lt;/p>
-&lt;figure class="right col-6 col-lg-8">&lt;a href="confirm-cht-conf.png">
-&lt;img src="confirm-cht-conf.png"/> &lt;/a>
-&lt;/figure>
-&lt;p>You can confirm that the installation was successful by typing &lt;code>cht&lt;/code> in your terminal.&lt;/p>
-&lt;p>If you have trouble installing &lt;code>cht-conf&lt;/code>, see the application&amp;rsquo;s &lt;a href="https://github.com/medic/cht-conf">GitHub repository&lt;/a> for more information.&lt;/p>
-&lt;br clear="all">
-&lt;hr>
-&lt;h3 id="3-upload-test-data">3. Upload Test Data&lt;/h3>
-&lt;p>By default, the CHT will have the &lt;a href="https://docs.communityhealthtoolkit.org/apps/examples/anc/">Maternal &amp;amp; Newborn Health Reference Application&lt;/a> installed. To upload demo data you can use &lt;code>cht-conf&lt;/code>:&lt;/p>
-&lt;figure class="right col-3 col-lg-6">&lt;a href="test.data.png">
-&lt;img src="test.data.png"/> &lt;/a>
-&lt;/figure>
-&lt;ul>
-&lt;li>Clone &lt;code>cht-core&lt;/code> on your computer using the following command:&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-core.git
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
-&lt;li>Navigate your terminal to the &lt;code>cht-core/config/default&lt;/code> directory. This is where the reference application is stored.&lt;/li>
-&lt;li>Run the following &lt;code>cht-conf&lt;/code> command to compile and upload default test data to your local instance:&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@localhost --accept-self-signed-certs csv-to-docs upload-docs
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>With the test data uploaded, log back into your CHT instance and note the &amp;ldquo;Test Health Facility&amp;rdquo; and related data.&lt;/p>
-&lt;br clear="all">
-&lt;hr>
-&lt;h3 id="4-create-and-upload-a-blank-project">4. Create and Upload a Blank Project&lt;/h3>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-This step will erase the default Maternal &amp;amp; Newborn Health Reference Application.
-&lt;/div>
-&lt;p>With &lt;code>cht-conf&lt;/code> you can also create a blank project. This provides you a template from which you can begin working on CHT. To do so, run the following commands which will create a new directory and initialize it. Be sure to use this directory for all subsequent calls:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir ~/cht-app-tutorials
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-app-tutorials
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht initialise-project-layout
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then deploy the blank project onto your local test environment with the command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@localhost --accept-self-signed-certs
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If the above command shows an error similar to this one &lt;code>ERROR Error: Webpack warnings when building contact-summary&lt;/code> you will need to install all the dependencies and libraries it needs, then you need to restart the docker-compose and try again. Run the following to install the dependancies.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm ci
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose restart
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://medic:password@localhost --accept-self-signed-certs
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;figure class="right col-6 col-lg-8">&lt;a href="all-actions-completed.png">
-&lt;img src="all-actions-completed.png"/> &lt;/a>
-&lt;/figure>
-&lt;p>&lt;code>accept-self-signed-certs&lt;/code> tells cht-conf that it’s OK that the server’s certificate isn’t signed properly, which will be the case when using docker locally.&lt;/p>
-&lt;p>Once you have run the above command it should complete with the message: &lt;code>INFO All actions completed.&lt;/code>.&lt;/p>
-&lt;br clear="all">
-&lt;hr>
-&lt;h3 id="5-optional-install-valid-tls-certificate">5. Optional: Install Valid TLS Certificate&lt;/h3>
-&lt;figure class="right col-6 col-lg-8">&lt;a href="local-ip.TLS.png">
-&lt;img src="local-ip.TLS.png"/> &lt;/a>
-&lt;/figure>
-&lt;p>With the blank project deployed to your CHT instance, you&amp;rsquo;re ready to start writing your first app. A big part of authoring an app is testing it on a mobile device, likely using the unbranded version of &lt;a href="https://github.com/medic/cht-android">CHT Android&lt;/a>. In order to test in the APK, your CHT instance needs a valid TLS certificate which the default docker version does not have.&lt;/p>
-&lt;p>To install a valid certificate, open a terminal in the &lt;code>cht-core&lt;/code> directory. Ensure the CHT instance is running and make this call:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./scripts/add-local-ip-certs-to-docker-4.x.sh cht_nginx_1
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If &lt;code>add-local-ip-certs-to-docker-4.x.sh&lt;/code> is not in your scripts directory, be sure to use &lt;code>git&lt;/code> or GitHub Desktop to update your local repository with the latest changes. If you can&amp;rsquo;t update for some reason, you can &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/add-local-ip-certs-to-docker-4.x.sh">download it directly&lt;/a>.&lt;/p>
-&lt;p>To see what a before and after looks like, note the screenshot to the left which uses &lt;code>curl&lt;/code> to test the certificate validity.&lt;/p>
-&lt;p>The output of &lt;code>add-local-ip-certs-to-docker.sh&lt;/code> looks like this:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-text" data-lang="text">&lt;span style="display:flex;">&lt;span>cht_nginx_1
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>If just container name is shown above, a fresh local-ip.co certificate was downloaded.
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The IP of your computer is used in the URL of the CHT instance now. For example if your IP is &lt;code>192.168.68.40&lt;/code> then the CHT URL with a valid TLS certificate is &lt;code>192-168-68-40.my.local-ip.co&lt;/code>. See the &lt;a href="http://local-ip.co/">local-ip.co&lt;/a> site to read more about these free to use certificates.&lt;/p>
-&lt;p>When using &lt;code>cht-conf&lt;/code> you can now drop the use of &lt;code>--accept-self-signed-certs&lt;/code>. Further, update the URL to be based on your IP. Using the example IP above, this would be &lt;code>--url=https://medic:password@192-168-68-40.my.local-ip.co&lt;/code>. As well, you can now use this URL to test with the CHT Android app.&lt;/p>
-&lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/cant-upgrade-to-3-8-version/608">How do I upgrade to a higher version of the webapp?&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/unable-to-install-core-framework-in-cloud-instance/533">How do I access the instance remotely?&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/installing-cht-conf/1593">Error &amp;lsquo;No module named pip&amp;rsquo; when installing cht-conf&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/couchdb-failed-to-start-properly/1683">CouchDB failed to start properly&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/enable-adding-contacts-in-a-blank-project-deployed-onlocal-test-environment-for-cht-instance/1652">Enable adding contacts in a blank project&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Apps: Contact and User Management - Part 1</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/contact-and-users-1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/contact-and-users-1/</guid><description>
+&lt;hr></description></item><item><title>Apps: Contact and User Management - Part 1</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/contact-and-users-1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/contact-and-users-1/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>In this tutorial you will learn how to create and edit contacts and their associated users in and application built with the CHT using the default contact creation forms. This will help you get familiar with the UI of the webapp as well as some features and functionality. If you are already comfortable with this, you can skip to &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/contact-and-users-2/">part 2, which covers manipulating contacts and their associated documents using cht-conf&lt;/a>.&lt;/p>
 &lt;/div>
@@ -473,161 +590,6 @@ This step will erase the default Maternal &amp;amp; Newborn Health Reference App
 &lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
 &lt;ul>
 &lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-one-person-belong-to-multiple-places-in-the-same-hierarchy/101">Can one person belong to multiple places in the same hierarchy?&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Apps: CHT Application Settings</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/application-settings/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/application-settings/</guid><description>
-&lt;div class="pageinfo pageinfo-primary">
-&lt;p>This tutorial will take you through how to manage the CHT application settings, including;&lt;/p>
-&lt;ul>
-&lt;li>Setting user roles and permissions&lt;/li>
-&lt;li>Enabling and disabling transitions&lt;/li>
-&lt;li>Configuring contact hierarchy and configuring replication.&lt;/li>
-&lt;/ul>
-&lt;p>App settings allow you to both persist information that is critical to the application outside the code, and to create profiles that store the preferences for project deployments.&lt;/p>
-&lt;/div>
-&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
-&lt;p>The settings which control CHT apps are defined in the &lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/">app_settings.json&lt;/a>&lt;/em> file, and stored in the settings doc in the database.&lt;/p>
-&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/#permissions">Permissions&lt;/a>&lt;/em> are settings that control access to specific app features and functionality.&lt;/p>
-&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/#roles">Roles&lt;/a>&lt;/em> define permissions for users to access a group of app features and functionality.&lt;/p>
-&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/replication/">Replication&lt;/a>&lt;/em> is when users download a copy of the data on to their device. &lt;em>Replication depth&lt;/em> refers to the number of levels within a hierarchy a specific user role is able to replicate.&lt;/p>
-&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/transitions/">Transitions&lt;/a>&lt;/em> are Javascript code that run when a document is changed. A transition can edit the changed doc or do anything server side code can do for that matter.&lt;/p>
-&lt;h2 id="required-resources">Required Resources&lt;/h2>
-&lt;p>You should have a functioning CHT instance and have cht-conf installed locally.
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">How to set up a CHT local configuration environment&lt;/a>&lt;/p>
-&lt;/p>
-&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
-&lt;p>In this section, you will define a new role, set permissions for the role, set transitions, configure a hierarchy, and upload your modified app settings file to your local environment.&lt;/p>
-&lt;h3 id="1-set-roles-and-permissions">1. Set Roles and Permissions&lt;/h3>
-&lt;p>To add a new role, edit the object corresponding to &lt;code>&amp;quot;roles&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. Add the new role as a key and within it, have an object with key/value pairs indicating the translation key of the role and whether it is an online or offline role.&lt;/p>
-&lt;p>Configure a CHW role by adding the following snippet to the &lt;code>&amp;quot;roles&amp;quot;&lt;/code> object:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;usertype.chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;offline&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-roles/">Roles&lt;/a>&lt;/p>
-&lt;p>Set permissions for the new role by adding the role to the relevant permission in the &lt;code>&amp;quot;permissions&amp;quot;&lt;/code> object.&lt;/p>
-&lt;p>For instance, to grant the CHW role permission to create people, add the role to the array with the key &lt;code>&amp;quot;can_create_people&amp;quot;&lt;/code>.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;permissions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a40000">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;can_create_people&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;program_officer&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw_supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a40000">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/">Permissions&lt;/a>&lt;/p>
-&lt;h3 id="2-set-transitions">2. Set Transitions&lt;/h3>
-&lt;p>To enable or disable a transition, edit the object corresponding to the &lt;code>&amp;quot;transitions&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. Enable the &lt;code>transition&lt;/code> by setting its corresponding value to &lt;code>true&lt;/code>, disable it by settings its value to &lt;code>false&lt;/code>.
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/">Transitions&lt;/a>&lt;/p>
-&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;transitions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;accept_patient_reports&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;conditional_alerts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;default_responses&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_sent_by&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;registration&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_clinics&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_notifications&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_scheduled_reports&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_sent_forms&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;generate_patient_id_on_people&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;death_reporting&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, the &lt;code>generate_patient_id_on_people&lt;/code> and &lt;code>death_reporting&lt;/code> transitions are enabled while the rest are disabled.&lt;/p>
-&lt;h3 id="3-set-hierarchy">3. Set Hierarchy&lt;/h3>
-&lt;p>You can configure hierarchies by editing the object corresponding to the &lt;code>&amp;quot;contact_types&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. The following code sample represents the default hierarchy configuration. You can modify existing contact types by editing the objects within the array.&lt;/p>
-&lt;p>When configuring a new deployment, it&amp;rsquo;s important to plan your hierarchy well. While there are no limits in the CHT to the hierarchical depth or breadth it will support, there are some trade-offs and caveats:&lt;/p>
-&lt;ul>
-&lt;li>While it is possible to &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/updates/moving-contacts/">update the hierarchy configuration&lt;/a> after launch it can be difficult and potentially disruptive to users. Try and avoid this by planning ahead as best as possible.&lt;/li>
-&lt;li>If your hierarchy is too shallow, users will download more docs than are necessary for their work which will impact the performance of the app. Taking the time to get the hierarchy configuration right makes it easy to give users access to only the docs they need.&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">Hierarchy&lt;/a>&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;contact_types&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-district-hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:district_hospital:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:district_hospital:edit&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-health-center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:health_center:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:health_center:edit&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:clinic:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:clinic:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;count_visits&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;primary_contact_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic.field.contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:person:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:person:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="4-set-replication-depth">4. Set Replication Depth&lt;/h3>
-&lt;p>To configure replication depth for a specific role, edit the object corresponding to the &lt;code>&amp;quot;replication_depth&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;replication_depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;national_manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Configure the CHW role&amp;rsquo;s depth to 2 by adding the following key/value pairs to the array above.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/replication/">Replication Depth&lt;/a>&lt;/p>
-&lt;h3 id="5-upload-app-settings">5. Upload App Settings&lt;/h3>
-&lt;p>To upload app settings to your local instance, run the following command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-zsh" data-lang="zsh">&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs upload-app-settings
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
-&lt;div class="alert alert-primary" role="alert">
-&lt;h4 class="alert-heading">Note&lt;/h4>
-Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &lt;code>&amp;lt;password&amp;gt;&lt;/code> with the actual username and password of your test instance.
-&lt;/div>
-&lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
-&lt;ul>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/default-config-do-not-compile/536">Compiling default app settings&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/documentation-for-role-permissions/502">Documentation for role permissions&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/is-it-possible-to-prevent-editing-for-some-forms-but-allow-it-for-others/93">Is it possible to prevent editing for some forms but allow it for others?&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-one-person-belong-to-multiple-places-in-the-same-hierarchy/101/2">Can one person belong to multiple places in the same hierarchy?&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-we-disable-the-guided-tour-on-first-login-if-yes-how-do-we-do-it/98/2">Can we disable the guided tour on first login?&lt;/a>&lt;/li>
 &lt;/ul></description></item><item><title>Apps: Building SMS Forms</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-forms/</guid><description>
 &lt;p>SMS forms allow users to submit reports from any device including &lt;a href="https://en.wikipedia.org/wiki/Feature_phone">feature phones&lt;/a> without internet access. SMS forms are ideal in scenarios where targeted users have no way of accessing internet or where they are restricted to using feature phones.&lt;/p>
 &lt;div class="pageinfo pageinfo-primary">
@@ -989,7 +951,162 @@ Users will pregnancy registration report by sending a text message in the format
 Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &lt;code>&amp;lt;password&amp;gt;&lt;/code> with the actual username and password of your test instance.
 &lt;/div>
 &lt;h2 id="next-steps">Next steps&lt;/h2>
-&lt;p>In the next tutorial, you will define scheduled messages that can be triggered or cleared by submitting SMS forms.&lt;/p></description></item><item><title>Apps: Building SMS Schedules</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-schedules/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-schedules/</guid><description>
+&lt;p>In the next tutorial, you will define scheduled messages that can be triggered or cleared by submitting SMS forms.&lt;/p></description></item><item><title>Apps: CHT Application Settings</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/application-settings/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/application-settings/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This tutorial will take you through how to manage the CHT application settings, including;&lt;/p>
+&lt;ul>
+&lt;li>Setting user roles and permissions&lt;/li>
+&lt;li>Enabling and disabling transitions&lt;/li>
+&lt;li>Configuring contact hierarchy and configuring replication.&lt;/li>
+&lt;/ul>
+&lt;p>App settings allow you to both persist information that is critical to the application outside the code, and to create profiles that store the preferences for project deployments.&lt;/p>
+&lt;/div>
+&lt;h2 id="brief-overview-of-key-concepts">Brief Overview of Key Concepts&lt;/h2>
+&lt;p>The settings which control CHT apps are defined in the &lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/">app_settings.json&lt;/a>&lt;/em> file, and stored in the settings doc in the database.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/#permissions">Permissions&lt;/a>&lt;/em> are settings that control access to specific app features and functionality.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/#roles">Roles&lt;/a>&lt;/em> define permissions for users to access a group of app features and functionality.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/replication/">Replication&lt;/a>&lt;/em> is when users download a copy of the data on to their device. &lt;em>Replication depth&lt;/em> refers to the number of levels within a hierarchy a specific user role is able to replicate.&lt;/p>
+&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/core/overview/transitions/">Transitions&lt;/a>&lt;/em> are Javascript code that run when a document is changed. A transition can edit the changed doc or do anything server side code can do for that matter.&lt;/p>
+&lt;h2 id="required-resources">Required Resources&lt;/h2>
+&lt;p>You should have a functioning CHT instance and have cht-conf installed locally.
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">How to set up a CHT local configuration environment&lt;/a>&lt;/p>
+&lt;/p>
+&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
+&lt;p>In this section, you will define a new role, set permissions for the role, set transitions, configure a hierarchy, and upload your modified app settings file to your local environment.&lt;/p>
+&lt;h3 id="1-set-roles-and-permissions">1. Set Roles and Permissions&lt;/h3>
+&lt;p>To add a new role, edit the object corresponding to &lt;code>&amp;quot;roles&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. Add the new role as a key and within it, have an object with key/value pairs indicating the translation key of the role and whether it is an online or offline role.&lt;/p>
+&lt;p>Configure a CHW role by adding the following snippet to the &lt;code>&amp;quot;roles&amp;quot;&lt;/code> object:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;usertype.chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;offline&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-roles/">Roles&lt;/a>&lt;/p>
+&lt;p>Set permissions for the new role by adding the role to the relevant permission in the &lt;code>&amp;quot;permissions&amp;quot;&lt;/code> object.&lt;/p>
+&lt;p>For instance, to grant the CHW role permission to create people, add the role to the array with the key &lt;code>&amp;quot;can_create_people&amp;quot;&lt;/code>.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;permissions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a40000">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;can_create_people&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;program_officer&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw_supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a40000">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-permissions/">Permissions&lt;/a>&lt;/p>
+&lt;h3 id="2-set-transitions">2. Set Transitions&lt;/h3>
+&lt;p>To enable or disable a transition, edit the object corresponding to the &lt;code>&amp;quot;transitions&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. Enable the &lt;code>transition&lt;/code> by setting its corresponding value to &lt;code>true&lt;/code>, disable it by settings its value to &lt;code>false&lt;/code>.
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/">Transitions&lt;/a>&lt;/p>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;transitions&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;accept_patient_reports&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;conditional_alerts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;default_responses&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_sent_by&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;registration&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_clinics&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_notifications&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_scheduled_reports&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;update_sent_forms&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;generate_patient_id_on_people&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;death_reporting&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, the &lt;code>generate_patient_id_on_people&lt;/code> and &lt;code>death_reporting&lt;/code> transitions are enabled while the rest are disabled.&lt;/p>
+&lt;h3 id="3-set-hierarchy">3. Set Hierarchy&lt;/h3>
+&lt;p>You can configure hierarchies by editing the object corresponding to the &lt;code>&amp;quot;contact_types&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>. The following code sample represents the default hierarchy configuration. You can modify existing contact types by editing the objects within the array.&lt;/p>
+&lt;p>When configuring a new deployment, it&amp;rsquo;s important to plan your hierarchy well. While there are no limits in the CHT to the hierarchical depth or breadth it will support, there are some trade-offs and caveats:&lt;/p>
+&lt;ul>
+&lt;li>While it is possible to &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/updates/moving-contacts/">update the hierarchy configuration&lt;/a> after launch it can be difficult and potentially disruptive to users. Try and avoid this by planning ahead as best as possible.&lt;/li>
+&lt;li>If your hierarchy is too shallow, users will download more docs than are necessary for their work which will impact the performance of the app. Taking the time to get the hierarchy configuration right makes it easy to give users access to only the docs they need.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">Hierarchy&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;contact_types&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.district_hospital.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-district-hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:district_hospital:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:district_hospital:edit&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.health_center.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-health-center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:health_center:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:health_center:edit&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.clinic.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.place.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:clinic:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:clinic:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;count_visits&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.person.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;primary_contact_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic.field.contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;medic-person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:person:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:person:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="4-set-replication-depth">4. Set Replication Depth&lt;/h3>
+&lt;p>To configure replication depth for a specific role, edit the object corresponding to the &lt;code>&amp;quot;replication_depth&amp;quot;&lt;/code> key in &lt;code>app_settings.json&lt;/code>.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;replication_depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;national_manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Configure the CHW role&amp;rsquo;s depth to 2 by adding the following key/value pairs to the array above.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;depth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/replication/">Replication Depth&lt;/a>&lt;/p>
+&lt;h3 id="5-upload-app-settings">5. Upload App Settings&lt;/h3>
+&lt;p>To upload app settings to your local instance, run the following command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-zsh" data-lang="zsh">&lt;span style="display:flex;">&lt;span>cht --url&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs upload-app-settings
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &lt;code>&amp;lt;password&amp;gt;&lt;/code> with the actual username and password of your test instance.
+&lt;/div>
+&lt;h2 id="frequently-asked-questions">Frequently Asked Questions&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/default-config-do-not-compile/536">Compiling default app settings&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/documentation-for-role-permissions/502">Documentation for role permissions&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/is-it-possible-to-prevent-editing-for-some-forms-but-allow-it-for-others/93">Is it possible to prevent editing for some forms but allow it for others?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-one-person-belong-to-multiple-places-in-the-same-hierarchy/101/2">Can one person belong to multiple places in the same hierarchy?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-we-disable-the-guided-tour-on-first-login-if-yes-how-do-we-do-it/98/2">Can we disable the guided tour on first login?&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Apps: Building SMS Schedules</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-schedules/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/sms-schedules/</guid><description>
 &lt;p>SMS schedules allow you to send reminder messages at predetermined times. These reminders serve as useful prompts for end-users to take specific actions.&lt;/p>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This tutorial takes you through how to set up SMS schedules for CHT applications. It uses a pregnancy registration workflow and follow-up reminders for a Community Health Worker as an example. The same methodology can be applied to other workflows and reminders as needed.&lt;/p>
@@ -3548,4 +3665,42 @@ If your &lt;code>package.json&lt;/code> file does not already have them, add &lt
 &lt;p>We will be looking at &lt;code>resolvedIf&lt;/code> and the concept of &lt;em>task completion&lt;/em> in more depth in [Configuring Tasks - Part 4]({{ &amp;lt; ref &amp;ldquo;apps/tutorials/tasks-4&amp;rdquo; &amp;gt;}}).&lt;/p>
 &lt;h2 id="actions">Actions&lt;/h2>
 &lt;pre tabindex="0">&lt;code>5. The first pregnancy visit should prompt the CHW to ask some additional questions
-&lt;/code>&lt;/pre>&lt;p>The &lt;code>modifyContent&lt;/code> attribute allows the task to pass data from the task (in JavaScript) into the action app form (xlsx). Check out the guide for &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/tasks/pass-data-to-form/">Passing data from a task into the app form&lt;/a>.&lt;/p></description></item></channel></rss>
+&lt;/code>&lt;/pre>&lt;p>The &lt;code>modifyContent&lt;/code> attribute allows the task to pass data from the task (in JavaScript) into the action app form (xlsx). Check out the guide for &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/tasks/pass-data-to-form/">Passing data from a task into the app form&lt;/a>.&lt;/p></description></item><item><title>Apps: Local Docker Setup</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/_partial_docker_setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/_partial_docker_setup/</guid><description>
+&lt;ul class="nav nav-tabs" id="tabs-0" role="tablist">&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-0-0-tab" data-toggle="tab" href="#tabs-0-0" role="tab"
+aria-controls="tabs-0-0" aria-selected="false">Linux (Ubuntu)&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-0-1-tab" data-toggle="tab" href="#tabs-0-1" role="tab"
+aria-controls="tabs-0-1" aria-selected="false">macOS&lt;/a>
+&lt;/li>
+&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-0-2-tab" data-toggle="tab" href="#tabs-0-2" role="tab"
+aria-controls="tabs-0-2" aria-selected="false">Windows (WSL2)&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-0-content">&lt;div class="tab-body tab-pane fade show active"
+id="tabs-0-0" role="tabpanel" aria-labelled-by="tabs-0-0-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -fsSL get.docker.com -o get-docker.sh &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sh get-docker.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># OPTIONAL: Allow user to run Docker without sudo&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>dockerd-rootless-setuptool.sh install
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export PATH=/usr/bin:&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export DOCKER_HOST=unix:///run/user/1000/docker.sock&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-0-1" role="tabpanel" aria-labelled-by="tabs-0-1-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-0-2" role="tabpanel" aria-labelled-by="tabs-0-2-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;p>Restart your entire machine to finish initializing Docker.&lt;/p>
+&lt;p>After restarting, verify Docker is running as expected. Run the simple &lt;code>hello-world&lt;/code> Docker container. This should output &amp;ldquo;Hello from Docker!&amp;rdquo; as well as some other intro text:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run hello-world
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
