@@ -466,8 +466,11 @@ This is for CHT 4.x. To use a CHT 3.x version, see the earlier &lt;a href="https
 &lt;iframe src="https://www.youtube.com/embed/hrcy8JlJP9M" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
 &lt;hr></description></item><item><title>Apps: Adding TLS certificates in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/</guid><description>
+&lt;p>By default, CHT 4.x will create a self-signed certificate for every deployment. These instructions are for changing to either a pre-existing certificate or automatically creating and renewing a &lt;a href="https://certbot.eff.org/">Certbot&lt;/a> based certificate using &lt;a href="https://acmeclients.com/">ACME&lt;/a>, like &lt;a href="https://letsencrypt.org/">Let&amp;rsquo;s Encrypt&lt;/a>.&lt;/p>
+&lt;p>This guide assumes you&amp;rsquo;ve already met the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">hosting requirements&lt;/a>, specifically around Docker being installed.&lt;/p>
+&lt;h2 id="pre-existing-certificate">Pre-existing certificate&lt;/h2>
 &lt;p>To load your certificates into your CHT instance, we&amp;rsquo;ll be creating an interstitial container called &lt;code>cht-temp-tls&lt;/code> which will enable you to copy your local certificate files into the native docker volume.&lt;/p>
-&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
 &lt;p>You have two files locally on your workstation in the directory you&amp;rsquo;re currently in:&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>key.pem&lt;/code> - the private key for your TLS certificate&lt;/li>
@@ -499,7 +502,52 @@ docker cp cert.pem temp:/etc/nginx/private/.
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> temp
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;/ol>
-&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites">prerequisites&lt;/a>.&lt;/p></description></item><item><title>Apps: Viewing server logs in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</guid><description>
+&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites">prerequisites&lt;/a>.&lt;/p>
+&lt;h2 id="certbot-certificate">Certbot certificate&lt;/h2>
+&lt;p>If you have a deployment with a publically accessible domain name, you can have Certbot automatically create free TLS certificates by using &lt;a href="https://hub.docker.com/r/certbot/certbot/">their Docker image&lt;/a>.&lt;/p>
+&lt;p>Assuming your CHT instance is running with the default self signed cert:&lt;/p>
+&lt;ol>
+&lt;li>Create certbot compose and env files by copying and pasting this code:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; docker-compose.yml &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">version: &amp;#39;3.9&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">services:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> certbot:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> container_name: certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> hostname: certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> image: certbot/certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - ssl-storage:/etc/nginx/private/
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> - ssl-storage:/var/log/letsencrypt/
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> command: certonly --debug --deploy-hook /etc/nginx/private/deploy.sh --webroot -w /etc/nginx/private/certbot/ --domain \$DOMAIN --non-interactive --key-type rsa --agree-tos --register-unsafely-without-email \$STAGING
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> ssl-storage:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> name: \${CHT_SSL_VOLUME}
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06"> external: true
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cat &amp;gt; .env &lt;span style="color:#4e9a06">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">DOMAIN=deleteme2-certbot-nginx-cht.plip.com
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">STAGING=
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">CHT_SSL_VOLUME=cht_cht-ssl
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">TZ=America/Whitehorse
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Generate certs:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Run this command to find the name of your CHT ngnix container:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker ps --filter &lt;span style="color:#4e9a06">&amp;#34;name=nginx&amp;#34;&lt;/span> --format &lt;span style="color:#4e9a06">&amp;#39;{{ .Names }}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Assuming the name is &lt;code>cht_nginx_1&lt;/code> from the prior step, reload your &lt;code>nginx&lt;/code> config with this command:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">exec&lt;/span> -it cht_nginx_1 nginx -s reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Attempt to renew your certificates once a week by adding this cronjob via &lt;code>crontab -e&lt;/code>. Certbot will only renew them as needed:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#0000cf;font-weight:bold">0&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span> * * &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span> &lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/certbot&lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span>docker compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol></description></item><item><title>Apps: Viewing server logs in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/logs/</guid><description>
 &lt;p>CHT 4.x has the following services running via Docker and each can have its logs queried:&lt;/p>
 &lt;ul>
 &lt;li>nginx&lt;/li>
