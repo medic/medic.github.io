@@ -2935,6 +2935,11 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
 &lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>getExtensionLib(name)&lt;/td>
+&lt;td>&lt;code>name&lt;/code>: String of script name&lt;/td>
+&lt;td>Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension-libs&lt;/a>.&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
 &lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
@@ -2944,6 +2949,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">averageFn&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">getExtensionLib&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;average.js&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="contact-summary">Contact Summary&lt;/h2>
 &lt;p>Each field that can be shown on a contact&amp;rsquo;s profile is defined as an object in the &lt;code>fields&lt;/code> array of &lt;code>contact-summary.templated.js&lt;/code>. The properties for each object determine how and when the field is shown.&lt;/p>
@@ -3187,7 +3193,57 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">};&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="build">Build&lt;/h2>
 &lt;p>To update the Contact profiles for an app, changes must be compiled into &lt;code>app-settings&lt;/code>, then uploaded.&lt;/p>
-&lt;p>&lt;code>cht --local compile-app-settings backup-app-settings upload-app-settings&lt;/code>&lt;/p></description></item><item><title>Apps: targets.js</title><link>https://docs.communityhealthtoolkit.org/apps/reference/targets/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/targets/</guid><description>
+&lt;p>&lt;code>cht --local compile-app-settings backup-app-settings upload-app-settings&lt;/code>&lt;/p></description></item><item><title>Apps: extension-libs/</title><link>https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/</guid><description>
+&lt;p>&lt;em>Introduced in v4.2.0&lt;/em>&lt;/p>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>Extension libraries are blocks of code that are cached with the CHT web application giving app developers a powerful tool to extend the CHT. This is an advanced feature and requires an app developer with some software development experience.&lt;/p>
+&lt;p>An example of a use for this feature is to provide a function to calculate a risk score based on a machine learning model. The function can then be called passing in values from app forms and return the result to be stored with the report.&lt;/p>
+&lt;h3 id="library">Library&lt;/h3>
+&lt;p>The first step is to create the js file to return the function that will be called by the web application. Create a new file using this template:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#8f5902;font-style:italic">/* parameters */&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#000">result&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now populate the function as needed. For complex functions, it is recommended to use third party libraries (such as momentjs, lodash, etc) and use a bundler (eg: &lt;a href="https://webpack.js.org/">webpack&lt;/a>) to make it easy to build a single file. It&amp;rsquo;s recommended to use development best practices such as linting, unit tests, and minification to ensure quality and small download size.&lt;/p>
+&lt;h4 id="xpath-functions">xpath functions&lt;/h4>
+&lt;p>To call the function from within a form the parameters and return value will need to have a very specific structure to work with Enketo xforms.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;t&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#a40000">&amp;lt;type&amp;gt;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;v&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#a40000">&amp;lt;value&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Where the type is one of &amp;ldquo;bool&amp;rdquo;, &amp;ldquo;num&amp;rdquo;, &amp;ldquo;str&amp;rdquo;, &amp;ldquo;date&amp;rdquo;, or &amp;ldquo;arr&amp;rdquo;. For example, to calculate the average of two inputs, you would use:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">getValue&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">let&lt;/span> &lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">t&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">===&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;arr&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">length&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v&lt;/span>&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span> &lt;span style="color:#204a87;font-weight:bold">else&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">val&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">obj&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">if&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">!&lt;/span>&lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">parsed&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#204a87">parseInt&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">val&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">textContent&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87">isNaN&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">parsed&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">?&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000">parsed&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#204a87;font-weight:bold">function&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">first&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#000">second&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">average&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">getValue&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">first&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">+&lt;/span> &lt;span style="color:#000">getValue&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">second&lt;/span>&lt;span style="color:#000;font-weight:bold">))&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">/&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">return&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">t&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;num&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000">v&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">:&lt;/span> &lt;span style="color:#000">average&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="uploading-to-the-cht">Uploading to the CHT&lt;/h3>
+&lt;p>Create a folder within the project configuration to contain the libraries, for example:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./extension-libs
+average.js
+calculate-risk-score.js
+&lt;/code>&lt;/pre>&lt;p>Now run the command: &lt;code>cht upload-extension-libs&lt;/code>&lt;/p>
+&lt;p>This will create or update a document to CouchDB with an ID of &lt;code>extension-libs&lt;/code> with each of the configured scripts attached. Once this is created the webapp service worker will be updated so the libraries are cached on the phone ready for use offline.&lt;/p>
+&lt;h3 id="invoking-the-function">Invoking the function&lt;/h3>
+&lt;h4 id="cht-api">CHT API&lt;/h4>
+&lt;p>The function will now be available via the CHT API for &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/tasks/">tasks&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/targets/">tasks&lt;/a>, and &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/contact-page/">contact summary&lt;/a> configurations.&lt;/p>
+&lt;h4 id="cht-xpath-functions">CHT xPath functions&lt;/h4>
+&lt;p>To execute the function from within an xform use the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#chtextension-lib">&lt;code>cht:extension-lib&lt;/code> xpath function&lt;/a>.&lt;/p></description></item><item><title>Apps: targets.js</title><link>https://docs.communityhealthtoolkit.org/apps/reference/targets/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/targets/</guid><description>
 &lt;p>&lt;img src="counts.png" alt="Percentages">&lt;/p>
 &lt;p>&lt;img src="percentages.png" alt="Percentages">&lt;/p>
 &lt;p>All targets are defined in the &lt;code>targets.js&lt;/code> file as an array of objects according to the Targets schema defined below. Each object corresponds to a target widget that shows in the app. The order of objects in the array defines the display order of widgets on the Targets tab. The properties of the object are used to define when the target should appear, what it should look like, and the values it will display.&lt;/p>
@@ -3420,6 +3476,11 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
 &lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>getExtensionLib(name)&lt;/td>
+&lt;td>&lt;code>name&lt;/code>: String of script name&lt;/td>
+&lt;td>Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension-libs&lt;/a>.&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
 &lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
@@ -3429,6 +3490,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">averageFn&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">getExtensionLib&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;average.js&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="code-samples">Code Samples&lt;/h2>
 &lt;p>This sample &lt;code>targets.js&lt;/code> generates three widgets, and uses functions written in the &lt;code>targets-extras.js&lt;/code> file.&lt;/p>
@@ -3745,6 +3807,11 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
 &lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>getExtensionLib(name)&lt;/td>
+&lt;td>&lt;code>name&lt;/code>: String of script name&lt;/td>
+&lt;td>Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension-libs&lt;/a>.&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
 &lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
@@ -3754,6 +3821,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">averageFn&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">getExtensionLib&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;average.js&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;h2 id="code-samples">Code samples&lt;/h2>
 &lt;h3 id="basic-task">Basic task&lt;/h3>
@@ -3958,6 +4026,11 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;td>&lt;code>permissionsGroups&lt;/code>: Array of groups of permission name(s).&lt;br>&lt;code>userRoles&lt;/code>: (Optional) Array of user roles. Default to the current logged in user.&lt;br>&lt;code>chtPermissionsSettings&lt;/code>: (Optional) Object of configured permissions in CHT-Core&amp;rsquo;s settings. Default to the current instance&amp;rsquo;s configured permissions.&lt;/td>
 &lt;td>Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td>
 &lt;/tr>
+&lt;tr>
+&lt;td>getExtensionLib(name)&lt;/td>
+&lt;td>&lt;code>name&lt;/code>: String of script name&lt;/td>
+&lt;td>Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension-libs&lt;/a>.&lt;/td>
+&lt;/tr>
 &lt;/tbody>
 &lt;/table>
 &lt;h3 id="cht-apis-code-samples">CHT API&amp;rsquo;s code samples&lt;/h3>
@@ -3967,6 +4040,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_messages&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_view_message_action&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;can_view_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;can_verify_reports&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">const&lt;/span> &lt;span style="color:#000">averageFn&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000">cht&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">v1&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">getExtensionLib&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;average.js&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: Utils Functions</title><link>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/_partial_utils/</guid><description>
 &lt;p>Utility functions in the Core Framework can make common tasks much easier. These are available only for Tasks and Targets. To use the function call &lt;code>Utils.&amp;lt;function-name&amp;gt;(&amp;lt;params&amp;gt;)&lt;/code>, for example &lt;code>Utils.addDate(report.reported_date, 10)&lt;/code>.&lt;/p>
 &lt;table>
