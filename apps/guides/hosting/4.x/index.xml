@@ -214,7 +214,8 @@ To get the correct &lt;code>docker-network-name&lt;/code> and &lt;code>docker-se
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h2>
 &lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
-&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
+&lt;pre tabindex="0">&lt;code>sudo apt install wamerican
+uuid=$(uuidgen)
 couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
 couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
 cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
@@ -227,7 +228,7 @@ COUCHDB_USER=medic
 COUCHDB_PASSWORD=${couchdb_password}
 COUCHDB_UUID=${uuid}
 EOF
-&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first four calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
 &lt;h2 id="launch-containers">Launch containers&lt;/h2>
 &lt;div class="alert alert-primary" role="alert">
 &lt;h4 class="alert-heading">Note&lt;/h4>
@@ -344,7 +345,8 @@ docker compose up --detach
 &lt;/ol>
 &lt;h3 id="prepare-environment-variables-file">Prepare Environment Variables file&lt;/h3>
 &lt;p>Prepare an &lt;code>.env&lt;/code> file by running this code:&lt;/p>
-&lt;pre tabindex="0">&lt;code>uuid=$(uuidgen)
+&lt;pre tabindex="0">&lt;code>sudo apt install wamerican
+uuid=$(uuidgen)
 couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
 couchdb_password=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
 cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &amp;lt;&amp;lt; EOF
@@ -355,7 +357,7 @@ COUCHDB_USER=medic
 COUCHDB_PASSWORD=${couchdb_password}
 COUCHDB_SERVERS=couchdb-1.local,couchdb-2.local,couchdb-3.local
 EOF
-&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first three calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
+&lt;/code>&lt;/pre>&lt;p>Note that secure passwords and UUIDs were generated on the first four calls and saved in the resulting &lt;code>.env&lt;/code> file.&lt;/p>
 &lt;h3 id="download-compose-files">Download compose files&lt;/h3>
 &lt;p>The following 2 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.0.1&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/
@@ -387,7 +389,8 @@ This section has the first use of &lt;code>docker compose&lt;/code>. This should
 &lt;p>First, &lt;strong>on the CHT Core node&lt;/strong>, get your CouchDB password with this command:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now, &lt;strong>on all 3 CouchDB nodes&lt;/strong>, create an &lt;code>.env&lt;/code> file by running this code. You&amp;rsquo;ll need to replace &lt;code>PASSWORD-FROM-ABOVE&lt;/code> so it is the same on all three nodes:&lt;/p>
-&lt;pre tabindex="0">&lt;code>mkdir -p /home/ubuntu/cht/srv
+&lt;pre tabindex="0">&lt;code>sudo apt install wamerican
+mkdir -p /home/ubuntu/cht/srv
 uuid=$(uuidgen)
 couchdb_secret=$(shuf -n7 /usr/share/dict/words --random-source=/dev/random | tr &amp;#39;\n&amp;#39; &amp;#39;-&amp;#39; | tr -d &amp;#34;&amp;#39;&amp;#34; | cut -d&amp;#39;-&amp;#39; -f1,2,3,4,5,6,7)
 cat &amp;gt; /home/ubuntu/cht/.env &amp;lt;&amp;lt; EOF
