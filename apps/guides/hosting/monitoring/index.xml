@@ -1,0 +1,374 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Monitoring</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/</link><description>Recent content in Monitoring on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Introduction to monitoring and alerting</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/introduction/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/introduction/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This guide applies to all production instances of the CHT for both 3.x (beyond 3.9) and 4.x.&lt;/p>
+&lt;p>Be sure to see how to deploy a solution to &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/">monitor and alert on production CHT instances&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;p>Each deployment will experience different stresses on its resources. Be sure to tune any alerting levels in the case of a false positive so that you may avoid them in the future. Any thresholds for alerts, and even what is alerted on, is just a guideline, not a guarantee of uptime.&lt;/p>
+&lt;h2 id="monitoring-vs-alerting">Monitoring vs Alerting&lt;/h2>
+&lt;p>Monitoring allows CHT admins to see statistics about their server, often over time. This can be helpful when you want to be aware of growth in your deployment (eg number of active users or number of reports per region). It should not be assumed that these will be checked regularly enough to notice a problem, for example a spike in number of feedback documents.&lt;/p>
+&lt;p>Alerting is a push mechanism designed to notify users who can act on the alert. These can go over SMS, email, Slack, WhatsApp or any other channel to notify the right users.&lt;/p>
+&lt;p>The process of setting up monitoring and alerting should be done together. Monitoring sets the baseline and then alerting tells admins when the metric has gone beyond the baseline to a critical state. Certain metrics, like uptime for example, likely do not need to have a monitoring visualization on a dashboard, but the monitoring system should still be the authority to send an alert to denote when the service has restarted unexpectedly.&lt;/p>
+&lt;h2 id="outside-the-cht">Outside the CHT&lt;/h2>
+&lt;p>Be sure to monitor important items that the CHT depends on in order to be healthy. You should alert when any of these are close to their maximum (disk space) or minimum (days left of valid TLS certificate):&lt;/p>
+&lt;ul>
+&lt;li>Domain expiration with registrar&lt;/li>
+&lt;li>TLS certificate expiration&lt;/li>
+&lt;li>Disk &amp;amp; swap space&lt;/li>
+&lt;li>CPU utilization&lt;/li>
+&lt;li>Memory utilization&lt;/li>
+&lt;li>Network utilization&lt;/li>
+&lt;li>Process count&lt;/li>
+&lt;li>OS Uptime&lt;/li>
+&lt;/ul>
+&lt;h2 id="inside-the-cht">Inside the CHT&lt;/h2>
+&lt;p>The &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">monitoring API&lt;/a> was added in 3.9.0 and does not require any authentication and so can easily be used with third party tools as they do not need a CHT user account.&lt;/p>
+&lt;p>All metrics need to be monitored over time so that you can easily see longitudinal patterns when debugging an outage or slow down.&lt;/p>
+&lt;h3 id="specific-of-monitoring">Specific of monitoring&lt;/h3>
+&lt;h4 id="explosive-growth">Explosive Growth&lt;/h4>
+&lt;p>Many of the values in the monitoring API do not mean much in isolation. For example if an instance has 10,714,278 feedback docs, is that bad? If it&amp;rsquo;s years old and has thousands of users, then this is normal. If it is 4 months old and has 100 users, this is a dire problem!&lt;/p>
+&lt;p>You should monitor these metrics for unexpected growth as measured by percent change over 24 hours. Ideally this can be subjectively calculated when it is more than 5% growth than the prior day. They&amp;rsquo;re marked as &lt;code>growth&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="non-zero-values">Non-Zero Values&lt;/h4>
+&lt;p>Other values should always be zero, and you should alert when they are not. You may opt to alert only when they are non-zero for more than 24 hours. These are marked as &lt;code>non-zero&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="zero-or-near-zero-values">Zero or Near Zero Values&lt;/h4>
+&lt;p>Finally, these values should always be &lt;em>not&lt;/em> zero, and you should alert when are zero or very close to it. You may opt to alert only when they are zero for more than 24 hours. They&amp;rsquo;re marked with &lt;code>zero&lt;/code> below.&lt;/p>
+&lt;h4 id="elements-types-and-samples">Elements, types and samples&lt;/h4>
+&lt;p>The names below are extrapolated from the paths in the JSON returned by the API and should be easy to find when viewing the Monitoring API URL on your CHT instance:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Example Value&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Conflict Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>23,318&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>16,254,271&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>1.4366029665729645&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>15,756,449&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.388733774539664&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>535&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.356411021364134&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Meta Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,761,549&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Feedback Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,714,368&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Due&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>3,807&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Failed&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outbound Push Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Sentinel Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Date Uptime&lt;/td>
+&lt;td>&lt;code>zero&lt;/code>&lt;/td>
+&lt;td>1,626,508.148&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Apps: Grafana and Prometheus Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="grafana-and-prometheus">Grafana and Prometheus&lt;/h2>
+&lt;p>Medic maintains an opinionated configuration of &lt;a href="https://prometheus.io/">Prometheus&lt;/a> (including &lt;a href="https://github.com/prometheus-community/json_exporter">json_exporter&lt;/a>) and &lt;a href="https://grafana.com/grafana/">Grafana&lt;/a> which can easily be deployed using Docker. It is supported on CHT 3.12 and later, including CHT 4.x. By using this solution a CHT deployment can easily get longitudinal monitoring and push alerts using Email, Slack or other mechanisms. All tools are open source and have no licensing fees.&lt;/p>
+&lt;p>The solution provides both an overview dashboard as well as a detail dashboard. Here is a portion of the overview dashboard:&lt;/p>
+&lt;p>&lt;img src="monitoring.and.alerting.screenshot.png" alt="Screenshot of Grafana Dashboard showing data from Prometheus">&lt;/p>
+&lt;p>&lt;a href="https://prometheus.io/docs/concepts/metric_types/">Prometheus supports&lt;/a> four metric types: Counter, Gauge, Histogram, and Summary. Currently, the CHT only provides Counter and Gauge type metrics. When building panels for Grafana dashboards, &lt;a href="https://prometheus.io/docs/prometheus/latest/querying/functions/">Prometheus Functions&lt;/a> can be used to manipulate the metric data. Refer to the &lt;a href="https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/">Grafana Documentation&lt;/a> for best practices on building dashboards.&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.docker.com/install/">Docker&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/compose/install/">Docker Compose&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git&lt;/a>&lt;/li>
+&lt;li>URL(s) of the CHT instance(s)&lt;/li>
+&lt;/ul>
+&lt;h3 id="setup">Setup&lt;/h3>
+&lt;p>These instructions have been tested against Ubuntu, but should work against any OS that meets the prerequisites. They follow a happy path assuming you need to only set a secure password and specify the URL(s) to monitor:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Run the following commands to clone this repository, initialize your &lt;code>.env&lt;/code> file, create a secure password and create your data directories:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-monitoring.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp cht-instances.example.yml cht-instances.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp grafana/grafana.example.ini grafana/grafana.ini
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p grafana/data &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p prometheus/data
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install -y wamerican &lt;span style="color:#8f5902;font-style:italic"># ensures /usr/share/dict/words is present for shuf call below &lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp .env.example .env
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>shuf -n7 /usr/share/dict/words --random-source&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>/dev/random &lt;span style="color:#000;font-weight:bold">|&lt;/span> tr &lt;span style="color:#4e9a06">&amp;#39;\n&amp;#39;&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;-&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> tr -d &lt;span style="color:#4e9a06">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;-&amp;#39;&lt;/span> -f1,2,3,4,5,6,7&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sed -i -e &lt;span style="color:#4e9a06">&amp;#34;s/password/&lt;/span>&lt;span style="color:#000">$password&lt;/span>&lt;span style="color:#4e9a06">/g&amp;#34;&lt;/span> .env
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Initial project structure created! To log into Grafana in the browser:&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34; username: medic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34; password: &lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that in step 4 below you&amp;rsquo;ll need the username and password which is printed after you run the above command.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Edit the &lt;code>cht-instances.yml&lt;/code> file to have the URLs of your CHT instances. You may include as many URLs of CHT instances as you like.&lt;/p>
+&lt;p>Here is an example:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yml" data-lang="yml">&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://subsub.sub.example.com&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://cht.domain.com&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://website.org&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Run the following command to deploy the stack:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Grafana is available at &lt;a href="http://localhost:3000">http://localhost:3000&lt;/a>. See the output from step 1 for your username and password.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>If you would like to do more customizing of your deployment, see &lt;a href="#additional-configuration">&amp;ldquo;Addition Configuration&amp;rdquo;&lt;/a>.&lt;/p>
+&lt;h3 id="upgrading">Upgrading&lt;/h3>
+&lt;p>Before upgrading, you should back up both your current configuration settings as well as your Prometheus/Grafana data directories.&lt;/p>
+&lt;h4 id="prometheus-grafana-and-json-exporter">Prometheus, Grafana and JSON Exporter&lt;/h4>
+&lt;p>To upgrade these dependencies, update the version numbers set in your &lt;code>.env&lt;/code> file (or leave them set to &lt;code>latest&lt;/code>). Then run the following commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="cht-monitoring-config">CHT Monitoring Config&lt;/h4>
+&lt;p>When you see a new version in the &lt;a href="https://github.com/medic/cht-monitoring">GitHub repository&lt;/a>, first review the release notes and upgrade instructions. Then, run the following commands to deploy the new configuration:&lt;/p>
+&lt;ol>
+&lt;li>Note the version number to derive the branch to pull. For example, &lt;code>1.1.0&lt;/code> would be &lt;code>1.1.x&lt;/code>&lt;/li>
+&lt;li>Run this command to update your instance and restart it. Be sure to replace &lt;code>BRANCH_NAME&lt;/code> with the value from the first step:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git fetch
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git checkout BRANCH_NAME
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose down
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d --remove-orphans
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">```&lt;/span>shell
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="additional-configuration">Additional Configuration&lt;/h3>
+&lt;h4 id="prometheus-retention-and-storage">Prometheus Retention and Storage&lt;/h4>
+&lt;p>By default, historical monitoring data will be stored in Prometheus (&lt;code>PROMETHEUS_DATA&lt;/code> directory) for 60 days (configurable by &lt;code>PROMETHEUS_RETENTION_TIME&lt;/code>). A longer retention time can be configured to allow for longer-term analysis of the data. However, this will increase the size of the Prometheus data volume. See the &lt;a href="https://prometheus.io/docs/prometheus/latest/storage/">Prometheus documentation&lt;/a> for more information.&lt;/p>
+&lt;p>Local storage is not suitable for storing large amounts of monitoring data. If you intend to store multiple years worth of metrics, you should consider integrating Prometheus with a &lt;a href="https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage/">Remote Storage&lt;/a>.&lt;/p>
+&lt;h4 id="alerts">Alerts&lt;/h4>
+&lt;p>This configuration includes number of pre-provisioned alerts. Additional alerting rules (and other contact points) can be set in the Grafana UI.&lt;/p>
+&lt;p>See both the Grafana &lt;a href="https://grafana.com/docs/grafana/latest/alerting/">high level alert Documentation&lt;/a> and &lt;a href="https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/#provision-alert-rules">provisioning alerts in the UI&lt;/a> for more information on how to edit or remove these provisioned alerts.&lt;/p>
+&lt;p>Additionally, you can configure where these alerts are sent. Two likely options are Email and Slack.&lt;/p>
+&lt;h5 id="email">Email&lt;/h5>
+&lt;p>To support sending email alerts from Grafana, you must update the &lt;code>smtp&lt;/code> section of your &lt;code>grafana/grafana.ini&lt;/code> file with your SMTP server configuration. Then, in the web interface, add the desired recipient email addresses in the &lt;code>grafana-default-email&lt;/code> contact point settings.&lt;/p>
+&lt;h5 id="slack">Slack&lt;/h5>
+&lt;p>Slack alerts can be configured within the Grafana web GUI for the specific rules you would like to alert on.&lt;/p>
+&lt;h3 id="configuration-reference">Configuration Reference&lt;/h3>
+&lt;h4 id="environment-variables">Environment Variables&lt;/h4>
+&lt;p>All the variables in the &lt;code>.env&lt;/code> file:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Default&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_ADMIN_USER&lt;/code>&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>&lt;/td>
+&lt;td>Username for the Grafana admin user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_ADMIN_PASSWORD&lt;/code>&lt;/td>
+&lt;td>&lt;code>password&lt;/code>&lt;/td>
+&lt;td>Password for the Grafana admin user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>grafana/grafana-oss&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_PORT&lt;/code>&lt;/td>
+&lt;td>&lt;code>3000&lt;/code>&lt;/td>
+&lt;td>Port on the host where Grafana will be available&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_BIND&lt;/code>&lt;/td>
+&lt;td>&lt;code>127.0.0.1&lt;/code>&lt;/td>
+&lt;td>Interface Grafana will bind to. Change to &lt;code>0.0.0.0&lt;/code> if you want to expose to all interfaces.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_DATA&lt;/code>&lt;/td>
+&lt;td>&lt;code>./grafana/data&lt;/code>&lt;/td>
+&lt;td>The host directory where Grafana data will be stored&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_PLUGINS&lt;/code>&lt;/td>
+&lt;td>&lt;code>grafana-discourse-datasource&lt;/code>&lt;/td>
+&lt;td>Comma separated list of plugins to install (e.g: &lt;code>grafana-clock-panel,grafana-simple-json-datasource&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>JSON_EXPORTER_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>prometheuscommunity/json-exporter&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>prom/prometheus&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_DATA&lt;/code>&lt;/td>
+&lt;td>&lt;code>./prometheus/data&lt;/code>&lt;/td>
+&lt;td>The host directory where Prometheus data will be stored&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_RETENTION_TIME&lt;/code>&lt;/td>
+&lt;td>&lt;code>60d&lt;/code>&lt;/td>
+&lt;td>Length of time that Prometheus will store data (e.g. &lt;code>15d&lt;/code>, &lt;code>6m&lt;/code>, &lt;code>1y&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="cht-metrics">CHT Metrics&lt;/h4>
+&lt;p>All CHT metrics in Prometheus:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>OpenMetrics name&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>label(s)&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>cht_version&lt;/code>&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;td>&lt;code>app&lt;/code>, &lt;code>node&lt;/code>, &lt;code>couchdb&lt;/code>&lt;/td>
+&lt;td>Version information for the CHT instance (recorded in labels)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_conflict_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of doc conflicts which need to be resolved manually.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_connected_users_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of users that have connected to the api recently. By default the time interval is 7 days. Otherwise it is equal to the connected_user_interval parameter value used when making the /monitoring request.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_doc_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_doc_del_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of deleted docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_fragmentation&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The fragmentation of the db, lower is better, “1” is no fragmentation.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_update_sequence&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of changes in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_date_current_millis&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>The current server date in millis since the epoch, useful for ensuring the server time is correct.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_date_uptime_seconds&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>How long API has been running.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_feedback_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of feedback docs created usually indicative of client side errors.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_messaging_outgoing_last_hundred&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;code>group&lt;/code>, &lt;code>status&lt;/code>&lt;/td>
+&lt;td>Counts of last 100 messages that have received status updates.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_messaging_outgoing_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>status&lt;/code>&lt;/td>
+&lt;td>Counts of the total number of messages.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_outbound_push_backlog_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of changes yet to be processed by Outbound Push.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_replication_limit_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of users that exceeded the replication limit of documents.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_sentinel_backlog_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item></channel></rss>
