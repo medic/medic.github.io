@@ -174,19 +174,14 @@
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker compose pull
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="cht-monitoring-config">CHT Monitoring Config&lt;/h4>
-&lt;p>When you see a new version in the &lt;a href="https://github.com/medic/cht-monitoring">GitHub repository&lt;/a>, first review the release notes and upgrade instructions. Then, run the following commands to deploy the new configuration:&lt;/p>
-&lt;ol>
-&lt;li>Note the version number to derive the branch to pull. For example, &lt;code>1.1.0&lt;/code> would be &lt;code>1.1.x&lt;/code>&lt;/li>
-&lt;li>Run this command to update your instance and restart it. Be sure to replace &lt;code>BRANCH_NAME&lt;/code> with the value from the first step:
+&lt;p>When you see a new version in the &lt;a href="https://github.com/medic/cht-monitoring">GitHub repository&lt;/a>, first review the release notes and upgrade instructions. Then, run the following commands to deploy the new configuration (be sure to replace &lt;code>TAG&lt;/code> with the tag name associated with the release (e.g. &lt;code>1.1.0&lt;/code>)):&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git fetch
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git checkout BRANCH_NAME
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git -c advice.detachedHead&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87">false&lt;/span> checkout TAG
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose down
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d --remove-orphans
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
-&lt;/ol>
-&lt;h3 id="additional-configuration">Additional Configuration&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="additional-configuration">Additional Configuration&lt;/h3>
 &lt;h4 id="prometheus-retention-and-storage">Prometheus Retention and Storage&lt;/h4>
 &lt;p>By default, historical monitoring data will be stored in Prometheus (&lt;code>PROMETHEUS_DATA&lt;/code> directory) for 60 days (configurable by &lt;code>PROMETHEUS_RETENTION_TIME&lt;/code>). A longer retention time can be configured to allow for longer-term analysis of the data. However, this will increase the size of the Prometheus data volume. See the &lt;a href="https://prometheus.io/docs/prometheus/latest/storage/">Prometheus documentation&lt;/a> for more information.&lt;/p>
 &lt;p>Local storage is not suitable for storing large amounts of monitoring data. If you intend to store multiple years worth of metrics, you should consider integrating Prometheus with a &lt;a href="https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage/">Remote Storage&lt;/a>.&lt;/p>
