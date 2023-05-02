@@ -365,4 +365,67 @@
 &lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
-&lt;/table></description></item></channel></rss>
+&lt;/table></description></item><item><title>Apps: Production Grafana and Prometheus</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/production/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/production/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="what-it-means-to-run-in-production">What it means to run in production&lt;/h2>
+&lt;p>When you run your monitoring and alerting in production, and it is publicly accessible on the Internet, and has mission-critical data on it, you should take extra precautions around security and backup. This mainly consists of:&lt;/p>
+&lt;ul>
+&lt;li>using TLS for all HTTP connections&lt;/li>
+&lt;li>using VPN or SSH for insecure protocols like &lt;code>ssl=false&lt;/code> in Postgres&lt;/li>
+&lt;li>ensuring if the server were to fail, you can recover the data&lt;/li>
+&lt;/ul>
+&lt;p>This guide assumes you have already &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">set up TLS&lt;/a> on your CHT instance and have gone through &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/">the Setup steps&lt;/a> to deploy an instance of CHT Monitoring on server with a static IP and DNS entry, &lt;code>monitor.example.com&lt;/code> for example.&lt;/p>
+&lt;h2 id="monitoring-over-tls">Monitoring over TLS&lt;/h2>
+&lt;p>All monitoring should happen over TLS. This means the &lt;code>cht-instances.yml&lt;/code> file should have all the URLs in it start with &lt;code> - https&lt;/code>.&lt;/p>
+&lt;h2 id="accessing-grafana-over-tls">Accessing Grafana over TLS&lt;/h2>
+&lt;p>By default, the &lt;code>docker-compose.yml&lt;/code> has the service bind to &lt;code>127.0.0.1&lt;/code>. This means if you deploy it on a remote server you can not access Grafana&amp;rsquo;s web UI because you are not on the localhost. The best solution to expose it to the Internet is to use a reverse proxy. Medic recommends using &lt;a href="https://caddyserver.com/">Caddy&lt;/a> for this, but any reverse proxy will suffice. A big benefit with Caddy is that with just two files you ensure all traffic, and critically, all login credentials, are always encrypted when being sent and it handles all TLS certificate management tasks for you.&lt;/p>
+&lt;h3 id="reverse-proxy-and-docker-files">Reverse Proxy and Docker files&lt;/h3>
+&lt;p>Assuming you have the DNS entry of &lt;code>monitor.example.com&lt;/code> pointing to your server, you would create the &lt;code>Caddyfile&lt;/code> file with this code.&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat &amp;gt; /root/Caddyfile &amp;lt;&amp;lt; EOF
+monitor.example.com {
+reverse_proxy grafana:3000
+}
+EOF
+&lt;/code>&lt;/pre>&lt;p>Using the awesome secure defaults of Caddy, this file will tell Caddy to:&lt;/p>
+&lt;ol>
+&lt;li>Create a free certificate for &lt;code>monitor.example.com&lt;/code> using &lt;a href="https://letsencrypt.org/">Let&amp;rsquo;s Encrypt&lt;/a> (and renew it!)&lt;/li>
+&lt;li>Redirect any requests to &lt;code>HTTP&lt;/code> to go to the &lt;code>HTTPS&lt;/code> port&lt;/li>
+&lt;li>Reverse proxy all traffic to the &lt;code>grafana&lt;/code> docker instance.&lt;/li>
+&lt;/ol>
+&lt;p>The reverse proxy will only work if the Caddy container is on the same docker network as Grafana. That&amp;rsquo;s where the &lt;code>caddy-compose.yml&lt;/code> file comes in, specifically using the &lt;code>cht-monitoring-net&lt;/code> network. Create the file with this code&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat &amp;gt; /root/caddy-compose.yml &amp;lt;&amp;lt; EOF
+version: &amp;#34;3.9&amp;#34;
+services:
+caddy:
+image: caddy:2-alpine
+restart: unless-stopped
+ports:
+- &amp;#34;80:80&amp;#34;
+- &amp;#34;443:443&amp;#34;
+volumes:
+- /root/Caddyfile:/etc/caddy/Caddyfile
+networks:
+- cht-monitoring-net
+EOF
+&lt;/code>&lt;/pre>&lt;h3 id="running">Running&lt;/h3>
+&lt;p>To start the reverse proxy, us the following command. Note that on first run it will provision your certificates:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cd ~/cht-monitoring
+docker compose -f docker-compose.yml -f ../caddy-compose.yml up -d
+&lt;/code>&lt;/pre>&lt;p>Because both the CHT Monitoring and Caddy compose files have the &lt;code>restart: unless-stopped&lt;/code> setting, the services will start when the server first boots.&lt;/p>
+&lt;h3 id="upgrades">Upgrades&lt;/h3>
+&lt;p>Upgrades can be done along with upgrades to your CHT Monitoring docker images:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../caddy-compose.yml pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../caddy-compose.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="backup">Backup&lt;/h2>
+&lt;p>When you deployed your monitoring instance, you created two directories:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>~/cht-monitoring/grafana/data&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/cht-monitoring/prometheus/data&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>These are the only directories you need to back up. Whether you use something as simple as &lt;code>zip&lt;/code> + &lt;code>scp&lt;/code> + &lt;code>cron&lt;/code> or a more full-featured solution like &lt;a href="https://www.borgbackup.org/">borgbackup&lt;/a> or &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html">AWS Data Lifecycle Manager&lt;/a>, be sure you follow &lt;a href="https://en.wikipedia.org/wiki/Backup#Storage">the 3-2-1 backup rule&lt;/a>:&lt;/p>
+&lt;blockquote>
+&lt;p>The 3-2-1 rule can aid in the backup process. It states that there should be at least 3 copies of the data, stored on 2 different types of storage media, and one copy should be kept offsite, in a remote location&lt;/p>
+&lt;/blockquote></description></item></channel></rss>
