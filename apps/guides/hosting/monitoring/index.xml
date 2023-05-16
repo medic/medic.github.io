@@ -128,6 +128,10 @@
 &lt;li>&lt;a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git&lt;/a>&lt;/li>
 &lt;li>URL(s) of the CHT instance(s)&lt;/li>
 &lt;/ul>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Always run Watchdog on a different server than the CHT Core. This ensures Watchdog doesn&amp;rsquo;t fail if the CHT Core server fails and alerts will always be sent. The instructions assume you&amp;rsquo;re connecting over the public Internet and no special VPN or routing is required.
+&lt;/div>
 &lt;h3 id="setup">Setup&lt;/h3>
 &lt;p>These instructions have been tested against Ubuntu, but should work against any OS that meets the prerequisites. They follow a happy path assuming you need to only set a secure password and specify the URL(s) to monitor:&lt;/p>
 &lt;ol>
@@ -411,6 +415,10 @@ Always run this longer version of the &lt;code>docker compose&lt;/code> command 
 &lt;li>ensuring if the server were to fail, you can recover the data&lt;/li>
 &lt;/ul>
 &lt;p>This guide assumes you have already &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">set up TLS&lt;/a> on your CHT instance and have gone through &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/">the Setup steps&lt;/a> to deploy an instance of CHT Monitoring on server with a static IP and DNS entry, &lt;code>monitor.example.com&lt;/code> for example.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Always run Watchdog on a different server than the CHT Core. This ensures Watchdog doesn&amp;rsquo;t fail if the CHT Core server fails and alerts will always be sent. The instructions assume you&amp;rsquo;re connecting over the public Internet and no special VPN or routing is required.
+&lt;/div>
 &lt;h2 id="monitoring-over-tls">Monitoring over TLS&lt;/h2>
 &lt;p>All monitoring should happen over TLS. This means the &lt;code>cht-instances.yml&lt;/code> file should have all the URLs in it start with &lt;code> - https&lt;/code>.&lt;/p>
 &lt;h2 id="accessing-grafana-over-tls">Accessing Grafana over TLS&lt;/h2>
@@ -468,4 +476,136 @@ docker compose -f docker-compose.yml -f ../caddy-compose.yml up -d
 &lt;pre tabindex="0">&lt;code>#################################### Server ##############################
 [server]
 root_url = https://monitor.example.com/
-&lt;/code>&lt;/pre></description></item></channel></rss>
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Integrating CHT Watchdog</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/integration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/integration/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="going-beyond-basic-setup">Going beyond basic setup&lt;/h2>
+&lt;p>After you have done the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/">setup of CHT Watchdog&lt;/a> and configured it to run &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/production/">with TLS and have backups enabled&lt;/a>, you may want to extend it to scrape other Prometheus data sources so that Grafana can send alerts on non-CHT Core metrics.&lt;/p>
+&lt;p>This guide uses example instances of CHT Core (&lt;code>cht.example.com&lt;/code>) and CHT Watchdog (&lt;code>watchdog.example.com&lt;/code>). When deploying, be sure to replace with your own hostnames.&lt;/p>
+&lt;h3 id="default-flow">Default Flow&lt;/h3>
+&lt;p>Let&amp;rsquo;s look at how the default deployment of Watchdog works when configured to only gather metrics from &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">CHT Core&amp;rsquo;s monitoring API&lt;/a>:&lt;/p>
+&lt;div class="mermaid">flowchart LR
+subgraph core["cht.example.com"]
+mon_api["Monitoring API (443)"]:::client_node
+end
+subgraph watchdog["watchdog.example.com"]
+json[JSON Exporter] --> Prometheus
+Prometheus --> Grafana
+end
+mon_api --> json
+&lt;/div>
+&lt;h3 id="additional-flows">Additional Flows&lt;/h3>
+&lt;p>Your Prometheus instance from CHT Watchog can ingest data from any &lt;a href="https://prometheus.io/docs/instrumenting/exporters/">supported data source&lt;/a> accessible via an HTTPS request. These data sources might be hosted on the same server as CHT Core or on a completely different server.&lt;/p>
+&lt;p>The focus of this guide is to collect metrics on Docker container usage and performance from the server hosting our CHT Core instance using &lt;a href="https://prometheus.io/docs/guides/cadvisor/">cAdvisor&lt;/a>.&lt;/p>
+&lt;div class="mermaid">flowchart LR
+subgraph core["cht.example.com"]
+mon_api["Monitoring API (443)"]:::client_node
+cAdvisor:::client_node
+end
+subgraph watchdog["watchdog.example.com"]
+json[JSON Exporter] --> Prometheus
+Prometheus --> Grafana
+end
+mon_api --> json
+cAdvisor["cAdvisor (8443)"] --> Prometheus
+&lt;/div>
+&lt;p>Note that because CHT Core is listening on port 443 already, we&amp;rsquo;ll have cAdvisor listen on port 8443.&lt;/p>
+&lt;p>By reading this guide you should not only be able to set up cAdvisor, but also be familiar with extending CHT Watchdog to support any other vital metrics.&lt;/p>
+&lt;h3 id="steps-to-new-integrations">Steps to new integrations&lt;/h3>
+&lt;p>While this is a specific example for cAdvisor, these same steps will be taken to extend Watchdog for other metrics:&lt;/p>
+&lt;ol start="3">
+&lt;li>CHT Core: &lt;a href="#cadvisor-compose-file">Create both cAdvisor and Caddy Docker Compose files&lt;/a>&lt;/li>
+&lt;li>CHT Core: &lt;a href="#start-cadvisor-caddy-and-cht-core-with-docker">Start the Caddy and a cAdvisor containers along with the CHT Core&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#scrape-config">Adding new scrape and compose configs&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#load-new-compose-files-with-existing-ones">Restart the Prometheus and Grafana server to include the new scrape config mounts&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#on-cht-watchdog-import-grafana-dashboard">Importing an exising cAdvisor dashboard from &lt;code>grafana.com&lt;/code>&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;p>After completing these steps, we now have Docker metrics we can alert on:&lt;/p>
+&lt;p>&lt;a href="cadvisor.screenshot.png">&lt;img src="cadvisor.screenshot.png" alt="Screenshot of Grafana Dashboard showing data from Prometheus">&lt;/a>&lt;/p>
+&lt;p>Read on below on how to set this up!&lt;/p>
+&lt;h2 id="integrating-with-cadvisor">Integrating with cAdvisor&lt;/h2>
+&lt;h3 id="on-cht-core">On CHT Core&lt;/h3>
+&lt;h4 id="cadvisor-compose-file">cAdvisor Compose file&lt;/h4>
+&lt;p>On your CHT instance, add a Docker composer file for the new cAdvisor service. Note this also includes a Redis caching layer. Also note that we&amp;rsquo;re reducing cAdvisors CPU usage by adding 3 extra flags in the &lt;code>command&lt;/code> stanza. In our example, we&amp;rsquo;ve put this file in &lt;code>/home/ubuntu/cht/compose/cadvisor_compose.yml&lt;/code> with these contents:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;3.9&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cadvisor&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">gcr.io/cadvisor/cadvisor:latest&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cadvisor&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/:/rootfs:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/var/run:/var/run:rw&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/sys:/sys:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/var/lib/docker/:/var/lib/docker:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">depends_on&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">redis&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">command&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--housekeeping_interval=30s&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--docker_only=true&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,accelerator,hugetlb,referenced_memory,cpu_topology,resctrl&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">redis&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">redis:latest&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">redis&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="caddy-config-and-compose-files">Caddy Config and Compose files&lt;/h4>
+&lt;p>Like we did in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/production/#accessing-grafana-over-tls">TLS section&lt;/a>, we&amp;rsquo;ll add both a &lt;code>/home/ubuntu/Caddyfile&lt;/code> and a &lt;code>/home/ubuntu/cht/compose/caddy-compose.yml&lt;/code>.&lt;/p>
+&lt;p>Starting with the &lt;code>Caddyfile&lt;/code>, let&amp;rsquo;s assume your server&amp;rsquo;s DNS entry is &lt;code>cht.example.com&lt;/code>. We can expose cAdvisor&amp;rsquo;s service running on localhost port &lt;code>8443&lt;/code> with this compose file. This tells Caddy to reverse proxy requests to the public interface to the private Docker network interface on port &lt;code>8080&lt;/code> where cAdvisor is running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">cht.example.com:8443 {&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">reverse_proxy cadvisor:8080&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then we can add the compose file to run Caddy. Note that it&amp;rsquo;s mounting the config file we just created:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;3.9&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">caddy&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">caddy:2-alpine&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">restart&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">unless-stopped&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ports&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;8443:8443&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/home/ubuntu/Caddyfile:/etc/caddy/Caddyfile&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="start-cadvisor-caddy-and-cht-core-with-docker">Start cAdvisor, Caddy and CHT Core with Docker&lt;/h4>
+&lt;p>Now that we have all the config files in place, you need to have Docker start everything together. This is so that the containers can see each other on the same &lt;code>CHT Net&lt;/code> Docker network. You will need to specify each of the compose files every time you start, stop or restart CHT instance so all the services stay running and connected.&lt;/p>
+&lt;p>Assuming you followed the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting-single-node/">production steps&lt;/a> to install the CHT, you use this Compose call to first stop all containers and then start them all up, including the new services:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker stop &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps --quiet&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that the CHT Upgrade Service will process all Docker Compose file in the &lt;code>/home/ubuntu/cht/compose&lt;/code> directory for us and we don&amp;rsquo;t need to explicity specify them in the &lt;code>docker compose up&lt;/code> command.&lt;/p>
+&lt;h3 id="on-cht-watchdog">On CHT Watchdog&lt;/h3>
+&lt;h4 id="scrape-config">Scrape config&lt;/h4>
+&lt;p>We&amp;rsquo;ll first create the &lt;code>~/cadvisor-prometheus-conf.yml&lt;/code> file and point the config to our CHT Core URL:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">scrape_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">job_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;cadvisor&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">scrape_interval&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">5s&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">scheme&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;https&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">static_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;cht.example.com:8443&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>CHT Watchdog allows you to use additional Docker Compose files to add as many additional Prometheus scrape configs as are needed. Here, we&amp;rsquo;ll create one in &lt;code>~/cadvisor-compose.yml&lt;/code> pointing to our &lt;code>cadvisor-prometheus-conf.yml&lt;/code> file from above.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;3.9&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">prometheus&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/root/cadvisor-prometheus-conf.yml:/etc/prometheus/scrape_configs/cadvisor.yml:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="load-new-compose-files-with-existing-ones">Load new Compose files with existing ones&lt;/h4>
+&lt;p>Now that you&amp;rsquo;ve added the new configuration files, we can load it alongside the existing ones. Assuming you&amp;rsquo;ve followed the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/setup/">Watchdog Setup&lt;/a>, this would be:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../cadvisor-compose.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="import-grafana-dashboard">Import Grafana Dashboard&lt;/h4>
+&lt;p>Now that cAdvisor is running on your CHT Core instance and CHT Watchdog&amp;rsquo;s Prometheus has additional scrape configs to ingest the cAdvisor metrics, we can now visualize it in a Grafana Dashboard and then alert on it.&lt;/p>
+&lt;ol>
+&lt;li>Log into your Watchdog instance&lt;/li>
+&lt;li>Click the upper left hamburger menu and click &amp;ldquo;Dashboards&amp;rdquo;&lt;/li>
+&lt;li>Find the &amp;ldquo;New&amp;rdquo; button on the left, click and choose &amp;ldquo;Import&amp;rdquo; from the drop down&lt;/li>
+&lt;li>On the next page, scroll down to find &amp;ldquo;Import via grafana.com&amp;rdquo;, enter ID &lt;code>193&lt;/code> (for the &lt;a href="https://grafana.com/grafana/dashboards/193-docker-monitoring/">Docker monitoring&lt;/a> dashboard) and click &amp;ldquo;Load&amp;rdquo;&lt;/li>
+&lt;li>Confirm the &amp;ldquo;Name&amp;rdquo; and &amp;ldquo;Folder&amp;rdquo; values and select &amp;ldquo;Prometheus&amp;rdquo; as the data source in the dropdown. Finally, click the &amp;ldquo;Import&amp;rdquo; button at the bottom of the page.&lt;/li>
+&lt;/ol>
+&lt;p>That&amp;rsquo;s it! After following these steps, you should be looking at the cAdvisor dashboard &lt;a href="#steps-to-new-integrations">as shown above&lt;/a>. From here, you can both customize this dashboard as well as add alerts as needed.&lt;/p>
+&lt;!-- there wasn't enough space after the diagrams, adding CSS to increase padding -->
+&lt;style>
+.mermaid { padding-bottom: 20px; }
+&lt;/style></description></item></channel></rss>
