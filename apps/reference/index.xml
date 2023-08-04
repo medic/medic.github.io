@@ -210,6 +210,11 @@ display: none;
 &lt;li>&lt;a href="#errors-5">Errors&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
+&lt;li>&lt;a href="#get-apiv1express-metrics">GET /api/v1/express-metrics&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#permissions-12">Permissions&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>&lt;a href="#upgrades">Upgrades&lt;/a>
@@ -599,8 +604,8 @@ X-OpenRosa-Version: 1.0
 &lt;/code>&lt;/pre>&lt;p>Get the latest version of the NPYY form in JSON format.&lt;/p>
 &lt;pre tabindex="0">&lt;code>GET /api/v1/forms/NPYY.json
 &lt;/code>&lt;/pre>&lt;h3 id="post-apiv1formsvalidate">POST /api/v1/forms/validate&lt;/h3>
-&lt;p>&lt;em>Added in 3.12.0&lt;/em>
-Validate the XForm passed. Require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
+&lt;p>&lt;em>Added in 3.12.0&lt;/em>&lt;/p>
+&lt;p>Validate the XForm passed. Require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
 &lt;h4 id="headers-1">Headers&lt;/h4>
 &lt;table>
 &lt;thead>
@@ -1169,7 +1174,7 @@ To regenerate the token, update the user sending &lt;code>token_login&lt;/code> 
 If &lt;code>app_settings.app_url&lt;/code> is not defined, the generated token-login URL will use the &lt;code>Host&lt;/code> request header, which may not always be correct.&lt;/p>
 &lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/access/#remote-login">Accessing CHT Apps&lt;/a>&lt;/p>
 &lt;h3 id="get-apiv1users">GET /api/v1/users&lt;/h3>
-&lt;p>&lt;em>DEPRECATED: use /api/v2/users&lt;/em>&lt;/p>
+&lt;p>&lt;em>DEPRECATED: use &lt;a href="#get-apiv2users">/api/v2/users&lt;/a>&lt;/em>&lt;/p>
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
 &lt;h4 id="permissions-3">Permissions&lt;/h4>
 &lt;p>&lt;code>can_view_users&lt;/code>&lt;/p>
@@ -1435,8 +1440,8 @@ Content-Type: application/json
 }
 ]
 &lt;/code>&lt;/pre>&lt;h3 id="post-apiv2users">POST /api/v2/users&lt;/h3>
-&lt;p>&lt;em>Added in 3.16.0&lt;/em>
-Create new users with a place and a contact from a CSV file.&lt;/p>
+&lt;p>&lt;em>Added in 3.16.0&lt;/em>&lt;/p>
+&lt;p>Create new users with a place and a contact from a CSV file.&lt;/p>
 &lt;p>Creating users from a CSV file behaves the same as passing a JSON array of users into the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#post-apiv1users">&lt;code>POST /api/v1/users&lt;/code>&lt;/a>
 where a row represents a user object and a column represents a user object property.&lt;br>
 Columns with a &lt;code>:excluded&lt;/code> suffix will be ignored, this allows providing a more user-friendly experience with
@@ -1732,8 +1737,8 @@ Content-Type: application/json
 &lt;/code>&lt;/pre>&lt;h2 id="monitoring">Monitoring&lt;/h2>
 &lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/monitoring/">Monitoring and alerting on the CHT&lt;/a> page for how to use this API in production.&lt;/p>
 &lt;h3 id="get-apiv1monitoring">GET /api/v1/monitoring&lt;/h3>
-&lt;p>&lt;em>Deprecated in 3.12.x in favor of &lt;a href="#get-apiv2monitoring">/api/v2/monitoring&lt;/a>&lt;/em>
-Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
+&lt;p>&lt;em>DEPRECATED: use &lt;a href="#get-apiv2monitoring">/api/v2/monitoring&lt;/a>&lt;/em>&lt;/p>
+&lt;p>Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p>
 &lt;h4 id="permissions-10">Permissions&lt;/h4>
 &lt;p>No permissions required.&lt;/p>
 &lt;h4 id="examples-14">Examples&lt;/h4>
@@ -2088,6 +2093,12 @@ Used to retrieve a range of metrics about the instance. While the output is huma
 &lt;li>A metric of &lt;code>&amp;quot;&amp;quot;&lt;/code> (for string values) or &lt;code>-1&lt;/code> (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li>
 &lt;li>If no response or an error response is received the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li>
 &lt;/ul>
+&lt;h3 id="get-apiv1express-metrics">GET /api/v1/express-metrics&lt;/h3>
+&lt;p>&lt;em>Added in 4.3.0&lt;/em>&lt;/p>
+&lt;p>Used to retrieve a range of metrics for monitoring CHT API&amp;rsquo;s performance and internals. This API is used by &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/watchdog/">CHT Watchdog&lt;/a>.&lt;/p>
+&lt;p>The response is formatted for the &lt;a href="https://prometheus.io/docs/concepts/data_model/">Prometheus Data Model&lt;/a>. The metrics exposed are defined by the &lt;a href="https://www.npmjs.com/package/prometheus-api-metrics">prometheus-api-metrics package&lt;/a> and include optional default metrics and garbage collection metrics.&lt;/p>
+&lt;h4 id="permissions-12">Permissions&lt;/h4>
+&lt;p>No permissions required.&lt;/p>
 &lt;h2 id="upgrades">Upgrades&lt;/h2>
 &lt;p>All of these endpoints require the &lt;code>can_configure&lt;/code> permission.&lt;/p>
 &lt;p>All of these endpoints are asynchronous. Progress can be followed by watching the &lt;code>horti-upgrade&lt;/code> document and looking at the &lt;code>log&lt;/code> property.&lt;/p>
@@ -2176,8 +2187,8 @@ Content-Type: application/json
 { &amp;#34;id&amp;#34;: &amp;#34;id3&amp;#34;, &amp;#34;doc&amp;#34;: { &amp;lt;...the hydrated document...&amp;gt; } },
 ]
 &lt;/code>&lt;/pre>&lt;h2 id="contacts-by-phone">Contacts by phone&lt;/h2>
-&lt;p>&lt;em>Added in 3.10.0&lt;/em>
-Accepts a phone number parameter and returns fully hydrated contacts that match the requested phone number.
+&lt;p>&lt;em>Added in 3.10.0&lt;/em>&lt;/p>
+&lt;p>Accepts a phone number parameter and returns fully hydrated contacts that match the requested phone number.
 If multiple contacts are found, all are returned. When no matches are found, a 404 error is returned.
 Supports both GET and POST.
 Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p>
@@ -2246,8 +2257,8 @@ Content-Type: application/json
 }
 }
 &lt;/code>&lt;/pre>&lt;h2 id="replication-limit">Replication Limit&lt;/h2>
-&lt;p>&lt;em>Added in 3.11.0&lt;/em>
-Returns the quantity of documents that were replicated by each user.
+&lt;p>&lt;em>Added in 3.11.0&lt;/em>&lt;/p>
+&lt;p>Returns the quantity of documents that were replicated by each user.
 Accepts filtering by user name, when not provided, it returns all users.
 Supports GET.
 Only allowed for users with &amp;ldquo;_admin&amp;rdquo; role.&lt;/p>
