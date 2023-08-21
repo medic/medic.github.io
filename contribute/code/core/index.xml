@@ -9,8 +9,8 @@
 These steps apply to both 3.x and 4.x CHT core development, unless stated otherwise.
 &lt;/div>
 &lt;h2 id="the-happy-path-installation">The Happy Path Installation&lt;/h2>
-&lt;p>CHT Core development can be done on Linux, macOS, or Windows (using the &lt;a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL2)&lt;/a>). This CHT Core developer guide will have you install NodeJS, npm, Grunt and CouchDB (via Docker) on your local workstation.&lt;/p>
-&lt;h3 id="install-nodejs-npm-grunt-and-docker">Install NodeJS, npm, grunt and Docker&lt;/h3>
+&lt;p>CHT Core development can be done on Linux, macOS, or Windows (using the &lt;a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL2)&lt;/a>). This CHT Core developer guide will have you install NodeJS, npm, and CouchDB (via Docker) on your local workstation.&lt;/p>
+&lt;h3 id="install-nodejs-npm-and-docker">Install NodeJS, npm, and Docker&lt;/h3>
 &lt;p>First, update your current packages and install some supporting tools:&lt;/p>
 &lt;p>&lt;em>(Node 16 is the environment used to run the CHT server in production, so this is the recommended version of Node to use for development.)&lt;/em>&lt;/p>
 &lt;ul class="nav nav-tabs" id="tabs-3" role="tablist">
@@ -69,8 +69,6 @@ id="tabs-03-02" role="tabpanel" aria-labelled-by="tabs-03-02-tab">
 &lt;/div>
 &lt;p>Now let&amp;rsquo;s ensure NodeJS 16 and npm 8 were installed. This should output version 16.x.x for NodeJS and 8.x.x for &lt;code>npm&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>node -v &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm -v
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>With NodeJS out of the way, let&amp;rsquo;s install &lt;code>grunt&lt;/code> via &lt;code>npm&lt;/code>:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm install -g grunt-cli
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install Docker:&lt;/p>
 &lt;ul class="nav nav-tabs" id="tabs-0" role="tablist">
 &lt;li class="nav-item">
@@ -130,15 +128,12 @@ id="tabs-00-02" role="tabpanel" aria-labelled-by="tabs-00-02-tab">
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v ~/cht-docker/local.d:/opt/couchdb/data -v ~/cht-docker/local.d:/opt/couchdb/etc/local.d apache/couchdb:2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s ensure CouchDB is set up with a test &lt;code>curl&lt;/code> call. This should show &amp;ldquo;nonode@nohost&amp;rdquo; in JSON:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -X GET &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_membership&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Every time you run any &lt;code>grunt&lt;/code> or &lt;code>node&lt;/code> commands, it will expect &lt;code>COUCH_NODE_NAME&lt;/code> and &lt;code>COUCH_URL&lt;/code> environment variables to be set:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Every time you run any &lt;code>npm&lt;/code> or &lt;code>node&lt;/code> commands, it will expect &lt;code>COUCH_NODE_NAME&lt;/code> and &lt;code>COUCH_URL&lt;/code> environment variables to be set:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_NODE_NAME=nonode@nohost&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_URL=http://medic:password@localhost:5984/medic&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To ensure these to exports and sourcing your rc file worked, echo the values back out. You should see &lt;code>nonode@nohost&lt;/code> and &lt;code>http://medic:password@localhost:5984/medic&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_URL&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>You need to harden CouchDB with a &lt;code>grunt&lt;/code> call, required even in development:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grunt secure-couchdb
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_node/&lt;/span>&lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span>&lt;span style="color:#4e9a06">/_config/httpd/WWW-Authenticate&amp;#34;&lt;/span> -d &lt;span style="color:#4e9a06">&amp;#39;&amp;#34;Basic realm=\&amp;#34;administrator\&amp;#34;&amp;#34;&amp;#39;&lt;/span> -H &lt;span style="color:#4e9a06">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-setup-in-cht-4x">CouchDB Setup in CHT 4.x&lt;/h4>
 &lt;p>Create a &lt;code>docker-compose.yml&lt;/code> and &lt;code>couchdb-override.yml&lt;/code> files under the &lt;code>~/cht-docker&lt;/code> folder with this code:&lt;/p>
 &lt;pre tabindex="0">&lt;code>mkdir -p ~/cht-docker
@@ -155,16 +150,17 @@ EOF
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-docker
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose -f docker-compose.yml -f couchdb-override.yml up -d
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
-&lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development. In the first terminal, run:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt
+&lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development.&lt;/p>
+&lt;p>In the first terminal we&amp;rsquo;ll start the API nodejs service by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run dev-api
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then in a 2nd terminal we&amp;rsquo;ll compile and deploy the web application by runing:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run build-dev-watch
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be &lt;strong>very&lt;/strong> patient until you see:&lt;/p>
 &lt;blockquote>
 &lt;p>&amp;ldquo;Waiting&amp;hellip;&amp;rdquo;&lt;/p>
 &lt;/blockquote>
-&lt;p>Then in a 2nd terminal run:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt dev-api
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Finally, in a 3rd terminal run:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> grunt dev-sentinel
+&lt;p>Finally, in a 3rd terminal we&amp;rsquo;ll start the Sentinel nodejs service by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run dev-sentinel
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>That&amp;rsquo;s it! Now when you edit code in your IDE, it will automatically reload. You can see the CHT running locally here: &lt;a href="http://localhost:5988/">http://localhost:5988/&lt;/a>&lt;/p>
 &lt;p>When you&amp;rsquo;re done with development you can &lt;code>ctrl + c&lt;/code> in the three terminals and stop the CouchDB container with &lt;code>docker stop medic-couchdb&lt;/code>. When you want to resume development later, run &lt;code>docker start medic-couchdb&lt;/code> and re-run the three terminal commands.&lt;/p>
 &lt;h2 id="other-path-troubleshooting">Other Path Troubleshooting&lt;/h2>
@@ -173,7 +169,6 @@ EOF
 &lt;p>If you had issues with following the above steps, check out these links for how to install the prerequisites on your specific platform:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://nodejs.org/">Node.js 16.x&lt;/a> &amp;amp; &lt;a href="https://npmjs.com/">npm 8.x.x&lt;/a> - Both of which we recommend installing &lt;a href="https://github.com/nvm-sh/nvm#installing-and-updating">via &lt;code>nvm&lt;/code>&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://gruntjs.com/using-the-cli">grunt cli&lt;/a>&lt;/li>
 &lt;li>&lt;a href="http://www.sagehill.net/docbookxsl/InstallingAProcessor.html">xsltproc&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://www.python.org/downloads/">python 2.7&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://docs.docker.com/engine/install/">Docker&lt;/a>&lt;/li>
@@ -206,7 +201,7 @@ EOF
 &lt;li>&lt;code>COUCH_URL&lt;/code>: the full authenticated url to the &lt;code>medic&lt;/code> DB. Locally this would be &lt;code>http://myadminuser:myadminpass@localhost:5984/medic&lt;/code>&lt;/li>
 &lt;li>&lt;code>COUCH_NODE_NAME&lt;/code>: the name of your CouchDB&amp;rsquo;s node. The Docker image default is &lt;code>nonode@nohost&lt;/code>. Other installations may use &lt;code>couchdb@127.0.0.1&lt;/code>. You can find out by querying &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#membership">CouchDB&amp;rsquo;s membership API&lt;/a>&lt;/li>
 &lt;li>(optionally) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined, the port defaults to &lt;code>5988&lt;/code>&lt;/li>
-&lt;li>(optionally) &lt;code>CHROME_BIN&lt;/code>: only required if &lt;code>grunt unit&lt;/code> or &lt;code>grunt e2e&lt;/code> complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
+&lt;li>(optionally) &lt;code>CHROME_BIN&lt;/code>: only required if tests complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
 &lt;/ul>
 &lt;p>How to permanently define environment variables depends on your OS and shell (e.g. for bash you can put them &lt;code>~/.bashrc&lt;/code>). You can temporarily define them with &lt;code>export&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>nonode@nohost
@@ -220,7 +215,7 @@ EOF
 &lt;li>&lt;code>cd&lt;/code> into the new directory: &lt;code>cd nginx-local-ip&lt;/code>&lt;/li>
 &lt;li>Assuming your IP is &lt;code>192.168.0.3&lt;/code>, start &lt;code>nginx-local-ip&lt;/code> to connect to:
 &lt;ul>
-&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>APP_URL=http://192.168.0.3:5988 docker compose up&lt;/code> and then access it at &lt;code>https://192-168-0-3.local-ip.medicmobile.org/&lt;/code>.&lt;/li>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>APP_URL=http://192.168.0.3:5988 docker compose up&lt;/code> and then access it at &lt;code>https://192-168-0-3.local-ip.medicmobile.org/&lt;/code>.&lt;/li>
 &lt;li>The CHT API running via &lt;code>docker&lt;/code>, the ports are remapped, so execute &lt;code>HTTP=8080 HTTPS=8443 APP_URL=https://192.168.0.3 docker compose up&lt;/code> and then access it at &lt;code>https://192-168-0-3.local-ip.medicmobile.org:8443/&lt;/code>.&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -236,7 +231,7 @@ EOF
 &lt;li>Create an &lt;a href="https://ngrok.com/">ngrok account&lt;/a>, download and install the binary, then link your computer to your ngrok account.&lt;/li>
 &lt;li>Start &lt;code>ngrok&lt;/code> to connect to:
 &lt;ul>
-&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>./ngrok http 5988&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>./ngrok http 5988&lt;/code>&lt;/li>
 &lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>./ngrok http 443&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -249,7 +244,7 @@ EOF
 &lt;li>Start pagekite (be sure to replace &lt;code>YOUR-PAGEKIT-NAME&lt;/code> with the URL you signed up for) to connect to:&lt;/li>
 &lt;/ol>
 &lt;ul>
-&lt;li>The CHT API running via &lt;code>grunt&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>python pagekite.py 5988 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>python pagekite.py 5988 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
 &lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>python pagekite.py 443 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;ol>
@@ -408,17 +403,15 @@ For the rest of this tutorial &lt;strong>in linux&lt;/strong> means code executi
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>couchdb@localhost
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="everything-else">Everything else&lt;/h2>
 &lt;p>&lt;code>npm ci&lt;/code> should just work once you&amp;rsquo;ve installed a latest version of node via nvm as noted above.&lt;/p>
-&lt;p>You won&amp;rsquo;t have grunt already installed, so install it by executing following command:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: npm i -g grunt-cli
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Also install xstproc in your WSL:&lt;/p>
+&lt;p>Also install xstproc in your WSL:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: sudo apt-get update
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: sudo apt-get install xsltproc
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now you can build the web app.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: &lt;span style="color:#204a87">cd&lt;/span> ~/medic/cht-core/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: npm ci
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: grunt
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: npm run build-dev-watch
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>From this point, follow the &lt;code>harden couch&lt;/code> section in &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/#cht-core-cloning-and-setup">Core Developer Setup&lt;/a>.&lt;/p>
-&lt;p>To get multiple linux terminals (so you can run &lt;code>grunt&lt;/code>, &lt;code>api&lt;/code> and &lt;code>sentinel&lt;/code> at the same time) either install and use something like Tmux, or if you click &lt;code>Ubuntu&lt;/code> in the Windows start menu again it will open up a new terminal in the same linux instance.&lt;/p>
+&lt;p>To get multiple linux terminals (so you can run &lt;code>npm run&lt;/code>, &lt;code>api&lt;/code> and &lt;code>sentinel&lt;/code> at the same time) either install and use something like Tmux, or if you click &lt;code>Ubuntu&lt;/code> in the Windows start menu again it will open up a new terminal in the same linux instance.&lt;/p>
 &lt;p>Once you&amp;rsquo;re done with the default instructions and have api running, check if it works by going to http://localhost:5988 in Chrome or Firefox.&lt;/p>
 &lt;h2 id="editing-code">Editing Code&lt;/h2>
 &lt;p>If you want to make changes to your code or contribute to our community health toolkit, you can do so by editing code from your favorite editor. If you editor supports UNC path, you can access and edit files inside WSL from &lt;code>\\wsl$\Ubuntu\&amp;lt;cht-core-location&amp;gt;&lt;/code>. If you use Visual Studio Code, it&amp;rsquo;s even easier to edit your code. Just navigate to where you have checked out cht-core and type &lt;code>code .&lt;/code> This will download VS Code Server for Ubuntu and open the project in Visual Studio Code in windows.&lt;/p>
