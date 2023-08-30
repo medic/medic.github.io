@@ -330,7 +330,197 @@ You can find the versions currently supported, dependencies, and release notes f
 &lt;h2 id="cht-conf">CHT Conf&lt;/h2>
 &lt;p>Follow the &lt;a href="https://github.com/medic/cht-conf/#user-content-releasing">instructions in the readme&lt;/a>.&lt;/p>
 &lt;h2 id="android-apps">Android apps&lt;/h2>
-&lt;p>Follow the instructions in the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/android/releasing/">Android &amp;gt; Releasing&lt;/a> section.&lt;/p></description></item><item><title>Contribute: Coding Style Guide</title><link>https://docs.communityhealthtoolkit.org/contribute/code/style-guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/style-guide/</guid><description>
+&lt;p>Follow the instructions in the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/android/releasing/">Android &amp;gt; Releasing&lt;/a> section.&lt;/p></description></item><item><title>Contribute: Static Analysis</title><link>https://docs.communityhealthtoolkit.org/contribute/code/static-analysis/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/static-analysis/</guid><description>
+&lt;h2 id="eslint">eslint&lt;/h2>
+&lt;p>All code must pass an eslint check which runs early in the CI cycle and uses the &lt;a href="https://github.com/medic/eslint-config">standard medic eslint configuration&lt;/a>.&lt;/p>
+&lt;h2 id="sonar">Sonar&lt;/h2>
+&lt;p>&lt;a href="https://www.sonarsource.com/">Sonar&lt;/a> static analysis supports development by providing feedback on code quality and security issues. Sonar analysis must pass on all &lt;em>new code&lt;/em>.&lt;/p>
+&lt;p>&lt;a href="https://www.sonarsource.com/products/sonarcloud/">SonarCloud&lt;/a> can be enabled on any public repo in the &lt;code>medic&lt;/code> organization.&lt;/p>
+&lt;h3 id="workflow">Workflow&lt;/h3>
+&lt;h4 id="during-development">During development&lt;/h4>
+&lt;p>While writing code, the &lt;a href="https://www.sonarsource.com/products/sonarlint/">SonarLint&lt;/a> plugin can be used to get real-time code analysis in your IDE. This is useful to avoid committing code with Sonar issues in the first place.&lt;/p>
+&lt;h4 id="pr-analysis">PR Analysis&lt;/h4>
+&lt;p>SonarCloud is integrated with the CHT GitHub repositories and runs on every pull request. The results are posted as a comment on the pull request. If the Sonar analysis fails the quality check, the pull request will be blocked from merging.&lt;/p>
+&lt;h5 id="what-should-i-do-if-sonar-finds-an-issue">What should I do if Sonar finds an issue?&lt;/h5>
+&lt;p>When Sonar flags an issue with the code in your pull request, use this decision tree to determine the proper mitigation:&lt;/p>
+&lt;ol>
+&lt;li>If the issue is a genuine concern that should be addressed:
+&lt;ol>
+&lt;li>Fix it and push the updated code to your PR. The PR will automatically be unblocked once the Sonar analysis succeeds.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>If the issue is a &amp;ldquo;false-positive&amp;rdquo; (i.e. Sonar has flagged some particular code as violating a rule, but it does not make sense to apply the rule in that context):
+&lt;ol>
+&lt;li>If the rule is one that should not be applied to any CHT code:
+&lt;ol>
+&lt;li>&lt;a href="#removing-a-rule">Remove the rule&lt;/a> from the default Quality Profile.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>If it does not make sense to apply the rule to this particular code, you can do one of the following:
+&lt;ol>
+&lt;li>Completely ignore Sonar issues &lt;a href="https://docs.sonarsource.com/sonarqube/latest/user-guide/issues/#technical-review">on that line of code&lt;/a> by adding the &lt;code>// NOSONAR&lt;/code> comment to the end of the line.&lt;/li>
+&lt;li>Update the &lt;code>.sonarcloud.properties&lt;/code> to &lt;a href="#ignoring-a-specific-rule-for-a-file">ignore &lt;em>that rule&lt;/em> for that particular file&lt;/a>.&lt;/li>
+&lt;li>Update the &lt;code>.sonarcloud.properties&lt;/code> to &lt;a href="#ignoring-all-rules-for-a-file">ignore &lt;em>all rules&lt;/em> for that particular file&lt;/a> (useful if the file has been copied from an external dependency).&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="adding-a-new-repo-to-sonarcloud">Adding a new repo to SonarCloud&lt;/h3>
+&lt;p>Add a &lt;code>.sonarcloud.properties&lt;/code> file to the repository with your desired &lt;a href="#ignoring-all-rules-for-a-file">repo-level configuration&lt;/a>.&lt;/p>
+&lt;p>In the GitHub UI, navigate to the settings for the &lt;code>medic&lt;/code> org &amp;gt; Integrations &amp;gt; Applications &amp;gt; SonarCloud and click the &lt;code>Configure&lt;/code> button.&lt;/p>
+&lt;p>In the Repository access section, select your desired repository from the drop-down and click &lt;code>Save&lt;/code>.&lt;/p>
+&lt;p>You will be automatically redirected to the SonarCloud UI where you can configure the repo-level settings. Use the &lt;code>+&lt;/code> button and choose &lt;code>Analyze new project&lt;/code>. Select the repo from the list and click &lt;code>Set Up&lt;/code>.&lt;/p>
+&lt;h4 id="new-code-definition">New Code Definition&lt;/h4>
+&lt;p>When setting up a new repository in SonarCloud, you will be asked to define what is considered to be &amp;ldquo;new code&amp;rdquo;. This is used to determine which code in the default branch is considered &amp;ldquo;new&amp;rdquo; (affects reporting of issues, etc).&lt;/p>
+&lt;p>Consult &lt;a href="https://docs.sonarcloud.io/improving/new-code-definition/">the documentation&lt;/a> for more details on the options available. For projects that do not use Gradle or Maven for version management, the &lt;code>Number of days&lt;/code> option is recommended (since &lt;code>Previous version&lt;/code> would require maintaining a version number in the &lt;code>.sonarcloud.properties&lt;/code> file).&lt;/p>
+&lt;h3 id="sonar-configuration">Sonar Configuration&lt;/h3>
+&lt;p>Broadly speaking, Sonar configuration is separated into repo-level and org-level configuration.&lt;/p>
+&lt;h4 id="repo-level-configuration">Repo-level configuration&lt;/h4>
+&lt;p>Each repository can include a &lt;code>.sonarcloud.properties&lt;/code> file in the root directory.&lt;/p>
+&lt;p>This file must specify the path to the source code in the repository as well as which source files should be considered to be test code. See &lt;a href="https://docs.sonarsource.com/sonarqube/latest/project-administration/analysis-scope/">the documentation&lt;/a> for more details.&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-properties" data-lang="properties"># Path to sources
+sonar.sources=.
+# Can have multiple comma-separated entries
+sonar.exclusions=**/test*/**/*
+# Path to tests
+sonar.tests=.
+# Can have multiple comma-separated entries
+sonar.test.inclusions=**/test*/**/*
+&lt;/code>&lt;/pre>&lt;p>Additionally, the &lt;code>.sonarcloud.properties&lt;/code> file can contain configuration regarding ignoring certain rules.&lt;/p>
+&lt;h5 id="ignoring-all-rules-for-a-file">Ignoring all rules for a file&lt;/h5>
+&lt;p>Use the following properties to completely ignore all rules for one or more files:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-properties" data-lang="properties">sonar.issue.ignore.allfile=r1
+sonar.issue.ignore.allfile.r1.fileRegexp=**/openrosa2html5form.xsl
+&lt;/code>&lt;/pre>&lt;h5 id="ignoring-a-specific-rule-for-a-file">Ignoring a specific rule for a file&lt;/h5>
+&lt;p>Use the following properties to ignore a specific rule for one or more files:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-properties" data-lang="properties">sonar.issue.ignore.multicriteria=e1,e2
+sonar.issue.ignore.multicriteria.e1.ruleKey=javascript:S6582
+sonar.issue.ignore.multicriteria.e1.resourceKey=**/auth.js
+sonar.issue.ignore.multicriteria.e2.ruleKey=javascript:S2699
+sonar.issue.ignore.multicriteria.e2.resourceKey=**/config.js
+&lt;/code>&lt;/pre>&lt;h4 id="org-level-configuration">Org-level configuration&lt;/h4>
+&lt;p>Organization-level configuration must be made by an authorized user in the &lt;a href="https://sonarcloud.io/projects">SonarCloud UI&lt;/a>.&lt;/p>
+&lt;h5 id="quality-profiles">Quality Profiles&lt;/h5>
+&lt;p>The quality profiles are the lists of rules that will be applied for the various supported languages. By default, we use the &lt;code>Sonar Way&lt;/code> quality profile for each language as it provides sensible defaults and is actively maintained receiving updates with new rules and bug fixes as they are added to Sonar.&lt;/p>
+&lt;h6 id="modifying-rule-parameters">Modifying rule parameters&lt;/h6>
+&lt;p>To modify a rule parameter (e.g. change the allowed level of complexity for a function &lt;a href="https://rules.sonarsource.com/javascript/RSPEC-3776/">according to &lt;code>javascript:S3776&lt;/code>&lt;/a>):&lt;/p>
+&lt;ol>
+&lt;li>Open a cht-docs PR to record your rule modification in the list below. This allows us to track the history of rule changes and record for posterity the discussions about them.&lt;/li>
+&lt;li>If not already using a custom quality profile, use the SonarCloud UI to create one that &lt;em>extends&lt;/em> the &lt;code>Sonar Way&lt;/code> profile.
+&lt;ol>
+&lt;li>Make sure to set the new quality profile as the default for that language, if desired.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>Open the rule in question in the SonarCloud UI and use the &lt;code>Change&lt;/code> button associated with your quality profile to set your custom parameter value for the rule.&lt;/li>
+&lt;/ol>
+&lt;h6 id="adding-a-rule">Adding a rule&lt;/h6>
+&lt;p>To include a new rule in the code analysis, add it to the quality profile:&lt;/p>
+&lt;ol>
+&lt;li>Open a cht-docs PR to record your rule addition in the list below. This allows us to track the history of rule changes and record for posterity the discussions about them.&lt;/li>
+&lt;li>If not already using a custom quality profile, use the SonarCloud UI to create one that &lt;em>extends&lt;/em> the &lt;code>Sonar Way&lt;/code> profile.
+&lt;ol>
+&lt;li>Make sure to set the new quality profile as the default for that language, if desired.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>Open the rule in question in the SonarCloud UI and use the &lt;code>Activate&lt;/code> button to activate the rule in your quality profile&lt;/li>
+&lt;/ol>
+&lt;h6 id="removing-a-rule">Removing a rule&lt;/h6>
+&lt;p>Removing a rule should only be done as a last resort. It is not possible to remove a rule inherited from the &lt;code>Sonar Way&lt;/code> profile while at the same time still &lt;em>extending&lt;/em> that profile. So, future updates to the &lt;code>Sonar Way&lt;/code> profile will not be applied to your custom profile after a rule has been removed.&lt;/p>
+&lt;ol>
+&lt;li>Open a cht-docs PR to record your rule removal in the list below. This allows us to track the history of rule changes and record for posterity the discussions about them.&lt;/li>
+&lt;li>If not already using a custom quality profile, use the SonarCloud UI to &lt;em>copy&lt;/em> (not extend) the &lt;code>Sonar Way&lt;/code> profile into a new profile.
+&lt;ol>
+&lt;li>Make sure to set the new quality profile as the default for that language, if desired.&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>Open the rule in question in the SonarCloud UI and use the &lt;code>Activate&lt;/code> button to activate the rule in your quality profile&lt;/li>
+&lt;/ol>
+&lt;h6 id="custom-cht-quality-profiles">Custom CHT Quality Profiles&lt;/h6>
+&lt;p>Java:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>CHT Way&lt;/strong> &lt;em>(default)&lt;/em> extends &lt;strong>Sonar Way&lt;/strong>
+&lt;ul>
+&lt;li>Modified:
+&lt;ul>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-107/">&lt;code>S107&lt;/code>&lt;/a> - Functions should not have too many parameters
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 7 -&amp;gt; 4&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-3776/">&lt;code>S3776&lt;/code>&lt;/a> - Cognitive Complexity of functions should not be too high
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 15 -&amp;gt; 5&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>JavaScript:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>CHT Way&lt;/strong> &lt;em>(default)&lt;/em> extends &lt;strong>Sonar Way&lt;/strong>
+&lt;ul>
+&lt;li>Modified:
+&lt;ul>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-107/">&lt;code>S107&lt;/code>&lt;/a> - Functions should not have too many parameters
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 7 -&amp;gt; 4&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-3776/">&lt;code>S3776&lt;/code>&lt;/a> - Cognitive Complexity of functions should not be too high
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 15 -&amp;gt; 5&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>Python:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>CHT Way&lt;/strong> &lt;em>(default)&lt;/em> extends &lt;strong>Sonar Way&lt;/strong>
+&lt;ul>
+&lt;li>Modified:
+&lt;ul>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-107/">&lt;code>S107&lt;/code>&lt;/a> - Functions should not have too many parameters
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 7 -&amp;gt; 4&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-3776/">&lt;code>S3776&lt;/code>&lt;/a> - Cognitive Complexity of functions should not be too high
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 15 -&amp;gt; 5&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>TypeScript:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>CHT Way&lt;/strong> &lt;em>(default)&lt;/em> extends &lt;strong>Sonar Way&lt;/strong>
+&lt;ul>
+&lt;li>Modified:
+&lt;ul>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-107/">&lt;code>S107&lt;/code>&lt;/a> - Functions should not have too many parameters
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 7 -&amp;gt; 4&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://rules.sonarsource.com/javascript/RSPEC-3776/">&lt;code>S3776&lt;/code>&lt;/a> - Cognitive Complexity of functions should not be too high
+&lt;ul>
+&lt;li>&lt;code>threshold&lt;/code> 15 -&amp;gt; 5&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Contribute: Coding Style Guide</title><link>https://docs.communityhealthtoolkit.org/contribute/code/style-guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/style-guide/</guid><description>
 &lt;h2 id="language">Language&lt;/h2>
 &lt;p>Prefer JavaScript or TypeScript wherever possible, including in webapps, on the server, and for scripting. This is because:&lt;/p>
 &lt;ul>
