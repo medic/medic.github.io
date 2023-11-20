@@ -473,7 +473,8 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;first config&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;relevant_to&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;...&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;destination&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;mapping&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;mapping&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;cron&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;...&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;second config&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
@@ -576,6 +577,16 @@ Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when display
 &lt;li>To define a property that is itself an object, you can make the mapping key a JSON path.&lt;/li>
 &lt;li>If you define a property as &lt;code>optional&lt;/code>, it won&amp;rsquo;t exist at all in the payload if the resulting value is &lt;code>undefined&lt;/code>, either because that is the result of executing the &lt;code>expr&lt;/code>, or the &lt;code>path&lt;/code> doesn&amp;rsquo;t exist. Note that if the &lt;code>event.in_danger&lt;/code> expression was instead &lt;code>doc.fields.danger_signs.length &amp;gt;= 3&lt;/code> the property &lt;code>in_danger&lt;/code> would always exist and would either be &lt;code>true&lt;/code> or &lt;code>false&lt;/code>&lt;/li>
 &lt;/ul>
+&lt;h3 id="cron">cron&lt;/h3>
+&lt;p>An optional cron expression for setting the cron rule in the outbound object.
+A cron expression is a string consisting of five fields that describe individual details of the schedule:&lt;/p>
+&lt;p>&lt;code>&amp;lt;minute&amp;gt; &amp;lt;hour&amp;gt; &amp;lt;day-of-month&amp;gt; &amp;lt;month&amp;gt; &amp;lt;day-of-week&amp;gt;&lt;/code>&lt;/p>
+&lt;p>The transition verifies if a cron field exists in the configuration. If a cron field is present, it checks if the document is due for push. If it is due, the new document is pushed. If it is not yet due for push, the document is added to the outbound queue. If the cron field isn’t present, then it goes ahead with the previous flow.&lt;/p>
+&lt;p>Example: you want the system to send outbound pushes based on a cron schedule every day at 1:05.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;cron&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;cron: 5 1 * * *&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Note:&lt;/strong> Schedule Outbound is only available in CHT Core 4.5.0 and above.&lt;/p>
 &lt;h4 id="other-notes">Other Notes&lt;/h4>
 &lt;ul>
 &lt;li>Your report will be hydrated before being passed to the mapper. This gives you access to the contact and its parents&lt;/li>
