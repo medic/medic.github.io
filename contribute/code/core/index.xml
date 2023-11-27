@@ -315,24 +315,20 @@ EOF
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>&lt;code>default-wdio-mobile-local&lt;/code>&lt;/td>
-&lt;td>Compiles the app and executes the mobile e2e test suite.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;code>e2e-integration-local&lt;/code>&lt;/td>
-&lt;td>Compiles the app and executes the e2e integration test suite.&lt;/td>
+&lt;td>&lt;code>integration-all-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the integration test suite except for the sentinel tests.&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>integration-api&lt;/code>&lt;/td>
 &lt;td>Compiles the app and executes the api integration test suite.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;code>lint&lt;/code>&lt;/td>
-&lt;td>Performs static analysis checks on the codebase.&lt;/td>
+&lt;td>&lt;code>integration-sentinel-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the sentinel integration test suite.&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;code>standard-wdio-local&lt;/code>&lt;/td>
-&lt;td>Compiles the app and executes the standard e2e test suite.&lt;/td>
+&lt;td>&lt;code>lint&lt;/code>&lt;/td>
+&lt;td>Performs static analysis checks on the codebase.&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>test&lt;/code>&lt;/td>
@@ -367,8 +363,16 @@ EOF
 &lt;td>Executes the unit test suite on &lt;code>webapp&lt;/code>, and re-runs on code change.&lt;/td>
 &lt;/tr>
 &lt;tr>
+&lt;td>&lt;code>wdio-default-mobile-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the mobile e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
 &lt;td>&lt;code>wdio-local&lt;/code>&lt;/td>
 &lt;td>Compiles the app and executes the default e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>wdio-standard-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the standard e2e test suite.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -512,7 +516,7 @@ see &amp;#34;/private/var/folders/tx/lskdwi/T/ng-23kdi/angular-errors.log&amp;#3
 &lt;h2 id="integration-tests">Integration Tests&lt;/h2>
 &lt;p>For us, integration testing means testing through the entire stack of our application connected to other applications within our system. In the image below, it means that we test each application (box) and its interaction with other applications within our system.
 We isolate the tests from the webapp and make the necessary shortcuts to make the test more straightforward and faster. We do not mock any part of the system.&lt;/p>
-&lt;p>Integration tests are located in &lt;code>tests/integration&lt;/code>. Run them locally with: &lt;code>npm run e2e-integration-local&lt;/code>.&lt;/p>
+&lt;p>Integration tests are located in &lt;code>tests/integration&lt;/code>. Run them locally with &lt;code>npm run integration-all-local&lt;/code> and &lt;code>npm run integration-sentinel-local&lt;/code>.&lt;/p>
 &lt;div class="mermaid">flowchart LR
 subgraph cht-e2e [Docker: cht-e2e]
 api
@@ -535,8 +539,8 @@ integration-tests &lt;--Pouch/HTTPS--> cht-e2e
 &lt;p>End-to-end tests are located in &lt;a href="https://github.com/medic/cht-core/tree/master/tests/e2e">&lt;code>tests/e2e&lt;/code>&lt;/a>. Run them locally with the following:&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>npm run wdio-local&lt;/code> to run the tests for the default config&lt;/li>
-&lt;li>&lt;code>npm run standard-wdio-local&lt;/code> to run the tests for the standard config&lt;/li>
-&lt;li>&lt;code>npm run default-wdio-mobile-local&lt;/code> to run the mobile tests&lt;/li>
+&lt;li>&lt;code>npm run wdio-standard-local&lt;/code> to run the tests for the standard config&lt;/li>
+&lt;li>&lt;code>npm run wdio-default-mobile-local&lt;/code> to run the mobile tests&lt;/li>
 &lt;/ul>
 &lt;div class="mermaid">flowchart LR
 subgraph cht-e2e [Docker: cht-e2e]
@@ -582,7 +586,7 @@ e2e-tests o--Pouch/HTTPS--o cht-e2e
 &lt;h4 id="running-just-the-failing-test">Running just the failing test&lt;/h4>
 &lt;p>Running e2e tests can be quite slow so to save time modify the &lt;code>specs&lt;/code> property of &lt;code>/tests/e2e/**/wdio.conf.js&lt;/code> so it only finds your test. You can also use &lt;code>describe.skip&lt;/code> and &lt;code>it.skip&lt;/code> to skip specific tests.&lt;/p>
 &lt;h4 id="watching-the-test-run">Watching the test run&lt;/h4>
-&lt;p>Running the tests locally with &lt;code>npm run wdio-local&lt;/code> or &lt;code>npm run standard-wdio-local&lt;/code> will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
+&lt;p>Running the tests locally with &lt;code>npm run wdio-local&lt;/code> or &lt;code>npm run wdio-standard-local&lt;/code> will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
 &lt;p>We don&amp;rsquo;t actively support development on Windows, instead preferring MacOS or Linux.&lt;/p>
 &lt;p>However, Microsoft has recently been stabilizing their &lt;a href="https://docs.microsoft.com/en-us/windows/wsl/about">Windows Subsystem for Linux&lt;/a>, which appears to work reasonably well for development.&lt;/p>
 &lt;p>Installation instructions are mostly the same as they written in &lt;a href="https://github.com/medic/cht-core/blob/master/README.md">the README&lt;/a> with a couple of caveats as of time of writing (2019-07-25), noted below.&lt;/p>
