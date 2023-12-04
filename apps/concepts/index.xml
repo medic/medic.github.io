@@ -87,8 +87,20 @@ The magic link workflow will not work for users who want to use multiple devices
 &lt;figure class="right col-6 col-lg-4">&lt;a href="sync-status.png">
 &lt;img src="sync-status.png"/> &lt;/a>
 &lt;/figure>
-&lt;p>Data synchronisation is important for &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/">offline users&lt;/a>. These users keep a copy of the data they have access to on their device. They can work from their device while disconnected from the internet (offline), by reading from and writing to their copy of the data. &amp;ldquo;Sync&amp;rdquo; (synchronisation) is when data on the device is made to match the data on the server. Synchronisation consists of uploading all new or altered data from the device to the server, and downloading new or altered data from the server to the device. This latter step may include the download of software updates to the CHT core or CHT app when available.&lt;/p>
-&lt;p>At the bottom of the menu is a notification which provides important information about data synchronisation.&lt;/p>
+&lt;p>Data synchronization is important for &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/users/">offline users&lt;/a>. These users keep a copy of the data they have access to on their device. They can work from their device while disconnected from the internet (offline), by reading from and writing to their copy of the data. “Sync” (synchronization) is when data on the device is made to match the data on the server and requires an internet connection. The CHT app monitors the online status and attempts sync accordingly.&lt;/p>
+&lt;h4 id="replication-types">Replication Types&lt;/h4>
+&lt;p>Synchronization consists of upward replication and downward replication.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Upward Replication&lt;/strong>: Uploading all new or updated data from the device to the server. It includes a retry mechanism for handling larger data batches, ensuring a robust and reliable upload process.&lt;/li>
+&lt;li>&lt;strong>Downward Replication&lt;/strong>: Downloading new or updated data from the server to the device. Downward replication may include the download of software updates to the CHT app when available.&lt;/li>
+&lt;/ul>
+&lt;p>The CHT application manages data synchronization across two types of databases:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Main Application Database (&lt;code>medic&lt;/code>)&lt;/strong>: The main database that stores the primary data used by the application. It includes contacts, reports, messages, and other critical documents necessary for the core functionality of the application. This database is synchronized continuously to reflect changes to the application, such as new contact creations. Each user stores a subset of the main database which includes only the documents they&amp;rsquo;re allowed to view.&lt;/li>
+&lt;li>&lt;strong>User-Metadata Database(&lt;code>medic-user-{username}-meta&lt;/code>)&lt;/strong>: Each user has a dedicated database that stores operational metadata, including &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry data&lt;/a> and error messages. Synchronization occurs at predefined intervals to ensure up-to-date monitoring and analysis.&lt;/li>
+&lt;/ul>
+&lt;h4 id="sync-status-notification">Sync Status Notification&lt;/h4>
+&lt;p>At the bottom of the menu is a notification which provides important information about data synchronization.&lt;/p>
 &lt;p>If the sync status is green and says “All reports synced,” this means you have successfully uploaded the most recent data on your device to the server. It also means that you downloaded the latest data from the server as of the time displayed. Note that there could be more recent data changes on the server, and it doesn&amp;rsquo;t guarantee you are up to date.&lt;/p>
 &lt;p>If the indicator is red, it means you have data changes waiting to be uploaded to the server. You should check your internet and data connection to ensure a successful sync.&lt;/p>
 &lt;aside class="right col-6 col-lg-4">
@@ -102,8 +114,24 @@ The magic link workflow will not work for users who want to use multiple devices
 &lt;img src="sync-successful.jpg"/> &lt;/a>
 &lt;/figure>
 &lt;/aside>
-&lt;p>Triggering a manual sync by clicking the &amp;ldquo;Sync now&amp;rdquo; button will provide feedback at every step of the process through a snackbar appearing on the bottom side of the screen.&lt;br>
-It will also allow to retry the sync process in case of failure.&lt;/p></description></item><item><title>Apps: Forms</title><link>https://docs.communityhealthtoolkit.org/apps/concepts/forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/concepts/forms/</guid><description>
+&lt;p>Triggering a manual sync by clicking the &amp;ldquo;Sync now&amp;rdquo; button will provide feedback at every step of the process through a snackbar appearing on the bottom side of the screen. This performs upward and downward synchronization of both databases. It will also retry the sync process in case of failure..&lt;/p>
+&lt;h4 id="synchronization-triggers">Synchronization Triggers&lt;/h4>
+&lt;ul>
+&lt;li>&lt;strong>On Login&lt;/strong>: Synchronization is automatically initiated upon successful user login if the app is connected to the internet.&lt;/li>
+&lt;li>&lt;strong>Manual&lt;/strong>: Clicking the &amp;ldquo;Sync now&amp;rdquo; button.&lt;/li>
+&lt;li>&lt;strong>Periodic Sync&lt;/strong>: The application performs regular checks and attempts to synchronize. The main application database syncs every 5 minutes, while the user metadata database syncs every 30 minutes..&lt;/li>
+&lt;li>&lt;strong>On Reload&lt;/strong>: Synchronization is automatically initiated when the user reloads the application, refreshes the page, or clicks the reload button in the &amp;ldquo;Update available&amp;rdquo; modal.&lt;/li>
+&lt;li>&lt;strong>On Connect&lt;/strong>: The app also detects when an internet connection becomes available and attempts to sync immediately.&lt;/li>
+&lt;/ul>
+&lt;h4 id="sync-status-states">Sync Status States&lt;/h4>
+&lt;p>The synchronization process can be in one of the following states:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Unknown&lt;/strong>: The sync status is not determined yet.&lt;/li>
+&lt;li>&lt;strong>Disabled&lt;/strong>: Sync is disabled - only applies to online-only users.&lt;/li>
+&lt;li>&lt;strong>InProgress&lt;/strong>: Synchronization is currently ongoing.&lt;/li>
+&lt;li>&lt;strong>Success&lt;/strong>: The last sync operation was successful.&lt;/li>
+&lt;li>&lt;strong>Required&lt;/strong>: There is data pending synchronization.&lt;/li>
+&lt;/ul></description></item><item><title>Apps: Forms</title><link>https://docs.communityhealthtoolkit.org/apps/concepts/forms/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/concepts/forms/</guid><description>
 &lt;p>Forms are a building block of all CHT apps. They are used when creating or editing contacts, and when completing a care guide or survey within the app. Forms are also used to interpret SMS interactions with the CHT.&lt;/p>
 &lt;p>When a completed form is submitted, it is treated as a Report in the app. All reports can be viewed in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/reports/">Reports tab&lt;/a> by those with the proper access within the &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/hierarchy/">hierarchy&lt;/a>.&lt;/p>
 &lt;p>There are four different types of forms:&lt;/p>
