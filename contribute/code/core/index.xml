@@ -594,7 +594,44 @@ e2e-tests o--Pouch/HTTPS--o cht-e2e
 &lt;h4 id="running-just-the-failing-test">Running just the failing test&lt;/h4>
 &lt;p>Running e2e tests can be quite slow so to save time modify the &lt;code>specs&lt;/code> property of &lt;code>/tests/e2e/**/wdio.conf.js&lt;/code> so it only finds your test. You can also use &lt;code>describe.skip&lt;/code> and &lt;code>it.skip&lt;/code> to skip specific tests.&lt;/p>
 &lt;h4 id="watching-the-test-run">Watching the test run&lt;/h4>
-&lt;p>Running the tests locally with &lt;code>npm run wdio-local&lt;/code> or &lt;code>npm run wdio-standard-local&lt;/code> will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
+&lt;p>Running the tests locally with &lt;code>npm run wdio-local&lt;/code> or &lt;code>npm run standard-wdio-local&lt;/code> will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p>
+&lt;h4 id="running-the-upgrade-e2e-test-locally">Running the upgrade e2e test locally&lt;/h4>
+&lt;p>To run the upgrade e2e tests in your local environment, follow these steps:&lt;/p>
+&lt;ul>
+&lt;li>Make sure your branch has been published, and it&amp;rsquo;s available in the market:
+&lt;ul>
+&lt;li>A way to do this is by pushing the branch, let the GitHubActions to run, if all the other e2e are okay, then it will publish the branch.&lt;/li>
+&lt;li>Check that your branch name is available &lt;a href="https://staging.dev.medicmobile.org/_couch/builds_4/_design/builds/_view/releases">here&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Make sure to stop all existing containers&lt;/li>
+&lt;li>Set these environment variables:
+&lt;ul>
+&lt;li>&lt;code>export MARKET_URL_READ=https://staging.dev.medicmobile.org&lt;/code>.&lt;/li>
+&lt;li>&lt;code>export STAGING_SERVER=_couch/builds_4&lt;/code>.&lt;/li>
+&lt;li>&lt;code>export BRANCH=&amp;lt;your branch name&amp;gt;&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Run the upgrade e2e tests: &lt;code>npm run upgrade-wdio&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>If you experience errors such as:&lt;/p>
+&lt;pre tabindex="0">&lt;code>Error in hook: StatusCodeError: 404 - &amp;#34;{\&amp;#34;error\&amp;#34;:\&amp;#34;not_found\&amp;#34;,\&amp;#34;reason\&amp;#34;:\&amp;#34;Document is missing attachment\&amp;#34;}\n&amp;#34;
+&lt;/code>&lt;/pre>&lt;p>Try the following:&lt;/p>
+&lt;ul>
+&lt;li>It&amp;rsquo;s probably because it can&amp;rsquo;t find the latest released version of CHT, double check that &lt;code>MARKET_URL_READ&lt;/code> and &lt;code>STAGING_SERVER&lt;/code> environment variables are set.&lt;/li>
+&lt;/ul>
+&lt;p>If you experience errors such as:&lt;/p>
+&lt;pre tabindex="0">&lt;code>If you are seeing this locally, it can mean that your internet is too slow to download all images in the allotted time.
+Either run the test multiple times until you load all images, download images manually or increase this timeout.
+&lt;/code>&lt;/pre>&lt;p>Try the following:&lt;/p>
+&lt;ul>
+&lt;li>Manually downloaded the images. To download images manually, you can use either docker-compose or docker:
+&lt;ul>
+&lt;li>With docker, you&amp;rsquo;d do a docker pull &lt;image tag> for every image you want to download.&lt;/li>
+&lt;li>With docker-compose, you&amp;rsquo;d save all docker-compose files in a folder, do a docker-compose pull, and point to your files as a source. &lt;a href="https://docs.docker.com/engine/reference/commandline/compose_pull/">Compose pull documentation&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
 &lt;p>We don&amp;rsquo;t actively support development on Windows, instead preferring MacOS or Linux.&lt;/p>
 &lt;p>However, Microsoft has recently been stabilizing their &lt;a href="https://docs.microsoft.com/en-us/windows/wsl/about">Windows Subsystem for Linux&lt;/a>, which appears to work reasonably well for development.&lt;/p>
 &lt;p>Installation instructions are mostly the same as they written in &lt;a href="https://github.com/medic/cht-core/blob/master/README.md">the README&lt;/a> with a couple of caveats as of time of writing (2019-07-25), noted below.&lt;/p>
