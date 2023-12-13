@@ -123,6 +123,7 @@ id="tabs-00-02" role="tabpanel" aria-labelled-by="tabs-00-02-tab">
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm ci --legacy-peer-deps
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="couchdb">CouchDB&lt;/h3>
 &lt;p>CouchDB execution differs depending on whether you&amp;rsquo;re running CHT 3.x or 4.x. Follow the instructions in one of the sections below.&lt;/p>
+&lt;p>If you are using a MacBook with the new Apple silicon chips (M1, M2 etc, with the ARM architecture) skip to the &lt;a href="#couchdb-setup-in-4x-for-apple-silicon-chip">CouchDB Setup in 4.x for Apple Silicon Chip&lt;/a> section in CouchDB Setup in CHT 4.x.&lt;/p>
 &lt;h4 id="couchdb-setup-in-cht-3x">CouchDB Setup in CHT 3.x&lt;/h4>
 &lt;p>Note this will run in the background and store its data in &lt;code>/home/YOUR-USER/cht-docker&lt;/code>. The login for your CHT instance will be &lt;code>medic&lt;/code> and the password will be &lt;code>password&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v ~/cht-docker/local.d:/opt/couchdb/data -v ~/cht-docker/local.d:/opt/couchdb/etc/local.d apache/couchdb:2
@@ -149,6 +150,29 @@ EOF
 &lt;/code>&lt;/pre>&lt;p>Now you can start CouchDB. The login for your CHT instance will be &lt;code>medic&lt;/code> and the &lt;code>password&lt;/code> will be password:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-docker
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose -f docker-compose.yml -f couchdb-override.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-setup-in-4x-for-apple-silicon-chip">CouchDB Setup in 4.x for Apple Silicon Chip&lt;/h4>
+&lt;p>You will need to build the Docker images locally on your machine because the images hosted publicly do not currently support Apple&amp;rsquo;s ARM architecture. While in the root directory of your &lt;code>cht-core&lt;/code> project:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm run local-images
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>After the &lt;code>npm&lt;/code> command completes successfully, a &lt;code>local-build&lt;/code> folder will be created in the root directory of your &lt;code>cht-core&lt;/code> project.&lt;/p>
+&lt;p>Confirm you have these four files in the &lt;code>local-build&lt;/code> folder: &lt;code>docker-compose.yml&lt;/code>, &lt;code>cht-core.yml&lt;/code>, &lt;code>cht-couchdb.yml&lt;/code> and &lt;code>cht-couchdb-clustered.yml&lt;/code>&lt;/p>
+&lt;p>Open the project with your favorite text editor, navigate inside the &lt;code>local-build&lt;/code> folder and update the &lt;code>cht-couchdb.yml&lt;/code> file with the necessary ports.&lt;/p>
+&lt;p>In the &lt;code>couchdb&lt;/code> configuration inside the &lt;code>cht-couchdb.yml&lt;/code> file, right after the &lt;code>volumes&lt;/code> property, add the following properties and save the changes:&lt;/p>
+&lt;pre tabindex="0">&lt;code>ports:
+- &amp;#34;5984:5984&amp;#34;
+- &amp;#34;5986:5986&amp;#34;
+expose:
+- &amp;#34;5984&amp;#34;
+- &amp;#34;5986&amp;#34;
+&lt;/code>&lt;/pre>&lt;p>Set environment variables required by &lt;code>npm&lt;/code> and &lt;code>node&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_NODE_NAME=nonode@nohost&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_URL=http://medic:password@localhost:5984/medic&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_DB_USER=medic&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_DB_PASSWORD=password&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In your terminal, navigate inside the &lt;code>local-build&lt;/code> folder, stop any running Docker containers and start the CHT Docker containers:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core/local-build
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">kill&lt;/span> &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps -q&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker-compose -f cht-couchdb.yml up -d
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
 &lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development.&lt;/p>
 &lt;p>In the first terminal we&amp;rsquo;ll compile and deploy the web application by runing:&lt;/p>
@@ -200,8 +224,10 @@ EOF
 &lt;ul>
 &lt;li>&lt;code>COUCH_URL&lt;/code>: the full authenticated url to the &lt;code>medic&lt;/code> DB. Locally this would be &lt;code>http://myadminuser:myadminpass@localhost:5984/medic&lt;/code>&lt;/li>
 &lt;li>&lt;code>COUCH_NODE_NAME&lt;/code>: the name of your CouchDB&amp;rsquo;s node. The Docker image default is &lt;code>nonode@nohost&lt;/code>. Other installations may use &lt;code>couchdb@127.0.0.1&lt;/code>. You can find out by querying &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#membership">CouchDB&amp;rsquo;s membership API&lt;/a>&lt;/li>
-&lt;li>(optionally) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined, the port defaults to &lt;code>5988&lt;/code>&lt;/li>
-&lt;li>(optionally) &lt;code>CHROME_BIN&lt;/code>: only required if tests complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
+&lt;li>(optional) &lt;code>COUCHDB_USER&lt;/code>: the name of your CouchDB&amp;rsquo;s user. The Docker image default is &lt;code>medic&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>COUCHDB_PASSWORD&lt;/code>: the credentials of your CouchDB user. The Docker image default is &lt;code>password&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined, the port defaults to &lt;code>5988&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>CHROME_BIN&lt;/code>: only required if tests complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
 &lt;/ul>
 &lt;p>How to permanently define environment variables depends on your OS and shell (e.g. for bash you can put them &lt;code>~/.bashrc&lt;/code>). You can temporarily define them with &lt;code>export&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>nonode@nohost
