@@ -359,6 +359,7 @@ You can find the versions currently supported, dependencies, and release notes f
 &lt;li>If it does not make sense to apply the rule to this particular code, you can do one of the following:
 &lt;ol>
 &lt;li>Completely ignore Sonar issues &lt;a href="https://docs.sonarsource.com/sonarqube/latest/user-guide/issues/#technical-review">on that line of code&lt;/a> by adding the &lt;code>// NOSONAR&lt;/code> comment to the end of the line.&lt;/li>
+&lt;li>Completely ignore Sonar issues for &lt;a href="#ignoring-all-rules-for-a-block-of-code">that block of code&lt;/a>.&lt;/li>
 &lt;li>Update the &lt;code>.sonarcloud.properties&lt;/code> to &lt;a href="#ignoring-a-specific-rule-for-a-file">ignore &lt;em>that rule&lt;/em> for that particular file&lt;/a>.&lt;/li>
 &lt;li>Update the &lt;code>.sonarcloud.properties&lt;/code> to &lt;a href="#ignoring-all-rules-for-a-file">ignore &lt;em>all rules&lt;/em> for that particular file&lt;/a> (useful if the file has been copied from an external dependency).&lt;/li>
 &lt;/ol>
@@ -393,6 +394,14 @@ sonar.tests=.
 # Can have multiple comma-separated entries
 sonar.test.inclusions=**/test*/**/*
 &lt;/code>&lt;/pre>&lt;p>Additionally, the &lt;code>.sonarcloud.properties&lt;/code> file can contain configuration regarding ignoring certain rules.&lt;/p>
+&lt;h5 id="ignoring-all-rules-for-a-block-of-code">Ignoring all rules for a block of code&lt;/h5>
+&lt;p>You can ignore all the rules for a block of code by telling Sonar to &lt;a href="https://docs.sonarsource.com/sonarqube/latest/project-administration/analysis-scope/#ignoring-blocks-within-files">ignore the block&lt;/a>. First, make sure your &lt;code>.sonarcloud.properties&lt;/code> file has the following configuration:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-properties" data-lang="properties">
+```properties
+sonar.issue.ignore.block=e1
+sonar.issue.ignore.block.e1.beginBlockRegexp=NOSONAR_BEGIN
+sonar.issue.ignore.block.e1.endBlockRegexp=NOSONAR_END
+&lt;/code>&lt;/pre>&lt;p>Then simply put &lt;code>//NOSONAR_BEGIN&lt;/code> before the block to ignore and &lt;code>//NOSONAR_END&lt;/code> after the block.&lt;/p>
 &lt;h5 id="ignoring-all-rules-for-a-file">Ignoring all rules for a file&lt;/h5>
 &lt;p>Use the following properties to completely ignore all rules for one or more files:&lt;/p>
 &lt;pre tabindex="0">&lt;code class="language-properties" data-lang="properties">sonar.issue.ignore.allfile=r1
