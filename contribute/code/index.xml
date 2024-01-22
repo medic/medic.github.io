@@ -378,8 +378,9 @@ You can find the versions currently supported, dependencies, and release notes f
 &lt;li>Select the repo from the list and click &lt;code>Set Up&lt;/code>.&lt;/li>
 &lt;/ol>
 &lt;h4 id="new-code-definition">New Code Definition&lt;/h4>
-&lt;p>When setting up a new repository in SonarCloud, you will be asked to define what is considered to be &amp;ldquo;new code&amp;rdquo;. This is used to determine which code in the default branch is considered &amp;ldquo;new&amp;rdquo; (affects reporting of issues, etc).&lt;/p>
+&lt;p>When setting up a new repository in SonarCloud, you will be asked to define what is considered to be &amp;ldquo;new code&amp;rdquo;. This is used to determine which code in the default branch is considered &amp;ldquo;new&amp;rdquo; (affects reporting of issues, etc). The new code definition is not applied to Sonar analysis of a PR. In that case, only the changes in the PR are considered &amp;ldquo;new&amp;rdquo;.&lt;/p>
 &lt;p>Consult &lt;a href="https://docs.sonarcloud.io/improving/new-code-definition/">the documentation&lt;/a> for more details on the options available. For projects that do not use Gradle or Maven for version management, the &lt;code>Number of days&lt;/code> option is recommended (since &lt;code>Previous version&lt;/code> would require maintaining a version number in the &lt;code>.sonarcloud.properties&lt;/code> file).&lt;/p>
+&lt;p>If you are using the &lt;code>CHT Way&lt;/code> quality gate (or a similar zero-tolerance quality gate) it is recommended to set &lt;code>Number of days = 1&lt;/code>. With a zero-tolerance quality gate, only issue-free code can be merged to the default branch. So, there is no need to check for issues accumulated over time. Also, having a higher &lt;code>Number of days&lt;/code> opens up a greater opportunity for Sonar to introduce a &lt;em>new rule&lt;/em> that will fail some code previously added to the default branch (code that is only included in the latest analysis because of the configured &lt;code>Number of days&lt;/code>).&lt;/p>
 &lt;h3 id="sonar-configuration">Sonar Configuration&lt;/h3>
 &lt;p>Broadly speaking, Sonar configuration is separated into repo-level and org-level configuration.&lt;/p>
 &lt;h4 id="repo-level-configuration">Repo-level configuration&lt;/h4>
@@ -429,7 +430,7 @@ sonar.issue.ignore.multicriteria.e2.resourceKey=**/config.js
 &lt;tr>
 &lt;td>Duplicated Lines (%)&lt;/td>
 &lt;td>is greater than&lt;/td>
-&lt;td>3.0%&lt;/td>
+&lt;td>6.0%&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>Issues&lt;/td>
