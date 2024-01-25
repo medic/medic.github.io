@@ -87,6 +87,7 @@ To get the correct &lt;code>docker-network-name&lt;/code> and &lt;code>docker-se
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>g) Run the &lt;code>verify&lt;/code> command to check whether the migration was successful.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose run couch-migration verify
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If all checks pass, you should see a message &lt;code>Migration verification passed&lt;/code>. It is then safe to proceed with starting CHT-Core 4.x, using the same environment variables you saved in &lt;code>~/couchdb-single/.env&lt;/code>.&lt;/p>
+&lt;p>h) &lt;a href="#6-cleanup">Remove unnecessary containers&lt;/a>.&lt;/p>
 &lt;h4 id="multi-node">Multi node&lt;/h4>
 &lt;p>a) Download 4.x clustered CouchDb docker-compose file:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir -p ~/couchdb-cluster/
@@ -189,7 +190,32 @@ To get the correct &lt;code>docker-network-name&lt;/code> and &lt;code>docker-se
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose run couch-migration remove-node couchdb@127.0.0.1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>j) Run the &lt;code>verify&lt;/code> command to check whether the migration was successful.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose run couch-migration verify
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If all checks pass, you should see a message &lt;code>Migration verification passed&lt;/code>. It is then safe to proceed with starting CHT-Core 4.x, using the same environment variables you saved in &lt;code>~/couchdb-cluster/.env&lt;/code>.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/</guid><description>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If all checks pass, you should see a message &lt;code>Migration verification passed&lt;/code>. It is then safe to proceed with starting CHT-Core 4.x, using the same environment variables you saved in &lt;code>~/couchdb-cluster/.env&lt;/code>.&lt;/p>
+&lt;p>k) &lt;a href="#6-cleanup">Remove unnecessary containers&lt;/a>.&lt;/p>
+&lt;h3 id="6-cleanup">6. Cleanup&lt;/h3>
+&lt;p>It&amp;rsquo;s very important to remove temporary containers that were used during migration and containers that deployed the previous CHT-Core 3.x installation. Only follow this step after making sure your CHT-Core 4.x installation is ready and can be used.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Warning&lt;/h4>
+Even if these containers are stopped, depending on their configuration, they could restart when the Docker engine is restarted, for example on system reboot.
+&lt;/div>
+&lt;h5 id="risks-for-not-removing-containers-include">Risks for not removing containers include&lt;/h5>
+&lt;ul>
+&lt;li>resource contention - where your new CHT installation might not have access to certain resources (for example network ports) because they are already used.&lt;/li>
+&lt;li>data corruption - when multiple CouchDb installations are accessing the same data source.&lt;/li>
+&lt;li>data loss - when multiple CouchDb installation are exposing on the same port.&lt;/li>
+&lt;/ul>
+&lt;p>To get a list of all containers run:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker ps -a
+&lt;/code>&lt;/pre>&lt;p>From this list, you should find the names for :&lt;/p>
+&lt;ul>
+&lt;li>containers that ran CHT-Core 3.x, likely named &lt;code>medic-os&lt;/code> and &lt;code>haproxy&lt;/code>.&lt;/li>
+&lt;li>temporary single node CouchDb containers, likely named &lt;code>couchdb-single-couchdb-1&lt;/code>&lt;/li>
+&lt;li>temporary clustered CouchDb containers, likely named &lt;code>couchdb-cluster-couchdb-2.local-1&lt;/code>, &lt;code>couchdb-cluster-couchdb-1.local-1&lt;/code> and &lt;code>couchdb-cluster-couchdb-3.local-1&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>To remove containers, run these commands:&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker stop &amp;lt;container&amp;gt; &amp;lt;container&amp;gt; &amp;lt;container&amp;gt;
+docker rm &amp;lt;container&amp;gt; &amp;lt;container&amp;gt; &amp;lt;container&amp;gt;
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Self Hosting in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/</guid><description>
 &lt;h1 id="recommendations-and-considerations">Recommendations and considerations&lt;/h1>
 &lt;h2 id="multi-vs-single-node-couchdb-requirements">Multi vs Single node couchdb requirements&lt;/h2>
 &lt;p>For smaller deployments a &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/single-node/">single node CouchDB&lt;/a> instance can be used, for larger deployments a &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/multiple-nodes/">multi-node CouchDB&lt;/a> cluster is generally recommended&lt;/p>
