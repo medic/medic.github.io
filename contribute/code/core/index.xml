@@ -12,7 +12,7 @@ These steps apply to both 3.x and 4.x CHT core development, unless stated otherw
 &lt;p>CHT Core development can be done on Linux, macOS, or Windows (using the &lt;a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL2)&lt;/a>). This CHT Core developer guide will have you install NodeJS, npm, and CouchDB (via Docker) on your local workstation.&lt;/p>
 &lt;h3 id="install-nodejs-npm-and-docker">Install NodeJS, npm, and Docker&lt;/h3>
 &lt;p>First, update your current packages and install some supporting tools:&lt;/p>
-&lt;p>&lt;em>(Node 16 is the environment used to run the CHT server in production, so this is the recommended version of Node to use for development.)&lt;/em>&lt;/p>
+&lt;p>&lt;em>(Node 20 is the environment used to run the CHT server in production, so this is the recommended version of Node to use for development.)&lt;/em>&lt;/p>
 &lt;ul class="nav nav-tabs" id="tabs-3" role="tablist">
 &lt;li class="nav-item">
 &lt;a class="nav-link active"
@@ -43,13 +43,13 @@ id="tabs-03-00" role="tabpanel" aria-labelled-by="tabs-03-00-tab">
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">16&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">20&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;/div>
 &lt;div class="tab-pane fade"
 id="tabs-03-01" role="tabpanel" aria-labelled-by="tabs-03-01-tab">
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Uses Homebrew: https://brew.sh/&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew update
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew install curl jq pyenv git make node@16 gcc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew install curl jq pyenv git make node@20 gcc
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Python no longer included by default in macOS &amp;gt;12.3 &lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv install 2.7.18
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv global 2.7.18
@@ -64,10 +64,10 @@ id="tabs-03-02" role="tabpanel" aria-labelled-by="tabs-03-02-tab">
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">16&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">20&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
 &lt;/div>
 &lt;/div>
-&lt;p>Now let&amp;rsquo;s ensure NodeJS 16 and npm 8 were installed. This should output version 16.x.x for NodeJS and 8.x.x for &lt;code>npm&lt;/code>:&lt;/p>
+&lt;p>Now let&amp;rsquo;s ensure NodeJS 20 and npm 10 were installed. This should output version 20.x.x for NodeJS and 10.x.x for &lt;code>npm&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>node -v &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm -v
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install Docker:&lt;/p>
 &lt;ul class="nav nav-tabs" id="tabs-0" role="tablist">
@@ -193,7 +193,7 @@ expose:
 &lt;h3 id="prerequisites">Prerequisites&lt;/h3>
 &lt;p>If you had issues with following the above steps, check out these links for how to install the prerequisites on your specific platform:&lt;/p>
 &lt;ul>
-&lt;li>&lt;a href="https://nodejs.org/">Node.js 16.x&lt;/a> &amp;amp; &lt;a href="https://npmjs.com/">npm 8.x.x&lt;/a> - Both of which we recommend installing &lt;a href="https://github.com/nvm-sh/nvm#installing-and-updating">via &lt;code>nvm&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://nodejs.org/">Node.js 20.x&lt;/a> &amp;amp; &lt;a href="https://npmjs.com/">npm 10.x.x&lt;/a> - Both of which we recommend installing &lt;a href="https://github.com/nvm-sh/nvm#installing-and-updating">via &lt;code>nvm&lt;/code>&lt;/a>&lt;/li>
 &lt;li>&lt;a href="http://www.sagehill.net/docbookxsl/InstallingAProcessor.html">xsltproc&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://www.python.org/downloads/">python 2.7&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://docs.docker.com/engine/install/">Docker&lt;/a>&lt;/li>
