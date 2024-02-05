@@ -438,6 +438,21 @@ api running 400_deleteme_api_1 public.ecr.aws/medic/cht-api:4.4.0-8229-outbound-
 sentinel running 400_deleteme_sentinel_1 public.ecr.aws/medic/cht-sentinel:4.4.0-8229-outbound-push
 nginx running 400_deleteme_nginx_1 public.ecr.aws/medic/cht-nginx:4.4.0-8229-outbound-push
 couchdb running 400_deleteme_couchdb_1 public.ecr.aws/medic/cht-couchdb:4.4.0-8229-outbound-push
+&lt;/code>&lt;/pre>&lt;h4 id="troubleshooting">Troubleshooting&lt;/h4>
+&lt;p>When you are starting a CHT Core instance using Docker Helper 4.x and don&amp;rsquo;t have any containers created, images downloaded, or storage volumes created - the &lt;code>*.local-ip.medicmobile.org&lt;/code> TLS certificate fails to install, which leads to a browser &lt;code>Your connection is not private&lt;/code> message.&lt;/p>
+&lt;p>To solve this issue, follow the steps below:&lt;/p>
+&lt;ol>
+&lt;li>First, find the name of the &lt;code>nginx&lt;/code> container with: &lt;code>docker ps --filter &amp;quot;name=nginx&amp;quot; --format '{{ .Names }}'&lt;/code>.&lt;/li>
+&lt;li>After cloning the &lt;a href="https://github.com/medic/cht-core">CHT Core repo&lt;/a>, &lt;code>cd&lt;/code> into the &lt;code>scripts&lt;/code> directory: &lt;code>cd ./cht-core/scripts&lt;/code>.&lt;/li>
+&lt;li>Using the container name from the first command, call the script to update the certificate: &lt;code>./add-local-ip-certs-to-docker-4.x.sh CONTAINER_NAME&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;p>These three steps look like as following assuming that &lt;code>CONTAINER_NAME&lt;/code> is equal to &lt;code>4_3_0_nginx_1&lt;/code>. Note that &lt;code>CONTAINER_NAME&lt;/code> will be different for each instance of CHT you run with Docker Helper:&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ docker ps --filter &amp;#34;name=nginx&amp;#34; --format &amp;#39;{{ .Names }}&amp;#39;
+4_3_0_nginx_1
+$ cd Documents/MedicMobile/cht-core/scripts/
+scripts $ ./add-local-ip-certs-to-docker-4.x.sh 4_3_0_nginx_1
+4_3_0_nginx_1
+If just container name is shown above, a fresh local-ip.medicmobile.org certificate was downloaded fresh local-ip.medicmobile.org.
 &lt;/code>&lt;/pre>&lt;h3 id="file-locations">File locations&lt;/h3>
 &lt;p>The bash script keeps files in two places:&lt;/p>
 &lt;ul>
