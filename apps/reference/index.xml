@@ -44,6 +44,11 @@ display: none;
 &lt;li>&lt;a href="#query-parameters-3">Query parameters&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
+&lt;li>&lt;a href="#get-apiv2exportuser-devices">GET /api/v2/export/user-devices&lt;/a>
+&lt;ul>
+&lt;li>&lt;a href="#output-2">Output&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>&lt;a href="#forms">Forms&lt;/a>
@@ -357,7 +362,7 @@ on a Javascript Date object.&lt;/p>
 &lt;/table>
 &lt;h2 id="export">Export&lt;/h2>
 &lt;p>Request different types of data in various formats.&lt;/p>
-&lt;p>Each of the export endpoints except contacts and feedback supports a parameter which returns date formatted in human readable form (ISO 8601). Setting this parameter to false or leaving it out will return dates formatted as an epoch timestamp.&lt;/p>
+&lt;p>Each of the export endpoints except contacts, feedback, and user-devices supports a parameter which returns date formatted in human readable form (ISO 8601). Setting this parameter to false or leaving it out will return dates formatted as an epoch timestamp.&lt;/p>
 &lt;p>To set this parameter for a GET request use:&lt;/p>
 &lt;pre tabindex="0">&lt;code>http://admin:pass@localhost:5988/api/v2/export/messages?options[humanReadable]=true
 &lt;/code>&lt;/pre>&lt;p>To set this parameter for a POST request submit this as the request body:&lt;/p>
@@ -563,7 +568,57 @@ on a Javascript Date object.&lt;/p>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Or using form-style parameters as &lt;code>GET&lt;/code>:&lt;/p>
 &lt;pre tabindex="0">&lt;code>GET /api/v2/export/contacts?filters[search]=jim
-&lt;/code>&lt;/pre>&lt;h2 id="forms">Forms&lt;/h2>
+&lt;/code>&lt;/pre>&lt;h3 id="get-apiv2exportuser-devices">GET /api/v2/export/user-devices&lt;/h3>
+&lt;p>&lt;em>Added in 4.7.0&lt;/em>&lt;/p>
+&lt;p>Returns a JSON array of CHT-related software versions for each user device. This information is derived from the latest telemetry entry for each user device. If a particular user has used multiple devices, an entry will be included for &lt;em>each&lt;/em> device. You can reference the &lt;code>date&lt;/code> value to determine which devices have been &lt;em>recently&lt;/em> used. If multiple users used the same physical device (e.g. they were logged into the same phone at different times), an entry will be included for &lt;em>each&lt;/em> user.&lt;/p>
+&lt;h4 id="output-2">Output&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Column&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>user&lt;/td>
+&lt;td>The user&amp;rsquo;s name.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>deviceId&lt;/td>
+&lt;td>The unique key for the user&amp;rsquo;s device.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>date&lt;/td>
+&lt;td>The date the telemetry entry was taken in YYYY-MM-DD, see &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">relevant docs&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>browser.name&lt;/td>
+&lt;td>The name of the browser used.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>browser.version&lt;/td>
+&lt;td>The version of the browser used.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>apk&lt;/td>
+&lt;td>The Internal &lt;a href="https://developer.android.com/reference/android/R.styleable#AndroidManifest_versionCode">version code&lt;/a> of the Android app.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>android&lt;/td>
+&lt;td>The version of Android OS.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cht&lt;/td>
+&lt;td>The version of CHT the user was on at time the telemetry entry was generated.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>settings&lt;/td>
+&lt;td>The revision of the App Settings document stored in CouchDB.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="forms">Forms&lt;/h2>
 &lt;h3 id="get-apiv1forms">GET /api/v1/forms&lt;/h3>
 &lt;p>Returns a list of currently installed forms (in all available formats) in JSON format.&lt;/p>
 &lt;h4 id="headers">Headers&lt;/h4>
