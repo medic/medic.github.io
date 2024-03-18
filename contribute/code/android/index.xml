@@ -5,7 +5,7 @@
 &lt;/div>
 &lt;h2 id="requirements">Requirements&lt;/h2>
 &lt;ul>
-&lt;li>Java 11+ (OpenJDK versions work).&lt;/li>
+&lt;li>Java 17+ (OpenJDK versions work).&lt;/li>
 &lt;li>Android SDK, and optionally Android Studio.&lt;/li>
 &lt;li>The &lt;code>adb&lt;/code> command for debugging and get the logs.&lt;/li>
 &lt;li>The source code. To run all the tests in the CHT Android app you need to clone also the submodules: &lt;code>git clone --recurse-submodules https://github.com/medic/cht-android.git&lt;/code>.&lt;/li>
@@ -16,7 +16,7 @@
 &lt;p>Bellow are the instructions of how to install and setup some of the tools required.&lt;/p>
 &lt;h2 id="install">Install&lt;/h2>
 &lt;h3 id="java">Java&lt;/h3>
-&lt;p>Java 11+ needs to be installed. The &lt;code>bin/&lt;/code> folder of the JDK must added into the &lt;code>$PATH&lt;/code> environment variable, and it&amp;rsquo;s recommended to have &lt;code>$JAVA_HOME&lt;/code> pointing to the JDK folder as well.&lt;/p>
+&lt;p>Java 17+ needs to be installed. The &lt;code>bin/&lt;/code> folder of the JDK must added into the &lt;code>$PATH&lt;/code> environment variable, and it&amp;rsquo;s recommended to have &lt;code>$JAVA_HOME&lt;/code> pointing to the JDK folder as well.&lt;/p>
 &lt;p>To install different versions of Java and without the need to have root permissions, checkout &lt;a href="https://sdkman.io/">Sdkman!&lt;/a>, if you are familiar with tools like &lt;code>nvm&lt;/code> or &lt;code>rvm&lt;/code>, this tool is pretty much the same for Java, and the command takes care of adding the selected JDK to the &lt;code>$PATH&lt;/code> variable and to set the &lt;code>$JAVA_HOME&lt;/code> variable when switching across different versions.&lt;/p>
 &lt;h3 id="android-studio-and-the-sdk">Android Studio and the SDK&lt;/h3>
 &lt;p>Android Studio is the full package: the IDE based on IntelliJ IDEA, the Android SDK and the SDK Manager with the UI to manage different packages visually, while the SDK alone only includes the command line tools like the &lt;code>sdkmanager&lt;/code> CLI.&lt;/p>
@@ -84,6 +84,25 @@ the submodules within the cht-android folder.&lt;/p>
 &lt;h4 id="connecting-to-the-server-locally">Connecting to the server locally&lt;/h4>
 &lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
 &lt;p>Refer to the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/#nginx-local-ip">CHT Core Developer Guide&lt;/a>.&lt;/p>
+&lt;h4 id="manually-testing-with-older-android-versions">Manually testing with older Android versions&lt;/h4>
+&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Later versions of the CHT, only support &lt;a href="https://docs.communityhealthtoolkit.org/core/releases/#dependencies">running on Chrome/Webview 90+&lt;/a>. Some older versions of Android will not have a new enough Android System Webview to be able to run the CHT webapp. This is particularly true of emulated Android devices, which typically are configured to not receive updates. To test the CHT functionality on these devices you must manually upgrade the version of the Chrome/Webview apk used as the Android System Webview.&lt;/p>
+&lt;p>To upgrade the necessary apk on an emulated Android device:&lt;/p>
+&lt;ul>
+&lt;li>Start by using the &lt;code>Google APIs&lt;/code> variant of the Android image. The base AOSP image bakes in the &lt;code>com.android.webview&lt;/code> package, making it difficult to update.&lt;/li>
+&lt;li>Depending on your version of Android, you will need to manually download a new version of the apk (make sure to get the correct variant for your architecture):
+&lt;ul>
+&lt;li>For Android 7-9, you should download a new version of &lt;code>com.android.chrome&lt;/code> (e.g. from &lt;a href="https://www.apkmirror.com/apk/google-inc/chrome/">apkMirror&lt;/a>).&lt;/li>
+&lt;li>For Android 10+, you should download a new version of &lt;code>com.google.android.webview&lt;/code> (e.g. from &lt;a href="https://www.apkmirror.com/apk/google-inc/android-system-webview/">apkMirror&lt;/a>).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Then, you can use adb to install the apk into the device: &lt;code>adb install -r *your_apk*.apk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>Testing using an Android 5-6 device can be more challenging. The &lt;code>com.android.webview&lt;/code> package seems to be baked into the system partition regardless of the image variant. It is possible use a custom ROM (e.g. CyanogenMod) with an upgraded WebView version on a physical device. Another approach to testing with older versions of Android is to simply test against an older version of the CHT (e.g. CHT &lt;code>3.x.&lt;/code> only requires Chrome/Webview 53). The functionality of cht-android can still be validated by interacting with this old CHT version.&lt;/p>
+&lt;p>If using the docker-helper to deploy CHT instances for testing with old Android versions, be aware that the &lt;code>local-ip.medicmobile.org&lt;/code> SSL certificates may not work with the device (because the root certificate is not recognized). On Android 5-6 you can manually install the root certificate via Settings &amp;gt; Security &amp;gt; Install from SD Card.&lt;/p>
+&lt;/div>
 &lt;h3 id="android-studio">Android Studio&lt;/h3>
 &lt;p>The &lt;a href="https://developer.android.com/studio">Android Studio&lt;/a> can be used to build and launch the app instead. Be sure to select the right flavor from the &lt;em>Build Variants&lt;/em> dialog (see &lt;a href="https://developer.android.com/studio/run#changing-variant">Change the build variant&lt;/a>). To launch the app in an emulator, you need to uncomment the code that has the strings for the &lt;code>x86&lt;/code> or the &lt;code>x86_64&lt;/code> architecture in the &lt;code>android&lt;/code> / &lt;code>splits&lt;/code> / &lt;code>include&lt;/code> sections of the &lt;code>build.gradle&lt;/code> file.&lt;/p>
 &lt;h3 id="artifact-formats">Artifact formats&lt;/h3>
