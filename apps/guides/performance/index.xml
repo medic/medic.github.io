@@ -538,7 +538,7 @@ It only works in conjunction with &lt;code>depth&lt;/code>.&lt;/p>
 Versions prior to v3.12.0 do aggregate in a monthly basis instead of daily, and the aggregate docs&amp;rsquo; IDs follow the pattern &lt;code>telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code>.
 &lt;/div>
 &lt;h2 id="performance-data">Performance data&lt;/h2>
-&lt;p>Each aggregate data point has the following fields.&lt;/p>
+&lt;p>Each aggregate data point has the following fields:&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -565,242 +565,376 @@ Versions prior to v3.12.0 do aggregate in a monthly basis instead of daily, and 
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>sumsqr&lt;/code>&lt;/td>
-&lt;td>The sum of squares of the times recorded in milliseconds.&lt;/td>
+&lt;td>The sum of squares of the times recorded in milliseconds. This is useful to see the variance, for example, a lower sumsqr can be indicative of having data closer together.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;p>The telemetry data gathered changes with different versions of the framework. Currently, the data points collected are:&lt;/p>
+&lt;p>The CHT records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications. Its purpose is to convert measurements into insights about user satisfaction, by specifying a uniform way to analyze and report on the degree to which measured performance meets user expectations.&lt;/p>
+&lt;p>The Apdex level is &lt;code>satisfied&lt;/code> when the duration is less than or equal to 3s; &lt;code>tolerable&lt;/code> when the duration is more than 3s but less than or equal to 12s; &lt;code>frustrated&lt;/code> when duration is more than 12s. The Apdex is recorded as a telemetry entry using the format: &lt;code>&amp;lt;telemetry_field&amp;gt;:apdex:&amp;lt;satisfied/tolerable/frustrated&amp;gt;&lt;/code>, for example, if the telemetry is about boot time and it had a tolerable performance, the Apdex is recorded as &lt;code>boot_time:apdex:tolerable&lt;/code>.&lt;/p>
+&lt;p>Find below the list of telemetry data recorded by CHT:&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
 &lt;th>Field&lt;/th>
 &lt;th>Description&lt;/th>
+&lt;th>Apdex&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
 &lt;td>&lt;code>boot_time&lt;/code>&lt;/td>
 &lt;td>The overall boot time including loading the code, purging, and accessing the database.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:1:to_first_code_execution&lt;/code>&lt;/td>
 &lt;td>The time between the page loading and the JavaScript starting to run.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:2:to_bootstrap&lt;/code>&lt;/td>
 &lt;td>The time between JavaScript starting and the bootstrapping (purging, initial replication, etc) to complete.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:2_1:to_replication&lt;/code>&lt;/td>
-&lt;td>The time it took to complete initial replication. If initial replication was interrupted and retried, this value will be incorrect. Added in 3.14.&lt;/td>
+&lt;td>The time it takes to complete initial replication. If initial replication was interrupted and retried, this value will be incorrect. Added in 3.14.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:2_2:to_purge&lt;/code>&lt;/td>
-&lt;td>The time it takes to complete the purge. Added in 3.14.&lt;/td>
+&lt;td>The time it takes to complete the purge. Added in 3.14 and removed in 4.3.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:2_3:to_purge_meta&lt;/code>&lt;/td>
 &lt;td>The time it takes to complete the purge of local meta database. Added in 3.14.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:3:to_angular_bootstrap&lt;/code>&lt;/td>
 &lt;td>The time between bootstrapping completing and the webapp being ready to use.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:4:to_db_warmed&lt;/code>&lt;/td>
-&lt;td>The time between the webapp being ready to use and the database being ready to use.&lt;/td>
+&lt;td>The time between the webapp being ready to use and the database being ready to use. Added in 3.6 and removed in 3.8.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:purging:&amp;lt;boolean&amp;gt;&lt;/code>&lt;/td>
-&lt;td>&lt;code>boot_time:purging:true&lt;/code> when purging ran successfully on device startup, &lt;code>boot_time:purging:false&lt;/code> when purging did not run. Added in 3.14.&lt;/td>
+&lt;td>&lt;code>boot_time:purging:true&lt;/code> when purging ran successfully on device startup, &lt;code>boot_time:purging:false&lt;/code> when purging did not run. Added in 3.14 and removed in 4.3.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:purging_failed&lt;/code>&lt;/td>
-&lt;td>The purging failed when running on device startup. Added in 3.14.&lt;/td>
+&lt;td>The purging failed when running on device startup. Added in 3.14 and removed in 4.3.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:purging_meta:&amp;lt;boolean&amp;gt;&lt;/code>&lt;/td>
 &lt;td>&lt;code>boot_time:purging_meta:true&lt;/code> when purging of the local meta database ran successfully, &lt;code>boot_time:purging_meta:false&lt;/code> when it did not run. Added in 3.14.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>boot_time:purging_meta_failed&lt;/code>&lt;/td>
 &lt;td>The purging of the local meta database failed. Added in 3.14.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_list:load&lt;/code>&lt;/td>
+&lt;td>The time taken to load the list of contacts on the left hand side of the Contacts tab. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_list:query&lt;/code>&lt;/td>
+&lt;td>The time taken to query the People tab on initial load, when searching or sorting, this metric covers from fetching the data to preparing the data before display. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:reports:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code>&lt;/td>
-&lt;td>The time taken to fill in Enketo forms. The &lt;code>action&lt;/code> can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;. The &lt;code>component&lt;/code> is one of: &amp;ldquo;render&amp;rdquo; covers getting the form and rendering it on screen; &amp;ldquo;user_edit_time&amp;rdquo; is the time the user took to fill in and submit the form; or &amp;ldquo;save&amp;rdquo; is about converting the form into a report and saving it.&lt;/td>
+&lt;td>The time taken to fill in app forms that are opened from Reports Tab. The &lt;code>action&lt;/code> can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;. The &lt;code>component&lt;/code> is one of: &amp;ldquo;render&amp;rdquo; covers getting the form and rendering it on screen; &amp;ldquo;user_edit_time&amp;rdquo; is the time the user took to fill in and submit the form; or &amp;ldquo;save&amp;rdquo; is about converting the form into a report and saving it.&lt;/td>
+&lt;td>Yes, added for &lt;code>render&lt;/code> and &lt;code>save&lt;/code> actions. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:contacts:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code>&lt;/td>
-&lt;td>As above but for Contact forms. The &lt;code>action&lt;/code> can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;.&lt;/td>
+&lt;td>The time taken to fill contact forms and app forms that are opened from People Tab. The &lt;code>action&lt;/code> can either be &amp;ldquo;add&amp;rdquo; or &amp;ldquo;edit&amp;rdquo;. The &lt;code>component&lt;/code> is one of: &amp;ldquo;render&amp;rdquo; covers getting the form and rendering it on screen; &amp;ldquo;user_edit_time&amp;rdquo; is the time the user took to fill in and submit the form; or &amp;ldquo;save&amp;rdquo; is about converting the form into a report and saving it.&lt;/td>
+&lt;td>Yes, added for &lt;code>render&lt;/code> and &lt;code>save&lt;/code> actions. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:tasks:&amp;lt;form&amp;gt;:&amp;lt;action&amp;gt;:&amp;lt;component&amp;gt;&lt;/code>&lt;/td>
 &lt;td>As above but for forms on the Tasks tab.&lt;/td>
+&lt;td>Yes, added for &lt;code>render&lt;/code> and &lt;code>save&lt;/code> actions. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>message_list:load&lt;/code>&lt;/td>
+&lt;td>The time taken to load the list of messages on the left hand side of the Messages tab. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>search:contacts&lt;/code>&lt;/td>
 &lt;td>The time taken to list all contacts.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>search:contacts:&amp;lt;filter[:filter]&amp;gt;&lt;/code>&lt;/td>
 &lt;td>The time taken to search all contacts using the given filters.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>search:reports&lt;/code>&lt;/td>
 &lt;td>The time taken to list all reports.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>search:reports:&amp;lt;filter[:filter]&amp;gt;&lt;/code>&lt;/td>
 &lt;td>The time taken to search all reports using the given filters.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;contact_type&amp;gt;:load&lt;/code>&lt;/td>
+&lt;td>On the People tab, the time taken to load a contact, from the time the contact was selected to the time all content for that contact (contact summary, condition cards, reports, tasks, etc&amp;hellip;) has fully loaded on the screen. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:contact_data&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s data. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:load_descendants&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s descendants, that is places and contacts under the contact heriarchy level. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:load_reports&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s asociated reports. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:load_targets&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s targets. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:load_tasks&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s tasks. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_detail:&amp;lt;_form&amp;gt;:load:load_contact_summary&lt;/code>&lt;/td>
+&lt;td>The time taken to load a contact&amp;rsquo;s contact-summary. Added in 4.7.&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>report_detail:&amp;lt;form&amp;gt;:load&lt;/code>&lt;/td>
+&lt;td>On the Reports tab, the time taken to load a report from the point it was selected on the left hand side to the time it was fully rendered. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>messages_detail:load&lt;/code>&lt;/td>
+&lt;td>On the Messages tab, the time taken to load the messages detail on the right hand side once has been selected from the list on the left hand side. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>sidebar_filter:reports:open&lt;/code>&lt;/td>
 &lt;td>Number of times the user opens the sidebar filter in Reports tab.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>client-date-offset&lt;/code>&lt;/td>
 &lt;td>The difference between the client datetime and the server datetime. Only recorded if the difference is large enough that it may cause issues.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>analytics:targets:load&lt;/code>&lt;/td>
 &lt;td>The time taken to load the targets page. Added in 3.9&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>analytics:target_aggregates:load&lt;/code>&lt;/td>
+&lt;td>The time taken to load the target aggregates. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:load&lt;/code>&lt;/td>
 &lt;td>The time taken to load the tasks page. Added in 3.9&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:refresh&lt;/code>&lt;/td>
 &lt;td>The time taken to refresh tasks on the tasks page. Added in 3.9&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>report_list:load&lt;/code>&lt;/td>
+&lt;td>On the Reports tab, the time taken to load the list of reports on the left hand side. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>report_list:query&lt;/code>&lt;/td>
+&lt;td>The time taken to query the Reports tab on initial load, when searching or filtering, this metric covers from fetching the data to preparing the data before display. Added in 4.7.&lt;/td>
+&lt;td>Yes. Added in 4.7&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:initialize&lt;/code>&lt;/td>
 &lt;td>The time taken to initialize the rules-engine . Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:update-emissions&lt;/code>&lt;/td>
 &lt;td>The time taken to update emissions in the rules-engine, when receiving a change. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:tasks:all-contacts&lt;/code>&lt;/td>
 &lt;td>The time taken to fetch tasks for all contacts in rules-engine. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:tasks:some-contacts&lt;/code>&lt;/td>
 &lt;td>The time taken to fetch tasks for some specific contacts in rules-engine. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:targets&lt;/code>&lt;/td>
 &lt;td>Time taken for the rules-engine to fetch targets. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:targets:dirty-contacts&lt;/code>&lt;/td>
 &lt;td>Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching targets in the rules-engine. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:tasks:dirty-contacts&lt;/code>&lt;/td>
 &lt;td>Number of &amp;ldquo;dirty&amp;rdquo; contacts[1] when fetching tasks in the rules-engine. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:ensureTaskFreshness:cancel&lt;/code>&lt;/td>
 &lt;td>The time taken to cancel the automated task freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:ensureTargetFreshness:cancel&lt;/code>&lt;/td>
 &lt;td>The time taken to cancel the automated target freshness thread in the rules-engine. This event is only recorded when the thread is cancelled before executing the refresh. Added in 3.9&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>rules-engine:tasks-breakdown:some-contacts&lt;/code>&lt;/td>
 &lt;td>The time taken to fetch the tasks breakdown by status for some contacts. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:user-initiated&lt;/code>&lt;/td>
 &lt;td>Number of times the user clicked &amp;ldquo;Sync now&amp;rdquo;. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:success&lt;/code>&lt;/td>
 &lt;td>Time taken to replicate, when replication was successful. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure&lt;/code>&lt;/td>
 &lt;td>Time taken to replicate, when replication failed. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:offline:client&lt;/code>&lt;/td>
 &lt;td>Number of times replication failed because of connection errors, and the app detects the client is offline. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:offline:server&lt;/code>&lt;/td>
 &lt;td>Number of times replication failed because of connection errors, and the app detects the client is online. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:failure:reason:error&lt;/code>&lt;/td>
 &lt;td>Number of times replication failed because of errors other than connection errors. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:&amp;lt;database&amp;gt;:&amp;lt;direction&amp;gt;:docs&lt;/code>&lt;/td>
 &lt;td>Number of replicated docs. For &lt;code>medic&lt;/code> replication, stores number of &amp;ldquo;read&amp;rdquo; docs, for &lt;code>meta&lt;/code> replication, stores sum of read docs for every direction. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:medic:&amp;lt;direction&amp;gt;:ms-since-last-replicated-date&lt;/code>&lt;/td>
 &lt;td>Time between a replication attempt and the last successful replication. Only recorded for medic database, every time replication is attempted. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>replication:medic:&amp;lt;direction&amp;gt;:denied&lt;/code>&lt;/td>
 &lt;td>Number of times replication was denied[2]. Added in 3.12.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:all-tasks&lt;/code>&lt;/td>
 &lt;td>Total number of tasks for the household (includes all statuses), when displaying household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:cancelled&lt;/code>&lt;/td>
 &lt;td>Number of cancelled tasks for the household, when displaying household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:ready&lt;/code>&lt;/td>
 &lt;td>Number of tasks in &amp;ldquo;Ready&amp;rdquo; state for the household, when displaying household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:ready:&amp;lt;task_title&amp;gt;&lt;/code>&lt;/td>
 &lt;td>Breakdown of &amp;ldquo;Ready&amp;rdquo; tasks by &lt;code>task_title&lt;/code> for the household, when displaying household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:modal:confirm&lt;/code>&lt;/td>
 &lt;td>Number times the user confirms navigation away from the household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>tasks:group:modal:reject&lt;/code>&lt;/td>
 &lt;td>Number times the user rejects navigation away from the household tasks page. Added in 3.13.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>user_settings:language:&amp;lt;language_code&amp;gt;&lt;/code>&lt;/td>
 &lt;td>The selected language by the user, example: &lt;code>user_settings:language:en&lt;/code>. Added in 3.14.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:&amp;lt;training-card&amp;gt;:add:render&lt;/code>&lt;/td>
 &lt;td>The time it took to render the training card. Added in 4.2.0&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:&amp;lt;training-card&amp;gt;:add:user_edit_time&lt;/code>&lt;/td>
 &lt;td>The time the user took to complete the training card. Added in 4.2.0&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:&amp;lt;training-card&amp;gt;:add:save&lt;/code>&lt;/td>
 &lt;td>The time it took to save the training card. Added in 4.2.0&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>enketo:&amp;lt;training-card&amp;gt;:add:quit&lt;/code>&lt;/td>
 &lt;td>The time from when the training card was rendered to when the user quits the training. Added in 4.2.0&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>geolocation:success&lt;/code>&lt;/td>
 &lt;td>A successful GPS response with the value showing the accuracy.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td>&lt;code>geolocation:failure:&amp;lt;x&amp;gt;&lt;/code>&lt;/td>
 &lt;td>An unsuccessful GPS response. &lt;code>x&lt;/code> is a constant matching the &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError/code">GeolocationPositionError&lt;/a> or with one of the following values: &lt;code>-1&lt;/code> unknown failure, &lt;code>-2&lt;/code> timeout, or &lt;code>-3&lt;/code> geolocation services unavailable.&lt;/td>
+&lt;td>&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
