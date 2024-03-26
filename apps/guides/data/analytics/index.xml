@@ -48,7 +48,55 @@ The first time you run the commands from any of the sections below it will need 
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.couchdb.yml -f docker-compose.postgres.yml -f docker-compose.yml down
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To remove all the data volumes, add &lt;code>-v&lt;/code> at the end of this command.&lt;/p>
 &lt;h2 id="setup-superset">Setup Superset&lt;/h2>
-&lt;p>To build data visualization dashboards, follow the &lt;a href="https://superset.apache.org/docs/installation/installing-superset-using-docker-compose/">Superset instructions&lt;/a> to run Superset and connect it to the PostgreSQL database.&lt;/p></description></item><item><title>Apps: Environment Variables</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/environment-variables/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/environment-variables/</guid><description>
+&lt;p>To build data visualization dashboards, follow the &lt;a href="https://superset.apache.org/docs/installation/installing-superset-using-docker-compose/">Superset instructions&lt;/a> to run Superset and connect it to the PostgreSQL database.&lt;/p></description></item><item><title>Apps: Production CHT Sync Setup</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/production/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/production/</guid><description>
+&lt;h2 id="services--security">Services &amp;amp; Security&lt;/h2>
+&lt;h3 id="main-services">Main Services&lt;/h3>
+&lt;p>Running &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/cht-sync/">CHT Sync&lt;/a> in production includes DBT, PostgREST and Logstash services. Details about deploying these services can be found &lt;a href="#create-and-configure-a-cht-sync-aws-ec2-instance">below&lt;/a>.&lt;/p>
+&lt;h3 id="external-services">External Services&lt;/h3>
+&lt;p>While CHT Sync can run against a stand alone CouchDB instance, it&amp;rsquo;s assumed you are configuring CHT Sync against an existing &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/">production CHT Core instance&lt;/a>, which includes CouchDB.&lt;/p>
+&lt;p>Along with CouchDB, these docs assume you have PostgreSQL deployed with an optional Data Visualization Tool, like &lt;a href="https://superset.apache.org/">Apache Superset&lt;/a>.&lt;/p>
+&lt;h3 id="security">Security&lt;/h3>
+&lt;p>Production deployments require extra precautions around security and backup. These include, but are not limited to always:&lt;/p>
+&lt;ul>
+&lt;li>Use SSH to access the server, requiring SSH keys, not allowing SSH passwords.&lt;/li>
+&lt;li>Encrypt all web-server connections with a valid TLS cert - this may involve using a load balancer or reverse proxy.&lt;/li>
+&lt;li>Ensure software is kept up to date to defend against security vulnerabilities.&lt;/li>
+&lt;li>Keeping good backups that are regularly tested.&lt;/li>
+&lt;/ul>
+&lt;p>Also, see the general CHT Core &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/#considerations">production hosting considerations&lt;/a>, all of which apply to CHT Sync production hosting as well.&lt;/p>
+&lt;h2 id="create-and-configure-a-cht-sync-aws-ec2-instance">Create and configure a CHT Sync AWS EC2 Instance&lt;/h2>
+&lt;p>After meeting the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/introduction/#cht-sync-prerequisites">prerequisites&lt;/a>, install CHT Sync:&lt;/p>
+&lt;ol>
+&lt;li>Deploy a &lt;code>t2.medium&lt;/code> EC2 instance with the Ubuntu 22 AMI and allow SSH in network permissions. Assign it &lt;code>60 GiB&lt;/code> of storage ensuring it can grow past the default &lt;code>8 GiB&lt;/code>.&lt;/li>
+&lt;li>Now that you have the static IP, in Route 53, set up DNS &lt;code>A&lt;/code> record using your real domain and IPs instead of these examples: &lt;code>cht-sync.example.com&lt;/code> -&amp;gt; &lt;code>1.2.3.4&lt;/code>.&lt;/li>
+&lt;li>Add SSH keys for users who should have access to the server in the &lt;code>/home/ubuntu/.ssh/authorized_keys&lt;/code> so that they can SSH in with &lt;code>ubuntu@cht-sync.example.com&lt;/code>.&lt;/li>
+&lt;li>Install Docker: &lt;code>curl -fsSL get.docker.com -o get-docker.sh &amp;amp;&amp;amp; sh get-docker.sh&lt;/code>.&lt;/li>
+&lt;li>Install updates: &lt;code>apt update&amp;amp;&amp;amp;apt dist-upgrade&amp;amp;&amp;amp;apt autoremove&lt;/code>.&lt;/li>
+&lt;li>Create 2 Docker compose files, one for Postgrest and one for DBT and Logstash:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -o /root/compose-files/posgtrest.yml https://raw.githubusercontent.com/medic/cht-sync/main/docker-compose.postgrest.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o /root/compose-files/dbt-logstash.yml https://raw.githubusercontent.com/medic/cht-sync/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Download and edit the file with Docker environment variables by running this &lt;code>curl&lt;/code> command and referencing the &lt;a href="(/apps/guides/data/analytics/environment-variables/)">Environment Variables page&lt;/a>:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -o /root/compose-files/.env https://raw.githubusercontent.com/medic/cht-sync/main/env.template
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Create a &lt;code>/root/compose-files/down.up.sh&lt;/code> script for keeping tabs which Docker files to include on stop and start:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic">&lt;/span>docker compose &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> -f postgrest.yml &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> -f dbt-logstash.yml &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> down
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> -f postgrest.yml &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> -f dbt-logstash.yml &lt;span style="color:#4e9a06">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#4e9a06">&lt;/span> up --remove-orphans -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Set the script as executable and start CHT Sync:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>chmod +x /root/compose-files/down.up.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>/root/compose-files/down.up.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Confirm the services are running with &lt;code>docker ps&lt;/code>. The command should show the DBT, Postgrest and Logstash services running.&lt;/li>
+&lt;/ol></description></item><item><title>Apps: Environment Variables</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/environment-variables/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/environment-variables/</guid><description>
 &lt;p>There are three environment variable groups in the &lt;code>.env&lt;/code> file. To successfully set up CHT Sync, it is important to understand the difference between them.&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>POSTGRES_&lt;/code>: Used by PostgREST and PostgreSQL to establish the PostgreSQL database to synchronize CouchDB data to. They also define the schema and table names to store the CouchDB data. The main objective is to define the environment where the raw CouchDB data will be copied.&lt;/li>
