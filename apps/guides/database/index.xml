@@ -266,7 +266,44 @@ X-CouchDB-Body-Time: 0
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, there are two references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, both in the &lt;code>1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code> document, one at &lt;code>fields.inputs.contact._id&lt;/code> and one at &lt;code>fields.patient_id&lt;/code>.&lt;/p>
-&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</guid><description>
+&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</guid><description>
+&lt;p>Added in &lt;code>4.7.0&lt;/code>, CHT now records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications.&lt;/p>
+&lt;p>Since apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> system, it is possible to view apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">analytics database&lt;/a>.&lt;/p>
+&lt;p>An example of an SQL to view the apdex score:&lt;/p>
+&lt;pre tabindex="0">&lt;code>WITH apdex_telemetry_data AS (
+SELECT
+substring(metric from &amp;#39;^(.*):apdex:&amp;#39;) AS event_category,
+CASE
+WHEN metric LIKE &amp;#39;%:satisfied&amp;#39; THEN &amp;#39;satisfied&amp;#39;
+WHEN metric LIKE &amp;#39;%:tolerable&amp;#39; THEN &amp;#39;tolerable&amp;#39;
+WHEN metric LIKE &amp;#39;%:frustrated&amp;#39; THEN &amp;#39;frustrated&amp;#39;
+END AS event_type,
+SUM(count) AS event_count
+FROM
+useview_telemetry_metrics
+WHERE metric LIKE &amp;#39;%:apdex:%&amp;#39;
+GROUP BY event_category, event_type
+),
+apdex_scores AS (
+SELECT
+event_category,
+SUM(CASE WHEN event_type = &amp;#39;satisfied&amp;#39; THEN event_count ELSE 0 END) AS satisfied_count,
+SUM(CASE WHEN event_type = &amp;#39;tolerable&amp;#39; THEN event_count ELSE 0 END) AS tolerable_count,
+SUM(CASE WHEN event_type = &amp;#39;frustrated&amp;#39; THEN event_count ELSE 0 END) AS frustrated_count,
+SUM(event_count) AS total_event_count
+FROM apdex_telemetry_data
+GROUP BY event_category
+)
+SELECT
+event_category,
+satisfied_count,
+tolerable_count,
+frustrated_count,
+ROUND(((satisfied_count + (tolerable_count / 2.0)) / total_event_count)::numeric, 2) AS apdex_score
+FROM apdex_scores
+ORDER BY apdex_score asc;
+&lt;/code>&lt;/pre>&lt;p>The SQL query above calculates the Apdex scores for various events recorded in the &lt;code>useview_telemetry_metrics&lt;/code> table, providing insights into the performance of different aspects of the CHT.&lt;/p>
+&lt;p>Such queries are instrumental in identifying areas of the CHT that may require performance improvements by highlighting how different parts of the application meet user expectations in terms of load times and Apdex score.&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</guid><description>
 &lt;p>Follow these steps on a Mac to generate your public/private keys and access the PostgreSQL server.&lt;/p>
 &lt;h2 id="access-terminal">Access Terminal&lt;/h2>
 &lt;p>Terminal (Terminal.app) is the terminal emulator included in the macOS operating system. You can use this application to generate your SSH key.&lt;/p>
