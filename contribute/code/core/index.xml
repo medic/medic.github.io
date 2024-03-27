@@ -439,7 +439,125 @@ EOF
 &lt;td>Executes the upgrade e2e test suite.&lt;/td>
 &lt;/tr>
 &lt;/tbody>
-&lt;/table></description></item><item><title>Contribute: Updating Dependencies</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</guid><description>
+&lt;/table></description></item><item><title>Contribute: Deploy CHT Core on Medic hosted EKS</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/deploy-on-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/deploy-on-eks/</guid><description>
+&lt;p>While not directly available to the public who might be doing CHT Core development, having Medic&amp;rsquo;s process for using our &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html">Amazon Elastic Kubernetes Service&lt;/a> (AWS EKS) publicly documented will help Medic employees new to EKS. As well, hopefully external developers looking to re-use Medic tools and process to use EKS will find it helpful.&lt;/p>
+&lt;p>While these instructions assume you work at Medic and have access to private GitHub repositories, many of the tools are fully open source.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;h3 id="command-line">Command Line&lt;/h3>
+&lt;p>Be sure you have these tools installed and repos cloned:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">awscli&lt;/a>: version &lt;code>2&lt;/code> or newer&lt;/li>
+&lt;li>&lt;a href="https://kubernetes.io/docs/tasks/tools">kubectl&lt;/a>: Must be within one minor version of cluster. If cluster is &lt;code>1.24.x&lt;/code>, use &lt;code>1.23.x&lt;/code>, &lt;code>1.24.x&lt;/code> or &lt;code>1.25.x&lt;/code>.&lt;/li>
+&lt;li>&lt;a href="https://helm.sh/docs/intro/install/">helm&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jqlang.github.io/jq/download/">jq&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/">Medic Infra&lt;/a> repo cloned&lt;/li>
+&lt;/ul>
+&lt;h4 id="optional--autocomplete">Optional: Autocomplete&lt;/h4>
+&lt;p>Both &lt;code>helm&lt;/code> and &lt;code>kubectl&lt;/code> have autocomplete libraries. For power users and beginners alike, it adds a lot of discoverability. This code is for &lt;code>zsh&lt;/code>, but &lt;code>bash&lt;/code>, &lt;code>fish&lt;/code> and &lt;code>powershell&lt;/code> are supported as well:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">source&lt;/span> &amp;lt;&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>kubectl completion zsh&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">source&lt;/span> &amp;lt;&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>helm completion zsh&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>See &lt;a href="https://helm.sh/docs/helm/helm_completion_bash/">helm&lt;/a> and &lt;a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-shell-autocompletion">kubectl&lt;/a> docs to automatically loading these on every new session.&lt;/p>
+&lt;h3 id="request-permission">Request permission&lt;/h3>
+&lt;p>By default, Medic teammates do not have EKS access and must file a ticket to request it:&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/issues/new">Create a ticket&lt;/a> to get your DNS and Namespace created for EKS, which should match each other. As an example, a &lt;code>mrjones-dev&lt;/code> name space would match &lt;code>mrjones.dev.medicmobile.org&lt;/code> DNS. The ticket should include requesting EKS access to be granted.&lt;/li>
+&lt;li>Once the ticket in step one is complete, follow the &lt;a href="https://github.com/medic/medic-infrastructure/blob/master/terraform/aws/dev/eks/access/README.md">CLI setup guide&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>NB&lt;/strong> - Security key (e.g. Yubikey) users need to add a TOTP MFA (Time-based, One-Time Password Multi-Factor Authentication) too! CLI requires the TOTP values (6-digit number) and security keys are not supported. Security keys can only be used on web logins.&lt;/p>
+&lt;h3 id="first-time-setup">First time setup&lt;/h3>
+&lt;p>These steps only need to be run once!&lt;/p>
+&lt;p>After you have created a ticket per &amp;ldquo;Request permission&amp;rdquo; above, you should get a link to sign up for AWS. Click the link and:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Create new password ensure it&amp;rsquo;s 10+ characters including one alpha (&lt;code>a-z&lt;/code>) and one special (&lt;code>~!@#$%^&amp;amp;*_-+=`|\(){}[]:;&amp;quot;'&amp;lt;&amp;gt;,.?/&lt;/code>) character.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Setup MFA. In top-right corner of browser, there is a drop-down menu with your &lt;code>username @ medic&lt;/code>. Click that and then on &amp;ldquo;My Security Credentials&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Assign an MFA device and give it the &lt;strong>same name&lt;/strong> as your username: In AWS web GUI, click your name in upper right:&lt;/p>
+&lt;ol>
+&lt;li>Security Credentials&lt;/li>
+&lt;li>scroll down to &amp;ldquo;Multi-factor authentication (MFA)&amp;rdquo;&lt;/li>
+&lt;li>click &amp;ldquo;Assign MFA device&amp;rdquo;&lt;/li>
+&lt;li>enter a &amp;ldquo;Device name&amp;rdquo; (should match username)&lt;/li>
+&lt;li>&amp;ldquo;Select MFA device&amp;rdquo; that you&amp;rsquo;re using&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>
+&lt;p>Create Access Keys for Command Line Interface: In AWS web GUI, click your name in upper right -&amp;gt; Security Credentials -&amp;gt; scroll down to &amp;ldquo;Access keys&amp;rdquo; -&amp;gt; click &amp;ldquo;Create access key&amp;rdquo; -&amp;gt; for use case choose &amp;ldquo;Command Line Interface&amp;rdquo; -&amp;gt; click &amp;ldquo;Next&amp;rdquo; -&amp;gt; enter description and click &amp;ldquo;Create access key&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run &lt;code>aws configure&lt;/code> and place appropriate access keys during prompts. Use &lt;code>eu-west-2&lt;/code> region. It should look like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ aws configure
+AWS Access Key ID [None]: &amp;lt;ACCESS-KEY-HERE&amp;gt;
+AWS Secret Access Key [None]: &amp;lt;SECRET-HERE&amp;gt;
+Default region name [None]: eu-west-2
+Default output format [None]:
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Run the Update Kubeconfig command, assuming username is &lt;code>mrjones&lt;/code> and namespace is &lt;code>mrjones-dev&lt;/code> - be sure to place these with yours: &lt;code>aws eks update-kubeconfig --name mrjones-dev --profile mrjones --region eu-west-2&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="starting-and-stopping-aka-deleting">Starting and stopping (aka deleting)&lt;/h2>
+&lt;ol>
+&lt;li>Login with &lt;code>eks-aws-mfa-login&lt;/code> script in the &lt;a href="https://github.com/medic/medic-infrastructure/tree/master/terraform/aws/dev/eks/access">infra repo&lt;/a>:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./eks-aws-mfa-login USERNAME TOTP_HERE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Ensure you&amp;rsquo;re using dev EKS cluster:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/dev-cht-eks
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Add new &lt;code>values.yaml&lt;/code> file - you can &lt;a href="https://github.com/medic/medic-infrastructure/blob/master/terraform/aws/dev/cht-projects/alpha-dev-cht-deploy-values.yaml">copy this one&lt;/a> and just change the &lt;code>alpha-dev&lt;/code> values to &lt;code>USERNAME-dev&lt;/code>. Remember where you created this file - you&amp;rsquo;ll need it every time you use the &lt;code>cht-deploy&lt;/code> script.&lt;/li>
+&lt;li>Use &lt;code>uuidgen&lt;/code> to fill in the &lt;code>secret&lt;/code> in &lt;code>values.yaml&lt;/code>&lt;/li>
+&lt;li>Use a good passphrase (diceware!) to fill in &lt;code>password&lt;/code> in &lt;code>values.yaml&lt;/code>&lt;/li>
+&lt;li>Ensure you have the latest code of &lt;code>cht-core&lt;/code> &lt;a href="https://github.com/medic/cht-core">repo&lt;/a>:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git checkout master&lt;span style="color:#000;font-weight:bold">;&lt;/span>git pull origin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Deploy!:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> scripts/deploy&lt;span style="color:#000;font-weight:bold">;&lt;/span>./cht-deploy -f PATH_TO/values.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Delete it when you&amp;rsquo;re done:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>helm delete USERNAME-dev --namespace USERNAME-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="references-and-debugging">References and Debugging&lt;/h2>
+&lt;p>More information on &lt;code>cht-deploy&lt;/code> script is available in the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/README.md">CHT Core GitHub repository&lt;/a> which includes specifics of the &lt;code>values.yaml&lt;/code> file and more details about the debugging utilities listed below.&lt;/p>
+&lt;h3 id="debugging">Debugging&lt;/h3>
+&lt;p>A summary of the utilities in &lt;code>cht-core/scripts/deploy&lt;/code> directory, assuming &lt;code>mrjones-dev&lt;/code> namespace:&lt;/p>
+&lt;ul>
+&lt;li>list all resources: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;li>view logs, assuming &lt;code>cht-couchdb-1&lt;/code> returned from prior command: &lt;code>./troubleshooting/view-logs mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>describe deployment, assuming &lt;code>cht-couchdb-1&lt;/code> returned from 1st command: &lt;code>./troubleshooting/describe-deployment mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>list all deployments: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="getting-shell">Getting shell&lt;/h3>
+&lt;p>Sometimes you need to look at files and other key pieces of data that are not available with &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/troubleshooting/view-logs">the current&lt;/a> &lt;code>troubleshooting/view-logs&lt;/code> script. In this case, getting an interactive shell on the pod can be helpful.&lt;/p>
+&lt;ol>
+&lt;li>First, get a list pods for your namespace: &lt;code>kubectl -n NAMESPACE get pods&lt;/code>&lt;/li>
+&lt;li>After finding the pod you&amp;rsquo;re interested, connect to the pod to get a shell: &lt;code>kubectl -n NAMESPACE exec -it PODNAME/CONTAINERNAME -- /bin/bash&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3 id="invalid-apiversion-error">&lt;code>invalid apiVersion&lt;/code> Error&lt;/h3>
+&lt;p>If you get the error:&lt;/p>
+&lt;blockquote>
+&lt;p>exec plugin: invalid apiVersion &amp;ldquo;client.authentication.k8s.io/v1alpha1&amp;rdquo; when running &lt;code>kubectl version&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;p>You might be using an version of kubernetes api &lt;code>client.authentication.k8s.io&lt;/code> which is not supported by your &lt;code>kubectl&lt;/code> client. This can sometimes happen in EKS clusters if aws cli is an older version, in most cases you need at least version &lt;code>2&lt;/code> of aws cli. Check version by running: &lt;code>aws --version&lt;/code> and note that version &lt;code>2&lt;/code> &lt;em>cannot&lt;/em> be installed through &lt;code>pip&lt;/code> (See &lt;a href="#command-line">Command Line&lt;/a> section above for installation instructions)&lt;/p>
+&lt;h2 id="sre-steps-for-granting-users-access-to-a-namespace">SRE Steps for granting users access to a namespace&lt;/h2>
+&lt;p>If you&amp;rsquo;re on the SRE/Infra team and want to grant a Medic teammate access to EKS:&lt;/p>
+&lt;ol>
+&lt;li>Tools required: aws, eksctl, kubectl&lt;/li>
+&lt;li>Create AWS User.
+&lt;ul>
+&lt;li>Attach IAM policy: Force_MFA and share auto-generated password safely&lt;/li>
+&lt;li>Have user log in and finish MFA, access key setup&lt;/li>
+&lt;li>SRE adds you to mfa-required-users group&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Add the namespaces and users to &lt;code>tf/eks/dev/access/main.tf&lt;/code>&lt;/li>
+&lt;li>Run tofu apply in the folder &lt;code>tf/eks/dev/access&lt;/code>&lt;/li>
+&lt;li>Create &lt;code>identitymapping&lt;/code> if needed:&lt;/li>
+&lt;/ol>
+&lt;p>Reading the &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html">AWS guide for principal access&lt;/a> may help here!&lt;/p></description></item><item><title>Contribute: Updating Dependencies</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</guid><description>
 &lt;p>Every minor release we update dependencies to get the latest fixes and improvements. We do this early in the release cycle so that we have some more time to find regressions and issues. This is done on all folders with a package.json, including:&lt;/p>
 &lt;ul>
 &lt;li>cht-core
