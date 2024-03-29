@@ -268,8 +268,8 @@ X-CouchDB-Body-Time: 0
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, there are two references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, both in the &lt;code>1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code> document, one at &lt;code>fields.inputs.contact._id&lt;/code> and one at &lt;code>fields.patient_id&lt;/code>.&lt;/p>
 &lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</guid><description>
 &lt;p>Added in &lt;code>4.7.0&lt;/code>, CHT now records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications.&lt;/p>
-&lt;p>Since apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> system, it is possible to view apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">analytics database&lt;/a>.&lt;/p>
-&lt;p>An example of an SQL to view the apdex score:&lt;/p>
+&lt;p>Since Apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> system, it is possible to view Apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">analytics database&lt;/a>.&lt;/p>
+&lt;p>An example of an SQL to view the Apdex score:&lt;/p>
 &lt;pre tabindex="0">&lt;code>WITH apdex_telemetry_data AS (
 SELECT
 substring(metric from &amp;#39;^(.*):apdex:&amp;#39;) AS event_category,
@@ -302,8 +302,58 @@ frustrated_count,
 ROUND(((satisfied_count + (tolerable_count / 2.0)) / total_event_count)::numeric, 2) AS apdex_score
 FROM apdex_scores
 ORDER BY apdex_score asc;
-&lt;/code>&lt;/pre>&lt;p>The SQL query above calculates the Apdex scores for various events recorded in the &lt;code>useview_telemetry_metrics&lt;/code> table, providing insights into the performance of different aspects of the CHT.&lt;/p>
-&lt;p>Such queries are instrumental in identifying areas of the CHT that may require performance improvements by highlighting how different parts of the application meet user expectations in terms of load times and Apdex score.&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</guid><description>
+&lt;/code>&lt;/pre>&lt;p>The SQL query above calculates the Apdex scores for various events recorded in the &lt;code>useview_telemetry_metrics&lt;/code> table, providing insights into the performance of different aspects of the CHT. In some cases, it is helpful to visualize the number of occurrences of each metric in a date range:&lt;/p>
+&lt;pre tabindex="0">&lt;code>WITH
+constants (days, start_date, end_date) AS (VALUES (&amp;lt;count_days_in_range&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;)),
+apdex_metrics AS(
+SELECT
+substring(metric FROM &amp;#39;^(.*):apdex:&amp;#39;) AS metric,
+SUM(COUNT) AS COUNT
+FROM useview_telemetry_metrics, constants
+WHERE
+metric LIKE &amp;#39;%:apdex:%&amp;#39;
+AND period_start BETWEEN constants.start_date::DATE AND constants.end_date::DATE
+GROUP BY metric
+),
+apdex_result as (
+SELECT
+metric,
+CASE
+WHEN apdex_metrics.metric = &amp;#39;contact_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_list:query&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:contacts:&amp;lt;contact_form&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:contacts:&amp;lt;contact_form&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:reports:&amp;lt;app_form&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:reports:&amp;lt;app_form&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_list:query&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_detail:&amp;lt;app_form_id&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;tasks:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;tasks:refresh&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:tasks:&amp;lt;app_form_id&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:tasks:&amp;lt;app_form_id&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;message_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;messages_detail:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;analytics:targets:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;boot_time&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+END AS expected_count,
+SUM(apdex_metrics.count) AS actual_count
+FROM apdex_metrics, constants
+GROUP BY apdex_metrics.metric, constants.days
+)
+SELECT
+apdex_result.metric,
+apdex_result.expected_count,
+apdex_result.actual_count,
+CASE
+WHEN apdex_result.actual_count &amp;gt;= apdex_result.expected_count THEN &amp;#39;TRUE&amp;#39; ELSE &amp;#39;FALSE&amp;#39;
+END AS meet_expectation
+FROM apdex_result
+ORDER BY apdex_result.metric ASC
+&lt;/code>&lt;/pre>&lt;p>Such queries are instrumental in identifying areas of the CHT that may require performance improvements by highlighting how different parts of the application meet user expectations in terms of load times and Apdex score.&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</guid><description>
 &lt;p>Follow these steps on a Mac to generate your public/private keys and access the PostgreSQL server.&lt;/p>
 &lt;h2 id="access-terminal">Access Terminal&lt;/h2>
 &lt;p>Terminal (Terminal.app) is the terminal emulator included in the macOS operating system. You can use this application to generate your SSH key.&lt;/p>
