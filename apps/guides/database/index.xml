@@ -1,0 +1,489 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing Databases</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/</link><description>Recent content in Managing Databases on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/database/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Contact Muting in SQL queries</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/muting_in_dashboards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/muting_in_dashboards/</guid><description>
+&lt;p>When a contact gets muted, two of &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/transitions/#muting">many things&lt;/a> happen:&lt;/p>
+&lt;ul>
+&lt;li>The target contact and all of its descendants have a &lt;code>muted&lt;/code> property set equal to the date they were muted&lt;/li>
+&lt;li>an entry is added to the contact&amp;rsquo;s &lt;code>muting_history&lt;/code> in sentinel&amp;rsquo;s info docs&lt;/li>
+&lt;/ul>
+&lt;p>When building dashboards on Superset, Klipfolio, or other data visualization platforms, you might need to exclude these muted contacts from the visualized data. An easy way to do this is to check the contact&amp;rsquo;s &lt;code>muted&lt;/code> property which when present has the date value of when the contact was muted and when absent means that the contact is not muted. This works when you are only interested in seeing the latest data but it gets complicated when you want to look at a contact&amp;rsquo;s mute state from a certain period in the past.&lt;/p>
+&lt;p>For example, if a contact was muted in February and unmuted in May; If you check the contact&amp;rsquo;s mute state in March from June, you&amp;rsquo;d find that the contact would not have the muted property as it would have been removed during the &lt;code>unmute&lt;/code> in May. This is where the &lt;code>muting_history&lt;/code> comes in. A contact&amp;rsquo;s &lt;code>muting_history&lt;/code> contains all mute and unmute events stored in a JSON array. An example of the mute/unmute entries is shown below:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_rev&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;3-01ecfdd2958baeaf16fc621c5622f4a9&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;info&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;doc_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;doc-id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;transitions&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;muting_history&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2021-04-07T13:41:09.769Z&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;muted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;report_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2021-06-07T13:41:09.769Z&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;muted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;report_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;latest_replication_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2020-10-30T15:46:45.482Z&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;initial_replication_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2020-10-30T15:46:45.482Z&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you extract this data into a separate table you can get a timeline that you can use to check if the contact was muted at a certain point in the past. An example of this approach is shown below where the data is first extracted using the query:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">SELECT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_muting_history&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">contact_uuid&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87">date&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">muted_on&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">muted&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">report_id&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">FROM&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">SELECT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">-&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;doc_id&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_uuid&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">couchdb&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">-&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;muting_history&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">muting_history&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">FROM&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">couchdb&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">WHERE&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">-&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;type&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">::&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87">text&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;info&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AND&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">doc&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">-&amp;gt;&amp;gt;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;muting_history&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">IS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">NOT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">NULL&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_muting_history&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">CROSS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">JOIN&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">LATERAL&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">json_populate_recordset&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87;font-weight:bold">null&lt;/span>&lt;span style="color:#000;font-weight:bold">::&lt;/span>&lt;span style="color:#000">record&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_muting_history&lt;/span>&lt;span style="color:#000;font-weight:bold">.&lt;/span>&lt;span style="color:#000">muting_history&lt;/span>&lt;span style="color:#000;font-weight:bold">::&lt;/span>&lt;span style="color:#000">json&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#204a87">date&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87">text&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">muted&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">bool&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">report_id&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">uuid&lt;/span>&lt;span style="color:#000;font-weight:bold">);&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The query above will give you a result set like the one below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>contact_uuid&lt;/th>
+&lt;th>muted_on&lt;/th>
+&lt;th>muted&lt;/th>
+&lt;th>report_id&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>1&lt;/td>
+&lt;td>2021-06-07T13:41:11.119Z&lt;/td>
+&lt;td>True&lt;/td>
+&lt;td>*****&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2&lt;/td>
+&lt;td>2020-12-24T18:02:53.190Z&lt;/td>
+&lt;td>True&lt;/td>
+&lt;td>*****&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3&lt;/td>
+&lt;td>2021-01-24T17:36:31.917Z&lt;/td>
+&lt;td>True&lt;/td>
+&lt;td>*****&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3&lt;/td>
+&lt;td>2021-04-15T16:56:05.984Z&lt;/td>
+&lt;td>False&lt;/td>
+&lt;td>*****&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>You can query the table above (&lt;code>mute_timeline&lt;/code>) to check if the contact was muted in a certain period in time as shown below:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">SELECT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_uuid&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">IS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">NOT&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">NULL&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AS&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">muted&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">FROM&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">mute_timeline&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">WHERE&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">contact_uuid&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">*****&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AND&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">date_trunc&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;day&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#000">muted_on&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">&amp;lt;=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">date_trunc&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;day&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">EXAMPLE_DATE&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">AND&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">unmuted_on&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">&amp;gt;=&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#000">date_trunc&lt;/span>&lt;span style="color:#000;font-weight:bold">(&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;day&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">EXAMPLE_DATE&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">+&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;1 day&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">::&lt;/span>&lt;span style="color:#204a87">interval&lt;/span>&lt;span style="color:#000;font-weight:bold">)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This query checks if a record exists for this contact where they were muted earlier or on &lt;code>EXAMPLE_DATE&lt;/code> and unmuted on or after the &lt;code>EXAMPLE_DATE&lt;/code>. For the earlier example where the contact was muted in February and unmuted in May if we pass February, March, or April as &lt;code>EXAMPLE_DATE&lt;/code>, we find a record because our &lt;code>unmuted_on&lt;/code> is always greater than &lt;code>EXAMPLE_DATE&lt;/code>. If we pass May going forward, we find no records that match our condition.&lt;/p></description></item><item><title>Apps: Fixing couch2pg Memory Errors</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/couch2pg-oom-errors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/couch2pg-oom-errors/</guid><description>
+&lt;p>Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors.
+To fix this, we need to delete this document so that couch2pg can proceed. Below are steps to follow to achieve this.&lt;/p>
+&lt;ol>
+&lt;li>Reduce the size of the replicated docs to a value of say 4 in the couch2pg.conf file so that you can get within the range of the failing document.&lt;/li>
+&lt;li>Clone the existing &lt;a href="https://github.com/medic/couch2pg">couch2pg&lt;/a> repo so that you can run couch2pg locally&lt;/li>
+&lt;li>Edit the file &lt;code>lib/importer.js&lt;/code> in the couch2pg source code to be able to log the doc-id of the problem doc&lt;/li>
+&lt;li>Edit just logs doc_ids to the console, around line 100 of importer.js &lt;code>console.log(row.doc._id);&lt;/code>&lt;/li>
+&lt;li>Get the remote couch2pg environment variable settings and export them into your profile terminal&lt;/li>
+&lt;li>Create an ssh reverse tunnel from the postgres server to your laptop&lt;/li>
+&lt;li>Run couch2pg locally so that you can see the doc-ids on console till it fails&lt;/li>
+&lt;li>From the ids printed on console try loading the docs in the couchdb web access(Futon or Fauxton), the problem doc is usually big and won&amp;rsquo;t load&lt;/li>
+&lt;li>This will help you identify the problem doc&lt;/li>
+&lt;li>Curl the document to your pc and back it up&lt;/li>
+&lt;li>Back up the document for further analysis&lt;/li>
+&lt;li>Delete the document using curl
+&lt;code>curl --head &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;&amp;quot;&lt;/code>
+This returns something like&lt;/li>
+&lt;/ol>
+&lt;pre tabindex="0">&lt;code>HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Content-Length: 307
+Content-Type: application/json
+Date: Tue, 25 Jun 2019 11:58:29 GMT
+ETag: &amp;#34;2-6beeb38da9b096bacfe2fa769e5171be&amp;#34;
+Server: CouchDB/2.3.1 (Erlang OTP/21)
+X-Couch-Request-ID: e4aa7a8696
+X-CouchDB-Body-Time: 0
+&lt;/code>&lt;/pre>&lt;p>The ETag is the rev. Delete document with curl: &lt;code>curl -X DELETE &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;?rev=&amp;lt;THE_REV&amp;gt;&amp;quot;&lt;/code>&lt;/p></description></item><item><title>Apps: CouchDB Authentication</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/couchdb-authentication/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/couchdb-authentication/</guid><description>
+&lt;h3 id="to-invalidate-a-session-in-couchdb-there-are-two-options">To invalidate a session in couchdb, there are two options:&lt;/h3>
+&lt;ol>
+&lt;li>Change the session signing certificate on the server&lt;/li>
+&lt;li>Change the password and/or salt for the user whose session should be invalidated&lt;/li>
+&lt;/ol>
+&lt;p>There are drawbacks to note with each. Option &lt;strong>1&lt;/strong> will invalidate &lt;em>all&lt;/em> sessions; option &lt;strong>2&lt;/strong> will invalidate all sessions &lt;em>for that user&lt;/em>, and also their password.&lt;/p>
+&lt;p>Because of the nature of couch&amp;rsquo;s session management, there is no way to see a list of active/open sessions. Invalidating a specific session key could be achieved by denying a cookie value in e.g. nginx or API, but this is unlikely to be of practical value.&lt;/p></description></item><item><title>Apps: Database Conflicts</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/database-conflicts/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/database-conflicts/</guid><description>
+&lt;p>Conflicts are a natural and unavoidable part of working in a distributed system.&lt;/p>
+&lt;p>Conflicts occur when one client (eg PouchDB) attempts to replicate to another (eg CouchDB), and the document that the first has does not have the same tree of changes that the second one has.&lt;/p>
+&lt;h2 id="an-example">An example&lt;/h2>
+&lt;p>To make it clear what&amp;rsquo;s happening, let&amp;rsquo;s walk through an example. If you already understand conflicts feel free to skip this section.&lt;/p>
+&lt;p>Let&amp;rsquo;s say you register a pregnancy in the UI. And then you notice that you got the LMP wrong, so you hit edit and quickly make the change.&lt;/p>
+&lt;p>Meanwhile, sentinel notices that you registers a pregnancy, and before you have a chance to change the LMP, sets up a bunch of recurring messages, editing the document.&lt;/p>
+&lt;p>Sentinel has now made a change to the first version of your document, and you&amp;rsquo;re trying to also make a change to the first version. These conflict.&lt;/p>
+&lt;h2 id="how-to-manage-conflicts">How to manage conflicts&lt;/h2>
+&lt;p>Conflicts will appear on the #downtime Slack channel, along with the other alerts. If a server you manage has a conflict, you should do the following:&lt;/p>
+&lt;h3 id="identify-why-conflicts-are-occuring">Identify why conflicts are occuring&lt;/h3>
+&lt;p>Take a look at the conflicts view, at &lt;code>https://yourserver/medic/_design/medic-conflicts/_view/conflicts&lt;/code>. Each entry in that view looks like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;1-82d9a42305a79e403d9eca6a9a9daae9&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The &lt;code>id&lt;/code> is the &lt;code>_id&lt;/code> of the conflicting document, and the &lt;code>key&lt;/code> is a list of conflicting &lt;code>_rev&lt;/code>s.&lt;/p>
+&lt;p>For each conflicting document, download that document, as well as all the &lt;code>_rev&lt;/code>s indicated in the &lt;code>key&lt;/code> above. To download a document with a specific &lt;code>_rev&lt;/code>, pass the &lt;code>rev&lt;/code> parameter.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>curl &lt;span style="color:#4e9a06">&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#39;&lt;/span> &amp;gt; doc.json
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl &lt;span style="color:#4e9a06">&amp;#39;https://yourserver/medic/1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8?rev=1-82d9a42305a79e403d9eca6a9a9daae9&amp;#39;&lt;/span> &amp;gt; doc-conflict1.json
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now you have all versions of the document, you can diff them and try to determine what went wrong.&lt;/p>
+&lt;p>A common problem, for example, might be sentinel hitting a document really quickly between you creating it and editing it.&lt;/p>
+&lt;p>A less common problem that requires some special attention, is UUID collisions (see below).&lt;/p>
+&lt;p>If you get stuck feel free to escalate to a developer, who can take a look.&lt;/p>
+&lt;h3 id="if-appropriate-raise-a-bug">If appropriate, raise a bug&lt;/h3>
+&lt;p>If you determine (or just suspect) that the problem could be in our code or data structures, feel free to raise a bug to development. For example, historically read status has been stored against the document, which can easily cause conflicts if you create a document and then instantly view it with sentinel processing in the background.&lt;/p>
+&lt;p>While some conflicts are inevitable, we want to architect away from them as much as possible. Ideally tech leads would never have to resolve conflicts.&lt;/p>
+&lt;h3 id="regardless-resolve-the-conflicts">Regardless, resolve the conflicts&lt;/h3>
+&lt;p>Now that you&amp;rsquo;ve diagnosed the problem, and perhaps reported a bug, you should resolve the conflict.&lt;/p>
+&lt;p>This is &lt;strong>extremely&lt;/strong> important. Conflicts cause saved changes to not appear against documents silently, and could cause important document changes (eg fixing someone&amp;rsquo;s EDD) to not occur.&lt;/p>
+&lt;p>For a document to no longer be conflicted, there must only be one active &lt;code>_rev&lt;/code>. You would do this by picking one rev and updating it with the changes you want to make, and then updating the others with the &lt;code>_deleted: true&lt;/code> property.&lt;/p>
+&lt;p>You can tell that a document is no longer conflicted if they don&amp;rsquo;t appear in the view, or if when you request the document with &lt;code>?conflicts=true&lt;/code> the &lt;code>_conflicts&lt;/code> property either doesn&amp;rsquo;t appear or is empty:&lt;/p>
+&lt;pre tabindex="0">&lt;code>https://yourserver/medic/yourdocid?conflicts=true
+{
+&amp;#34;_id&amp;#34;: &amp;#34;yourdocid&amp;#34;,
+&amp;#34;_rev&amp;#34;: &amp;#34;2-the-current-rev&amp;#34;
+&amp;#34;_conflicts&amp;#34;: [
+&amp;#34;2-a-conflicting-rev&amp;#34;
+]
+}
+&lt;/code>&lt;/pre>&lt;p>In the above example, &lt;code>yourdocid&lt;/code> has two revisions that conflict with each other. Here you would need to update one of the revs (it doesn&amp;rsquo;t matter which) with the other&amp;rsquo;s changes, then delete the other rev. You would then see:&lt;/p>
+&lt;pre tabindex="0">&lt;code>https://yourserver/medic/yourdocid?conflicts=true
+{
+&amp;#34;_id&amp;#34;: &amp;#34;yourdocid&amp;#34;,
+&amp;#34;_rev&amp;#34;: &amp;#34;3-the-new-rev&amp;#34;
+}
+&lt;/code>&lt;/pre>&lt;h4 id="a-trivial-example">A trivial example&lt;/h4>
+&lt;p>Let&amp;rsquo;s say that you have two documents, and the diff between them looks something like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-diff" data-lang="diff">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000080;font-weight:bold">===================================================================
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000080;font-weight:bold">&lt;/span>&lt;span style="color:#a40000">--- 277533E3-A41B-3C46-909F-BCA038197C1E___2-2fff60be1557fdfef9915aa09e1b5119.json
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">&lt;/span>&lt;span style="color:#00a000">+++ 277533E3-A41B-3C46-909F-BCA038197C1E___2-d2a7186380b72306d75cd64b64402575.json
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#00a000">&lt;/span>&lt;span style="color:#800080;font-weight:bold">@@ -1,7 +1,7 @@
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#800080;font-weight:bold">&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;#34;_id&amp;#34;: &amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">- &amp;#34;_rev&amp;#34;: &amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">&lt;/span>&lt;span style="color:#00a000">+ &amp;#34;_rev&amp;#34;: &amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#00a000">&lt;/span> &amp;#34;data&amp;#34;: &amp;#34;some shared data&amp;#34;,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;#34;read&amp;#34;: [
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">- &amp;#34;some_user&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">&lt;/span>&lt;span style="color:#00a000">+ &amp;#34;admin&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#00a000">&lt;/span> ]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The problem here is clear: &lt;code>some_user&lt;/code> and &lt;code>admin&lt;/code> read the document at the same time. To solve this, we could add &lt;code>some_user&lt;/code> to the revision with &lt;code>admin&lt;/code> already in it, and then delete the &lt;code>some_user&lt;/code> revision:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_rev&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2-d2a7186380b72306d75cd64b64402575&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some shared data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;read&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;admin&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;some_user&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;277533E3-A41B-3C46-909F-BCA038197C1E&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_rev&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2-2fff60be1557fdfef9915aa09e1b5119&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_deleted&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some shared data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;read&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;some_user&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="resolving-uuid-collisions">Resolving UUID collisions&lt;/h4>
+&lt;p>A UUID collision is a rare event where two clients (eg two android phones running our application) generate the same UUID ID for two completely different documents.&lt;/p>
+&lt;p>You can tell when your conflict is a UUID collision as there is no common root between the two conflicting versions. For example, one might be of type person and one might of type data_record.&lt;/p>
+&lt;p>These situations are more complicated, and require that you essentially recreate all conflicting versions as new documents, and fix any linkages that exist in the database.&lt;/p>
+&lt;p>Let&amp;rsquo;s say you find the following situation:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-diff" data-lang="diff">&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;#34;_id&amp;#34;: &amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">- &amp;#34;_rev&amp;#34;: &amp;#34;1-e4da228c29dc4ebc8b156967bbf48bd1&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">&lt;/span>&lt;span style="color:#00a000">+ &amp;#34;_rev&amp;#34;: &amp;#34;1-ce40d1dc470643e2b9be9368ea9ff240&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#00a000">&lt;/span>&lt;span style="color:#a40000">- &amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a40000">&lt;/span>&lt;span style="color:#00a000">+ &amp;#34;type&amp;#34;: &amp;#34;data_record&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#00a000">&lt;/span>&amp;lt;snip a bunch more stuff that doesn&amp;#39;t relate to each other&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>You will want to do four things:&lt;/p>
+&lt;ul>
+&lt;li>Download the &lt;code>_rev&lt;/code> for the &lt;code>person&lt;/code> and create a new document, with a new uuid, for that document (you can do this by uploadig the document without an &lt;code>_id&lt;/code> or &lt;code>_rev&lt;/code> parameter and let CouchDB generate them for you)&lt;/li>
+&lt;li>Do the same for the &lt;code>data_record&lt;/code> version&lt;/li>
+&lt;li>Delete the main conflicting document &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>And finally, find any references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, work out which doc they were &lt;em>supposed&lt;/em> to point to, and then edit those UUIDs to be the correct UUID &lt;code>_id&lt;/code> from the docs you created above.&lt;/p>
+&lt;p>Because this should be a rare event and a generic view would be enormous, we do not ship a view that helps you find this out.&lt;/p>
+&lt;p>However, you can create your own view! You&amp;rsquo;re going to want to create a DDOC specifically for this view. You can follow the following template to create what you want:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;_design/docs-by-reference&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;views&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;docs-by-reference&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;map&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;function(doc) {\n var KEYS = [];\n\n // TODO: consider switching this around to list allowed doc types\n if (doc._id.match(/-info$/) ||\n doc._id.match(/^_local/)) {\n return;\n }\n\n var goDeeper = function(obj, path) {\n Object.keys(obj).forEach(function(key) {\n if (typeof obj[key] === &amp;#39;string&amp;#39; &amp;amp;&amp;amp;\n KEYS.indexOf(obj[key]) !== -1) {\n emit(obj[key], path + &amp;#39;.&amp;#39; + key);\n }\n\n if (obj[key] &amp;amp;&amp;amp; typeof obj[key] === &amp;#39;object&amp;#39;) {\n goDeeper(obj[key], path + &amp;#39;.&amp;#39; + key);\n }\n });\n };\n\n goDeeper(doc, doc._id);\n}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this, add any IDs you want to be found in the &lt;code>KEYS&lt;/code> variable at the top of the function. So in our case, we would change &lt;code>KEYS&lt;/code> to look like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-js" data-lang="js">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">var&lt;/span> &lt;span style="color:#000">KEYS&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Upload this document to CouchDB (do not just add the view to an existing DDOC, as you will force all views on that DDOC to regenerate) and then warm up the views by querying it once (it may take a long time to run).&lt;/p>
+&lt;p>Once it is complete you can query the view again to return a list of documents that reference the ids you hard-coded above.&lt;/p>
+&lt;p>This will help you to identify which documents are affected by this change. Usually the only change needed is to change the ID located to the new ones you generated.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;total_rows&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;offset&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;rows&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.inputs.contact._id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;7FADDF76-55E4-4E50-9444-5E468E61EA83&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8.fields.patient_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, there are two references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, both in the &lt;code>1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code> document, one at &lt;code>fields.inputs.contact._id&lt;/code> and one at &lt;code>fields.patient_id&lt;/code>.&lt;/p>
+&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</guid><description>
+&lt;p>Added in &lt;code>4.7.0&lt;/code>, CHT now records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications.&lt;/p>
+&lt;p>Since Apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> system, it is possible to view Apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">analytics database&lt;/a>.&lt;/p>
+&lt;p>An example of an SQL to view the Apdex score:&lt;/p>
+&lt;pre tabindex="0">&lt;code>WITH apdex_telemetry_data AS (
+SELECT
+substring(metric from &amp;#39;^(.*):apdex:&amp;#39;) AS event_category,
+CASE
+WHEN metric LIKE &amp;#39;%:satisfied&amp;#39; THEN &amp;#39;satisfied&amp;#39;
+WHEN metric LIKE &amp;#39;%:tolerable&amp;#39; THEN &amp;#39;tolerable&amp;#39;
+WHEN metric LIKE &amp;#39;%:frustrated&amp;#39; THEN &amp;#39;frustrated&amp;#39;
+END AS event_type,
+SUM(count) AS event_count
+FROM
+useview_telemetry_metrics
+WHERE metric LIKE &amp;#39;%:apdex:%&amp;#39;
+GROUP BY event_category, event_type
+),
+apdex_scores AS (
+SELECT
+event_category,
+SUM(CASE WHEN event_type = &amp;#39;satisfied&amp;#39; THEN event_count ELSE 0 END) AS satisfied_count,
+SUM(CASE WHEN event_type = &amp;#39;tolerable&amp;#39; THEN event_count ELSE 0 END) AS tolerable_count,
+SUM(CASE WHEN event_type = &amp;#39;frustrated&amp;#39; THEN event_count ELSE 0 END) AS frustrated_count,
+SUM(event_count) AS total_event_count
+FROM apdex_telemetry_data
+GROUP BY event_category
+)
+SELECT
+event_category,
+satisfied_count,
+tolerable_count,
+frustrated_count,
+ROUND(((satisfied_count + (tolerable_count / 2.0)) / total_event_count)::numeric, 2) AS apdex_score
+FROM apdex_scores
+ORDER BY apdex_score asc;
+&lt;/code>&lt;/pre>&lt;p>The SQL query above calculates the Apdex scores for various events recorded in the &lt;code>useview_telemetry_metrics&lt;/code> table, providing insights into the performance of different aspects of the CHT. In some cases, it is helpful to visualize the number of occurrences of each metric in a date range:&lt;/p>
+&lt;pre tabindex="0">&lt;code>WITH
+constants (days, start_date, end_date) AS (VALUES (&amp;lt;count_days_in_range&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;)),
+apdex_metrics AS(
+SELECT
+substring(metric FROM &amp;#39;^(.*):apdex:&amp;#39;) AS metric,
+SUM(COUNT) AS COUNT
+FROM useview_telemetry_metrics, constants
+WHERE
+metric LIKE &amp;#39;%:apdex:%&amp;#39;
+AND period_start BETWEEN constants.start_date::DATE AND constants.end_date::DATE
+GROUP BY metric
+),
+apdex_result as (
+SELECT
+metric,
+CASE
+WHEN apdex_metrics.metric = &amp;#39;contact_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_list:query&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;contact_detail:&amp;lt;contact_type&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:contacts:&amp;lt;contact_form&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:contacts:&amp;lt;contact_form&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:reports:&amp;lt;app_form&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:reports:&amp;lt;app_form&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_list:query&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;report_detail:&amp;lt;app_form_id&amp;gt;:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;tasks:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;tasks:refresh&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:tasks:&amp;lt;app_form_id&amp;gt;:add:render&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;enketo:tasks:&amp;lt;app_form_id&amp;gt;:add:save&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;message_list:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;messages_detail:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;analytics:targets:load&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+WHEN apdex_metrics.metric = &amp;#39;boot_time&amp;#39; THEN &amp;lt;count_in_a_day&amp;gt; * constants.days
+END AS expected_count,
+SUM(apdex_metrics.count) AS actual_count
+FROM apdex_metrics, constants
+GROUP BY apdex_metrics.metric, constants.days
+)
+SELECT
+apdex_result.metric,
+apdex_result.expected_count,
+apdex_result.actual_count,
+CASE
+WHEN apdex_result.actual_count &amp;gt;= apdex_result.expected_count THEN &amp;#39;TRUE&amp;#39; ELSE &amp;#39;FALSE&amp;#39;
+END AS meet_expectation
+FROM apdex_result
+ORDER BY apdex_result.metric ASC
+&lt;/code>&lt;/pre>&lt;p>Such queries are instrumental in identifying areas of the CHT that may require performance improvements by highlighting how different parts of the application meet user expectations in terms of load times and Apdex score.&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-mac/</guid><description>
+&lt;p>Follow these steps on a Mac to generate your public/private keys and access the PostgreSQL server.&lt;/p>
+&lt;h2 id="access-terminal">Access Terminal&lt;/h2>
+&lt;p>Terminal (Terminal.app) is the terminal emulator included in the macOS operating system. You can use this application to generate your SSH key.&lt;/p>
+&lt;ol>
+&lt;li>Open a new &lt;strong>Finder&lt;/strong> window&lt;/li>
+&lt;li>Navigate to the &lt;strong>Applications&lt;/strong> folder&lt;/li>
+&lt;li>Navigate to the &lt;strong>Utilities&lt;/strong> folder&lt;/li>
+&lt;li>Open the &lt;strong>Terminal&lt;/strong> app&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="terminal.png" alt="Terminal">&lt;/p>
+&lt;h2 id="generate-key">Generate Key&lt;/h2>
+&lt;p>From Terminal, follow these instructions (see screenshot below):&lt;/p>
+&lt;ol>
+&lt;li>Type: &lt;code>ssh-keygen -t rsa&lt;/code>&lt;/li>
+&lt;li>Hit return to use the default file / location&lt;/li>
+&lt;li>Enter a &lt;em>passphrase&lt;/em>&lt;/li>
+&lt;li>Enter your &lt;em>passphrase&lt;/em> again&lt;/li>
+&lt;li>Type: &lt;code>cat ~/.ssh/id_rsa.pub&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>In the screenshot below:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>(a)&lt;/code> is the location and filename of your &lt;em>&lt;strong>private&lt;/strong>&lt;/em> key&lt;/li>
+&lt;li>&lt;code>(b)&lt;/code> is the location and filename of your &lt;em>&lt;strong>public&lt;/strong>&lt;/em> key&lt;/li>
+&lt;li>&lt;code>(c)&lt;/code> are the contents of your &lt;em>&lt;strong>public&lt;/strong>&lt;/em> key&lt;/li>
+&lt;/ul>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+You will need to provide the contents of &lt;code>(c)&lt;/code> to your Medic contact or RDBMS administrator. It should start with &lt;code>ssh-rsa&lt;/code> and end with something that looks like an email address.
+&lt;/div>
+&lt;p>&lt;img src="ssh-commands.png" alt="SSH Commands">&lt;/p>
+&lt;h2 id="connect-to-postgresql">Connect to PostgreSQL&lt;/h2>
+&lt;p>Copy your public key and provide it to your Medic contact or RDBMS administrator. Your public key is not sensitive and can be shared over slack, github, etc&amp;hellip;&lt;/p>
+&lt;p>Once the RDBMS administrator has added your public SSH key on RDBMS, the administrator will provide you with login credentials to the SSH server as well as for PostgreSQL.&lt;/p>
+&lt;p>Verify you can successfully connect to to the SSH server with &lt;code>ssh -i ~/.ssh/id_rsa &amp;lt;user&amp;gt;@&amp;lt;rdbms host&amp;gt; -p &amp;lt;port&amp;gt;&lt;/code>. If your setup is correct, you should login to the server and see the prompt of your terminal change to &lt;code>&amp;lt;user&amp;gt;@rdbms:~$&lt;/code>&lt;/p>
+&lt;p>You should be able to access PostgreSQL from a SQL client using the provided credentials. Some common SQL clients include: &lt;a href="https://www.pgadmin.org/">pgAdmin&lt;/a>, &lt;a href="https://dbeaver.io/">DBeaver&lt;/a>, &lt;a href="https://eggerapps.at/postico/">Postico&lt;/a>.&lt;/p>
+&lt;p>From your SQL client, use the settings mentioned below to connect. Be sure to select the &lt;em>&lt;strong>Private Key&lt;/strong>&lt;/em> that you generated above.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Field&lt;/th>
+&lt;th>Value&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Host&lt;/td>
+&lt;td>&lt;code>localhost&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Host Port&lt;/td>
+&lt;td>&lt;code>5432&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>User&lt;/td>
+&lt;td>&lt;code>&amp;lt;provided by Medic&amp;gt;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Password&lt;/td>
+&lt;td>&lt;code>&amp;lt;provided by Medic&amp;gt;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Database&lt;/td>
+&lt;td>&lt;code>&amp;lt;provided by Medic&amp;gt;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SSH Host&lt;/td>
+&lt;td>&lt;code>rdbms.dev.medicmobile.org&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SSH Port&lt;/td>
+&lt;td>&lt;code>33696&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SSH User&lt;/td>
+&lt;td>&lt;code>&amp;lt;provided by Medic&amp;gt;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SSH Password&lt;/td>
+&lt;td>N/A - Use Private Key&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Private Key&lt;/td>
+&lt;td>Choose the location of the private key generated above&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;img src="connection-settings.png" alt="PG Connection Settings">&lt;/p></description></item><item><title>Apps: Connecting to RDBMS from Windows</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/rdbms-from-windows/</guid><description>
+&lt;p>Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p>
+&lt;h2 id="ssh-key-generation-and-importing">SSH Key Generation and Importing&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Download Puttygen from &lt;a href="https://www.ssh.com/ssh/putty/download">here&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Create a new key pair for your computer.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="puttygen-run-key-generate.png" alt="Putty-gen-key-pair">&lt;/p>
+&lt;ol start="4">
+&lt;li>Convert the key generated from ssh2 format to openssh. Puttygen &lt;a href="https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygen-windows-into-key-pairs-us/2224204#2224204">supports this&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;pre tabindex="0">&lt;code>1. Open PuttyGen
+2. Click Load
+3. Load your private key
+4. Go to Conversions-&amp;gt;Export OpenSSH and export your private key
+5. Copy your private key to ~/.ssh/id_dsa (or id_rsa).
+6. Create the RFC 4716 version of the public key using ssh-keygen
+ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
+6. Convert the RFC 4716 version of the public key to the OpenSSH format:
+ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub
+&lt;/code>&lt;/pre>&lt;ol start="5">
+&lt;li>Import the file using PuTTYgen:&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="putty-gen-import.png" alt="puttty-import-key">&lt;/p>
+&lt;ol start="6">
+&lt;li>Save it as PuTTY Private Key File .ppk:&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="putty-save-key.png" alt="puttty-save-key">&lt;/p>
+&lt;ol start="7">
+&lt;li>Add the key (.ppk) to Pageant (PuTTY authentication agent):&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="putty-add-key.png" alt="puttty-add-key">&lt;/p>
+&lt;ol start="8">
+&lt;li>Now you can connect to RDBMS using PuTTY:&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="puttty-connect.png" alt="puttty-connect">&lt;/p>
+&lt;p>&lt;img src="putty-connect-final.png" alt="puttty-connect">&lt;/p>
+&lt;p>If you are connecting to rdbms in order to use a PostgreSQL client. You may not need to tunnel the connection. The client can do it for you.&lt;/p>
+&lt;p>&lt;img src="rdbms_connect_1.png" alt="rdbms_1">&lt;/p>
+&lt;p>&lt;img src="rdbms_connect_2.png" alt="rdbms_2">&lt;/p></description></item></channel></rss>

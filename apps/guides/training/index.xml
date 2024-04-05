@@ -1,0 +1,154 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Training</title><link>https://docs.communityhealthtoolkit.org/apps/guides/training/</link><description>Recent content in Training on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/training/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Onboarding Using a Training App</title><link>https://docs.communityhealthtoolkit.org/apps/guides/training/onboarding/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/training/onboarding/</guid><description>
+&lt;p>When onboarding new users, having a dedicated CHT app and instance for training can be helpful; it allows new users to do training exercises with mock data to get familiar with the app, while not having the data from their training interfering with the future use of their CHT app. Different approaches are possible, such as only entering real patient data during training, or manually deleting all the training data, but these methods are less practical for large deployments.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+The suggestions in this guide should be assessed and adapted as needed to benefit a deployment. It is important that users don’t accidentally use the wrong app. The &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/">troubleshooting guide&lt;/a> can help to monitor and remediate training data being in the production instance, or the opposite.
+&lt;/div>
+&lt;h2 id="setting-up-a-training-app">Setting up a training app&lt;/h2>
+&lt;p>A separate Android App can be created for training, which would point to a CHT instance dedicated to training. The training instance should have the same configuration as the production instance, and have users created for training. To differentiate the Android app used for training from the production one, create a duplicate of &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/branding/">your flavor&lt;/a> and modify the following aspects&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;figure class="right col-6 col-lg-4">&lt;a href="training-app.png">
+&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/training/onboarding/training-app.png"
+alt="CHT training app with border and message"/> &lt;/a>
+&lt;/figure>
+&lt;strong>Border &amp;amp; Message&lt;/strong>: Consider adding a distinctive border and message when using the training app. This can be done by setting the build config field &lt;code>IS_TRAINING_APP&lt;/code> to &lt;code>true&lt;/code>, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L212-L216">&lt;code>build.gradle&lt;/code>&lt;/a> for the training version of the Gamma app.&lt;/li>
+&lt;li>&lt;strong>CHT Instance&lt;/strong>: In your flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file set the &lt;code>app_host&lt;/code> string to be the URL of your training instance, as seen in the &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L3">Gamma Training app&lt;/a>. If left the same as the production app both training and production data will end up in your production instance.&lt;/li>
+&lt;li>&lt;strong>Launcher icons&lt;/strong>: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/li>
+&lt;li>&lt;strong>App name&lt;/strong>: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code>CHW App [TRAINING VERSION]&lt;/code> may display as &lt;code>CHW App...&lt;/code> so it would be better to use &lt;code>[TRAINING] CHW App&lt;/code>. The app name is set in the flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L4">the Gamma training app&lt;/a>.&lt;/li>
+&lt;li>&lt;strong>App ID&lt;/strong>: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code>applicationId&lt;/code>, as seen &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L214">in &lt;code>build.gradle&lt;/code> for the Gamma training app&lt;/a>.
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Keeping the &lt;code>applicationId&lt;/code> values the same will make it impossible to have both the training and production apps installed at the same time on a device. If you have a way to install the production app after the training is complete then you may choose to do this to prevent users from using the wrong app.
+&lt;/div>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="switching-from-training-to-production-app">Switching from training to production app&lt;/h2>
+&lt;p>To avoid having production data in the training app, it is encouraged to &lt;strong>remove&lt;/strong> the training app from the device once training is complete.&lt;/p>
+&lt;p>If the production app can always be installed after the use of the training is complete, then using the same &lt;code>applicationId&lt;/code> guarantees that only one of the apps is installed at any given time.&lt;/p>
+&lt;p>Changing passwords for the training users in an attempt to lock them out is not recommended. In some circumstances a user would be able to continue to use the training app for production use and not have the data sync back to the server.&lt;/p>
+&lt;p>It is preferable to remove the training app from devices, and &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/">monitor the training instance for unexpected activity&lt;/a> that can be brought over to the production instance if needed.&lt;/p></description></item><item><title>Apps: Training Cards</title><link>https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/</guid><description>
+&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/apps/features/training/">Training Cards&lt;/a> enable remote training from within the CHT by showing a sequence of &amp;ldquo;cards&amp;rdquo; containing content provided by App Developers. The content might include information about a newly deployed feature, changes to a &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/care-guides/">care guide&lt;/a>, or simply a reminder about an underused feature or workflow. Enketo forms are used to display the content, and App Developers can specify a start date, duration, and to which &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-roles/">user roles&lt;/a> the cards should be shown. Like &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/">app forms&lt;/a>, forms used by training cards will automatically be downloaded to the user’s devices.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Example training forms are available &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards-resources/">here&lt;/a> and provide a good starting point.
+&lt;/div>
+&lt;h1 id="step-1-create-the-training-form">Step 1: Create the training form&lt;/h1>
+&lt;p>Create an &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#xlsform">XLS Form&lt;/a>. In the following example, the training form is called &lt;code>my_new_feature&lt;/code>, it has some text in the &lt;code>label::en&lt;/code> column, and some images in the column &lt;code>media::images&lt;/code> to illustrate the feature.&lt;/p>
+&lt;figure class="left col-10">&lt;a href="step-1-xls-form.png">
+&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/step-1-xls-form.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;h1 id="step-2-add-the-forms-id">Step 2: Add the form’s ID&lt;/h1>
+&lt;p>Important, define the &lt;code>form_id&lt;/code> located in the &lt;code>settings&lt;/code> sheet with the prefix &lt;code>training:&lt;/code> and add the form name, otherwise the training card won&amp;rsquo;t display. In our example, the &lt;code>form_id&lt;/code> should be &lt;code>training:my_new_feature&lt;/code>.&lt;/p>
+&lt;figure class="left col-10">&lt;a href="step-2-xls-form-id.png">
+&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/step-2-xls-form-id.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;h1 id="step-3-configure-the-training-form">Step 3: Configure the training form&lt;/h1>
+&lt;p>Create a &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/form-properties/#3-define-the-forms-context">properties file&lt;/a> to define the starting date of the training, the number of days it will be active, and the user roles that can access the training. In our example, the file name is &lt;code>my_new_feature.properties.json&lt;/code> and contains the following properties:&lt;/p>
+&lt;pre tabindex="0">&lt;code>{
+&amp;#34;title&amp;#34;: &amp;#34;&amp;#34;,
+&amp;#34;context&amp;#34;: {
+&amp;#34;start_date&amp;#34;: &amp;#34;2023-07-13&amp;#34;,
+&amp;#34;duration&amp;#34;: 60,
+&amp;#34;user_roles&amp;#34;: [ &amp;#34;nurse&amp;#34; ]
+}
+}
+&lt;/code>&lt;/pre>&lt;p>In the example above, the training cards could be shown to any user with the &amp;ldquo;nurse&amp;rdquo; role between July 13, 2023 and September 11, 2023 (inclusive). See more information about these configuration settings below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&amp;ldquo;title&amp;rdquo;&lt;/td>
+&lt;td>Optional. Enketo’s form title that is displayed under the modal’s header section. Leave this property empty if you don’t need to display a title.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;ldquo;start_date&amp;rdquo;&lt;/td>
+&lt;td>Optional. Define the training start day using &lt;code>yyyy-mm-dd&lt;/code> format. If not defined then the training will start immediately.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;ldquo;duration&amp;rdquo;&lt;/td>
+&lt;td>Optional. Number of days this training should be active. If not defined then the training will never expire.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;ldquo;user_roles&amp;rdquo;&lt;/td>
+&lt;td>Optional. List of user roles that can access this training. If not defined then all users can access the training.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Users with an admin role can access training cards but they need to have a contact associated in the &lt;code>org.couchdb.user:[user-name]&lt;/code> document from CouchDB.
+&lt;/div>
+&lt;h1 id="step-4-add-multimedia-to-the-training-form">Step 4: Add multimedia to the training form&lt;/h1>
+&lt;p>If your training form has images, create a folder with the same name as the form and add &lt;code>-media&lt;/code> suffix. In our example, the form name is &lt;code>my_new_feature&lt;/code>, then the folder name should be &lt;code>my_new_feature-media&lt;/code>.&lt;/p>
+&lt;p>Inside that new folder, make another one called images and put inside all the &lt;code>images&lt;/code> that your form needs. See more about &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/forms/multimedia/">multimedia in forms&lt;/a>.&lt;/p>
+&lt;h1 id="step-5-put-everything-in-the-right-place">Step 5: Put everything in the right place&lt;/h1>
+&lt;p>In your project configuration folder, place the XLS form, the properties file, and the media folder inside &lt;code>/forms/training/&lt;/code>. The file structure should look like this:&lt;/p>
+&lt;figure class="left col-10">&lt;a href="step-5-file-structure.png">
+&lt;img src="https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/step-5-file-structure.png"/> &lt;/a>
+&lt;/figure>
+&lt;br clear="all">
+&lt;h1 id="step-6-convert-and-upload-the-training-form">Step 6: Convert and upload the training form&lt;/h1>
+&lt;p>Open the terminal and use the latest version of the &lt;code>cht&lt;/code> command line tool to convert and upload the training form:&lt;/p>
+&lt;p>Convert the form by running this command:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --url=[instance_url] convert-training-forms -- [form_name]
+&lt;/code>&lt;/pre>&lt;p>Example:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --url=http://admin-user:secretpass@my-xyz-project.org convert-training-forms -- my_new_feature
+&lt;/code>&lt;/pre>&lt;p>Upload the form by running this command:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --url=[instance_url] upload-training-forms -- [form_name]
+&lt;/code>&lt;/pre>&lt;p>Example:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --url=http://admin-user:secretpass@my-xyz-project.org upload-training-forms -- my_new_feature
+&lt;/code>&lt;/pre>&lt;h1 id="step-7-verify-and-monitor">Step 7: Verify and monitor&lt;/h1>
+&lt;p>At this point the training cards are ready to use. You can verify by logging in with a user that has a valid role assigned for the training card, on the day that the training starts. Remember, to sync the app to see the results.&lt;/p>
+&lt;p>Using &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> you can monitor user interaction with each training card &amp;ldquo;set&amp;rdquo;. Some key metrics you can view include:&lt;/p>
+&lt;ol>
+&lt;li>Number of times each user was presented with training cards&lt;/li>
+&lt;li>The date(s) each user was presented with training cards&lt;/li>
+&lt;li>Number of times each user completed a training card set*&lt;/li>
+&lt;li>The min/max amount of time each user spent viewing the training cards&lt;/li>
+&lt;li>The device_id of any device from which the user saw the training cards&lt;/li>
+&lt;/ol>
+&lt;p>&lt;em>* Training Cards are designed to only be viewed once so this should normally only ever be 0 or 1. It is possible that a user deletes the training &amp;ldquo;report&amp;rdquo;, in which case they would be presented with training cards again.&lt;/em>&lt;/p>
+&lt;p>Example SQL:&lt;/p>
+&lt;pre tabindex="0">&lt;code>SELECT
+doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user,
+doc#&amp;gt;&amp;gt;&amp;#39;{metadata,deviceId}&amp;#39; AS device_id,
+concat(doc#&amp;gt;&amp;gt;&amp;#39;{metadata,year}&amp;#39;, &amp;#39;-&amp;#39;, doc#&amp;gt;&amp;gt;&amp;#39;{metadata,month}&amp;#39;, &amp;#39;-&amp;#39;,doc#&amp;gt;&amp;gt;&amp;#39;{metadata,day}&amp;#39;)::date AS telemetry_date,
+COALESCE(doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:&amp;lt;my_new_feature&amp;gt;:add:render,count}&amp;#39;,&amp;#39;0&amp;#39;)::int AS count_render_training,
+COALESCE(doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:&amp;lt;my_new_feature&amp;gt;:add:user_edit_time,count}&amp;#39;,&amp;#39;0&amp;#39;)::int AS count_submit_training,
+COALESCE(doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:&amp;lt;my_new_feature&amp;gt;:add:user_edit_time,max}&amp;#39;,&amp;#39;0&amp;#39;)::int/1000 AS max_seconds_on_form,
+COALESCE(doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:&amp;lt;my_new_feature&amp;gt;:add:user_edit_time,min}&amp;#39;,&amp;#39;0&amp;#39;)::int/1000 AS min_seconds_on_form
+FROM
+couchdb_users_meta
+WHERE
+doc-&amp;gt;&amp;gt;&amp;#39;type&amp;#39;=&amp;#39;telemetry&amp;#39;
+AND doc#&amp;gt;&amp;#39;{metadata}&amp;#39; ? &amp;#39;day&amp;#39;
+AND doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:&amp;lt;my_new_feature&amp;gt;:add:render&amp;#39;
+ORDER BY
+telemetry_date DESC
+&lt;/code>&lt;/pre></description></item><item><title>Apps: Training Cards Resources</title><link>https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards-resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards-resources/</guid><description>
+&lt;p>This is a list of &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/training/">trainings cards&lt;/a> that you can use in your project to train users about new updates in CHT. Read the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/training/training-cards/">step by step guide&lt;/a> to deploy the training cards.&lt;/p>
+&lt;h2 id="floating-action-button">Floating Action Button&lt;/h2>
+&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>The additive actions (creating reports, places, people, etc&amp;hellip;) have moved from the bottom action bar to a Floating Action Button. Use this training to introduce the change to your users.&lt;/p>
+&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/apps/guides/training/training-cards-resources/available-trainings/floating-action-button">here&lt;/a>.&lt;/p>
+&lt;figure class="left col-10">
+&lt;img src="images/floating-action-button.png"/>
+&lt;/figure>
+&lt;br clear="all">
+&lt;h2 id="more-options-menu">More Options Menu&lt;/h2>
+&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>The Edit, Delete and Export actions have been moved to the More Options menu. Use this training to introduce the change to your users.&lt;/p>
+&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/apps/guides/training/training-cards-resources/available-trainings/more-options">here&lt;/a>.&lt;/p>
+&lt;figure class="left col-10">
+&lt;img src="images/more-options.png"/>
+&lt;/figure>
+&lt;br clear="all"></description></item></channel></rss>

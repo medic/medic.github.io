@@ -1,0 +1,927 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/</link><description>Recent content in Managing Data on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/apps/guides/data/index.xml" rel="self" type="application/rss+xml"/><item><title>Apps: Database document hydration</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/hydration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/hydration/</guid><description>
+&lt;p>Documents are connected with each other via their document &lt;code>_id&lt;/code>.
+For example:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>a contact document is connected to its parent by storing their &lt;code>_id&lt;/code> in the &lt;code>parent&lt;/code> property&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>a report document is connected to its submitter by storing their &lt;code>_id&lt;/code> in the &lt;code>contact&lt;/code> property&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/db-schema/">DB Schema&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>To optimize database storage, documents are &amp;ldquo;minified&amp;rdquo; when stored and are &amp;ldquo;hydrated&amp;rdquo; when they are used by the app.&lt;/p>
+&lt;h3 id="minification">Minification&lt;/h3>
+&lt;p>Minification means replacing a linked document&amp;rsquo;s content with an object that only contains its uuid. This is done to reduce duplication of data to save storage space on the client and server. Additionally, as we only have one copy of the data is easier to keep the information up to date.&lt;/p>
+&lt;p>Unminified object:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic_uuid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Health Center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;District&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Primary contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;phone&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;555 111 222&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;linked_docs&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sibling_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Sibling clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;supervisor_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;The supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>when minified, becomes:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic_uuid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;linked_docs&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sibling_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;supervisor_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The following properties are minified:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>parent&lt;/code> and recursively, every ancestor&lt;/li>
+&lt;li>&lt;code>contact&lt;/code>&lt;/li>
+&lt;li>&lt;code>patient&lt;/code> and &lt;code>place&lt;/code> are removed from reports. The &lt;code>place_id&lt;/code>, &lt;code>place_uuid&lt;/code>, &lt;code>patient_id&lt;/code>, or &lt;code>patient_uuid&lt;/code> fields are available in the document.&lt;/li>
+&lt;li>&lt;code>linked_docs&lt;/code> when minifying a contact (&lt;em>as of &lt;code>3.10.0&lt;/code>&lt;/em>)&lt;/li>
+&lt;/ol>
+&lt;h3 id="hydration">Hydration&lt;/h3>
+&lt;p>Hydration represents the inverse process to minification, where a stored id representing a connected document is replaced with the corresponding document&amp;rsquo;s content.&lt;/p>
+&lt;p>Minified doc:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic_uuid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;linked_docs&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sibling_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;supervisor_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>when hydrated becomes:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic_uuid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Health Center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;supervisor_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;parent_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;District&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;manager_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;parent_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Primary contact&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;phone&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;555 111 222&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;parent_id&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;linked_docs&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sibling_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Sibling clinic&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;clinic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tag2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;supervisor_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;The supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>There are two types of hydration:&lt;/p>
+&lt;ul>
+&lt;li>&lt;em>shallow&lt;/em> hydration - when the id is replaced with the document&amp;rsquo;s content&lt;/li>
+&lt;li>&lt;em>deep&lt;/em> hydration - when the id is replaced with the document&amp;rsquo;s content and, recursively, each ancestor is deeply hydrated&lt;/li>
+&lt;/ul>
+&lt;h6 id="a-hydrated-contact-has">A hydrated contact has&lt;/h6>
+&lt;ul>
+&lt;li>deeply hydrated &lt;code>parent&lt;/code> along with every ancestor&lt;/li>
+&lt;li>shallowly hydrated primary &lt;code>contact&lt;/code>&lt;/li>
+&lt;li>shallowly hydrated &lt;code>linked_docs&lt;/code> (&lt;em>as of 3.10&lt;/em>)&lt;/li>
+&lt;/ul>
+&lt;h6 id="a-hydrated-report-has">A hydrated report has&lt;/h6>
+&lt;ul>
+&lt;li>a deeply hydrated submitter &lt;code>contact&lt;/code>&lt;/li>
+&lt;li>a deeply hydrated &lt;code>patient&lt;/code>, if the report has a &lt;code>patient_id&lt;/code>/&lt;code>patient_uuid&lt;/code>&lt;/li>
+&lt;li>a deeply hydrated &lt;code>place&lt;/code>, if the report has a &lt;code>place_id&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>Apps: How to bulk load users</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/users-bulk-load/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/users-bulk-load/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>The bulk user upload feature is available in 3.16.0 and later versions of the CHT. As of CHT 3.17.0, when creating both a contact and a place, the contact will be set as the default contact of the place. User creation can be scripted using the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#post-apiv2users">CHT API&lt;/a> directly or using the &lt;a href="https://github.com/medic/cht-conf">&lt;code>cht-conf&lt;/code> tool&lt;/a>, which is detailed in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/csv-to-docs/">CSV-to-Docs guide&lt;/a>.&lt;/p>
+&lt;p>This feature can be used to load as many users as possible but works optimally with chunks of 1,000 users or less.&lt;/p>
+&lt;/div>
+&lt;p>Steps to bulk load users:&lt;/p>
+&lt;ol>
+&lt;li>Using Google Sheets, populate a spreadsheet with the users to be imported.&lt;/li>
+&lt;li>Import the new users using the Admin UI in the CHT.&lt;/li>
+&lt;li>Handle any errors that may occur during importation.&lt;/li>
+&lt;li>When done, you will have created new users, new contacts and new places, all of which are correctly associated in CouchDB with the correct UUIDs.&lt;/li>
+&lt;/ol>
+&lt;h2 id="workbook-instructions">Workbook Instructions&lt;/h2>
+&lt;p>The workbook contains a varying number of spreadsheets depending on the hierarchy in question. Users with different roles are placed in different spreadsheets as shown in the templates below. For example when creating users with chw and chw_supervisor roles, you will have &amp;ldquo;contact.chw&amp;rdquo;, &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo;, &amp;ldquo;contact.chw_supervisor&amp;rdquo; and &amp;ldquo;contact.chw_supervisor_VLOOKUP&amp;rdquo; spreadsheets. These pair per role spreadsheets contain actual data on users and parent place data respectively.&lt;/p>
+&lt;p>There is another spreadsheet, &amp;ldquo;place.type_VLOOKUP&amp;rdquo;, which is required when creating user accounts, contacts and their places. This spreadsheet defines the name and type of places in your hierarchy and should match those in the app_settings.json file. Note that you will need to create the parent place before importing the users.&lt;/p>
+&lt;p>To get started, there are three different workbook templates available that are compatible with the &lt;code>default&lt;/code> configuration of the CHT, they cater for use cases that you might encounter when creating users in bulk. You will notice some columns have an &lt;code>:excluded&lt;/code> suffix. These are columns that are ignored by the API and allow addition of autocomplete and data validation within the spreadsheet to make it easier to work with.&lt;/p>
+&lt;p>Click on any of the use cases below to make a copy of the spreadsheet for the use case in question:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1zlvF5cWnV2n1rax1bAO2hSBCIxgD0c-5tZ-yh96kwws/copy">when you want to create user accounts only&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1y6wYqRIWiC2QZA7NaWfolP_Wf9FnSahjYHlL3iDYeJ4/copy">when you want to create user accounts and their contacts&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy">when you want to create user accounts, their contacts and their places&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>We will use the second use case to create user accounts and their contacts in the example below.&lt;/p>
+&lt;h2 id="contact-spreadsheet-instructions">Contact Spreadsheet Instructions&lt;/h2>
+&lt;p>The spreadsheet interfaces with the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv1users">&lt;code>POST /api/v1/users&lt;/code> API&lt;/a> which works as though passing a JSON array of users. Rows in the spreadsheet represent a user while columns represent properties of the user.
+Each column in the spreadsheet maps to an object property understood by the API to insert the users into the database. These properties can be found in &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#post-apiv1users">the Users API documentation&lt;/a>.&lt;/p>
+&lt;p>Contact spreadsheets are named according to the user role, for example when creating users who are chws and others who are chw_supervisors, the following contact spreadsheets are populated respectively: &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_supervisor&amp;rdquo;.&lt;/p>
+&lt;p>There are three sections to the contact spreadsheet:&lt;/p>
+&lt;p>&lt;img src="users-spreadsheet.png" alt="bulk user import spreadsheet with areas labeled">&lt;/p>
+&lt;h4 id="spreadsheet-area-1">&lt;strong>Spreadsheet Area 1&lt;/strong>&lt;/h4>
+&lt;p>These three columns are where you paste the results after running an import. See step 8 in &amp;ldquo;Importing users example&amp;rdquo; &lt;a href="#importing-users-example">below&lt;/a>.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>import.status:excluded&lt;/code>: This field can have three values. Over time, they should all be &lt;code>imported&lt;/code> or &lt;code>skipped&lt;/code> as you will have processed all users on the list:
+&lt;ul>
+&lt;li>&lt;code>imported&lt;/code>- This user has already been successfully imported&lt;/li>
+&lt;li>&lt;code>skipped&lt;/code> - This user was skipped&lt;/li>
+&lt;li>&lt;code>error&lt;/code> - Contains errors that were encountered during importation. See &lt;code>import.message:excluded&lt;/code> field for more information&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>import.message:excluded&lt;/code>: The status of the last import. For example, &lt;code>Imported successfully&lt;/code> or &lt;code>Username 'mrjones' already taken&lt;/code>&lt;/li>
+&lt;li>&lt;code>import.username:excluded&lt;/code>: Use this column to ensure you&amp;rsquo;re matching the response with the correct user in the &lt;code>contact.username&lt;/code> to the right&lt;/li>
+&lt;/ol>
+&lt;h4 id="spreadsheet-area-2">&lt;strong>Spreadsheet Area 2&lt;/strong>&lt;/h4>
+&lt;p>This is where you enter your user data and contains the following columns:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>username&lt;/code>: username used to log into the application&lt;/li>
+&lt;li>&lt;code>Parent-Place:excluded&lt;/code>: existing parent place of the new user place. A drop-down populated from contact vlookup spreadsheet&lt;/li>
+&lt;li>&lt;code>User-Place-Type:excluded&lt;/code>: type of user place to be created. A drop-down populated from place vlookup spreadsheet&lt;/li>
+&lt;li>&lt;code>contact.first_name&lt;/code>: first name of the new user&lt;/li>
+&lt;li>&lt;code>contact.last_name&lt;/code>: last name of the new user&lt;/li>
+&lt;li>&lt;code>contact.sex&lt;/code>: sex of the new user&lt;/li>
+&lt;li>&lt;code>contact.phone&lt;/code>: phone number of the new user&lt;/li>
+&lt;li>&lt;code>email&lt;/code>: email of the new user (optional field)&lt;/li>
+&lt;li>&lt;code>contact.meta.created_by&lt;/code>: this column contains metadata on the person who created the user (optional field)&lt;/li>
+&lt;li>&lt;code>token_login&lt;/code>: whether the user should be sent login credentials via SMS as a link&lt;/li>
+&lt;li>&lt;code>contact.type&lt;/code> or &lt;code>place.type&lt;/code>: when creating a user, is logged as contact. In the case of the &lt;a href="https://github.com/medic/cht-core/tree/master/config/default/">default config&lt;/a>, possible values are district_hospital, health_center, clinic, and person&lt;/li>
+&lt;li>&lt;code>contact.contact_type&lt;/code> or &lt;code>place.contact_type&lt;/code>: defines the type of contact being created depending on the deployment&amp;rsquo;s configuration. It should match one of the contact types defined in the config&amp;rsquo;s contact_types field&lt;/li>
+&lt;li>&lt;code>type&lt;/code>: role of the contact&lt;/li>
+&lt;/ol>
+&lt;h4 id="spreadsheet-area-3">&lt;strong>Spreadsheet Area 3&lt;/strong>&lt;/h4>
+&lt;p>Columns in this area are automatically populated by the spreadsheet logic.
+While this is needed to create a user, it is intentionally not editable and you will see this error when you try to edit data:&lt;/p>
+&lt;p>&lt;img src="users-spreadsheet-warning.png" alt="bulk user import spreadsheet warning">&lt;/p>
+&lt;p>However, for the mapping to occur as expected, you may edit the fields &lt;code>contact.role&lt;/code>, &lt;code>contact.contact_type&lt;/code>, &lt;code>place.contact_type&lt;/code> and &lt;code>type&lt;/code> to match your deployment&amp;rsquo;s configuration.&lt;/p>
+&lt;p>Do not edit column headers in row 1. They are needed by the CHT to identify which data is in it. Changing the names will result in errors or missing data in the CHT.&lt;/p>
+&lt;h3 id="passwords">Passwords&lt;/h3>
+&lt;p>Passwords are automatically generated by the spreadsheet. Use caution when editing rows marked as &lt;code>imported&lt;/code> in the Import.status:excluded column.
+For example, if a user was imported two weeks ago and the token_login is set to &lt;code>TRUE&lt;/code> and then back to &lt;code>FALSE&lt;/code>,
+the password will be regenerated and thus be different from the one the user is using to login.
+If a change is made, you can use Google Sheets history (&amp;ldquo;File&amp;rdquo; -&amp;gt; &amp;ldquo;Version History&amp;rdquo;) to retrieve the old value.&lt;/p>
+&lt;h2 id="importing-users-example">Importing users example&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Create a copy of &lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy">this spreadsheet&lt;/a>.
+Give it a descriptive name and note its location in Google Drive. You will always come back to your copy of this Sheet whenever you want to add a set of users.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Copy the &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo; spreadsheets so that you have a set of the pair per level of your hierarchy.
+If your hierarchy was &amp;ldquo;Central -&amp;gt; Supervisor -&amp;gt; CHW&amp;rdquo;, you would have 3 pairs (6 spreadsheets total). Be sure each spreadsheet is named accurately.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Open the spreadsheet and populate your list of parent places that you&amp;rsquo;d like to use for your users.
+In this example the &amp;ldquo;Penda Ouedraogo&amp;rdquo; place has gotten an updated UUID starting with &amp;ldquo;bcc&amp;rdquo;
+&lt;img src="importing-users-populate-parents-places.png" alt="populate your list of parent places">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the users you would like to create
+&lt;img src="importing-users-entering-data.png" alt="entering data into the spreadsheet">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Export spreadsheet into CSV
+&lt;img src="importing-users-export-csv.png" alt="export spreadsheet into CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Access the &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/admin/">Admin Console&lt;/a> of your instance, go to &amp;ldquo;Users&amp;rdquo;, click &amp;ldquo;Import from file&amp;rdquo; and select your CSV file you just exported
+&lt;img src="importing-users-import-csv.png" alt="import CSV into CHT">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Be patient during import (testing showed ~0.4 seconds per record up to 500 records)
+&lt;img src="importing-users-import-progress.png" alt="progress feedback during CSV import">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Download the status file
+&lt;img src="importing-users-download-status-file.png" alt="download the status file">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Transfer errors back into spreadsheet. Make sure you copy all three columns A, B and C.
+The usernames in column C must match those in column D of the original spreadsheet.
+&lt;img src="importing-users-transfer-errors.png" alt="transfers errors back into spreadsheet">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Fix the errors and export to CSV
+&lt;img src="importing-users-fix-errors.png" alt="fix errors and export to CSV">
+&lt;br />
+&lt;br />
+&lt;img src="importing-users-export-csv.png" alt="export spreadsheet into CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Import the fixed CSV, noting already import rows are skipped
+&lt;img src="importing-users-import-fixed-csv.png" alt="import the fixed CSV">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Deliver credentials to phone or to CHW, using care to not overshare the login and password&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="adding-new-places">Adding new places&lt;/h2>
+&lt;p>Over time, new places will be added to different levels of the hierarchy.
+You will need to manually add these new places to the spreadsheet so that you can add users to the new places.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Navigate in the CHT to the new site. In this case, it is &amp;ldquo;Site Dieco&amp;rdquo; that has been added (item 1). Copy the 36 character UUID from the URL (item 2).
+&lt;img src="adding-places-cht-new-site.png" alt="navigate in the CHT to the new site">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Open your existing Google Spreadsheet with your users. Find the hierarchy level you added your new site.
+In this case &amp;ldquo;Site Dieco&amp;rdquo; is a CHW place, so we&amp;rsquo;ll go to the &amp;ldquo;contact.c62_chw_VLOOKUP&amp;rdquo; spreadsheet.
+Add some new rows at the bottom (item 1), enter the new place name in column A (item 2) and paste the UUID in column B (item 3)
+&lt;img src="adding-places-existing-spreadsheet.png" alt="open your existing spreadsheet">&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="trouble-shooting">Trouble shooting&lt;/h2>
+&lt;h3 id="wrong-type-this-is-not-a-person">&amp;ldquo;Wrong type, this is not a person.&amp;rdquo;&lt;/h3>
+&lt;p>If you have miss-matched contact types, you will get an error upon import:&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Wrong type, this is not a person.&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;p>As of CHT 3.7.0, you&amp;rsquo;re &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/#app_settingsjson-contact_types">allowed to declare different contact types&lt;/a> in your &lt;code>app_settings.json&lt;/code>. If you have populated the &lt;code>.contact_types[]&lt;/code> property in your JSON, you will need to update the automatic value of the &lt;code>contact.contact_type&lt;/code> column. The default value is:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87;font-weight:bold">if&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>NOT&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>ISBLANK&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>D2&lt;span style="color:#ce5c00;font-weight:bold">))&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Often times numbers are used in &lt;code>app_settings.json&lt;/code> to declare &lt;code>contact_types&lt;/code> matching numerical names from &lt;code>place_hierarchy_types&lt;/code>. It might look like this:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;contact_types&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;c52_supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c52_supervisor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c52_supervisor.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c52_supervisor.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c52_supervisor.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;icon-manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:c52_supervisor:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:c52_supervisor:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;c62_chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c62_chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c62_chw.plural&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c62_chw.new&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;contact.type.c62_chw.edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parents&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;c60_chw_site&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;icon-chw&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:c62_chw:create&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;form:contact:c62_chw:edit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this case, you would need to change the value of the &lt;code>contact.contact_type&lt;/code> column to match your new types. Based on the &lt;code>contact.types&lt;/code> above, a CHW would be declared like this now:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87;font-weight:bold">if&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>NOT&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>ISBLANK&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>D2&lt;span style="color:#ce5c00;font-weight:bold">))&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;c62_chw&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be sure you copy this updated formula for all rows in the &lt;code>contact.contact_type&lt;/code> column.&lt;/p>
+&lt;h3 id="access-denied">Access denied&lt;/h3>
+&lt;p>If a user you successfully created can not log in because they see an error:&lt;/p>
+&lt;p>&lt;img src="access.denied.png" alt="Access denied - You have insufficient privileges to view this page. Talk to an administrator to increase your privileges">&lt;/p>
+&lt;p>A possible cause of this is you have a bad role defined in your spreadsheet that doesn&amp;rsquo;t match your configuration. For example, the the default role should be &lt;code>chw_supervisor&lt;/code>, but here we see garbage characters were accidentally added. While the user was created without errors, they&amp;rsquo;ll see the above error when they try to log in:&lt;/p>
+&lt;p>&lt;img src="bad.type.png" alt="Bad type declared in spreadsheet causes the user to have no role">&lt;/p>
+&lt;p>You may manually fix any users you imported to have the correct role. To ensure future users have valid roles to log in with, check the &lt;code>/admin/#/authorization/roles&lt;/code> area on your CHT instance for valid roles:&lt;/p>
+&lt;p>&lt;img src="valid.roles.png" alt="CHT admin showing a list of valid roles in the &amp;ldquo;Role&amp;rdquo; column on the left">&lt;/p></description></item><item><title>Apps: CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/impact-metrics/</guid><description>
+&lt;p>Impact monitoring is an essential part of both the Community Health Toolkit and Medic&amp;rsquo;s processes and ethos. We are committed to harnessing data to:&lt;/p>
+&lt;ol>
+&lt;li>Support our partners in data-driven operational and strategic decision making&lt;/li>
+&lt;li>Inform our product roadmap and organizational strategy, and&lt;/li>
+&lt;li>Participate in overarching policy discussions around community health.&lt;/li>
+&lt;/ol>
+&lt;p>As a member of the CHT community and potential CHT implementer, we encourage you to learn more about the recommended impact metrics for monitoring and evaluation across priority use cases by reviewing the metrics listed below.&lt;/p>
+&lt;h2 id="impact-metrics">Impact Metrics&lt;/h2>
+&lt;p>The following list of Impact Metrics is comprehensive; it includes all of the Impact Metric that Medic and one or more additional CHT implementers have decided to share with the general public across workflows:&lt;/p>
+&lt;p>&lt;em>Caring Activities&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of caring activities logged on the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Engagement&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of frontline health workers supported by the CHT (total, per month)&lt;/li>
+&lt;li>Total number of frontline health workers trained to use the CHT for a specific use case (ie. antenatal care) (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Households&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of households registered in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of new households registered in the CHT per month&lt;/li>
+&lt;li>Total number of registered households with one or more visits by a health worker logged in the CHT per month&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Antenatal Care&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of pregnancy registrations logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of pregnancy registrations logged in the first trimester in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of confirmed deliveries logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of confirmed deliveries occurring in a health facility logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Postnatal Care&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of postnatal visits logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of women receiving the first postnatal care visit within 48h of delivery logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>iCCM&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of assessments conducted on children under five (U5) in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of resulting diagnoses from U5 child assessments in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of resulting referrals from U5 child assessments in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of assessments conducted where the U5 child was presenting symptoms in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child assessments conducted within 72h of symptom onset logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child assessments conducted within 24h of symptom onset logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of patients receiving correct treatment at home from a healthcare worker, when treatment is recommended, logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of patient referral follow-up visits with a health facility visit confirmed logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Family Planning&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of women counseled by healthcare workers on family planning logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of women newly using family planning following a counseling session with a healthcare worker logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Malnutrition&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of malnutrition screenings completed for U5 children logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child malnutrition cases identified via malnutrition screening logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 children with malnutrition receiving treatment and assessed to have recovered via a follow-up malnutrition screening logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>Immunization&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of immunization screenings for U5 children logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 children receiving vaccinations logged in the CHT (total, per month)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>COVID-19&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Total number of community event-based surveillance signals for COVID-19 reported by health workers via the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;li>Total number of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;li>Total number of contacts of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;/ul></description></item><item><title>Apps: Detecting and fixing production data on training instances</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/training-instance/</guid><description>
+&lt;p>After &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/training/onboarding/">onboarding CHWs&lt;/a>, sometimes data ends up on the wrong CHT instance. There are some passive and active actions you can take to help deal with this situation.&lt;/p>
+&lt;h2 id="monitoring">Monitoring&lt;/h2>
+&lt;p>Monitoring is a good way to see if CHWs are sending forms to the wrong CHT server. By catching such a problem early, it may be easy to fix manually which avoids more laborious fixes on the command line for admins.&lt;/p>
+&lt;h3 id="manual-device-checks">Manual device checks&lt;/h3>
+&lt;p>Supervisors can actively monitor CHWs as they register their first household. If each CHW is given a deadline to do this, the Supervisor can follow up promptly with CHWs who have not met the deadline.&lt;/p>
+&lt;h3 id="centralized-database-checks">Centralized database checks&lt;/h3>
+&lt;p>From an administrative perspective, passive monitoring can be done by querying the Postgres instance that &lt;a href="https://github.com/medic/cht-couch2pg/">couch2pg&lt;/a> is populating. If &lt;code>2020-09-14&lt;/code> was the date to stop use the training instance, this SQL query would show CHWs using the wrong instance after &lt;code>2020-09-14&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>with forms as &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> doc &lt;span style="color:#8f5902;font-style:italic">#&amp;gt;&amp;gt; &amp;#39;{fields,inputs,user,contact_id}&amp;#39; as chw_id,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> count&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>*&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span> as n_forms
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> from
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> couchdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> where to_timestamp&lt;span style="color:#ce5c00;font-weight:bold">((&lt;/span>doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;reported_date&amp;#39;&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>::bigint / 1000&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span> &amp;gt; &lt;span style="color:#4e9a06">&amp;#39;2020-09-14 00:00:00&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> group by &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>, chw_names as &lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;_id&amp;#39;&lt;/span> as chw_id,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;name&amp;#39;&lt;/span> as chw_name
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> from couchdb
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> where doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;role&amp;#39;&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;chw&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> and doc -&amp;gt;&amp;gt; &lt;span style="color:#4e9a06">&amp;#39;name&amp;#39;&lt;/span> not like &lt;span style="color:#4e9a06">&amp;#39;ASC%&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">select&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> n.chw_name,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> f.n_forms
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>from
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>forms f
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>left join
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>chw_names n
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>using&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>chw_id&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>order by n_forms desc&lt;span style="color:#000;font-weight:bold">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>A limitation of this technique is that CHWs who have not synchronized their device will not show up. In this case, a supervisor proactively checking per above is a better failsafe.&lt;/p>
+&lt;h3 id="cht-based-supervisor-tasks">CHT based supervisor tasks&lt;/h3>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/apps/features/supervision/#supervisor-tasks">Tasks for supervisors&lt;/a> can also be used for the CHWs that report to them. This can be used to trigger a task when a CHW hasn&amp;rsquo;t submitted a task within a given period on production.&lt;/p>
+&lt;h2 id="remediation">Remediation&lt;/h2>
+&lt;p>In the case that production data has been entered into a training instance, care must be used to ensure data is not lost or overwritten. These steps assume you&amp;rsquo;re on a Linux command line and have jq, curl and cat installed. The task is to carefully download all docs created after a certain date on a training, clean up extra docs not needed and then upload them to a production instance:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Set the aliases and environment variables:&lt;/p>
+&lt;pre tabindex="0">&lt;code>alias ts=&amp;#39;date -u +&amp;#34;%Y-%m-%dT%H:%M:%SZ&amp;#34;&amp;#39;
+alias curlj=&amp;#34;curl -H &amp;#39;content-type:application/json&amp;#39;&amp;#34;
+alias curljz=&amp;#34;curl --compressed -H &amp;#39;content-type:application/json&amp;#39;&amp;#34;
+export COUCH_URL=https://admin:pass@dev.example.org
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Ensure affected CHWs have synced their devices to the development instance one last time. If they have been offline for some time and gathered production data, signing out or deleting the app before synchronizing may result in lost data.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Find the date when CHWs should have started using production. Convert this to epoch with milliseconds. For example if the time was &amp;ldquo;Tue, 01 Dec 2020 09:36:50 GMT&amp;rdquo; then the epoch would be &amp;ldquo;1606815410000&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Using Fauxton, create a view to show all documents created after this date:&lt;/p>
+&lt;pre tabindex="0">&lt;code>function (doc) {
+if(doc.reported_date &amp;gt; 1606815410000) {
+emit(doc._id, 1);
+}
+}
+&lt;/code>&lt;/pre>&lt;p>&lt;img src="create.view.png" alt="Creating a view in Fauxton">&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Download the UUIDs of the documents in the view, and convert it to raw format (uuids-2.txt):&lt;/p>
+&lt;pre tabindex="0">&lt;code>curl &amp;#34;$COUCH_URL/medic/_design/temp/_view/temp1&amp;#34; &amp;gt; uuids-1.txt
+cat uuids-1.txt | jq -r &amp;#39;.rows[].id&amp;#39; &amp;gt; uuids-2.txt
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Download all the matching docs to docs.json:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat uuids-2.txt | jq --raw-input --slurp &amp;#39;{keys: split(&amp;#34;\n&amp;#34;) }&amp;#39; | curljz -d@- &amp;#34;$COUCH_URL/medic/_all_docs?include_docs=true&amp;#34; | jq &amp;#39;{docs: [ .rows[] | select(.doc).doc ]}&amp;#39; &amp;gt; docs.json
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Change the fields by deleting &amp;ldquo;_rev&amp;rdquo; field and also &amp;ldquo;_attachments&amp;rdquo; if uploading in a different instance. This can be carefully done by manually editing the JSON locally before uploading.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Change the COUCH_URL to be your production instance by setting another export:&lt;/p>
+&lt;pre tabindex="0">&lt;code>export COUCH_URL=http://admin:pass@app.example.org
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Upload the docs, for example, the following command adds a field (updated=true) to the docs and uploads them:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat docs.json | jq &amp;#39;{&amp;#34;docs&amp;#34;:[ .docs[] | .updated = true ]}&amp;#39; | curljz -d@- $COUCH_URL/medic/_bulk_docs &amp;gt; results.json
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;/ol></description></item><item><title>Apps: Revalidate invalid reports</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/invalid-reports/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/invalid-reports/</guid><description>
+&lt;p>You may encounter a dreaded case when reports coming in to a Medic Webapp instance have a red indicator instead of the green indicator.&lt;/p>
+&lt;p>&lt;img src="invalid_report.png" alt="Invalid Reports">&lt;/p>
+&lt;p>This may be caused by:&lt;/p>
+&lt;ul>
+&lt;li>Missing forms in the &lt;code>app_settings&lt;/code> config.&lt;/li>
+&lt;li>Missing or incorrect fields in the input form. e.g Missing patient ID, or Patient ID with letters&lt;/li>
+&lt;li>Extra fields in the input form. This happens when you don&amp;rsquo;t configure for some fields in the app_settings.json of the webapp&lt;/li>
+&lt;li>Configuring some forms in the wrong section of the app_settings i.e &lt;code>registrations&lt;/code> and &lt;code>patient_reports&lt;/code>. Forms that don&amp;rsquo;t have a patient_id field because it is generated afterwards, e.g ANCR, IMMR, go to the &lt;code>registrations&lt;/code> section, while form that have a patient_id field e.g ANCP, ANCV, IMMV; go to the &lt;code>patient_reports&lt;/code> section&lt;/li>
+&lt;/ul>
+&lt;h2 id="how-to-solve">How to solve&lt;/h2>
+&lt;p>To revalidate an invalid report, we need to clear the errors field on the doc (set it to []). Updating this field from Futon will not work and will result in an endless update process. The recommended way to do it is to download the doc, update it and then upload it. This will also ensure propagation and replication in couchdb.&lt;/p>
+&lt;p>To download a doc, use:&lt;/p>
+&lt;pre tabindex="0">&lt;code>curl &amp;#39;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt;&amp;#39; &amp;gt; filename.json
+&lt;/code>&lt;/pre>&lt;p>&lt;code>filename.json&lt;/code> is the local file in your computer you have stored the doc json&lt;/p>
+&lt;p>Update &lt;code>filename.json&lt;/code>: Set &amp;ldquo;errors&amp;rdquo; to [] and remove &amp;ldquo;accept_patient_reports&amp;rdquo; transition so that sentinel can revalidate the report.&lt;/p>
+&lt;p>Upload &lt;code>filename.json&lt;/code> with:&lt;/p>
+&lt;pre tabindex="0">&lt;code>curl -X PUT hhttps://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt; -d @filename.json --header &amp;#34;Content-Type: application/json&amp;#34;
+&lt;/code>&lt;/pre></description></item><item><title>Apps: CSV to Docs</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/csv-to-docs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/csv-to-docs/</guid><description>
+&lt;h2 id="seeding-data-with-cht-conf">Seeding data with cht-conf&lt;/h2>
+&lt;p>Users, contacts, and report data can be specified in comma-separated value (CSV) files, then converted to JavaScript Object Notation (JSON) files and uploaded into your instance using &lt;a href="https://github.com/medic/cht-conf">cht-conf&lt;/a>. This documentation will cover the CSV notation used, fetching CSV files from Google Sheets, converting the CSV files into JSON docs, and then uploading the data from the JSON files to your instance.&lt;/p>
+&lt;h3 id="converting-csvs">Converting CSVs&lt;/h3>
+&lt;p>Running &lt;code>cht-conf&lt;/code> with the &lt;code>csv-to-docs&lt;/code> action converts CSV files from the &lt;code>csv&lt;/code> folder into JSON docs to be uploaded to your instance. The JSON files are stored in the &lt;code>json_docs&lt;/code> folder. Instructions for creating the CSV files are in sections below.&lt;/p>
+&lt;h3 id="uploading-csvs">Uploading CSVs&lt;/h3>
+&lt;p>Running &lt;code>cht-conf&lt;/code> with the &lt;code>upload-docs&lt;/code> action will upload the JSON docs that were generated from the CSV files to your instance. For example, running &lt;code>cht --local upload-docs&lt;/code> will upload the converted docs into your local instance. The target location &lt;code>--local&lt;/code> can be replaced with an instance or URL. See &lt;a href="https://github.com/medic/cht-conf">cht-conf&lt;/a> for detailed instructions.&lt;/p>
+&lt;h3 id="creating-csv-files-for-contacts-reports">Creating CSV files for Contacts, Reports&lt;/h3>
+&lt;p>A separate CSV file is needed for each type of place, person, or report in your project&amp;rsquo;s local &lt;code>csv&lt;/code> folder. The name of the file determines the type of doc created for rows contained in the file. The possible types are: &lt;code>report&lt;/code>, &lt;code>person&lt;/code>, and &lt;code>place&lt;/code>. Each of these has a further specifier provided in the filename:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>place.{place_type}.csv&lt;/code>: where &lt;code>{place_type}&lt;/code> is the type of place specified in the file. By default, the place types are one of &lt;code>clinic&lt;/code>, &lt;code>health_center&lt;/code>, or &lt;code>district_hospital&lt;/code>. As of 3.7 of the &lt;a href="https://github.com/medic/cht-core">Core Framework&lt;/a>, the number of place types and their names can be configured — the &lt;code>{place_type}&lt;/code> should match with the hierarchy names used.&lt;/li>
+&lt;li>&lt;code>person.{parent_place_type}.csv&lt;/code>: where &lt;code>{parent_place_type}&lt;/code> is the type of place to which the people in the file will belong.&lt;/li>
+&lt;li>&lt;code>report.{form_id}.csv&lt;/code>: where &lt;code>{form_id}&lt;/code> is the form ID for all the reports in the file. You will need one file per form ID&lt;/li>
+&lt;/ul>
+&lt;p>Here are some examples:&lt;/p>
+&lt;ul>
+&lt;li>File named &lt;code>place.district_hospital.csv&lt;/code> adds the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;district_hospital&amp;quot;&lt;/code>&lt;/li>
+&lt;li>File named &lt;code>person.clinic.csv&lt;/code> add the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;person&amp;quot;&lt;/code>&lt;/li>
+&lt;li>File named &lt;code>report.immunization_visit.csv&lt;/code> add the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;report&amp;quot;, &amp;quot;form&amp;quot;:&amp;quot;immunization_visit&amp;quot;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>In each of these files a header row is used to specify the JSON field names, and each subsequent row specifies the corresponding values for a doc. A &lt;code>_id&lt;/code> field is automatically generated with a universally unique identifier.&lt;/p>
+&lt;p>Here is an example of a &lt;code>csv/person.clinic.csv&lt;/code> file for people belonging to clinics:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">name,sex,date_of_birth
+Adriana Akiyama,female,1985-12-31
+Becky Backlund,female,1987-10-17
+Carson Crane,male,2015-01-23
+&lt;/code>&lt;/pre>&lt;p>Here is the table representation of the CSV:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>name&lt;/th>
+&lt;th>sex&lt;/th>
+&lt;th>date_of_birth&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Adriana Akiyama&lt;/td>
+&lt;td>female&lt;/td>
+&lt;td>1985-12-31&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Becky Backlund&lt;/td>
+&lt;td>female&lt;/td>
+&lt;td>1987-10-17&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Carson Crane&lt;/td>
+&lt;td>male&lt;/td>
+&lt;td>2015-01-23&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Converting that CSV file to JSON docs with the &lt;code>csv-to-docs&lt;/code> action would generate three files, one for each person. Here is one of the corresponding JSON files, &lt;code>json_docs/dbfbc0f0-117a-59ec-9542-3313fb10ef25.doc.json&lt;/code>, which was created from the CSV data above:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Adriana Akiyama&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;sex&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;female&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;date_of_birth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1985-12-31&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dbfbc0f0-117a-59ec-9542-3313fb10ef25&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="special-notations">Special notations&lt;/h3>
+&lt;h4 id="specifying-property-type">Specifying property type&lt;/h4>
+&lt;p>By default, values are parsed as strings. To parse a CSV column as a different JSON type, append the JSON type name to the column definition, e.g.&lt;/p>
+&lt;pre>&lt;code>column_one,column_two:bool,column_three:int,column_four:float,column_five:date,column_six:timestamp
+some string,true,1,2.3,2017-12-31,1513255007072
+&lt;/code>&lt;/pre>
+&lt;p>This would create a structure such as:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;09efb53f-9cd8-524c-9dfd-f62c242f1817&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_one&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some string&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_two&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_three&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_four&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2.3&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_five&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;2017-12-31T00:00:00.000Z&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;column_six&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1513255007072&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="excluding-column">Excluding column&lt;/h5>
+&lt;p>A special column type, &lt;code>excluded&lt;/code>, is used for excluding a column from the final JSON data:&lt;/p>
+&lt;pre>&lt;code>my_column_that_will_not_be_a_property:excluded
+&lt;/code>&lt;/pre>
+&lt;p>This can be useful if using a column for doc references.&lt;/p>
+&lt;h4 id="available-types">Available types&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>outcome&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>date&lt;/td>
+&lt;td>Creates a date using Date() in javascript&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-date&lt;/td>
+&lt;td>Creates a date with the addition of number days to the current date. A negative number results in a past date.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>timestamp&lt;/td>
+&lt;td>Sets the string passed in as a timestamp number. If the timestamp in the csv is in milliseconds that will be used. If a date is passed it will be parsed and the milliseconds returned. EX: 04 Dec 1995 00:12:00 GMT becomes 818035920000&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-timestamp&lt;/td>
+&lt;td>Creates a timestamp that is offset by milliseconds against the current(NOW) timestamp. A negative number results in a past timestamp&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>int&lt;/td>
+&lt;td>Parses the value as an int using Number.parseInt()&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>bool&lt;/td>
+&lt;td>Sets boolean value based on string passed, either &lt;code>&amp;quot;true&amp;quot;&lt;/code> or &lt;code>&amp;quot;false&amp;quot;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>Sets the value as the string being interpreted. Can be omitted if values are only strings.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>float&lt;/td>
+&lt;td>Sets value using Number.parseFloat()&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="including-another-doc">Including another doc&lt;/h3>
+&lt;p>Often times database documents need to include or refer to other documents in the database. This can be achieved with queries across CSV files, which is done by specifying a query in the column header. The query specifies the doc type (&lt;code>person&lt;/code> or &lt;code>place&lt;/code>) and matching condition.&lt;/p>
+&lt;p>For instance, to include the parent district&amp;rsquo;s doc in a health center&amp;rsquo;s doc, the &lt;code>parent:place WHERE reference_id=COL_VAL&lt;/code> column header is used. The &lt;code>COL_VAL&lt;/code> is a special notation for that column&amp;rsquo;s value for the row, and it will be used to match against the &lt;code>reference_id&lt;/code> field in all other places. Given these example CSVs, you can see the corresponding JSON structure:&lt;/p>
+&lt;p>&lt;strong>&lt;code>place.district.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>&lt;code>place.health_center.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent:place WHERE reference_id=COL_VAL&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_2&lt;/td>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_3&lt;/td>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>&lt;code>480d0cd0-c021-5d55-8c63-d86576d592fc.doc.json&lt;/code>&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;D2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;notes&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;f223f240-5d6a-5a7a-91d4-46d3c59de73e&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HC7&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;notes&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;480d0cd0-c021-5d55-8c63-d86576d592fc&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="including-value-from-another-doc">Including value from another doc&lt;/h5>
+&lt;p>Similar to including another doc, it is also possible to get the value of a specific field in another doc. For instance, if &lt;code>parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/code> were used in the example above, the &lt;code>parent&lt;/code> field&amp;rsquo;s value would have been set to the &lt;code>_id&lt;/code> of the refered to doc instead of including the whole doc. Note that &lt;code>_id&lt;/code> is a generated value included in all generated docs.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_2&lt;/td>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_3&lt;/td>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The resulting doc would be as follows, with the &lt;code>_id&lt;/code> from &lt;code>district_1&lt;/code> as the &lt;code>parent&lt;/code> value:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HC3&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;notes&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="link-to-a-parent-document-already-existing-in-the-database">Link to a parent document already existing in the database&lt;/h5>
+&lt;p>You may wish to link the new record to a parent document that already exists in the database that was created in the past.
+Get the UUID of the existing parent document and place it in the column named &lt;code>parent._id&lt;/code>. Get the rest of the the parent UUIDs in the hierarchy lineage and track them in separate columns. It is important to track all levels of the hierarchy as certain app features (e.g Tasks) in the configuration could be directly referencing a UUID deeper in the hierrarchy.&lt;/p>
+&lt;p>For example, a parent document below can be linked as shown in the table&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;66142fef-c4b4-4578-94e2-3d7f1a304ef7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent._id&lt;/th>
+&lt;th>parent.parent._id&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>0c31056a-3a80-54dd-b136-46145d451a66&lt;/td>
+&lt;td>66142fef-c4b4-4578-94e2-3d7f1a304ef7&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The resulting doc would be as follows:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;66142fef-c4b4-4578-94e2-3d7f1a304ef7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="creating-csv-files-for-users">Creating CSV files for users&lt;/h3>
+&lt;p>To create user accounts from CSV files, a &lt;code>users.csv&lt;/code> file will be needed in the &lt;code>csv&lt;/code> folder. The &lt;code>users.csv&lt;/code> file requires columns for &lt;code>username&lt;/code> and &lt;code>password&lt;/code>. Additional columns can be used for any additional fields needed on the user&amp;rsquo;s doc, for example &lt;code>roles&lt;/code>, &lt;code>phone&lt;/code>. Running the &lt;code>csv-to-docs&lt;/code> &lt;code>upload-docs&lt;/code> &lt;code>create-users&lt;/code> actions in that order will generate the necessary JSON docs with a &lt;code>users.csv&lt;/code> file in your working directory, and then create the people, places, and users.&lt;/p>
+&lt;p>The following sections describe the different ways to associate the new users to contacts.&lt;/p>
+&lt;h4 id="creating-new-users-with-existing-contacts">Creating new users with existing contacts&lt;/h4>
+&lt;p>When creating users that are associated to existing contacts, &lt;code>contact&lt;/code> and &lt;code>place&lt;/code> columns should be created. Each row should have the UUID of an existing person for &lt;code>contact&lt;/code>, and an existing place for &lt;code>place&lt;/code>.&lt;/p>
+&lt;h3 id="creating-new-users-with-new-contacts">Creating new users with new contacts&lt;/h3>
+&lt;p>To create new contacts for each new user provide values for &lt;code>contact.name&lt;/code>, &lt;code>place.name&lt;/code>, and &lt;code>place.parent&lt;/code> (can be existing place), as seen in this example CSV:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">username,password,roles,name,phone,contact.name,place.c_prop,place.type,place.name,place.parent
+alice,Secret_1,district-admin,Alice Example,+123456789,Alice,p_val_a,health_center,alice area,district_uuid
+bob,Secret_1,district-admin,bob Example,+123456789,bob,p_val_a,health_center,bob area,disctrict_uuid
+&lt;/code>&lt;/pre>&lt;p>The &lt;code>username&lt;/code>, &lt;code>password&lt;/code>, &lt;code>contact.name&lt;/code>, &lt;code>place.type&lt;/code>, &lt;code>place.name&lt;/code> columns are required to have functional users with new places.&lt;/p>
+&lt;h3 id="creating-new-users-linked-to-contacts-in-csv-files">Creating new users linked to contacts in CSV files&lt;/h3>
+&lt;p>To associate the new users to contacts that will also be created with the &lt;code>csv-to-docs&lt;/code> action, use reference queries to the contacts.
+For instance, the column header for the person would be &lt;code>contact:person WHERE reference_id=COL_VAL&lt;/code>, and for the place would be &lt;code>place:GET _id OF place WHERE reference_id=COL_VAL&lt;/code>.&lt;/p>
+&lt;p>Here is a example of how the three CSV files need to be configured to setup a user linked to existing place and contact.&lt;/p>
+&lt;p>&lt;strong>&lt;code>csv/place.health_center.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">reference_id:excluded,parent:place WHERE reference_id=COL_VAL,is_name_generated,name,reported_date:timestamp
+health_center_1,district_1,FALSE,HC1,1544031155715
+&lt;/code>&lt;/pre>&lt;p>Generated JSON doc for the health center:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;District1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;notes&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;FALSE&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>&lt;code>csv/person.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">reference_id:excluded,parent:place WHERE reference_id=COL_VAL,name,phone,sex,role,reported_date,patient_id
+p_hc1,health_center_1,Bob Johnson 1,+16143291527,male,manager,1552494835669,60951
+p_hc2,health_center_1,Bob Johnson 2,+16143291528,male,manager,1552494835669,60951
+&lt;/code>&lt;/pre>&lt;p>Generated JSON doc for the person:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;person&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parent&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;false&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;District1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;notes&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;FALSE&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1544031155715&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Bob Johnson 1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;phone&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;+16143291527&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;sex&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;male&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;manager&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1552494835669&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;patient_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;60951&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>&lt;code>csv/users.csv&lt;/code>&lt;/strong>:&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">username,password,roles,phone,contact:person WHERE reference_id=COL_VAL,place:GET _id OF place WHERE reference_id=COL_VAL
+ac1,Secret_1,district_admin:red1,+123456789,p_hc1,health_center_1
+ac2,Secret_1,district_admin:supervisor,+123456789,p_hc2,health_center_1
+ac3,Secret_1,district_admin,+123456789,p_hc3,health_center_1
+ac4,Secret_1,district_admin,+123456789,p_hc4,health_center_1
+&lt;/code>&lt;/pre>&lt;p>This will generate the &lt;code>users.csv&lt;/code> file in the working directory which is used by the &lt;code>create-users&lt;/code> action. The contact and place fields should be resolved to the actual UUIDs.&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">p_hc1&amp;#34;username&amp;#34;,&amp;#34;password&amp;#34;,&amp;#34;roles&amp;#34;,&amp;#34;contact&amp;#34;,&amp;#34;phone&amp;#34;,&amp;#34;place&amp;#34;
+&amp;#34;ac1&amp;#34;,&amp;#34;Secret_1&amp;#34;,&amp;#34;district_admin:red1&amp;#34;,&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;,&amp;#34;+123456789&amp;#34;,&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;
+&amp;#34;ac2&amp;#34;,&amp;#34;Secret_1&amp;#34;,&amp;#34;district_admin:supervisor&amp;#34;,&amp;#34;b7d0dbd5-beeb-52a8-8e4c-513d0baece8e&amp;#34;,&amp;#34;+123456789&amp;#34;,&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;
+&lt;/code>&lt;/pre>&lt;h3 id="using-csv-files-on-google-drive">Using CSV files on Google Drive&lt;/h3>
+&lt;p>Individual Google Sheets can be used for each CSV file, which can be exported manually to CSV file format, or linked to your project to be downloaded by cht-conf.&lt;/p>
+&lt;p>To fetch the files from Google Drive run the &lt;code>fetch-csvs-from-google-drive&lt;/code> action in cht-conf. This will download the CSV files specified in the &lt;code>csvs-on-google-drive.json&lt;/code> file, and place them into the &lt;code>csv&lt;/code> folder.&lt;/p>
+&lt;h4 id="linking-to-google-drive">Linking to Google Drive&lt;/h4>
+&lt;p>The file &lt;code>csvs-on-google-drive.json&lt;/code> in your project&amp;rsquo;s home directory will consist of a key value pair for each CSV file. The keys must be the filename where the CSV will be stored locally — see the CSV &lt;a href="#creating-csv-files-for-contacts-reports">file documentation above&lt;/a> for the notation. The value of each key must be the ID of the corresponding file in Google Drive — the ID can be obtained from the URL eg &lt;code>https://docs.google.com/spreadsheets/d/{FILE_ID}/edit&lt;/code>.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;person.clinic.csv&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;google_drive_ID&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="google-drive-authentication">Google Drive authentication&lt;/h3>
+&lt;p>Cht-conf leverages Google authentication to access Google Drive. You will need to create a client_secrets file named &lt;code>.gdrive.secrets.json&lt;/code> and place it in your working directory, and &lt;a href="https://developers.google.com/identity/protocols/OAuth2InstalledApp">create a token&lt;/a>.&lt;/p>
+&lt;p>Create the &lt;code>.gdrive.secrets.json&lt;/code> file by downloading the &lt;code>client_secrets.json&lt;/code> from Google. You will need a &lt;code>CLIENT_ID&lt;/code>, &lt;code>CLIENT_SECRET&lt;/code> and &lt;code>REDIRECT_URL&lt;/code>. You can find these pieces of information by going to the Developer Console, clicking your project &amp;ndash;&amp;gt; APIs &amp;amp; auth &amp;ndash;&amp;gt; credentials &amp;ndash;&amp;gt; Download JSON. This will download the credentials but will need modified to be in this structure.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;client_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;lt;client_id&amp;gt;.apps.googleusercontent.com&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;project_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;proj_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;auth_uri&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;https://accounts.google.com/o/oauth2/auth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;token_uri&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;https://accounts.google.com/o/oauth2/token&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;auth_provider_x509_cert_url&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;https://www.googleapis.com/oauth2/v1/certs&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;client_secret&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;client_secret&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;redirect_uris&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;urn:ietf:wg:oauth:2.0:oob&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;http://localhost&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>See Google&amp;rsquo;s docs &lt;a href="https://github.com/googleapis/google-api-nodejs-client#user-content-oauth2-client">here&lt;/a> on Oauth2&lt;/p></description></item><item><title>Apps: Data Synchronization and Analytics</title><link>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/</guid><description/></item></channel></rss>

@@ -1,0 +1,837 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Contributing CHT Core Code</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/</link><description>Recent content in Contributing CHT Core Code on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/contribute/code/core/index.xml" rel="self" type="application/rss+xml"/><item><title>Contribute: CHT Core dev environment setup</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+&lt;p>This guide assumes you are a CHT Core developer wanting to run the CHT Core from source code to make commits to the &lt;a href="https://github.com/medic/cht-core">public GitHub repository&lt;/a>. To set up your environment for developing apps, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/app-developer/">app guide&lt;/a>.&lt;/p>
+&lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/ec2-setup-guide/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/3.x/self-hosting/">Self hosting&lt;/a>&lt;/p>
+&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+These steps apply to both 3.x and 4.x CHT core development, unless stated otherwise.
+&lt;/div>
+&lt;h2 id="the-happy-path-installation">The Happy Path Installation&lt;/h2>
+&lt;p>CHT Core development can be done on Linux, macOS, or Windows (using the &lt;a href="https://learn.microsoft.com/en-us/windows/wsl/install">Windows Subsystem for Linux (WSL2)&lt;/a>). This CHT Core developer guide will have you install NodeJS, npm, and CouchDB (via Docker) on your local workstation.&lt;/p>
+&lt;h3 id="install-nodejs-npm-and-docker">Install NodeJS, npm, and Docker&lt;/h3>
+&lt;p>First, update your current packages and install some supporting tools:&lt;/p>
+&lt;p>&lt;em>(Node 20 is the environment used to run the CHT server in production, so this is the recommended version of Node to use for development.)&lt;/em>&lt;/p>
+&lt;ul class="nav nav-tabs" id="tabs-3" role="tablist">
+&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-03-00-tab" data-toggle="tab" href="#tabs-03-00" role="tab"
+aria-controls="tabs-03-00" aria-selected="false">
+Linux (Ubuntu)
+&lt;/a>
+&lt;/li>&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-03-01-tab" data-toggle="tab" href="#tabs-03-01" role="tab"
+aria-controls="tabs-03-01" aria-selected="false">
+macOS
+&lt;/a>
+&lt;/li>&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-03-02-tab" data-toggle="tab" href="#tabs-03-02" role="tab"
+aria-controls="tabs-03-02" aria-selected="false">
+Windows (WSL2)
+&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-3-content">
+&lt;div class="tab-pane fade show active"
+id="tabs-03-00" role="tabpanel" aria-labelled-by="tabs-03-00-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt -y install xsltproc curl uidmap jq python2 git make g++
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Use NVM to install NodeJS:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">20&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/div>
+&lt;div class="tab-pane fade"
+id="tabs-03-01" role="tabpanel" aria-labelled-by="tabs-03-01-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Uses Homebrew: https://brew.sh/&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew install curl jq pyenv git make node@20 gcc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Python no longer included by default in macOS &amp;gt;12.3 &lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv install 2.7.18
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pyenv global 2.7.18
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;eval \&amp;#34;\$(pyenv init --path)\&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/div>
+&lt;div class="tab-pane fade"
+id="tabs-03-02" role="tabpanel" aria-labelled-by="tabs-03-02-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo apt update &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sudo apt -y dist-upgrade
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt -y install xsltproc curl uidmap jq python2 git make g++
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Use NVM to install NodeJS:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">nvm_version&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">`&lt;/span>curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq -r .name&lt;span style="color:#4e9a06">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/&lt;span style="color:#000">$nvm_version&lt;/span>/install.sh &lt;span style="color:#000;font-weight:bold">|&lt;/span> &lt;span style="color:#000">$SHELL&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nvm install &lt;span style="color:#0000cf;font-weight:bold">20&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Now let&amp;rsquo;s ensure NodeJS 20 and npm 10 were installed. This should output version 20.x.x for NodeJS and 10.x.x for &lt;code>npm&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>node -v &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm -v
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install Docker:&lt;/p>
+&lt;ul class="nav nav-tabs" id="tabs-0" role="tablist">
+&lt;li class="nav-item">
+&lt;a class="nav-link active"
+id="tabs-00-00-tab" data-toggle="tab" href="#tabs-00-00" role="tab"
+aria-controls="tabs-00-00" aria-selected="false">
+Linux (Ubuntu)
+&lt;/a>
+&lt;/li>&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-00-01-tab" data-toggle="tab" href="#tabs-00-01" role="tab"
+aria-controls="tabs-00-01" aria-selected="false">
+macOS
+&lt;/a>
+&lt;/li>&lt;li class="nav-item">
+&lt;a class="nav-link"
+id="tabs-00-02-tab" data-toggle="tab" href="#tabs-00-02" role="tab"
+aria-controls="tabs-00-02" aria-selected="false">
+Windows (WSL2)
+&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;div class="tab-content" id="tabs-0-content">
+&lt;div class="tab-body tab-pane fade show active"
+id="tabs-00-00" role="tabpanel" aria-labelled-by="tabs-00-00-tab">
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -fsSL get.docker.com -o get-docker.sh &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> sh get-docker.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># OPTIONAL: Allow user to run Docker without sudo&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>dockerd-rootless-setuptool.sh install
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export PATH=/usr/bin:&lt;/span>&lt;span style="color:#000">$PATH&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export DOCKER_HOST=unix:///run/user/1000/docker.sock&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-00-01" role="tabpanel" aria-labelled-by="tabs-00-01-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a> or &lt;a href="https://github.com/abiosoft/colima#readme">Colima&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;div class="tab-body tab-pane fade"
+id="tabs-00-02" role="tabpanel" aria-labelled-by="tabs-00-02-tab">
+&lt;p>Download and install &lt;a href="https://www.docker.com/products/docker-desktop">Docker Desktop&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;p>Restart your entire machine to finish initializing Docker.&lt;/p>
+&lt;p>After restarting, verify Docker is running as expected. Run the simple &lt;code>hello-world&lt;/code> Docker container. This should output &amp;ldquo;Hello from Docker!&amp;rdquo; as well as some other intro text:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run hello-world
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>
+&lt;h3 id="cht-core-cloning-and-setup">CHT Core Cloning and Setup&lt;/h3>
+&lt;p>Clone the main CHT Core repo from GitHub and change directories into it:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-core ~/cht-core
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Install dependencies and perform other setup tasks via an &lt;code>npm&lt;/code> command. Note this command may take many minutes. Be patient!&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm ci --legacy-peer-deps
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To finalise setting up any remaining dependencies build the project by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>npm run build-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Every time you run any &lt;code>npm&lt;/code> or &lt;code>node&lt;/code> commands, it will expect &lt;code>COUCH_NODE_NAME&lt;/code> and &lt;code>COUCH_URL&lt;/code> environment variables to be set:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_NODE_NAME=nonode@nohost&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;export COUCH_URL=http://medic:password@localhost:5984/medic&amp;#34;&lt;/span>&amp;gt;&amp;gt; ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. ~/.&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>basename &lt;span style="color:#000">$SHELL&lt;/span>&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>rc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To ensure these to exports and sourcing your rc file worked, echo the values back out. You should see &lt;code>nonode@nohost&lt;/code> and &lt;code>http://medic:password@localhost:5984/medic&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_NODE_NAME&lt;/span> &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#000">$COUCH_URL&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="couchdb">CouchDB&lt;/h3>
+&lt;p>CouchDB execution differs depending on whether you&amp;rsquo;re running CHT 3.x or 4.x. Follow the instructions in one of the sections below.&lt;/p>
+&lt;h4 id="couchdb-setup-in-cht-3x">CouchDB Setup in CHT 3.x&lt;/h4>
+&lt;p>Note this will run in the background and store its data in &lt;code>/home/YOUR-USER/cht-docker&lt;/code>. The login for your CHT instance will be &lt;code>medic&lt;/code> and the password will be &lt;code>password&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v ~/cht-docker/local.d:/opt/couchdb/data -v ~/cht-docker/local.d:/opt/couchdb/etc/local.d apache/couchdb:2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s ensure CouchDB is set up with a test &lt;code>curl&lt;/code> call. This should show &amp;ldquo;nonode@nohost&amp;rdquo; in JSON:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -X GET &lt;span style="color:#4e9a06">&amp;#34;http://medic:password@localhost:5984/_membership&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> jq
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couchdb-setup-in-cht-4x">CouchDB Setup in CHT 4.x&lt;/h4>
+&lt;p>Create a &lt;code>docker-compose.yml&lt;/code> and &lt;code>couchdb-override.yml&lt;/code> files under the &lt;code>~/cht-docker&lt;/code> folder with this code:&lt;/p>
+&lt;pre tabindex="0">&lt;code>mkdir -p ~/cht-docker
+curl -s -o ~/cht-docker/docker-compose.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:master/docker-compose/cht-couchdb.yml
+cat &amp;gt; ~/cht-docker/couchdb-override.yml &amp;lt;&amp;lt; EOF
+version: &amp;#39;3.9&amp;#39;
+services:
+couchdb:
+ports:
+- &amp;#34;5984:5984&amp;#34;
+- &amp;#34;5986:5986&amp;#34;
+EOF
+&lt;/code>&lt;/pre>&lt;p>Now you can start CouchDB. The login for your CHT instance will be &lt;code>medic&lt;/code> and the &lt;code>password&lt;/code> will be password:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-docker
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password docker-compose -f docker-compose.yml -f couchdb-override.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="developing">Developing&lt;/h3>
+&lt;p>Now you have everything installed and can begin development! You&amp;rsquo;ll need three separate terminals when doing development.&lt;/p>
+&lt;p>In the first terminal we&amp;rsquo;ll compile and deploy the web application by runing:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run build-dev-watch
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be &lt;strong>very&lt;/strong> patient until you see:&lt;/p>
+&lt;blockquote>
+&lt;p>&amp;ldquo;Waiting&amp;hellip;&amp;rdquo;&lt;/p>
+&lt;/blockquote>
+&lt;p>In the second terminal we&amp;rsquo;ll start the API nodejs service by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run dev-api
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Finally, in a 3rd terminal we&amp;rsquo;ll start the Sentinel nodejs service by running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-core &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> npm run dev-sentinel
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>That&amp;rsquo;s it! Now when you edit code in your IDE, it will automatically reload. You can see the CHT running locally here: &lt;a href="http://localhost:5988/">http://localhost:5988/&lt;/a>&lt;/p>
+&lt;p>When you&amp;rsquo;re done with development you can &lt;code>ctrl + c&lt;/code> in the three terminals and stop the CouchDB container with &lt;code>docker stop medic-couchdb&lt;/code>. When you want to resume development later, run &lt;code>docker start medic-couchdb&lt;/code> and re-run the three terminal commands.&lt;/p>
+&lt;h2 id="other-path-troubleshooting">Other Path Troubleshooting&lt;/h2>
+&lt;p>If you weren&amp;rsquo;t able to follow &lt;a href="#the-happy-path-installation">the happy path above&lt;/a>, here are some details about the developer install that may help you troubleshoot what went wrong.&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;p>If you had issues with following the above steps, check out these links for how to install the prerequisites on your specific platform:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://nodejs.org/">Node.js 20.x&lt;/a> &amp;amp; &lt;a href="https://npmjs.com/">npm 10.x.x&lt;/a> - Both of which we recommend installing &lt;a href="https://github.com/nvm-sh/nvm#installing-and-updating">via &lt;code>nvm&lt;/code>&lt;/a>&lt;/li>
+&lt;li>&lt;a href="http://www.sagehill.net/docbookxsl/InstallingAProcessor.html">xsltproc&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.python.org/downloads/">python 2.7&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/">Docker&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.couchdb.org/en/2.3.1/install/index.html">CouchDB&lt;/a> - OS package instead of in Docker - you &lt;strong>MUST&lt;/strong> use CouchDB 2.x! We still strongly recommend using Docker.&lt;/li>
+&lt;/ul>
+&lt;h3 id="ubuntu-1804">Ubuntu 18.04&lt;/h3>
+&lt;p>Ubuntu 18.04&amp;rsquo;s default &lt;code>apt&lt;/code> repositories do not know about &lt;code>python2&lt;/code>. This means when you go to install run the first &lt;code>apt install&lt;/code> command above, you see an error:&lt;/p>
+&lt;pre tabindex="0">&lt;code>E: Unable to locate package python2
+&lt;/code>&lt;/pre>&lt;p>To fix this, change the &lt;code>apt install&lt;/code> call to this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>sudo apt -y install xsltproc curl uidmap jq python git make g++
+&lt;/code>&lt;/pre>&lt;p>As well, after you install docker, and go to run the rootless script &lt;code>dockerd-rootless-setuptool.sh&lt;/code>, you might see this error:&lt;/p>
+&lt;pre tabindex="0">&lt;code>[ERROR] Failed to start docker.service. Run `journalctl -n 20 --no-pager --user --unit docker.service` to show the error log.
+&lt;/code>&lt;/pre>&lt;p>The workaround, unfortunately, is to just start your CouchDB Docker container with sudo: &lt;code>sudo docker run...&lt;/code>.&lt;/p>
+&lt;h3 id="couchdb-on-docker-details">CouchDB on Docker Details&lt;/h3>
+&lt;p>Breaking down the command from &lt;a href="#couchdb">the above section&lt;/a>, here&amp;rsquo;s a generic version that doesn&amp;rsquo;t include hard coded paths:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span style="color:#000">COUCHDB_USER&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>medic -e &lt;span style="color:#000">COUCHDB_PASSWORD&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>password -v &amp;lt;data path&amp;gt;:/opt/couchdb/data -v &amp;lt;config path&amp;gt;:/opt/couchdb/etc/local.d apache/couchdb:2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Parts of the command:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>--name&lt;/code> creates a container called &lt;code>medic-couchdb&lt;/code>. You can name it whatever you want, but this is how you refer to it later&lt;/li>
+&lt;li>&lt;code>-e&lt;/code> sets an environment variable inside the container. Two are set here, for a user and password for the initial admin user.&lt;/li>
+&lt;li>&lt;code>-v&lt;/code> maps where couchdb stores data to your local file system to ensure persistence without depending on the container, using the path &lt;em>before&lt;/em> the &lt;code>:&lt;/code> (the path after the colon is the internal path inside the docker image). This should be somewhere you have write access to, and want this data to be stored. The second mounted volume is for the couch configuration, which will retain settings if your container is removed. This is especially important after running the command to secure the instance (done in steps below).&lt;/li>
+&lt;li>&lt;code>apache/couchdb:2&lt;/code> will install the latest package for CouchDB 2.x&lt;/li>
+&lt;/ul>
+&lt;p>Once this downloads and starts, you will need to &lt;a href="http://localhost:5984/_utils/#/setup">initialise CouchDB&lt;/a> as noted in &lt;a href="https://docs.couchdb.org/en/2.3.1/setup/index.html#setup">their install instructions&lt;/a>.&lt;/p>
+&lt;p>You can use &lt;code>docker stop medic-couchdb&lt;/code> to stop it and &lt;code>docker start medic-couchdb&lt;/code> to start it again. Remember that you&amp;rsquo;ll need to start it whenever you restart your OS, which might not be the case if you use a normal OS package. &lt;code>docker rm medic-couchdb&lt;/code> will totally remove the container.&lt;/p>
+&lt;p>Medic recommends you familiarise yourself with other Docker commands to make docker image and container management clearer.&lt;/p>
+&lt;h3 id="required-environment-variables">Required environment variables&lt;/h3>
+&lt;p>Medic needs the following environment variables to be declared:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>COUCH_URL&lt;/code>: the full authenticated url to the &lt;code>medic&lt;/code> DB. Locally this would be &lt;code>http://myadminuser:myadminpass@localhost:5984/medic&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH_NODE_NAME&lt;/code>: the name of your CouchDB&amp;rsquo;s node. The Docker image default is &lt;code>nonode@nohost&lt;/code>. Other installations may use &lt;code>couchdb@127.0.0.1&lt;/code>. You can find out by querying &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#membership">CouchDB&amp;rsquo;s membership API&lt;/a>&lt;/li>
+&lt;li>(optional) &lt;code>COUCHDB_USER&lt;/code>: the name of your CouchDB&amp;rsquo;s user. The Docker image default is &lt;code>medic&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>COUCHDB_PASSWORD&lt;/code>: the credentials of your CouchDB user. The Docker image default is &lt;code>password&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>API_PORT&lt;/code>: the port API will run on. If not defined, the port defaults to &lt;code>5988&lt;/code>&lt;/li>
+&lt;li>(optional) &lt;code>CHROME_BIN&lt;/code>: only required if tests complain that they can&amp;rsquo;t find Chrome or if you want to run a specific version of the Chrome webdriver.&lt;/li>
+&lt;/ul>
+&lt;p>How to permanently define environment variables depends on your OS and shell (e.g. for bash you can put them &lt;code>~/.bashrc&lt;/code>). You can temporarily define them with &lt;code>export&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>nonode@nohost
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_URL&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>http://myadminuser:myadminpass@localhost:5984/medic
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tests">Tests&lt;/h2>
+&lt;p>Refer to &lt;a href="https://github.com/medic/cht-core/blob/master/TESTING.md">the testing doc&lt;/a> in the GitHub repo.&lt;/p>
+&lt;h2 id="nginx-local-ip">nginx-local-ip&lt;/h2>
+&lt;p>&lt;a href="https://github.com/medic/nginx-local-ip">&lt;code>nginx-local-ip&lt;/code>&lt;/a> is a local proxy that keeps all traffic local, and runs without latency or throttling. If sharing your local CHT instance is not required, it is the recommended method to add a valid SSL certificate (rather than &lt;code>ngrok&lt;/code> or similar).&lt;/p>
+&lt;ol>
+&lt;li>Clone the repo: &lt;code>git clone https://github.com/medic/nginx-local-ip.git&lt;/code>&lt;/li>
+&lt;li>&lt;code>cd&lt;/code> into the new directory: &lt;code>cd nginx-local-ip&lt;/code>&lt;/li>
+&lt;li>Assuming your IP is &lt;code>192.168.0.3&lt;/code>, start &lt;code>nginx-local-ip&lt;/code> to connect to:
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>APP_URL=http://192.168.0.3:5988 docker compose up&lt;/code> and then access it at &lt;code>https://192-168-0-3.local-ip.medicmobile.org/&lt;/code>.&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, the ports are remapped, so execute &lt;code>HTTP=8080 HTTPS=8443 APP_URL=https://192.168.0.3 docker compose up&lt;/code> and then access it at &lt;code>https://192-168-0-3.local-ip.medicmobile.org:8443/&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The HTTP/HTTPS ports (&lt;code>80&lt;/code>/&lt;code>443&lt;/code>) need to accept traffic from the IP address of your host machine and your local webapp port (e.g. &lt;code>5988&lt;/code>) needs to accept traffic from the IP address of the &lt;code>nginx-local-ip&lt;/code> container (on the Docker network). If you are using the UFW firewall (in a Linux environment) you can allow traffic on these ports with the following commands:&lt;/li>
+&lt;/ol>
+&lt;p>(Since local IP addresses can change over time, ranges are used in these rules so that the firewall configuration does not have to be updated each time a new address is assigned.)&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>sudo ufw allow proto tcp from 192.168.0.0/16 to any port 80,443
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo ufw allow proto tcp from 172.16.0.0/16 to any port &lt;span style="color:#0000cf;font-weight:bold">5988&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="remote-proxies">Remote Proxies&lt;/h2>
+&lt;p>&lt;code>ngrok&lt;/code> and &lt;code>pagekite&lt;/code> are remote proxies that route local traffic between your client and the CHT via a remote SSL terminator. While easy and handy, they introduce latency and are sometimes throttled. Always use &lt;code>nginx-local-ip&lt;/code> when you need a TLS certificate and only use these when you need to share your dev instance.&lt;/p>
+&lt;h3 id="ngrok">ngrok&lt;/h3>
+&lt;ol>
+&lt;li>Create an &lt;a href="https://ngrok.com/">ngrok account&lt;/a>, download and install the binary, then link your computer to your ngrok account.&lt;/li>
+&lt;li>Start &lt;code>ngrok&lt;/code> to connect to:
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>./ngrok http 5988&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>./ngrok http 443&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Access the app using the https address shown (e.g. &lt;code>https://YOUR-NGROK-NAME.ngrok.io&lt;/code>, replacing &lt;code>YOUR-NGROK-NAME&lt;/code> with what you signed up with).&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>Note:&lt;/strong> The service worker cache preload sometimes fails due to connection throttling (thereby causing an &lt;code>ngrok&lt;/code> failure at startup).&lt;/p>
+&lt;h3 id="pagekite">pagekite&lt;/h3>
+&lt;ol>
+&lt;li>Create a &lt;a href="https://pagekite.net/signup/">pagekite account&lt;/a>, download and install the python script.&lt;/li>
+&lt;li>Start pagekite (be sure to replace &lt;code>YOUR-PAGEKIT-NAME&lt;/code> with the URL you signed up for) to connect to:&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>The CHT API running via &lt;code>npm run&lt;/code> or &lt;code>horti&lt;/code>, execute &lt;code>python pagekite.py 5988 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
+&lt;li>The CHT API running via &lt;code>docker&lt;/code>, execute &lt;code>python pagekite.py 443 YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;ol>
+&lt;li>Access the app using the https address shown (e.g. &lt;code>https://YOUR-PAGEKIT-NAME.pagekite.me&lt;/code>).&lt;/li>
+&lt;/ol></description></item><item><title>Contribute: Build commands</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/build-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/build-commands/</guid><description>
+&lt;h1 id="cht-core-build-commands">CHT Core build commands&lt;/h1>
+&lt;p>These commands are defined in the &lt;code>package.json&lt;/code> and can be executed with &lt;code>npm run &amp;lt;command&amp;gt;&lt;/code> from the cht-core repository directory.&lt;/p>
+&lt;h2 id="development-build-commands">Development build commands&lt;/h2>
+&lt;p>For developers (humans) to execute to build &lt;code>cht-core&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Command&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>build-ddocs&lt;/code>&lt;/td>
+&lt;td>Compiles all the DDocs and outputs them into &lt;code>/api/build/ddocs&lt;/code> ready for deployment.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>build-dev&lt;/code>&lt;/td>
+&lt;td>Updates dependencies and builds all the applications.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>build-dev-watch&lt;/code>&lt;/td>
+&lt;td>Same as &lt;code>build-dev&lt;/code>, but keeps watching for any code changes and automatically deploys on change.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>build-documentation&lt;/code>&lt;/td>
+&lt;td>Executes jsdoc on all the applications.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>build-webapp-dev&lt;/code>&lt;/td>
+&lt;td>Compiles the &lt;code>/webapp&lt;/code> application.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>build-cht-form&lt;/code>&lt;/td>
+&lt;td>Compiles the &lt;code>cht-form&lt;/code> web component.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>copy-api-resources&lt;/code>&lt;/td>
+&lt;td>Copies the static api files into the &lt;code>api&lt;/code> build directory ready for deployment.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>dev-api&lt;/code>&lt;/td>
+&lt;td>Sets up and runs the &lt;code>api&lt;/code> server, and automatically deploys source changes.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>dev-sentinel&lt;/code>&lt;/td>
+&lt;td>Sets up and runs the &lt;code>sentinel&lt;/code> server, and automatically deploys source changes.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>local-images&lt;/code>&lt;/td>
+&lt;td>Builds the docker images and updates the docker compose files.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>update-service-worker&lt;/code>&lt;/td>
+&lt;td>Updates the service worker file for deployment.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="development-test-commands">Development test commands&lt;/h2>
+&lt;p>For developers to execute to test &lt;code>cht-core&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Command&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>integration-all-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the integration test suite except for the sentinel tests.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>integration-api&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the api integration test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>integration-sentinel-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the sentinel integration test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>lint&lt;/code>&lt;/td>
+&lt;td>Performs static analysis checks on the codebase.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>test&lt;/code>&lt;/td>
+&lt;td>Same as running &lt;code>lint&lt;/code>, &lt;code>unit&lt;/code>, and &lt;code>integration-api&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit&lt;/code>&lt;/td>
+&lt;td>Executes unit test suites for all applications.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-admin&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on &lt;code>admin&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-api&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on &lt;code>api&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-sentinel&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on &lt;code>sentinel&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-shared-lib&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on all &lt;code>shared-lib&lt;/code> modules.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-webapp&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on &lt;code>webapp&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>unit-webapp-continuous&lt;/code>&lt;/td>
+&lt;td>Executes the unit test suite on &lt;code>webapp&lt;/code>, and re-runs on code change.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>wdio-default-mobile-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the mobile e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>wdio-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the default e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>wdio-standard-local&lt;/code>&lt;/td>
+&lt;td>Compiles the app and executes the standard e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>wdio-cht-form&lt;/code>&lt;/td>
+&lt;td>Executes the default e2e test suite on code change.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="ci-commands">CI commands&lt;/h2>
+&lt;p>For Continuous Integration (robots) to run to build and test &lt;code>cht-core&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Command&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>build&lt;/code>&lt;/td>
+&lt;td>Compiles, minifies, bundles the code, and builds the DDocs for publishing.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ci-compile&lt;/code>&lt;/td>
+&lt;td>Builds, does static analysis, and runs unit tests for all applications.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ci-e2e-integration&lt;/code>&lt;/td>
+&lt;td>Executes the integration e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ci-webdriver-default&lt;/code>&lt;/td>
+&lt;td>Executes the default e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ci-webdriver-default-mobile&lt;/code>&lt;/td>
+&lt;td>Executes the mobile e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ci-webdriver-standard&lt;/code>&lt;/td>
+&lt;td>Executes the standard e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>publish-for-testing&lt;/code>&lt;/td>
+&lt;td>Builds docker images and publishes to the staging server for use in e2e test builds.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>test-config-default&lt;/code>&lt;/td>
+&lt;td>Executes the default config test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>test-config-standard&lt;/code>&lt;/td>
+&lt;td>Executes the standard config test suite.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>upgrade-wdio&lt;/code>&lt;/td>
+&lt;td>Executes the upgrade e2e test suite.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Contribute: Deploy CHT Core on Medic hosted EKS</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/deploy-on-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/deploy-on-eks/</guid><description>
+&lt;p>While not directly available to the public who might be doing CHT Core development, having Medic&amp;rsquo;s process for using our &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html">Amazon Elastic Kubernetes Service&lt;/a> (AWS EKS) publicly documented will help Medic employees new to EKS. As well, hopefully external developers looking to re-use Medic tools and process to use EKS will find it helpful.&lt;/p>
+&lt;p>While these instructions assume you work at Medic and have access to private GitHub repositories, many of the tools are fully open source.&lt;/p>
+&lt;h2 id="prerequisites">Prerequisites&lt;/h2>
+&lt;h3 id="command-line">Command Line&lt;/h3>
+&lt;p>Be sure you have these tools installed and repos cloned:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">awscli&lt;/a>: version &lt;code>2&lt;/code> or newer&lt;/li>
+&lt;li>&lt;a href="https://kubernetes.io/docs/tasks/tools">kubectl&lt;/a>: Must be within one minor version of cluster. If cluster is &lt;code>1.24.x&lt;/code>, use &lt;code>1.23.x&lt;/code>, &lt;code>1.24.x&lt;/code> or &lt;code>1.25.x&lt;/code>.&lt;/li>
+&lt;li>&lt;a href="https://helm.sh/docs/intro/install/">helm&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jqlang.github.io/jq/download/">jq&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/">Medic Infra&lt;/a> repo cloned&lt;/li>
+&lt;/ul>
+&lt;h4 id="optional--autocomplete">Optional: Autocomplete&lt;/h4>
+&lt;p>Both &lt;code>helm&lt;/code> and &lt;code>kubectl&lt;/code> have autocomplete libraries. For power users and beginners alike, it adds a lot of discoverability. This code is for &lt;code>zsh&lt;/code>, but &lt;code>bash&lt;/code>, &lt;code>fish&lt;/code> and &lt;code>powershell&lt;/code> are supported as well:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">source&lt;/span> &amp;lt;&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>kubectl completion zsh&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">source&lt;/span> &amp;lt;&lt;span style="color:#ce5c00;font-weight:bold">(&lt;/span>helm completion zsh&lt;span style="color:#ce5c00;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>See &lt;a href="https://helm.sh/docs/helm/helm_completion_bash/">helm&lt;/a> and &lt;a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-shell-autocompletion">kubectl&lt;/a> docs to automatically loading these on every new session.&lt;/p>
+&lt;h3 id="request-permission">Request permission&lt;/h3>
+&lt;p>By default, Medic teammates do not have EKS access and must file a ticket to request it:&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/issues/new">Create a ticket&lt;/a> to get your DNS and Namespace created for EKS, which should match each other. As an example, a &lt;code>mrjones-dev&lt;/code> name space would match &lt;code>mrjones.dev.medicmobile.org&lt;/code> DNS. The ticket should include requesting EKS access to be granted.&lt;/li>
+&lt;li>Once the ticket in step one is complete, follow the &lt;a href="https://github.com/medic/medic-infrastructure/blob/master/terraform/aws/dev/eks/access/README.md">CLI setup guide&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>NB&lt;/strong> - Security key (e.g. Yubikey) users need to add a TOTP MFA (Time-based, One-Time Password Multi-Factor Authentication) too! CLI requires the TOTP values (6-digit number) and security keys are not supported. Security keys can only be used on web logins.&lt;/p>
+&lt;h3 id="first-time-setup">First time setup&lt;/h3>
+&lt;p>These steps only need to be run once!&lt;/p>
+&lt;p>After you have created a ticket per &amp;ldquo;Request permission&amp;rdquo; above, you should get a link to sign up for AWS. Click the link and:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Create new password ensure it&amp;rsquo;s 10+ characters including one alpha (&lt;code>a-z&lt;/code>) and one special (&lt;code>~!@#$%^&amp;amp;*_-+=`|\(){}[]:;&amp;quot;'&amp;lt;&amp;gt;,.?/&lt;/code>) character.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Setup MFA. In top-right corner of browser, there is a drop-down menu with your &lt;code>username @ medic&lt;/code>. Click that and then on &amp;ldquo;My Security Credentials&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Assign an MFA device and give it the &lt;strong>same name&lt;/strong> as your username: In AWS web GUI, click your name in upper right:&lt;/p>
+&lt;ol>
+&lt;li>Security Credentials&lt;/li>
+&lt;li>scroll down to &amp;ldquo;Multi-factor authentication (MFA)&amp;rdquo;&lt;/li>
+&lt;li>click &amp;ldquo;Assign MFA device&amp;rdquo;&lt;/li>
+&lt;li>enter a &amp;ldquo;Device name&amp;rdquo; (should match username)&lt;/li>
+&lt;li>&amp;ldquo;Select MFA device&amp;rdquo; that you&amp;rsquo;re using&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>
+&lt;p>Create Access Keys for Command Line Interface: In AWS web GUI, click your name in upper right -&amp;gt; Security Credentials -&amp;gt; scroll down to &amp;ldquo;Access keys&amp;rdquo; -&amp;gt; click &amp;ldquo;Create access key&amp;rdquo; -&amp;gt; for use case choose &amp;ldquo;Command Line Interface&amp;rdquo; -&amp;gt; click &amp;ldquo;Next&amp;rdquo; -&amp;gt; enter description and click &amp;ldquo;Create access key&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run &lt;code>aws configure&lt;/code> and place appropriate access keys during prompts. Use &lt;code>eu-west-2&lt;/code> region. It should look like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>$ aws configure
+AWS Access Key ID [None]: &amp;lt;ACCESS-KEY-HERE&amp;gt;
+AWS Secret Access Key [None]: &amp;lt;SECRET-HERE&amp;gt;
+Default region name [None]: eu-west-2
+Default output format [None]:
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Run the Update Kubeconfig command, assuming username is &lt;code>mrjones&lt;/code> and namespace is &lt;code>mrjones-dev&lt;/code> - be sure to place these with yours: &lt;code>aws eks update-kubeconfig --name mrjones-dev --profile mrjones --region eu-west-2&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="starting-and-stopping-aka-deleting">Starting and stopping (aka deleting)&lt;/h2>
+&lt;ol>
+&lt;li>Login with &lt;code>eks-aws-mfa-login&lt;/code> script in the &lt;a href="https://github.com/medic/medic-infrastructure/tree/master/terraform/aws/dev/eks/access">infra repo&lt;/a>:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>./eks-aws-mfa-login USERNAME TOTP_HERE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Ensure you&amp;rsquo;re using dev EKS cluster:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/dev-cht-eks
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Add new &lt;code>values.yaml&lt;/code> file - you can &lt;a href="https://github.com/medic/medic-infrastructure/blob/master/terraform/aws/dev/cht-projects/alpha-dev-cht-deploy-values.yaml">copy this one&lt;/a> and just change the &lt;code>alpha-dev&lt;/code> values to &lt;code>USERNAME-dev&lt;/code> and change the value in &lt;code>ingress&lt;/code> -&amp;gt; &lt;code>annotations&lt;/code> -&amp;gt; &lt;code>certificate&lt;/code> to the latest updated value(request the SRE team for the latest value). Remember where you created this file - you&amp;rsquo;ll need it every time you use the &lt;code>cht-deploy&lt;/code> script.&lt;/li>
+&lt;li>Use &lt;code>uuidgen&lt;/code> to fill in the &lt;code>secret&lt;/code> in &lt;code>values.yaml&lt;/code>&lt;/li>
+&lt;li>Use a good passphrase (diceware!) to fill in &lt;code>password&lt;/code> in &lt;code>values.yaml&lt;/code>. &lt;em>Please note that a few special characters are unsupported in this field like &lt;code>:&lt;/code>, &lt;code>@&lt;/code>, &lt;code>&amp;quot;&lt;/code>, &lt;code>'&lt;/code>, etc. Also, do not use quotes &lt;code>&amp;quot;&amp;quot;&lt;/code> to enclose your password, and do not use spaces in your password. This will not impact the deployment but will not let you log in to the CHT instance.&lt;/em>&lt;/li>
+&lt;li>Ensure you have the latest code of &lt;code>cht-core&lt;/code> &lt;a href="https://github.com/medic/cht-core">repo&lt;/a>:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>git checkout master&lt;span style="color:#000;font-weight:bold">;&lt;/span>git pull origin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Deploy!:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> scripts/deploy&lt;span style="color:#000;font-weight:bold">;&lt;/span>./cht-deploy -f PATH_TO/values.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>Delete it when you&amp;rsquo;re done:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>helm delete USERNAME-dev --namespace USERNAME-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="references-and-debugging">References and Debugging&lt;/h2>
+&lt;p>More information on &lt;code>cht-deploy&lt;/code> script is available in the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/README.md">CHT Core GitHub repository&lt;/a> which includes specifics of the &lt;code>values.yaml&lt;/code> file and more details about the debugging utilities listed below.&lt;/p>
+&lt;h3 id="debugging">Debugging&lt;/h3>
+&lt;p>A summary of the utilities in &lt;code>cht-core/scripts/deploy&lt;/code> directory, assuming &lt;code>mrjones-dev&lt;/code> namespace:&lt;/p>
+&lt;ul>
+&lt;li>list all resources: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;li>view logs, assuming &lt;code>cht-couchdb-1&lt;/code> returned from prior command: &lt;code>./troubleshooting/view-logs mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>describe deployment, assuming &lt;code>cht-couchdb-1&lt;/code> returned from 1st command: &lt;code>./troubleshooting/describe-deployment mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>list all deployments: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="getting-shell">Getting shell&lt;/h3>
+&lt;p>Sometimes you need to look at files and other key pieces of data that are not available with &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/troubleshooting/view-logs">the current&lt;/a> &lt;code>troubleshooting/view-logs&lt;/code> script. In this case, getting an interactive shell on the pod can be helpful.&lt;/p>
+&lt;ol>
+&lt;li>First, get a list pods for your namespace: &lt;code>kubectl -n NAMESPACE get pods&lt;/code>&lt;/li>
+&lt;li>After finding the pod you&amp;rsquo;re interested, connect to the pod to get a shell: &lt;code>kubectl -n NAMESPACE exec -it PODNAME/CONTAINERNAME -- /bin/bash&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3 id="invalid-apiversion-error">&lt;code>invalid apiVersion&lt;/code> Error&lt;/h3>
+&lt;p>If you get the error:&lt;/p>
+&lt;blockquote>
+&lt;p>exec plugin: invalid apiVersion &amp;ldquo;client.authentication.k8s.io/v1alpha1&amp;rdquo; when running &lt;code>kubectl version&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;p>You might be using an version of kubernetes api &lt;code>client.authentication.k8s.io&lt;/code> which is not supported by your &lt;code>kubectl&lt;/code> client. This can sometimes happen in EKS clusters if aws cli is an older version, in most cases you need at least version &lt;code>2&lt;/code> of aws cli. Check version by running: &lt;code>aws --version&lt;/code> and note that version &lt;code>2&lt;/code> &lt;em>cannot&lt;/em> be installed through &lt;code>pip&lt;/code> (See &lt;a href="#command-line">Command Line&lt;/a> section above for installation instructions)&lt;/p>
+&lt;h2 id="sre-steps-for-granting-users-access-to-a-namespace">SRE Steps for granting users access to a namespace&lt;/h2>
+&lt;p>If you&amp;rsquo;re on the SRE/Infra team and want to grant a Medic teammate access to EKS:&lt;/p>
+&lt;ol>
+&lt;li>Tools required: aws, eksctl, kubectl&lt;/li>
+&lt;li>Create AWS User.
+&lt;ul>
+&lt;li>Attach IAM policy: Force_MFA and share auto-generated password safely&lt;/li>
+&lt;li>Have user log in and finish MFA, access key setup&lt;/li>
+&lt;li>SRE adds you to mfa-required-users group&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Add the namespaces and users to &lt;code>tf/eks/dev/access/main.tf&lt;/code>&lt;/li>
+&lt;li>Run tofu apply in the folder &lt;code>tf/eks/dev/access&lt;/code>&lt;/li>
+&lt;li>Create &lt;code>identitymapping&lt;/code> if needed:&lt;/li>
+&lt;/ol>
+&lt;p>Reading the &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html">AWS guide for principal access&lt;/a> may help here!&lt;/p></description></item><item><title>Contribute: Updating Dependencies</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/update-dependencies/</guid><description>
+&lt;p>Every minor release we update dependencies to get the latest fixes and improvements. We do this early in the release cycle so that we have some more time to find regressions and issues. This is done on all folders with a package.json, including:&lt;/p>
+&lt;ul>
+&lt;li>cht-core
+&lt;ul>
+&lt;li>/ (root)&lt;/li>
+&lt;li>/admin&lt;/li>
+&lt;li>/api&lt;/li>
+&lt;li>/sentinel&lt;/li>
+&lt;li>/shared-libs/*&lt;/li>
+&lt;li>/webapp&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>cht-conf&lt;/li>
+&lt;/ul>
+&lt;h2 id="steps">Steps&lt;/h2>
+&lt;ol>
+&lt;li>Checkout and pull the latest default branch - get the latest code&lt;/li>
+&lt;li>Make a branch: &lt;code>git checkout -b &amp;quot;&amp;lt;issue&amp;gt;-update-dendencies&amp;quot;&lt;/code>&lt;/li>
+&lt;li>Take a look at the current &lt;a href="https://github.com/medic/cht-core/issues?q=is%3Aopen+is%3Aissue+label%3ADependencies">list of dependencies related issues&lt;/a>, where you can find the latest conversations and information.&lt;/li>
+&lt;/ol>
+&lt;p>Then for each folder go through these steps.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>npm ci&lt;/code> - update your local node_modules to match expected&lt;/li>
+&lt;li>&lt;code>npm outdated&lt;/code> - report on any dependencies which aren&amp;rsquo;t at the latest&lt;/li>
+&lt;li>&lt;code>npm install --save[-dev] package@version&lt;/code> - install the latest version (be careful and read the release notes if the new version is a major change from the current)&lt;/li>
+&lt;li>&lt;code>npm dedupe&lt;/code> - remove duplicated dependencies&lt;/li>
+&lt;li>&lt;code>npm audit fix&lt;/code> - automatically fix any nested dependencies with vulnerabilities&lt;/li>
+&lt;li>&lt;code>npm audit&lt;/code> - get a report on any remaining vulnerabilities and manually scan it to see if there&amp;rsquo;s anything else you can do&lt;/li>
+&lt;/ol>
+&lt;h2 id="problems">Problems&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>Don&amp;rsquo;t update &lt;code>bootstrap&lt;/code> to 4+ as it has many breaking changes. One day we will either raise an issue to upgrade it or migrate off it, but that is outside the scope of this change.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Don&amp;rsquo;t update &lt;code>bootstrap-daterangepicker&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Don&amp;rsquo;t update &lt;code>select2&lt;/code> as the latest patch always seems to fail.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Don&amp;rsquo;t update &lt;code>jquery&lt;/code> to 3.6.0+ as the &lt;code>select2&lt;/code> search input loses focus on click event, this is an &lt;a href="https://github.com/select2/select2/issues/5993">open issue&lt;/a> in their repository.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>CHT-Core&amp;rsquo;s webapp is using Enketo and jQuery library, at the same time Enketo internally uses a specific version of jQuery. Make sure webapp installs the same jQuery version than the one Enketo uses internally: &lt;code>3.2.x&lt;/code>.&lt;/p>
+&lt;p>Do this by checking the jquery entry in &lt;code>./webapp/package.json&lt;/code> matches &lt;code>./webapp/node_modules/enketo-core/package.json&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>grep &amp;#39;&amp;#34;jquery&amp;#34;&amp;#39; ./webapp/package.json
+&amp;#34;jquery&amp;#34;: &amp;#34;3.2.x&amp;#34;,
+grep &amp;#39;&amp;#34;jquery&amp;#34;&amp;#39; ./webapp/node_modules/enketo-core/package.json
+&amp;#34;jquery&amp;#34;: &amp;#34;3.2.x&amp;#34;,
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Make sure the version of &lt;code>api/enketo-xslt&lt;/code> is the same as &lt;code>webapp/enketo-core/enketo-transformer/enketo-xslt&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If you have trouble upgrading any other dependency and you think it&amp;rsquo;ll be challenging to fix it then raise a new issue with &lt;code>Upgrade dependencies&lt;/code> tag, to upgrade just that dependency. Don&amp;rsquo;t hold up all the other upgrades you&amp;rsquo;ve made.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
+&lt;h3 id="angular-exception">Angular exception&lt;/h3>
+&lt;p>When upgrading Webapp&amp;rsquo;s Angular, you might get the following exception:&lt;/p>
+&lt;pre tabindex="0">&lt;code>Running &amp;#34;exec:build-webapp&amp;#34; (exec) task
+________________________________________
+An unhandled exception occured: Class extends value undefined is not a constructor or null
+see &amp;#34;/private/var/folders/tx/lskdwi/T/ng-23kdi/angular-errors.log&amp;#34; for further details.
+&amp;gt;&amp;gt; Exited with code: 127
+&lt;/code>&lt;/pre>&lt;p>This error is thrown by the Webpack&amp;rsquo;s subresource integrity. It&amp;rsquo;s likely that &lt;code>@angular/compiler&lt;/code>, &lt;code>@angular-devkit/build-angular&lt;/code> or &lt;code>@angular-builders/custom-webpack&lt;/code> aren&amp;rsquo;t resolved properly in the &lt;code>package-lock.json&lt;/code>.&lt;/p>
+&lt;p>To fix it, uninstall these 3 dependencies and then install them again in this order:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>@angular/compiler&lt;/code>&lt;/li>
+&lt;li>&lt;code>@angular-devkit/build-angular&lt;/code>&lt;/li>
+&lt;li>&lt;code>@angular-builders/custom-webpack&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>If the error is still happening, try reinstalling &lt;code>@angular/cli&lt;/code>.&lt;/p>
+&lt;h3 id="npm-errno--17">npm errno -17&lt;/h3>
+&lt;p>If &lt;code>npm ci&lt;/code> errors with &amp;ldquo;errno -17&amp;rdquo; in shared-libs you may need to manually remove the nested dependencies from the package-lock.json. This needs move investigation to work out why this is happening.&lt;/p>
+&lt;h3 id="select2-is-not-a-function">select2 is not a function&lt;/h3>
+&lt;p>If you get &lt;code>TypeError: &amp;quot;$(...).select2 is not a function&amp;quot;&lt;/code> then either:&lt;/p>
+&lt;ol>
+&lt;li>You bumped select2. For some reason this breaks it.&lt;/li>
+&lt;li>You have multiple jquery libraries and select2 is getting attached to one but not the other. Make sure the jquery versions in enketo-core and webapp match and you&amp;rsquo;ve &lt;code>run dedupe&lt;/code> to remove the enketo-core copy.&lt;/li>
+&lt;/ol></description></item><item><title>Contribute: Automated Tests</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/automated-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/automated-tests/</guid><description>
+&lt;h2 id="unit-tests">Unit Tests&lt;/h2>
+&lt;p>Each unit test is only intended to validate an isolated piece (unit) of functionality separated from the rest of the system. They can use mocking to replicate the behavior of other parts of the system.&lt;/p>
+&lt;p>Unit tests are located in the &lt;code>tests&lt;/code> directories of each app (e.g. in &lt;code>webapp/tests&lt;/code> you can find unit test for the webapp). Run them locally with: &lt;code>npm run unit&lt;/code>.&lt;/p>
+&lt;h2 id="integration-tests">Integration Tests&lt;/h2>
+&lt;p>For us, integration testing means testing through the entire stack of our application connected to other applications within our system. In the image below, it means that we test each application (box) and its interaction with other applications within our system.
+We isolate the tests from the webapp and make the necessary shortcuts to make the test more straightforward and faster. We do not mock any part of the system.&lt;/p>
+&lt;p>Integration tests are located in &lt;code>tests/integration&lt;/code>. Run them locally with &lt;code>npm run integration-all-local&lt;/code> and &lt;code>npm run integration-sentinel-local&lt;/code>.&lt;/p>
+&lt;div class="mermaid">flowchart LR
+subgraph cht-e2e [Docker: cht-e2e]
+api
+couchdb-1.local[(couchdb-1)]
+couchdb-2.local[(couchdb-2)]
+couchdb-3.local[(couchdb-3)]
+haproxy
+nginx
+sentinel
+nginx --> api
+sentinel --> api
+api --> haproxy
+haproxy --> couchdb-1.local &amp; couchdb-2.local &amp; couchdb-3.local
+end
+integration-tests{Integration Tests}
+integration-tests &lt;--Pouch/HTTPS--> cht-e2e
+&lt;/div>
+&lt;h2 id="e2e-tests">E2E Tests&lt;/h2>
+&lt;p>Our end-to-end tests are designed to test the entire system as a whole. They interact with the webapp as a user would, using &lt;a href="https://webdriver.io/">WebdriverIO&lt;/a> to control a headless browser session. They are not isolated from the rest of the system, and they do not use mocking.&lt;/p>
+&lt;p>End-to-end tests are located in &lt;a href="https://github.com/medic/cht-core/tree/master/tests/e2e">&lt;code>tests/e2e&lt;/code>&lt;/a>. Run them locally with the following:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>npm run wdio-local&lt;/code> to run the tests for the default config&lt;/li>
+&lt;li>&lt;code>npm run wdio-standard-local&lt;/code> to run the tests for the standard config&lt;/li>
+&lt;li>&lt;code>npm run wdio-default-mobile-local&lt;/code> to run the mobile tests&lt;/li>
+&lt;/ul>
+&lt;div class="mermaid">flowchart LR
+subgraph cht-e2e [Docker: cht-e2e]
+api
+couchdb-1.local[(couchdb-1)]
+couchdb-2.local[(couchdb-2)]
+couchdb-3.local[(couchdb-3)]
+haproxy
+nginx
+sentinel
+nginx --> api
+sentinel --> api
+api --> haproxy
+haproxy --> couchdb-1.local &amp; couchdb-2.local &amp; couchdb-3.local
+end
+subgraph browser
+webapp
+end
+e2e-tests{E2E Tests}
+browser &lt;--HTTPS--> cht-e2e
+e2e-tests &lt;--wdio--> browser
+e2e-tests o--Pouch/HTTPS--o cht-e2e
+&lt;/div>
+&lt;h3 id="debugging-e2e-tests">Debugging E2E tests&lt;/h3>
+&lt;p>End to end (e2e) tests can be really difficult to debug - sometimes they fail seemingly at random, and sometimes they only fail on certain environments (eg: ci but not locally). This can make reproducing and reliably fixing the issue challenging, so here are some tips to help!&lt;/p>
+&lt;h4 id="set-the-debug-flag">Set the &lt;code>DEBUG&lt;/code> flag&lt;/h4>
+&lt;p>Setting the &lt;code>DEBUG&lt;/code> environment variable (e.g. &lt;code>DEBUG=true npm run wdio-local&lt;/code>) when running the tests locally will do the following:&lt;/p>
+&lt;ul>
+&lt;li>Run the browser without the &lt;code>headless&lt;/code> flag (details &lt;a href="https://github.com/medic/cht-core/blob/master/tests/e2e/wdio.conf.js#L86-L87">here&lt;/a>), so the browser will be displayed when running the tests&lt;/li>
+&lt;li>Increase the test timeout from 2 minutes to 10 minutes&lt;/li>
+&lt;li>Prevent Mocha from automatically retrying tests that fail (by default a failing test is retried 5 times, details &lt;a href="https://github.com/medic/cht-core/blob/master/tests/e2e/wdio.conf.js#L177">here&lt;/a>)&lt;/li>
+&lt;li>Prevent the &lt;code>cht-e2e&lt;/code> Docker containers from being torn down after the test finishes&lt;/li>
+&lt;/ul>
+&lt;h4 id="read-the-logs">Read the logs&lt;/h4>
+&lt;p>Read the failure carefully - it often has really good info but sometimes it&amp;rsquo;s just hard to find. Most importantly it tells you exactly the line in the test that failed and you can look that up in the source to see what it was trying to do. The error message itself is also really useful. Also sometimes one error causes the next, so always start with the first test failure before looking at the others.&lt;/p>
+&lt;h5 id="known-failure-patterns">Known failure patterns&lt;/h5>
+&lt;ul>
+&lt;li>Can&amp;rsquo;t click on an element because another element would get the click. This usually means a modal dialog was being shown. 90% of the time this is the update notification modal which means some settings change has been detected after the test started execution.&lt;/li>
+&lt;li>Stale element. This means the DOM element has been removed after it was found on the page but before trying to do something with it. Generally try to find the element just before it needs it to reduce the chance of this happening&lt;/li>
+&lt;/ul>
+&lt;h4 id="other-logs-and-screenshots">Other logs and screenshots&lt;/h4>
+&lt;p>There are logs and screenshots stored in the allure reports. &lt;a href="https://github.com/medic/cht-core/blob/master/TESTING.md#view-the-ci-report">Here&lt;/a> are the instructions to access that information.&lt;/p>
+&lt;h4 id="running-just-the-failing-test">Running just the failing test&lt;/h4>
+&lt;p>Running e2e tests can be quite slow so to save time modify the &lt;code>specs&lt;/code> property of &lt;code>/tests/e2e/**/wdio.conf.js&lt;/code> so it only finds your test. You can also use &lt;code>describe.skip&lt;/code> and &lt;code>it.skip&lt;/code> to skip specific tests.&lt;/p>
+&lt;h4 id="watching-the-test-run">Watching the test run&lt;/h4>
+&lt;p>Running the tests locally with &lt;code>npm run wdio-local&lt;/code> or &lt;code>npm run standard-wdio-local&lt;/code> will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p>
+&lt;h4 id="running-the-upgrade-e2e-test-locally">Running the upgrade e2e test locally&lt;/h4>
+&lt;p>To run the upgrade e2e tests in your local environment, follow these steps:&lt;/p>
+&lt;ul>
+&lt;li>Make sure your branch has been published, and it&amp;rsquo;s available in the market:
+&lt;ul>
+&lt;li>A way to do this is by pushing the branch, let the GitHubActions to run, if all the other e2e are okay, then it will publish the branch.&lt;/li>
+&lt;li>Check that your branch name is available &lt;a href="https://staging.dev.medicmobile.org/_couch/builds_4/_design/builds/_view/releases">here&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Make sure to stop all existing containers&lt;/li>
+&lt;li>Set these environment variables:
+&lt;ul>
+&lt;li>&lt;code>export MARKET_URL_READ=https://staging.dev.medicmobile.org&lt;/code>.&lt;/li>
+&lt;li>&lt;code>export STAGING_SERVER=_couch/builds_4&lt;/code>.&lt;/li>
+&lt;li>&lt;code>export BRANCH=&amp;lt;your branch name&amp;gt;&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Run the upgrade e2e tests: &lt;code>npm run upgrade-wdio&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>If you experience errors such as:&lt;/p>
+&lt;pre tabindex="0">&lt;code>Error in hook: StatusCodeError: 404 - &amp;#34;{\&amp;#34;error\&amp;#34;:\&amp;#34;not_found\&amp;#34;,\&amp;#34;reason\&amp;#34;:\&amp;#34;Document is missing attachment\&amp;#34;}\n&amp;#34;
+&lt;/code>&lt;/pre>&lt;p>Try the following:&lt;/p>
+&lt;ul>
+&lt;li>It&amp;rsquo;s probably because it can&amp;rsquo;t find the latest released version of CHT, double check that &lt;code>MARKET_URL_READ&lt;/code> and &lt;code>STAGING_SERVER&lt;/code> environment variables are set.&lt;/li>
+&lt;/ul>
+&lt;p>If you experience errors such as:&lt;/p>
+&lt;pre tabindex="0">&lt;code>If you are seeing this locally, it can mean that your internet is too slow to download all images in the allotted time.
+Either run the test multiple times until you load all images, download images manually or increase this timeout.
+&lt;/code>&lt;/pre>&lt;p>Try the following:&lt;/p>
+&lt;ul>
+&lt;li>Manually downloaded the images. To download images manually, you can use either docker-compose or docker:
+&lt;ul>
+&lt;li>With docker, you&amp;rsquo;d do a docker pull &lt;image tag> for every image you want to download.&lt;/li>
+&lt;li>With docker-compose, you&amp;rsquo;d save all docker-compose files in a folder, do a docker-compose pull, and point to your files as a source. &lt;a href="https://docs.docker.com/engine/reference/commandline/compose_pull/">Compose pull documentation&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
+&lt;p>We don&amp;rsquo;t actively support development on Windows, instead preferring MacOS or Linux.&lt;/p>
+&lt;p>However, Microsoft has recently been stabilizing their &lt;a href="https://docs.microsoft.com/en-us/windows/wsl/about">Windows Subsystem for Linux&lt;/a>, which appears to work reasonably well for development.&lt;/p>
+&lt;p>Installation instructions are mostly the same as they written in &lt;a href="https://github.com/medic/cht-core/blob/master/README.md">the README&lt;/a> with a couple of caveats as of time of writing (2019-07-25), noted below.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Both the Windows Subsystem for Linux and Medic&amp;rsquo;s support for developing in it is very much in beta. These are advanced instructions, expect some understanding of linux and may not always work. Be patient and raise bugs as you find them!
+&lt;/div>
+&lt;h2 id="installing-ubuntu-in-the-windows-subsystem-for-linux">Installing Ubuntu in the Windows Subsystem for Linux.&lt;/h2>
+&lt;p>For the rest of this document we&amp;rsquo;re going to presume that you&amp;rsquo;re using Ubuntu (18.04) in WSL. Medic probably works on all distributions, but Ubuntu is likely the best supported.&lt;/p>
+&lt;p>First, follow Microsoft&amp;rsquo;s &lt;a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">instructions on enabling and installing linux&lt;/a>. At the end of this process you should have a linux terminal.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+For the rest of this tutorial &lt;strong>in linux&lt;/strong> means code executing or performing actions in the WSL, while &lt;strong>in Windows&lt;/strong> means code executing or performing actions in Windows natively.
+&lt;/div>
+&lt;h2 id="couchdb">CouchDB&lt;/h2>
+&lt;p>As of writing CouchDB wouldn&amp;rsquo;t autostart (due to systemd not existing?), and wasn&amp;rsquo;t manually starting due to erlang errors.&lt;/p>
+&lt;p>Luckily, there is a perfectly working CouchDB installation for Windows:&lt;/p>
+&lt;ul>
+&lt;li>Download from &lt;a href="https://couchdb.apache.org/#download">CouchDB&lt;/a> and install the Windows version. This will create a Windows service.&lt;/li>
+&lt;li>Run it either by directly executing &lt;code>C:\CouchDB\bin\couchdb.cmd&lt;/code> or by starting the service&lt;/li>
+&lt;/ul>
+&lt;p>Then go to &lt;code>http://localhost:5984/_utils/#/setup&lt;/code> in Windows and do the single node setup. Once done head back to linux and confirm it works:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: curl http://localhost:5984/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;couchdb&amp;#34;&lt;/span>:&lt;span style="color:#4e9a06">&amp;#34;Welcome&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;version&amp;#34;&lt;/span>:&lt;span style="color:#4e9a06">&amp;#34;2.3.1&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;git_sha&amp;#34;&lt;/span>:&lt;span style="color:#4e9a06">&amp;#34;c298091a4&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;uuid&amp;#34;&lt;/span>:&lt;span style="color:#4e9a06">&amp;#34;5f60350abaaa11c0131a5630e83ae979&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;features&amp;#34;&lt;/span>:&lt;span style="color:#ce5c00;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;pluggable-storage-engines&amp;#34;&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;scheduler&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">]&lt;/span>,&lt;span style="color:#4e9a06">&amp;#34;vendor&amp;#34;&lt;/span>:&lt;span style="color:#ce5c00;font-weight:bold">{&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;name&amp;#34;&lt;/span>:&lt;span style="color:#4e9a06">&amp;#34;The Apache Software Foundation&amp;#34;&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="installing-npm">Installing NPM&lt;/h2>
+&lt;p>Start your WSL instance (Ubuntu), not WSL as they take you to two different default directories.&lt;/p>
+&lt;p>The default &lt;code>npm&lt;/code> in linux is really old and doesn&amp;rsquo;t have &lt;code>npm ci&lt;/code>, which we need.&lt;/p>
+&lt;p>Instead use &lt;a href="https://github.com/nvm-sh/nvm">nvm&lt;/a> to install &lt;code>nvm install 11.3&lt;/code> .&lt;/p>
+&lt;h2 id="checking-out-the-code">Checking out the code&lt;/h2>
+&lt;p>We used git that&amp;rsquo;s preinstalled with Ubuntu to check out the code.&lt;/p>
+&lt;p>You can checkout cht code inside WSL itself. You can checkout anywhere you have write access. We&amp;rsquo;ll checkout inside /home/username/medic directory.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: mkdir ~/medic &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#204a87">cd&lt;/span> ~/medic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: git clone https://github.com/medic/cht-core.git
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="setup-environment-variables">Setup Environment Variables&lt;/h2>
+&lt;p>Using &lt;code>.bashrc&lt;/code> works as expected, and so is a good place to put exports:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"># Medic stuff&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_URL&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>http://admin:pass@localhost:5984/medic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">export&lt;/span> &lt;span style="color:#000">COUCH_NODE_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>couchdb@localhost
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="everything-else">Everything else&lt;/h2>
+&lt;p>&lt;code>npm ci&lt;/code> should just work once you&amp;rsquo;ve installed a latest version of node via nvm as noted above.&lt;/p>
+&lt;p>Also install xstproc in your WSL:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: sudo apt-get update
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: sudo apt-get install xsltproc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now you can build the web app.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: &lt;span style="color:#204a87">cd&lt;/span> ~/medic/cht-core/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: npm ci
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: npm run build-dev-watch
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>From this point, follow the &lt;code>harden couch&lt;/code> section in &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/#cht-core-cloning-and-setup">Core Developer Setup&lt;/a>.&lt;/p>
+&lt;p>To get multiple linux terminals (so you can run &lt;code>npm run&lt;/code>, &lt;code>api&lt;/code> and &lt;code>sentinel&lt;/code> at the same time) either install and use something like Tmux, or if you click &lt;code>Ubuntu&lt;/code> in the Windows start menu again it will open up a new terminal in the same linux instance.&lt;/p>
+&lt;p>Once you&amp;rsquo;re done with the default instructions and have api running, check if it works by going to http://localhost:5988 in Chrome or Firefox.&lt;/p>
+&lt;h2 id="editing-code">Editing Code&lt;/h2>
+&lt;p>If you want to make changes to your code or contribute to our community health toolkit, you can do so by editing code from your favorite editor. If you editor supports UNC path, you can access and edit files inside WSL from &lt;code>\\wsl$\Ubuntu\&amp;lt;cht-core-location&amp;gt;&lt;/code>. If you use Visual Studio Code, it&amp;rsquo;s even easier to edit your code. Just navigate to where you have checked out cht-core and type &lt;code>code .&lt;/code> This will download VS Code Server for Ubuntu and open the project in Visual Studio Code in windows.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>$: &lt;span style="color:#204a87">cd&lt;/span> ~/medic/cht-core
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>$: code .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="default-port-and-credentials-for-cht-core-web">Default port and credentials for cht-core web&lt;/h2>
+&lt;p>The default launch port for cht-core is 5988, which can be changed by providing the environment variable at runtime &lt;code>API_PORT&lt;/code>, for example: &lt;code>API_PORT=6000 node server.js&lt;/code>.&lt;/p>
+&lt;p>The deployed web app&amp;rsquo;s default user name and password is the username and password we set for CouchDB in the initial steps.&lt;/p>
+&lt;h2 id="problems">Problems?&lt;/h2>
+&lt;p>As none of our code developers use Windows as a development environment daily this solution may not be as stable as directly using MacOS or Linux. If you encounter issues please let a developer know&lt;/p></description></item><item><title>Contribute: Running multiple Chrome versions</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/run-multiple-chrome-versions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/run-multiple-chrome-versions/</guid><description>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+These steps are suitable for Mac. It was tested in a Mac Intel. It can be adapted to any Chrome version.
+&lt;/div>
+&lt;p>Follow these steps on a Mac to run Chrome version 90 while having another Chrome app on a different version.&lt;/p>
+&lt;ul>
+&lt;li>Download Chrome &lt;code>90.0.4430.72&lt;/code> from &lt;a href="https://www.slimjet.com/chrome/google-chrome-old-version.php?cmtx_sort=">slimjet&lt;/a>&lt;/li>
+&lt;li>Do not install the &lt;code>Google Chrome.app&lt;/code> in your &lt;code>Application&lt;/code> folder. Install it in your &lt;code>Desktop&lt;/code> folder for example.&lt;/li>
+&lt;li>Change the name of the app to &lt;code>Google Chrome 90.app&lt;/code> and then move it to the &lt;code>Application&lt;/code> folder, &lt;em>&lt;strong>without&lt;/strong>&lt;/em> overwritting your current Chrome&lt;/li>
+&lt;li>Remove Chrome’s automatic updates by:
+&lt;ul>
+&lt;li>Close all Chrome open instances.&lt;/li>
+&lt;li>Open &lt;code>Google Chrome 90.app&lt;/code> while not having Internet, so it doesn&amp;rsquo;t give an error after modifying the &lt;code>Info.plis&lt;/code>.&lt;/li>
+&lt;li>Right-click on &lt;code>Application/Google Chrome 90.app&lt;/code>&lt;/li>
+&lt;li>Click on &lt;code>Show package content&lt;/code>&lt;/li>
+&lt;li>Open the file &lt;code>Contents/Info.plist&lt;/code> in your IDE&lt;/li>
+&lt;li>Find the key &lt;code>KSUpdateURL&lt;/code>&lt;/li>
+&lt;li>Replace the string below: &lt;string>&lt;a href="https://tools.google.com/service/update2">https://tools.google.com/service/update2&lt;/a>&lt;/string> to &lt;string>&lt;a href="https://tools.google.com/%5BDUMMYTEXT%5D">https://tools.google.com/[DUMMYTEXT]&lt;/a>&lt;/string>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Run &lt;code>Google Chrome 90.app&lt;/code> as long as it’s the only one running&lt;/li>
+&lt;/ul></description></item></channel></rss>
