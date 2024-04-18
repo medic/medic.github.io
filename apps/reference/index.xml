@@ -145,6 +145,7 @@ display: none;
 &lt;li>&lt;a href="#get-apiv2users">GET /api/v2/users&lt;/a>
 &lt;ul>
 &lt;li>&lt;a href="#permissions-4">Permissions&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#query-parameters-4">Query Parameters&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#examples-9">Examples&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -238,7 +239,7 @@ display: none;
 &lt;ul>
 &lt;li>&lt;a href="#get-apiv1hydrate">GET /api/v1/hydrate&lt;/a>
 &lt;ul>
-&lt;li>&lt;a href="#query-parameters-5">Query parameters&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#query-parameters-6">Query parameters&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#example-4">Example&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -254,7 +255,7 @@ display: none;
 &lt;ul>
 &lt;li>&lt;a href="#get-apiv1contacts-by-phone">GET /api/v1/contacts-by-phone&lt;/a>
 &lt;ul>
-&lt;li>&lt;a href="#query-parameters-6">Query parameters&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#query-parameters-7">Query parameters&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#example-6">Example&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -270,7 +271,7 @@ display: none;
 &lt;ul>
 &lt;li>&lt;a href="#get-apiv1users-doc-count">GET /api/v1/users-doc-count&lt;/a>
 &lt;ul>
-&lt;li>&lt;a href="#query-parameters-7">Query parameters&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#query-parameters-8">Query parameters&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#example-8">Example&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
@@ -1315,6 +1316,25 @@ Content-Type: application/json; charset=utf-8
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
 &lt;h4 id="permissions-4">Permissions&lt;/h4>
 &lt;p>&lt;code>can_view_users&lt;/code>&lt;/p>
+&lt;h4 id="query-parameters-4">Query Parameters&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>facility_id&lt;/td>
+&lt;td>Added in 4.7.0. String identifier representing the uuid of the user’s facility.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>contact_id&lt;/td>
+&lt;td>Added in 4.7.0. String identifier representing the uuid of the user’s associated contact.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
 &lt;h4 id="examples-9">Examples&lt;/h4>
 &lt;p>Get list of users:&lt;/p>
 &lt;pre tabindex="0">&lt;code>GET /api/v2/users
@@ -1327,6 +1347,66 @@ Content-Type: application/json; charset=utf-8
 &amp;#34;roles&amp;#34;: [ &amp;#34;admin&amp;#34; ],
 &amp;#34;username&amp;#34;: &amp;#34;admin&amp;#34;
 },
+{
+&amp;#34;id&amp;#34;: &amp;#34;org.couchdb.user:demo&amp;#34;,
+&amp;#34;rev&amp;#34;: &amp;#34;14-8758c8493edcc6dac50366173fc3e24a&amp;#34;,
+&amp;#34;roles&amp;#34;: [ &amp;#34;district_admin&amp;#34;, &amp;#34;data_user&amp;#34; ],
+&amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
+&amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;place&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Sample District&amp;#34;,
+&amp;#34;contact&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Paul&amp;#34;,
+&amp;#34;phone&amp;#34;: &amp;#34;+2868917046&amp;#34;
+}
+},
+&amp;#34;contact&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Paul&amp;#34;,
+&amp;#34;phone&amp;#34;: &amp;#34;+2868917046&amp;#34;
+}
+}
+]
+&lt;/code>&lt;/pre>&lt;p>Get users with a specific &lt;code>facility_id&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>GET /api/v2/users?facility_id=eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b
+&lt;/code>&lt;/pre>&lt;pre tabindex="0">&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+[
+{
+&amp;#34;id&amp;#34;: &amp;#34;org.couchdb.user:demo&amp;#34;,
+&amp;#34;rev&amp;#34;: &amp;#34;14-8758c8493edcc6dac50366173fc3e24a&amp;#34;,
+&amp;#34;roles&amp;#34;: [ &amp;#34;district_admin&amp;#34;, &amp;#34;data_user&amp;#34; ],
+&amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
+&amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;place&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Sample District&amp;#34;,
+&amp;#34;contact&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Paul&amp;#34;,
+&amp;#34;phone&amp;#34;: &amp;#34;+2868917046&amp;#34;
+}
+},
+&amp;#34;contact&amp;#34;: {
+&amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17&amp;#34;,
+&amp;#34;type&amp;#34;: &amp;#34;person&amp;#34;,
+&amp;#34;name&amp;#34;: &amp;#34;Paul&amp;#34;,
+&amp;#34;phone&amp;#34;: &amp;#34;+2868917046&amp;#34;
+}
+}
+]
+&lt;/code>&lt;/pre>&lt;p>Get users with a specific &lt;code>contact_id&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>GET /api/v2/users?contact_id=eeb17d6d-5dde-c2c0-62c4a1a0ca17fd17
+&lt;/code>&lt;/pre>&lt;pre tabindex="0">&lt;code>HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+[
 {
 &amp;#34;id&amp;#34;: &amp;#34;org.couchdb.user:demo&amp;#34;,
 &amp;#34;rev&amp;#34;: &amp;#34;14-8758c8493edcc6dac50366173fc3e24a&amp;#34;,
@@ -1733,7 +1813,7 @@ Content-Type: application/json
 &amp;#34;limit: 10000
 }
 &lt;/code>&lt;/pre>&lt;p>When the requester has an online role, the following query parameters are accepted:&lt;/p>
-&lt;h5 id="query-parameters-4">Query Parameters&lt;/h5>
+&lt;h5 id="query-parameters-5">Query Parameters&lt;/h5>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -2224,7 +2304,7 @@ When documents are not found, an entry with the missing uuid and an error is add
 Supports both GET and POST.
 Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p>
 &lt;h3 id="get-apiv1hydrate">GET /api/v1/hydrate&lt;/h3>
-&lt;h4 id="query-parameters-5">Query parameters&lt;/h4>
+&lt;h4 id="query-parameters-6">Query parameters&lt;/h4>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -2288,7 +2368,7 @@ If multiple contacts are found, all are returned. When no matches are found, a 4
 Supports both GET and POST.
 Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p>
 &lt;h3 id="get-apiv1contacts-by-phone">GET /api/v1/contacts-by-phone&lt;/h3>
-&lt;h4 id="query-parameters-6">Query parameters&lt;/h4>
+&lt;h4 id="query-parameters-7">Query parameters&lt;/h4>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -2358,7 +2438,7 @@ Accepts filtering by user name, when not provided, it returns all users.
 Supports GET.
 Only allowed for users with &amp;ldquo;_admin&amp;rdquo; role.&lt;/p>
 &lt;h3 id="get-apiv1users-doc-count">GET /api/v1/users-doc-count&lt;/h3>
-&lt;h4 id="query-parameters-7">Query parameters&lt;/h4>
+&lt;h4 id="query-parameters-8">Query parameters&lt;/h4>
 &lt;table>
 &lt;thead>
 &lt;tr>
