@@ -530,33 +530,31 @@ root_url = https://monitor.example.com/
 &lt;p>This guide will walk you through adding a custom metric from Postgres &lt;em>data&lt;/em>. The following naming convention is used throughout to reference the relevant server instances: CHT Core (&lt;code>cht.example.com&lt;/code>), CHT Watchdog (&lt;code>watchdog.example.com&lt;/code>) and a Postgres server (&lt;code>db.example.com&lt;/code>).&lt;/p>
 &lt;h3 id="base-flow">Base Flow&lt;/h3>
 &lt;p>This is the initial basic flow of data from a CHT instance to Watchdog:&lt;/p>
-&lt;div class="mermaid">flowchart LR
-subgraph core["cht.example.com"]
-mon_api["Monitoring API (443)"]
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]
 end
-subgraph watchdog["watchdog.example.com"]
-json[JSON Exporter] --> Prometheus
-Prometheus --> Grafana
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
 end
-mon_api --> json
-&lt;/div>
+mon_api --&amp;gt; json&lt;/pre>
 &lt;h3 id="postgres-flow">Postgres Flow&lt;/h3>
 &lt;p>This guide will have you deploy a &lt;a href="https://github.com/prometheus-community/postgres_exporter">Postgres Exporter&lt;/a> on your Watchdog server (&lt;code>watchdog.example.com&lt;/code>). This, in turn, will query your Postgres server (&lt;code>db.example.com&lt;/code>):&lt;/p>
-&lt;div class="mermaid">flowchart LR
-subgraph core["cht.example.com"]
-mon_api["Monitoring API (443)"]
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]
 end
-subgraph watchdog["watchdog.example.com"]
-json[JSON Exporter] --> Prometheus
-postgres-exp[Postgres Exporter] --> Prometheus
-Prometheus --> Grafana
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+postgres-exp[Postgres Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
 end
-subgraph db["db.example.com"]
-postgres["Postgres (5431)"]
+subgraph db[&amp;#34;db.example.com&amp;#34;]
+postgres[&amp;#34;Postgres (5431)&amp;#34;]
 end
-mon_api --> json
-postgres --> postgres-exp
-&lt;/div>
+mon_api --&amp;gt; json
+postgres --&amp;gt; postgres-exp&lt;/pre>
 &lt;p>Adding a custom Postgres metric&lt;/p>
 &lt;p>The following steps are all performed on the CHT Watchdog instance and assume you installed Watchdog in &lt;code>~/cht-watchdog&lt;/code>. Note that user credentials with READ access to your Postgres server are required.&lt;/p>
 &lt;ol>
@@ -879,31 +877,29 @@ postgres --> postgres-exp
 &lt;p>This guide uses example instances of CHT Core (&lt;code>cht.example.com&lt;/code>) and CHT Watchdog (&lt;code>watchdog.example.com&lt;/code>). When deploying, be sure to replace with your own hostnames.&lt;/p>
 &lt;h3 id="default-flow">Default Flow&lt;/h3>
 &lt;p>Let&amp;rsquo;s look at how the default deployment of Watchdog works when configured to only gather metrics from &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">CHT Core&amp;rsquo;s monitoring API&lt;/a>:&lt;/p>
-&lt;div class="mermaid">flowchart LR
-subgraph core["cht.example.com"]
-mon_api["Monitoring API (443)"]:::client_node
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]:::client_node
 end
-subgraph watchdog["watchdog.example.com"]
-json[JSON Exporter] --> Prometheus
-Prometheus --> Grafana
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
 end
-mon_api --> json
-&lt;/div>
+mon_api --&amp;gt; json&lt;/pre>
 &lt;h3 id="additional-flows">Additional Flows&lt;/h3>
 &lt;p>Your Prometheus instance from CHT Watchog can ingest data from any &lt;a href="https://prometheus.io/docs/instrumenting/exporters/">supported data source&lt;/a> accessible via an HTTPS request. These data sources might be hosted on the same server as CHT Core or on a completely different server.&lt;/p>
 &lt;p>The focus of this guide is to collect metrics on Docker container usage and performance from the server hosting our CHT Core instance using &lt;a href="https://prometheus.io/docs/guides/cadvisor/">cAdvisor&lt;/a>.&lt;/p>
-&lt;div class="mermaid">flowchart LR
-subgraph core["cht.example.com"]
-mon_api["Monitoring API (443)"]:::client_node
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]:::client_node
 cAdvisor:::client_node
 end
-subgraph watchdog["watchdog.example.com"]
-json[JSON Exporter] --> Prometheus
-Prometheus --> Grafana
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
 end
-mon_api --> json
-cAdvisor["cAdvisor (8443)"] --> Prometheus
-&lt;/div>
+mon_api --&amp;gt; json
+cAdvisor[&amp;#34;cAdvisor (8443)&amp;#34;] --&amp;gt; Prometheus&lt;/pre>
 &lt;p>Note that because CHT Core is listening on port 443 already, we&amp;rsquo;ll have cAdvisor listen on port 8443.&lt;/p>
 &lt;p>By reading this guide you should not only be able to set up cAdvisor, but also be familiar with extending CHT Watchdog to support any other vital metrics.&lt;/p>
 &lt;h3 id="steps-to-new-integrations">Steps to new integrations&lt;/h3>

@@ -61,19 +61,17 @@ Skip this step if you&amp;rsquo;re following the &lt;a href="https://docs.commun
 &lt;p>Before getting into how the CHT horizontally scales, it should be well understood the importance of vertical scaling and what it is. This is the ability of the CHT to support more users by adding more RAM and CPU to either the bare-metal or virtual machine host. This ensures key services like API, Sentinel and, most importantly, CouchDB, can operate without performance degradation.&lt;/p>
 &lt;p>When thousands of users are simultaneously trying to synchronize with the CHT, the load can overwhelm CouchDB. As discovered &lt;a href="https://forum.communityhealthtoolkit.org/t/how-we-tested-scalability-of-cht-infrastructure/1532">through extensive research&lt;/a> and &lt;a href="https://github.com/medic/cht-core/issues/8324#issuecomment-1691411542">large production deployments&lt;/a>, administrators will start to see errors in their logs and end users will complain of slow sync times. Before moving to more CouchDB nodes, administrators should consider adding more RAM and CPU to the single server where the CHT is hosted. This applies to both CHT 3.x and CHT 4.x. Given the ease of allocating more resources, presumably in virtualized environment like &lt;a href="https://aws.amazon.com/ec2/">EC2&lt;/a>, &lt;a href="https://www.vmware.com/content/vmware/vmware-published-sites/us/products/esxi-and-esx.html.html">Proxmox&lt;/a> or &lt;a href="https://www.vmware.com/content/vmware/vmware-published-sites/us/products/esxi-and-esx.html.html">ESXi&lt;/a>, this is much easier than moving &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/data-migration/">from a single to multi-node CouchDB instance&lt;/a>.&lt;/p>
 &lt;p>Here we see a normal deployment following the bare minimum &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/requirements/">hosting requirements&lt;/a> for the CHT. We&amp;rsquo;ll call this a &amp;ldquo;short&amp;rdquo; deployment because it is not yet vertically scaled:&lt;/p>
-&lt;div class="mermaid">flowchart TD
-subgraph couch1[" CouchDB - Single ''short'' Node "]
-couchInner1["2 CPU/4 GB RAM"]
+&lt;pre class="mermaid">flowchart TD
+subgraph couch1[&amp;#34; CouchDB - Single &amp;#39;&amp;#39;short&amp;#39;&amp;#39; Node &amp;#34;]
+couchInner1[&amp;#34;2 CPU/4 GB RAM&amp;#34;]
 end
-API["API"] --> HAProxy --> couch1
-&lt;/div>
+API[&amp;#34;API&amp;#34;] --&amp;gt; HAProxy --&amp;gt; couch1&lt;/pre>
 &lt;p>After looking at the logs, and seeing error messages about API timeouts to CouchDB, the CHT admin can make this &amp;ldquo;taller&amp;rdquo; by adding both more RAM and CPU, so it looks like this:&lt;/p>
-&lt;div class="mermaid">flowchart TD
-subgraph couch2[" CouchDB - Single ''tall'' Node "]
-couchInner2["16 CPU/16 GB RAM"]
+&lt;pre class="mermaid">flowchart TD
+subgraph couch2[&amp;#34; CouchDB - Single &amp;#39;&amp;#39;tall&amp;#39;&amp;#39; Node &amp;#34;]
+couchInner2[&amp;#34;16 CPU/16 GB RAM&amp;#34;]
 end
-API["API"] --> HAProxy --> couch2
-&lt;/div>
+API[&amp;#34;API&amp;#34;] --&amp;gt; HAProxy --&amp;gt; couch2&lt;/pre>
 &lt;p>Since both CHT 3.x and 4.x support this, vertical scaling is an easy, good first step in addressing performance issues in the CHT.&lt;/p>
 &lt;h2 id="horizontal-scaling-4x">Horizontal scaling 4.x&lt;/h2>
 &lt;p>When:&lt;/p>
@@ -83,14 +81,13 @@ API["API"] --> HAProxy --> couch2
 &lt;li>you&amp;rsquo;re starting a new deployment and you predict a large number of users (in excess of 1k)&lt;/li>
 &lt;/ul>
 &lt;p>it is time to consider horizontally scaling your CHT instance. The benefit is that CouchDB has been &lt;a href="https://forum.communityhealthtoolkit.org/t/how-we-tested-scalability-of-cht-infrastructure/1532">proven to use resources much better&lt;/a> when there&amp;rsquo;s multiple of instances of it, each taking a share of the work. Here we see 18 CPUs being spread across 3 nodes (vs 16 CPUs on one instance above) with a load balancer (HAProxy) distributing requests :&lt;/p>
-&lt;div class="mermaid">flowchart TD
-subgraph couch4["CouchDB - Three Nodes"]
-couchInner4["6 CPU/6 GB RAM "]
-couchInner5["6 CPU/6 GB RAM "]
-couchInner6["6 CPU/6 GB RAM "]
+&lt;pre class="mermaid">flowchart TD
+subgraph couch4[&amp;#34;CouchDB - Three Nodes&amp;#34;]
+couchInner4[&amp;#34;6 CPU/6 GB RAM &amp;#34;]
+couchInner5[&amp;#34;6 CPU/6 GB RAM &amp;#34;]
+couchInner6[&amp;#34;6 CPU/6 GB RAM &amp;#34;]
 end
-API["API"] --> HAProxy --> couch4
-&lt;/div>
+API[&amp;#34;API&amp;#34;] --&amp;gt; HAProxy --&amp;gt; couch4&lt;/pre>
 &lt;p>To read up on how to migrate your data from a single to multi-node, please see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/data-migration/">data migration guide&lt;/a>.&lt;/p>
 &lt;p>It should be noted that, unlike vertical scaling, horizontal scaling of a large, existing dataset can take a while to prepare the transfer (hours to days) and may involve a brief service outage. This should be taken into consideration when planning a move of a CHT instance with a lot of data.&lt;/p>
 &lt;style>
