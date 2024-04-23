@@ -177,8 +177,6 @@ export ANDROID_KEYSTORE_PASSWORD_NEW_BRAND=dd8668...
 export ANDROID_KEY_PASSWORD_NEW_BRAND=dd8668...
 export ANDROID_SECRETS_IV_NEW_BRAND=88d9c2dea7a9...
 export ANDROID_SECRETS_KEY_NEW_BRAND=2824d02d2bc221f5844b8fe1d928211dcbbc...
-export ANDROID_KEYSTORE_PATH_NEW_BRAND=new_brand.keystore
-export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
 #
 # The file secrets/secrets-new_brand.tar.gz.enc was created and has to be added to the git
 # repository (don&amp;#39;t worry, it&amp;#39;s encrypted with some of the keys above). #
@@ -189,7 +187,7 @@ export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
 &lt;p>Use a safe channel to send the environment variables to the manager in charge, like a password manager, and keep them locally at least for testing, storing in a script file that is safe in your computer.&lt;/p>
 &lt;p>About the file &lt;code>secrets/secrets-new_brand.tar.gz.enc&lt;/code>, as the last paragraph in the console says: &lt;em>has to be added to the git repository (don&amp;rsquo;t worry, it&amp;rsquo;s encrypted with some of the keys above)&lt;/em>.&lt;/p>
 &lt;p>If you want to start over because some of the parameters were wrong, just execute &lt;code>make org=new_brand keyrm-all&lt;/code> to clean all the files generated. Once committed the &lt;code>.enc&lt;/code> file, you can delete the uncompressed and unencrypted version with &lt;code>make org=new_brand keyrm&lt;/code>, it will delete the &lt;code>new_brand.keystore&lt;/code>, &lt;code>new_brand_private_key.pepk&lt;/code>, and the unencrypted &lt;code>.tar.gz&lt;/code> files, that are safer kept in the &lt;code>.tar.gz.enc&lt;/code> file.&lt;/p>
-&lt;h3 id="4-test-locally-the-keystore">4. Test locally the keystore&lt;/h3>
+&lt;h3 id="4-test-the-keystore-locally">4. Test the keystore locally&lt;/h3>
 &lt;p>&lt;strong>Want to check the keystore?&lt;/strong> here are a few things you must test before upload to the repository:&lt;/p>
 &lt;ol>
 &lt;li>
@@ -199,7 +197,7 @@ export ANDROID_KEY_ALIAS_NEW_BRAND=medicmobile
 &lt;p>Execute &lt;code>make org=new_brand keyprint&lt;/code> to see the certificate content, like the org name, the certificate fingerprints, etc.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Sign your app! try locally to build the app with the certificate. To create the .apk files run: &lt;code>make org=new_brand flavor=New_brand assemble&lt;/code>. The &amp;ldquo;release&amp;rdquo; files signed should be placed in &lt;code>build/outputs/apk/new_brand/release/&lt;/code>. To ensure the files were signed with the right signature execute &lt;code>make keyprint-apk&lt;/code>, it will check the certificate of the first apk file under the &lt;code>build/&lt;/code> folder:&lt;/p>
+&lt;p>Sign your app! You can try locally to build the app with the certificate. To create the .apk files run: &lt;code>make org=new_brand flavor=New_brand assemble&lt;/code>. The &amp;ldquo;release&amp;rdquo; files signed should be placed in &lt;code>build/outputs/apk/new_brand/release/&lt;/code>. To ensure the files were signed with the right signature execute &lt;code>make keyprint-apk&lt;/code>, it will check the certificate of the first apk file under the &lt;code>build/&lt;/code> folder:&lt;/p>
 &lt;pre tabindex="0">&lt;code>make keyprint-apk
 apksigner verify -v --print-certs build/outputs/apk/new_brand/release/cht-android-SNAPSHOT-new_brand-arm64-v8a-release.apk
 ... ...
@@ -209,7 +207,7 @@ Signer #1 certificate DN: CN=Unknown, OU=New Brand, O=Medic Mobile, L=San Franci
 Signer #1 certificate SHA-256 digest: 7f072b...
 &lt;/code>&lt;/pre>&lt;/li>
 &lt;/ol>
-&lt;p>Also do the same for the bundle format: build and verify, despite the AAB are not useful for local development. In our example, execute first &lt;code>make org=new_brand flavor=New_brand bundle&lt;/code>, and then &lt;code>make keyprint-bundle&lt;/code> to see the signature of one of the &lt;code>.aab&lt;/code> files generated.&lt;/p>
+&lt;p>Also, do the same for the bundle format: build and verify, despite the AAB are not useful for local development. In our example, execute first &lt;code>make org=new_brand flavor=New_brand bundle&lt;/code>, and then &lt;code>make keyprint-bundle&lt;/code> to see the signature of one of the &lt;code>.aab&lt;/code> files generated.&lt;/p>
 &lt;p>Because the files generated here are signed with the same key that you are going to use in CI, and the files produced in CI will be uploaded to the Play Store later, any file generated locally following the steps above will be compatible with any installation made from the Play Store, means that if a user install the app from the Play Store, and then we want to replace the installation with an alpha version generated in CI or a local version generated in dev environment, it will work without requiring the user to uninstall the app and lost the data.&lt;/p>
 &lt;h3 id="5-release-the-new-flavor">5. Release the new flavor&lt;/h3>
 &lt;p>Releasing a new flavor requires the following steps:&lt;/p>
