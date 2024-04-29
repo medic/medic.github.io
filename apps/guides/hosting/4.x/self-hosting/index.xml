@@ -84,7 +84,22 @@ docker compose up --detach
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="tls-certificates">TLS Certificates&lt;/h2>
 &lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/adding-tls-certificates/">TLS Certificates page&lt;/a> for how to import your certificates.&lt;/p>
 &lt;h2 id="upgrades">Upgrades&lt;/h2>
-&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes on Docker Swarm</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/multiple-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/multiple-nodes/</guid><description>
+&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p>
+&lt;h3 id="upgrading-the-cht-upgrade-service">Upgrading the cht-upgrade-service&lt;/h3>
+&lt;p>The &lt;a href="https://github.com/medic/cht-upgrade-service">CHT Upgrade Service&lt;/a> provides an interface between the CHT Core API and Docker to allow easy startup and one-click upgrades from the CHT Admin UI. Occasionally, the CHT Upgrade Service, itself, will need to be upgraded. If an upgrade is available, it is highly recommended that you install the upgrade for the CHT Upgrade Service before performing further upgrades on your CHT instance. This is done via the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Verify that the &lt;em>version&lt;/em> of the &lt;code>cht-upgrade-service&lt;/code> image in your &lt;code>./upgrade-service/docker-compose.yml&lt;/code> files is set to &lt;code>latest&lt;/code>.&lt;/li>
+&lt;li>Pull the latest &lt;code>cht-upgrade-service&lt;/code> image from Docker Hub and replace the current container by running the following command:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Upgrading the CHT Upgrade Service will not cause a new CHT version to be installed. The CHT Core and CouchDB contains are not affected.
+&lt;/div>
+&lt;p>Follow the &lt;a href="https://forum.communityhealthtoolkit.org/c/product/releases/26">Product Releases channel&lt;/a> on the CHT forum to stay informed about new releases and upgrades.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes on Docker Swarm</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/multiple-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/multiple-nodes/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>The clustered multi-node hosting described below is recommended for deployments that need increased performance gains. These gains will increase the complexity of troubleshooting and decrease the ease ongoing maintenance.&lt;/p>
 &lt;p>If you are unsure which deployment to use check out &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/#recommendations-and-considerations">Self-hosting recommendations&lt;/a>.&lt;/p>
@@ -323,7 +338,22 @@ This section has the first use of &lt;code>docker compose&lt;/code>. This should
 &lt;p>To login as the medic user in the web app, you can find your password with this command:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;=&amp;#39;&lt;/span> -f2
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="upgrades">Upgrades&lt;/h2>
-&lt;p>Upgrades are completely manual for the clustered setup right now. You have to go into each of the docker compose files and modify the image tag and take containers down and restart them.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes on k3s on VMWare</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/self-hosting-k3s-multinode/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/self-hosting-k3s-multinode/</guid><description>
+&lt;p>Upgrades are completely manual for the clustered setup right now. You have to go into each of the docker compose files and modify the image tag and take containers down and restart them.&lt;/p>
+&lt;h3 id="upgrading-the-cht-upgrade-service">Upgrading the cht-upgrade-service&lt;/h3>
+&lt;p>The &lt;a href="https://github.com/medic/cht-upgrade-service">CHT Upgrade Service&lt;/a> provides an interface between the CHT Core API and Docker to allow easy startup and one-click upgrades from the CHT Admin UI. Occasionally, the CHT Upgrade Service, itself, will need to be upgraded. If an upgrade is available, it is highly recommended that you install the upgrade for the CHT Upgrade Service before performing further upgrades on your CHT instance. This is done via the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Verify that the &lt;em>version&lt;/em> of the &lt;code>cht-upgrade-service&lt;/code> image in your &lt;code>./upgrade-service/docker-compose.yml&lt;/code> files is set to &lt;code>latest&lt;/code>.&lt;/li>
+&lt;li>Pull the latest &lt;code>cht-upgrade-service&lt;/code> image from Docker Hub and replace the current container by running the following command:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Upgrading the CHT Upgrade Service will not cause a new CHT version to be installed. The CHT Core and CouchDB contains are not affected.
+&lt;/div>
+&lt;p>Follow the &lt;a href="https://forum.communityhealthtoolkit.org/c/product/releases/26">Product Releases channel&lt;/a> on the CHT forum to stay informed about new releases and upgrades.&lt;/p></description></item><item><title>Apps: Self Hosting in CHT 4.x - Multiple CouchDB Nodes on k3s on VMWare</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/self-hosting-k3s-multinode/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/self-hosting-k3s-multinode/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>This page covers an example k3s cluster setup on a VMware datacenter with vSphere 7+ for a national deployment across 50 counties capable of supporting 20,000+ CHWs concurrently. After setup, administrators should only add VMs to the cluster or deploy CHT Core projects to be orchestrated.&lt;/p>
 &lt;/div>
@@ -655,4 +685,19 @@ status: {}
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Ingress&lt;/a> - This is what forwards traffic to a particular project or pods. In most use-cases, there is an nginx deployed outside of the k3s cluster than contains DNS entries for existing projects, and contains a proxy_pass parameter to send traffic based on host header to any of the k3s server IPs. Inside the k3s cluster, the traefik container and servicelb-traefik containers in kube-system namespace will handle forwarding traffic to the correct cht-core containers based on url&lt;/li>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">Persistent Volume Claim&lt;/a> - This is where our project data will be stored. Important to ensure you have configured this correctly, with retain policies intact so the data is not deleted if the project is removed. It&amp;rsquo;s also vital to ensure you have a backup policy either set-up in VMware vCenter GUI or you have configured the csi-snapshotter that comes with vSphere CSI.&lt;/li>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/services-networking/service/">Services&lt;/a> - This is utilized for CouchDB nodes to discover each other through DNS rather than internal IPs, which can change. This is also used in the COUCH_URL so API containers can discover where CouchDB is running.&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;/ul></description></item><item><title>Apps: Upgrading the cht-upgrade-service</title><link>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/_partial_upgrade_service/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/hosting/4.x/self-hosting/_partial_upgrade_service/</guid><description>
+&lt;h3 id="upgrading-the-cht-upgrade-service">Upgrading the cht-upgrade-service&lt;/h3>
+&lt;p>The &lt;a href="https://github.com/medic/cht-upgrade-service">CHT Upgrade Service&lt;/a> provides an interface between the CHT Core API and Docker to allow easy startup and one-click upgrades from the CHT Admin UI. Occasionally, the CHT Upgrade Service, itself, will need to be upgraded. If an upgrade is available, it is highly recommended that you install the upgrade for the CHT Upgrade Service before performing further upgrades on your CHT instance. This is done via the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Verify that the &lt;em>version&lt;/em> of the &lt;code>cht-upgrade-service&lt;/code> image in your &lt;code>./upgrade-service/docker-compose.yml&lt;/code> files is set to &lt;code>latest&lt;/code>.&lt;/li>
+&lt;li>Pull the latest &lt;code>cht-upgrade-service&lt;/code> image from Docker Hub and replace the current container by running the following command:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Upgrading the CHT Upgrade Service will not cause a new CHT version to be installed. The CHT Core and CouchDB contains are not affected.
+&lt;/div>
+&lt;p>Follow the &lt;a href="https://forum.communityhealthtoolkit.org/c/product/releases/26">Product Releases channel&lt;/a> on the CHT forum to stay informed about new releases and upgrades.&lt;/p></description></item></channel></rss>
