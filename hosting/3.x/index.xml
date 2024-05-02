@@ -1,0 +1,690 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – 3.x</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/</link><description>Recent content in 3.x on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/3.x/index.xml" rel="self" type="application/rss+xml"/><item><title>Hosting: AWS Hosting in CHT 3.x</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/ec2-setup-guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/3.x/ec2-setup-guide/</guid><description>
+&lt;p>Most production CHT instances are deployed on AWS EC2. Leveraging Elastic Compute Cloud (EC2) and Elastic Block Store (EBS), CHT instances can easily be scaled up with larger EC2 instances and have easy increased disk space, backup and restores with EBS.&lt;/p>
+&lt;p>This guide will walk you through the process of creating an EC2 instance, mounting an EBS volume and provisioning Docker containers.&lt;/p>
+&lt;h2 id="create-and-configure-ec2-instance">Create and Configure EC2 Instance&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Create EC2 (use security best practices)&lt;/p>
+&lt;p>Review the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/#hardware-requirements">CHT hardware requirements&lt;/a> and start with an appropriately sized instance. After creating the instance and downloading the &lt;code>.pem&lt;/code> file, change permissions to &lt;code>0600&lt;/code> for it:&lt;/p>
+&lt;pre tabindex="0">&lt;code>sudo chmod 0600 ~/Downloads/name_of_file.pem
+&lt;/code>&lt;/pre>&lt;p>Create an &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html">Elastic IP (EIP) and associate the EIP to your EC2 instance&lt;/a>.&lt;/p>
+&lt;p>You should now be able to SSH into the EC2 instance using the EIP and the &lt;code>.pem&lt;/code> file.&lt;/p>
+&lt;p>&lt;code>Goal&lt;/code>: SSH into instance&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Create or Restore EBS Volume&lt;/p>
+&lt;ul>
+&lt;li>Create or &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-restoring-volume.html">Restore&lt;/a> your EBS Volume, tagging appropriately, so it can be found later.&lt;/li>
+&lt;li>Attach volume to EC2 instance&lt;/li>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html">Increase disk size&lt;/a> (Optional)&lt;/li>
+&lt;li>If you are using a newly created EBS Volume, you will have to format the disk appropriately:
+&lt;ol>
+&lt;li>SSH into instance&lt;/li>
+&lt;li>Follow the instructions here: &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html">Using EBS Volumes&lt;/a>&lt;/li>
+&lt;li>Use &lt;code>sudo mkfs -t ext4 &amp;lt;location&amp;gt;&lt;/code> in step 4&lt;/li>
+&lt;li>Mount disk to &lt;code>/srv&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>Goal&lt;/code>: Mount EBS volume to &lt;code>/srv&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Provision Docker server&lt;/p>
+&lt;p>Follow README &amp;amp; Run scripts in &lt;a href="https://github.com/medic/cht-infrastructure/tree/master/self-hosting/prepare-system">cht-infrastructure repository&lt;/a>.&lt;/p>
+&lt;p>&lt;code>Goal&lt;/code>: CHT Application bootstraps and comes online&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>DNS configuration&lt;/p>
+&lt;ul>
+&lt;li>Point DNS &lt;code>A&lt;/code> record to EIP given to Docker server in the prior step.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Review SSL certificates&lt;/p>
+&lt;ul>
+&lt;li>Location of certs is &lt;code>/srv/settings/medic-core/nginx/private/&lt;/code>&lt;/li>
+&lt;li>Name the key file is &lt;code>default.key&lt;/code> and the certificate file is &lt;code>default.crt&lt;/code>&lt;/li>
+&lt;li>See &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/ssl-cert-install/">SSL Certficates&lt;/a> to install new certificates&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Configure couch2pg
+See the &lt;a href="https://github.com/medic/cht-couch2pg/blob/main/README.md">couch2pg basic configuration&lt;/a> in the &lt;code>cht-couch2pg&lt;/code> repository.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Setup postgres to work with couch2pg&lt;/p>
+&lt;ul>
+&lt;li>Creating the database, setting up permissions, exploring the tables and what they store&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Debugging couch2pg/postgres&lt;/p>
+&lt;ul>
+&lt;li>Understanding the log and what the entries mean&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="troubleshooting">Troubleshooting&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Restarting processes&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>/boot/svc-&amp;lt;start/stop/restart&amp;gt; &amp;lt;service-name/medic-api/medic-sentinel/medic-core couchdb/medic-core nginx&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>Also see &lt;a href="https://github.com/medic/medic-os#user-content-service-management-scripts">MedicOS service management scripts&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Investigating logs inside Medic OS&lt;/p>
+&lt;ul>
+&lt;li>To view logs, first run this to access a shell in the medic-os container: &lt;code>docker exec -it medic-os /bin/bash&lt;/code>&lt;/li>
+&lt;li>View CouchDB logs: &lt;code>less /srv/storage/medic-core/couchdb/logs/startup.log&lt;/code>&lt;/li>
+&lt;li>View medic-api logs: &lt;code>less /srv/storage/medic-api/logs/medic-api.log&lt;/code>&lt;/li>
+&lt;li>View medic-sentinel logs: &lt;code>less /srv/storage/medic-sentinel/logs/medic-sentinel.log&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Investigating docker stderr/stdout logs&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span> sudo docker logs medic-os
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sudo docker logs haproxy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Upgrading the container&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Backup all data (EBS)&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Log into container and stop all services&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To prepare for the upgrade, delete all other files in &lt;code>/srv&lt;/code> EXCEPT for &lt;code>/srv/storage/medic-core/&lt;/code>&lt;/p>
+&lt;p>The &lt;code>medic-core&lt;/code> directory is where the CHT stores user data. Of key importance is &lt;code>./couchdb/local.in&lt;/code> and &lt;code>./medic-core/couchdb/local.d/&lt;/code> where custom CouchDB configuration is stored.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Change the image tag to the final Medic OS image release version (&lt;code>cht-3.9.0-rc.2&lt;/code>) in the docker compose file:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">medic-os&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medicmobile/medic-os:cht-3.9.0-rc.2&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Launch new containers with appropriate &lt;code>COUCHDB_ADMIN_PASSWORD&lt;/code> &amp;amp; &lt;code>HA_PASSWORD&lt;/code> environment variables&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Upgrading the webapp&lt;/p>
+&lt;ul>
+&lt;li>Use Admin GUI page&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/#links-to-medic-documentation-for-horticulturalist-for-upgrades">CLI via horticulturalist&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>RDS help&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">Amazon user guide&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="backups">Backups&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Configure backups&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html">EBS Snapshot Lifecycle Manager&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Restoring from backup&lt;/p>
+&lt;ul>
+&lt;li>Create volume from snapshot&lt;/li>
+&lt;li>Tag appropriately for backups&lt;/li>
+&lt;li>Mount volume to docker server&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="process-supervision">Process supervision&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>supvisorctl&lt;/code>&lt;/li>
+&lt;li>&lt;code>/boot/supervisor-inspect&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="increasing-disk-size">Increasing disk size&lt;/h2>
+&lt;p>Monitor disk usage so alerts are sent before all disk spaces is used up. If free disk space falls below 40%, increase the disk space as follows:&lt;/p>
+&lt;ul>
+&lt;li>Stop medic: &lt;code>sudo supervisorctl stop medic&lt;/code>&lt;/li>
+&lt;li>Go to EBS in AWS and take a snapshot of the volume.&lt;/li>
+&lt;li>Modify the volume size (Increase it by 2x preferably). Wait until the modification succeeds.&lt;/li>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html">Make the instance recognize the additional space&lt;/a>&lt;/li>
+&lt;li>Turn medic back on: &lt;code>sudo supervisorctl start medic&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="monitoring--backup">Monitoring &amp;amp; Backup&lt;/h2>
+&lt;ul>
+&lt;li>AWS CloudWatch and monitoring tab. Enable detailed monitoring (This costs more money)&lt;/li>
+&lt;li>Set up &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#snapshot-lifecycle-console">Lifecycle Management for EBS snapshots&lt;/a>&lt;/li>
+&lt;li>Steps to mounting a backup snapshot to the instance and restarting the application&lt;/li>
+&lt;li>Please see the second-half of &amp;ldquo;Increasing disk size&amp;rdquo; reference above&lt;/li>
+&lt;li>Setup a TLS cert &amp;amp; DNS registration&lt;/li>
+&lt;/ul></description></item><item><title>Hosting: Self Hosting in CHT 3.x</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/</guid><description>
+&lt;p>Whether run on bare-metal or in a cloud provider, the Community Health Toolkit (CHT) core framework has been packaged into a docker container to make it portable and easy to install. It is available from &lt;a href="https://hub.docker.com/r/medicmobile/medic-os">dockerhub&lt;/a>. To learn more how to work with docker you could follow the tutorial &lt;a href="https://docker-curriculum.com/#getting-started">here&lt;/a> and the cheat sheet &lt;a href="https://docs.docker.com/get-started/docker_cheatsheet.pdf">here&lt;/a>.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Before continuing, ensure all &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/">requirements&lt;/a> are met.
+&lt;/div>
+&lt;h2 id="installing-with-a-compose-file">Installing with a compose file&lt;/h2>
+&lt;p>The CHT containers are installed using &lt;a href="https://docs.docker.com/compose/reference/overview/">docker compose&lt;/a> so that you can run multiple containers as a single service.&lt;/p>
+&lt;p>Start by choosing the location where you would like to save your compose configuration file. Then create the &lt;code>docker-compose.yml&lt;/code> file by &lt;code>cd&lt;/code>ing into the correct directory and running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>curl -s -o docker-compose.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The install requires an admin password that it will configure in the database. You need to provide this externally as an environment variable. Before you run the compose file, you need to export this variable as shown below.&lt;/p>
+&lt;p>&lt;code>export DOCKER_COUCHDB_ADMIN_PASSWORD=myAwesomeCHTAdminPassword&lt;/code>&lt;/p>
+&lt;p>You can then run &lt;code>docker-compose&lt;/code> in the folder where you put your compose &lt;code>docker-compose.yml&lt;/code> file. To start, run it interactively to see all the logs on screen and be able to stop the containers with &lt;code>ctrl&lt;/code> + &lt;code>c&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If there are no errors, stop the containers with &lt;code>ctrl&lt;/code> + &lt;code>c&lt;/code> and then run it detached with &lt;code>-d&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker-compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note In certain shells, &lt;code>docker-compose&lt;/code> may not interpolate the admin password that was exported in &lt;code>DOCKER_COUCHDB_ADMIN_PASSWORD&lt;/code>. Check if this is the case by searching the logs in the medic-os dockers instance. If the &lt;code>docker logs medic-os&lt;/code> command below returns a user and password, then the export above failed, and you should use this user and password to complete the installation:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker logs medic-os &lt;span style="color:#000;font-weight:bold">|&lt;/span>grep &lt;span style="color:#4e9a06">&amp;#39;New CouchDB Admin&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Info: New CouchDB Administrative User: medic
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Info: New CouchDB Administrative Password: password
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Monitor the logs until you get the &lt;code>Setting up software (100% complete)&lt;/code> message. At this stage all containers are fully set up.&lt;/p>
+&lt;p>Once containers are setup, please run the following command from your host terminal:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker &lt;span style="color:#204a87">exec&lt;/span> -it medic-os /bin/bash -c &lt;span style="color:#4e9a06">&amp;#34;sed -i &amp;#39;s/--install=3.9.0/--complete-install/g&amp;#39; /srv/scripts/horticulturalist/postrun/horticulturalist&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo docker &lt;span style="color:#204a87">exec&lt;/span> -it medic-os /bin/bash -c &lt;span style="color:#4e9a06">&amp;#34;/boot/svc-disable medic-core openssh &amp;amp;&amp;amp; /boot/svc-disable medic-rdbms &amp;amp;&amp;amp; /boot/svc-disable medic-couch2pg&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The first command fixes a postrun script for horticulturalist to prevent unique scenarios of re-install. The second command removes extra services that you will not need.&lt;/p>
+&lt;h3 id="visit-your-project">Visit your project&lt;/h3>
+&lt;p>If you&amp;rsquo;re running this on your local machine, then open a browser to &lt;a href="https://localhost">https://localhost&lt;/a>. Otherwise open a browser to the public IP of the host if it&amp;rsquo;s running remotely.&lt;/p>
+&lt;p>You will have to click to through the SSL Security warning. Click &amp;ldquo;Advanced&amp;rdquo; -&amp;gt; &amp;ldquo;Continue to site&amp;rdquo;.&lt;/p>
+&lt;h3 id="clean-up-and-re-install">Clean up and re-install&lt;/h3>
+&lt;p>If some instructions were missed and there&amp;rsquo;s a broken CHT deployment, use the commands below to start afresh:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Stop containers: &lt;code>docker stop medic-os &amp;amp;&amp;amp; docker stop haproxy&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Remove containers: &lt;code>docker rm medic-os &amp;amp;&amp;amp; docker rm haproxy&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Clean data volume:&lt;code>docker volume rm medic-data&lt;/code>&lt;/p>
+&lt;p>Note: Running &lt;code>docker-compose down -v&lt;/code> would do all the above 3 steps&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Prune system: &lt;code>docker system prune&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>After following the above commands, you can re-run docker-compose up and create a clean install: &lt;code>docker-compose up -d&lt;/code>&lt;/p>
+&lt;h3 id="port-conflicts">Port Conflicts&lt;/h3>
+&lt;p>In case you are already running services on HTTP(80) and HTTPS(443),you will have to either remap ports to the medic-os container or stop the services using those ports.&lt;/p>
+&lt;p>To find out which service is using a conflicting port: On Linux:&lt;/p>
+&lt;p>&lt;code>sudo netstat -plnt | grep ':&amp;lt;port&amp;gt;'&lt;/code>&lt;/p>
+&lt;p>On Mac (10.10 and above):&lt;/p>
+&lt;p>&lt;code>sudo lsof -iTCP -sTCP:LISTEN -n -P | grep ':&amp;lt;port&amp;gt;'&lt;/code>&lt;/p>
+&lt;p>You can either kill the service which is occupying HTTP/HTTPS ports, or run the container with forwarded ports that are free. In your compose file, change the ports under medic-os:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">medic-os&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medic-os&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medicmobile/medic-os:cht-3.7.0-rc.1&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">medic-data:/srv&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ports&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#0000cf;font-weight:bold">8080&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">80&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#0000cf;font-weight:bold">444&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">443&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Turn off and remove all existing containers that were started:&lt;/p>
+&lt;p>&lt;code>sudo docker-compose down&lt;/code>&lt;/p>
+&lt;p>Bring Up the containers in detached mode with the new forwarded ports.&lt;/p>
+&lt;p>&lt;code>sudo docker-compose up -d&lt;/code>&lt;/p>
+&lt;p>Note: You can substitute 8080, 444 with whichever ports are free on your host. You would now visit https://localhost:444 to visit your project.&lt;/p>
+&lt;h2 id="data-storage--persistence">Data storage &amp;amp; persistence&lt;/h2>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Containers that are already set up will lose all data when following the steps below to remap the &lt;code>/srv&lt;/code> directory.
+&lt;/div>
+&lt;p>Docker containers are &lt;a href="https://www.redhat.com/en/topics/cloud-native-apps/stateful-vs-stateless">stateless&lt;/a> by design. In order to persist your data when a container restarts you need to specify the volumes that the container can use to store data. The CHT app stores all its data in the &lt;code>/srv&lt;/code> folder. This is the folder that you need to map to your volume before you spin up your containers.&lt;/p>
+&lt;p>Ideally you should map this folder to a volume that is backed up regularly by your cloud hosting provider.&lt;/p>
+&lt;p>The example below shows how to map this folder in Ubuntu:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Create the &lt;code>/srv&lt;/code> folder: &lt;code>sudo mkdir /srv&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Mount your volume to this folder: &lt;code>sudo mount /dev/xvdg /srv&lt;/code> . The attached volume number varies. Find your volume by running &lt;code>lsblk&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Update your compose file so that the containers store data to this folder&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">medic-os&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medic-os&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medicmobile/medic-os:cht-3.9.0-rc.2&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/srv:/srv&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>----&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">haproxy&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">haproxy&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">medicmobile/haproxy:rc-1.17&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/srv:/srv &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>Alternatively, can create the &lt;code>/srv&lt;/code> folder on any drive with enough space that is regularly backed up. Then map the path to the folder in the compose file like this.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/path/to/srv:/srv&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Be sure to check the available storage space regularly and expand your volume when needed&lt;/p>
+&lt;h2 id="backup">Backup&lt;/h2>
+&lt;p>Regular backups should be made of the &lt;code>/srv&lt;/code> directory to have holistic and easy to restore copies of all important data and the current CHT version installed. To backup just the data and not the CHT, make copies of &lt;code>/srv/storage/medic-core/&lt;/code>. This directory includes 4 key sub-directies:&lt;/p>
+&lt;ul>
+&lt;li>./couchdb&lt;/li>
+&lt;li>./openssh&lt;/li>
+&lt;li>./nginx&lt;/li>
+&lt;li>./passwd&lt;/li>
+&lt;/ul>
+&lt;p>To make backups of just CouchDB data outside of the CHT docker infrastructure, please see &lt;a href="https://docs.couchdb.org/en/2.3.1/maintenance/backups.html">CouchDB&amp;rsquo;s Backup docs for 2.3.1&lt;/a>. Please note:&lt;/p>
+&lt;ul>
+&lt;li>CouchDB data files are in &lt;code>/srv/storage/medic-core/couchdb/data&lt;/code> in the &lt;code>medic-os&lt;/code> container.&lt;/li>
+&lt;li>Backing up via replication is discouraged as restored DBs can cause offline users to restart replication from zero. Use file backups instead.&lt;/li>
+&lt;/ul></description></item><item><title>Hosting: App Developer Hosting in CHT 3.x</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/3.x/app-developer/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without loosing any data while doing so. To do development on the CHT core itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/dev-environment/">development guide&lt;/a>.&lt;/p>
+&lt;p>To deploy the CHT in production, see either &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/">AWS hosting&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/ec2-setup-guide/">Self hosting&lt;/a>&lt;/p>
+&lt;/div>
+&lt;h2 id="getting-started">Getting started&lt;/h2>
+&lt;p>Be sure to meet the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/">CHT hosting requirements&lt;/a> first. As well, if any other &lt;code>medic-os&lt;/code> instances using &lt;a href="https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml">the main &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> file&lt;/a> are running locally, stop them otherwise port, storage volume and container name conflicts may occur.&lt;/p>
+&lt;p>After meeting these requirements, download the developer YAML file in the directory you want to store them:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>curl -o docker-compose-developer-3.x-only.yml https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper/docker-compose-developer-3.x-only.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To start the first developer CHT instance, run &lt;code>docker-compose&lt;/code> and specify the file that was just download:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose -f docker-compose-developer-3.x-only.yml up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This may take some minutes to fully start depending on the speed of the Internet connection and speed of the bare-metal host. This is because docker needs to download all the storage layers for all the containers and the CHT needs to run the first run set up. After downloads and setup has completed, the CHT should be accessible on &lt;a href="https://localhost">https://localhost&lt;/a>.&lt;/p>
+&lt;p>When connecting to a new dev CHT instance for the first time, an error will be shown, &amp;ldquo;Your connection is not private&amp;rdquo; (see &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/privacy.error.png">screenshot&lt;/a>). To get past this, click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
+&lt;h2 id="running-the-nth-cht-instance">Running the Nth CHT instance&lt;/h2>
+&lt;p>After running the first instance of the CHT, it&amp;rsquo;s easy to run as many more as are needed. This is achieved by specifying different:&lt;/p>
+&lt;ul>
+&lt;li>port for &lt;code>HTTP&lt;/code> redirects (&lt;code>CHT_HTTP&lt;/code>)&lt;/li>
+&lt;li>port for &lt;code>HTTPS&lt;/code> traffic (&lt;code>CHT_HTTPS&lt;/code>)&lt;/li>
+&lt;li>project to for the docker compose call (&lt;code>-p PROJECT&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;p>Assuming you want to start a new project called &lt;code>the_second&lt;/code> and start the instance on &lt;code>HTTP&lt;/code> port &lt;code>8081&lt;/code> and &lt;code>HTTPS&lt;/code> port &lt;code>8443&lt;/code>, this would be the command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span> &lt;span style="color:#000">CHT_HTTPS&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8443&lt;/span> docker-compose -p the_second -f docker-compose-developer-3.x-only.yml up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The second instance is now accessible at &lt;a href="https://localhost:8443">https://localhost:8443&lt;/a>.&lt;/p>
+&lt;h2 id="the-env-file">The &lt;code>.env&lt;/code> file&lt;/h2>
+&lt;p>Often times it&amp;rsquo;s convenient to use revision control, like GitHub, to store and publish changes in a CHT app. A nice compliment to this is to store the specifics on how to run the &lt;code>docker-compose&lt;/code> command for each app. By using a shared &lt;code>docker-compose&lt;/code> configuration for all developers on the same app, it avoids any port collisions and enables all developers to have a unified configuration.&lt;/p>
+&lt;p>Using the above &lt;code>the_second&lt;/code> sample project, we can create another directory to host this project&amp;rsquo;s configuration:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>mkdir ../the_second
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Create a file &lt;code>../the_second/.env-docker-compose&lt;/code> with this contents:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">COMPOSE_PROJECT_NAME&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>the_second
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8081&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">CHT_HTTPS&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#0000cf;font-weight:bold">8443&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now it&amp;rsquo;s easy to boot this environment by specifying which &lt;code>.env&lt;/code> file to use:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker-compose --env-file ../the_second/.env-docker-compose -f docker-compose-developer-3.x-only.yml up
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="switching--concurrent-projects">Switching &amp;amp; concurrent projects&lt;/h2>
+&lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code>. Then start the second project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and project name as shown above.&lt;/p>
+&lt;p>To run projects concurrently, instead of cancelling the first one, open a second terminal and start the second project.&lt;/p>
+&lt;h2 id="cht-docker-helper">CHT Docker Helper&lt;/h2>
+&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts builds on the &lt;code>docker-compose-developer-3.x-only.yml&lt;/code> and &lt;code>.env&lt;/code> files used above by helping start CHT instances with a simple text based GUI:&lt;/p>
+&lt;p>&lt;img src="cht-docker-helper.png" alt="The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;ldquo;Successfully started my_first_project&amp;rdquo; message is shown and denotes the login is &amp;ldquo;medic&amp;rdquo; and the password is &amp;ldquo;password&amp;rdquo;.">&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;h4 id="os">OS&lt;/h4>
+&lt;p>This script has been heavily tested on Ubuntu and should work very well there. It has been lightly tested on WSL2 on Windows 10 and macOS (x86*) - both should likely work as well.&lt;/p>
+&lt;p>* It will not work on macOS on Apple Silicon (M1/M2).&lt;/p>
+&lt;h4 id="software">Software&lt;/h4>
+&lt;p>The script will check and require these commands. All but &lt;code>docker&lt;/code> and &lt;code>docker-compose&lt;/code> should be installed by default on Ubuntu:&lt;/p>
+&lt;ul>
+&lt;li>awk&lt;/li>
+&lt;li>curl&lt;/li>
+&lt;li>cut&lt;/li>
+&lt;li>dirname&lt;/li>
+&lt;li>docker (At least version 20.x)&lt;/li>
+&lt;li>docker-compose (At least version 1.27)&lt;/li>
+&lt;li>file&lt;/li>
+&lt;li>grep&lt;/li>
+&lt;li>head&lt;/li>
+&lt;li>nc&lt;/li>
+&lt;li>tail&lt;/li>
+&lt;li>tr&lt;/li>
+&lt;li>wc&lt;/li>
+&lt;/ul>
+&lt;p>Optionally you can install &lt;code>jq&lt;/code> so that the script can parse JSON and tell you which version of the CHT is running.&lt;/p>
+&lt;h4 id="docker-compose-file-and-helper-scripts">Docker compose file and helper scripts&lt;/h4>
+&lt;p>An up-to-date clone of &lt;a href="https://github.com/medic/cht-core/">cht-core&lt;/a> has everything you need including:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>docker-compose-developer-3.x-only.yml&lt;/code>&lt;/li>
+&lt;li>&lt;code>cht-docker-compose.sh&lt;/code>&lt;/li>
+&lt;li>&lt;code>docker-status.sh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="using">Using&lt;/h3>
+&lt;h4 id="syntax">Syntax&lt;/h4>
+&lt;p>The helper script is run by calling &lt;code>./cht-docker-compose.sh&lt;/code>. It accepts one required and one optional arguments:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-e | --env-file&lt;/code> - path to the environment file. Required&lt;/li>
+&lt;li>&lt;code>-d | --docker_action&lt;/code> - docker action to run: &lt;code>up&lt;/code>, &lt;code>down&lt;/code> or &lt;code>destory&lt;/code>. Optional, defaults to &lt;code>up&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="nomenclature">Nomenclature&lt;/h4>
+&lt;p>Docker containers, networks and volumes are always named after the project you&amp;rsquo;re using. So if your project is called &lt;code>my_first_project&lt;/code>, you will see:&lt;/p>
+&lt;ul>
+&lt;li>Two containers: &lt;code>my_first_project_medic-os_1&lt;/code> and &lt;code>my_first_project_haproxy_1&lt;/code>&lt;/li>
+&lt;li>One storage volume: &lt;code>my_first_project_medic-data&lt;/code>&lt;/li>
+&lt;li>One network: &lt;code>my_first_project_medic-net&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="first-run">First Run&lt;/h4>
+&lt;p>These steps assume:&lt;/p>
+&lt;ul>
+&lt;li>the first project is &lt;code>my_first_project&lt;/code>&lt;/li>
+&lt;li>one &lt;code>.env_docker&lt;/code> environment file per project&lt;/li>
+&lt;li>&lt;code>my_first_project&lt;/code> and &lt;code>cht-core&lt;/code> directories are next to each other in the same parent directory&lt;/li>
+&lt;li>you have Internet connectivity (&lt;em>See &lt;a href="#booting-with-no-connectivity">booting with no connectivity&lt;/a>&lt;/em>)&lt;/li>
+&lt;/ul>
+&lt;p>Follow these steps to create your first developer instance. You can create as many as you&amp;rsquo;d like:&lt;/p>
+&lt;ol>
+&lt;li>create &lt;code>./my_first_project/.env_docker&lt;/code> with the contents:
+&lt;pre tabindex="0">&lt;code>COMPOSE_PROJECT_NAME=my_first_project
+CHT_HTTP=8080
+CHT_HTTPS=8443
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>Change into the &lt;code>docker-help&lt;/code> directory: &lt;code>cd ./cht-core/scripts/docker-helper/&lt;/code>&lt;/li>
+&lt;li>Run the helper script and specify your &lt;code>.env_docker&lt;/code> file:
+&lt;pre tabindex="0">&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>Your CHT instance will be started when you see the text:
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Successfully started project my_first_project
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h4 id="second-run">Second Run&lt;/h4>
+&lt;p>When you&amp;rsquo;re done with an instance, be sure to shut it down:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker -d down
+&lt;/code>&lt;/pre>&lt;p>All information will be saved, and it should be quick to start for the Nth time.&lt;/p>
+&lt;p>To start an existing instance again, just run the command from the &amp;ldquo;First Run&amp;rdquo; section:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker
+&lt;/code>&lt;/pre>&lt;p>This command is safe to run as many times as you&amp;rsquo;d like if you forget the state of your project&amp;rsquo;s Docker containers.&lt;/p>
+&lt;h4 id="last-run">Last Run&lt;/h4>
+&lt;p>When you&amp;rsquo;re done with a project and want to completely destroy it, run &lt;code>destroy&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>./cht-docker-compose.sh -e ../../../my_first_project/.env_docker -d destroy
+&lt;/code>&lt;/pre>&lt;p>&lt;em>&lt;strong>NOTE&lt;/strong>&lt;/em> - Be sure you want to run &lt;code>destroy&lt;/code>. The script will &lt;em>not&lt;/em> prompt &amp;ldquo;are you sure?&amp;rdquo; and it will just delete all your project&amp;rsquo;s data.&lt;/p>
+&lt;h3 id="troubleshooting">Troubleshooting&lt;/h3>
+&lt;p>The main issue you&amp;rsquo;re likely to run into is that the CHT doesn&amp;rsquo;t correctly start up, the very reason this script was created. If the script either hangs on one step, or fails to start and quits after 5 tries, try these steps:&lt;/p>
+&lt;ol>
+&lt;li>Ensure your Internet is working.&lt;/li>
+&lt;li>Destroy everything by using the &lt;code>-d destroy&lt;/code> &lt;a href="#syntax">option&lt;/a>. While this will delete any data, if you can&amp;rsquo;t start the CHT instance, you won&amp;rsquo;t be loosing any data you care about ;). This will delete the containers and volumes. Then run &lt;code>-d up&lt;/code> and try again.&lt;/li>
+&lt;li>Quit apps that may be causing a high load on your computer. Possibly consider rebooting and running nothing else. In one instance this helped!&lt;/li>
+&lt;/ol>
+&lt;p>If you still get stuck review the items below as possible issues you may find workarounds to. If none of these work, see the debug file which is always output in the same directory as your &lt;code>env_file&lt;/code>. File a ticket in this repository and attach this log file. To read more about the contents of the &lt;code>cht-docker-compose.log&lt;/code> see &lt;a href="#cht-docker-composelog">the CHT Docker Compose Log section&lt;/a>.&lt;/p>
+&lt;h4 id="running-without-the-ip-utility">Running without the &lt;code>ip&lt;/code> utility&lt;/h4>
+&lt;p>If you&amp;rsquo;re on macOS, or other OS without the &lt;code>ip&lt;/code> utility, your IP address will always show as &lt;code>127.0.0.1&lt;/code>. You can not connect to this IP from a mobile client on your LAN because it always references the host it&amp;rsquo;s on, not a foreign host.&lt;/p>
+&lt;p>To work around this, you can find out your IP on your LAN and just replace the &lt;code>127-0-0-1&lt;/code> part of the &lt;code>https://127-0-0-1.local-ip.medicmobile.org:8443&lt;/code> URL to be your IP address. So if your local IP was &lt;code>192.168.0.22&lt;/code> your URL would be &lt;code>https://192-168-0-22.local-ip.medicmobile.org:8443&lt;/code>.&lt;/p>
+&lt;h4 id="booting-with-no-connectivity">Booting with no connectivity&lt;/h4>
+&lt;p>This script can work without connectivity after the initial boot. However, it needs connectivity to do DNS lookups for the &lt;code>*.local-ip.medicmobile.org&lt;/code> URLs. To work around this, when you have no connectivity, add an entry in your &lt;code>/etc/hosts&lt;/code> for the URL showing up in the script. For example, if you&amp;rsquo;re seeing &lt;code>https://127-0-0-1.local-ip.medicmobile.org:8443&lt;/code> as your IP, add this line to the top of your &lt;code>/etc/hosts&lt;/code> file.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>127.0.0.1 127-0-0-1.local-ip.medicmobile.org
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>&lt;strong>NOTE&lt;/strong>&lt;/em> - You need connectivity on the initial boot of the VM to connect to &lt;code>staging.dev.medicmobile.org&lt;/code> to download the base version of the CHT. As well, certificates for &lt;code>*.local-ip.medicmobile.org&lt;/code> are downloaded. Subsequent boots do not require connectivity as long as you do not run &lt;code>destroy&lt;/code>.&lt;/p>
+&lt;h4 id="port-conflicts">Port conflicts&lt;/h4>
+&lt;p>If you have two &lt;code>.env_docker&lt;/code> files that have the same ports or re-use the same project name, bad things will happen. Don&amp;rsquo;t do this.&lt;/p>
+&lt;p>Medic recommends setting up unique project names and unique ports for each project. Commit these &lt;code>.env_docker&lt;/code> files to your app config&amp;rsquo;s revision control so all app developers use the same &lt;code>.env_docker&lt;/code> files.&lt;/p>
+&lt;h4 id="slow-downloads-and-wait-periods">Slow downloads and wait periods&lt;/h4>
+&lt;p>During testing on an Internet connection with high latency (&amp;gt;1000ms) and packet loss, this script had trouble booting the CHT instance because it was taking too long to download the assets from &lt;code>staging.dev.medicmobile.org&lt;/code>. Each version is about 38 MB.&lt;/p>
+&lt;p>To account for this, the wait time is multiplied times the boot iteration for each time it reboots. It starts at 100 seconds and then 200, 300, 400 up to the fifth time it will wait 500 seconds.&lt;/p>
+&lt;h4 id="too-many-containers">Too many containers&lt;/h4>
+&lt;p>If you&amp;rsquo;re on a resource constrained computer, like a very old or very slow laptop, be sure to watch the total number of containers you&amp;rsquo;re running. More than one or two projects (2 or 4 containers) and you may notice a slow-down. You can use the &lt;code>./docker-status.sh&lt;/code> script if you forgot which projects you have running:&lt;/p>
+&lt;p>&lt;img src="docker-status.png" alt="The docker-status.sh script showing 4 sections. The top section lists the running CHT containers, their IP, their mapped ports and the state (running time). The second section found on the left is a list of docker networks. The third section is on the top right and lists downloaded docker images. The furth section on the bottom right, shows docker volumes">&lt;/p>
+&lt;p>A word of caution though - for now this script doesn&amp;rsquo;t scale well if you have 10s of containers and volumes. Content &lt;a href="https://user-images.githubusercontent.com/1608415/137566806-e13b765e-4f95-48be-82e7-c8e6351e14b7.mp4">can scroll off the screen&lt;/a> and seem confusing!&lt;/p>
+&lt;h4 id="output-on-macos-is-too-narrow">Output on macOS is too narrow&lt;/h4>
+&lt;p>There&amp;rsquo;s a known bug with the bash library we&amp;rsquo;re using that causes it to always render at 80 characters wide. &lt;a href="https://github.com/metal3d/bashsimplecurses/issues/51#issuecomment-905914780">The fix is&lt;/a> to use &lt;code>brew&lt;/code> to run a more recent version of &lt;code>ncurses&lt;/code>.&lt;/p>
+&lt;h4 id="device--does-not-exist-and-curl-6-could-not-resolve-host-errors">&amp;ldquo;Device &amp;rsquo;&amp;rsquo; does not exist&amp;rsquo;&amp;rdquo; and &amp;ldquo;curl: (6) Could not resolve host&amp;rdquo; errors&lt;/h4>
+&lt;p>If you see either of these errors, you&amp;rsquo;re very likely off-line such that you effectively cannot reach the Internet. The script will not work as is. See the &amp;ldquo;Booting with no connectivity&amp;rdquo; section above for work-arounds.&lt;/p>
+&lt;h4 id="resetting-everything">Resetting everything&lt;/h4>
+&lt;p>If you REALLY get stuck and want to destroy &lt;em>&lt;strong>ALL&lt;/strong>&lt;/em> docker containers/volumes/networks, even those not started by this script, run this (but be &lt;em>&lt;strong>extra&lt;/strong>&lt;/em> sure that&amp;rsquo;s what you want to do):&lt;/p>
+&lt;pre tabindex="0">&lt;code>docker stop $(docker ps -q)&amp;amp;&amp;amp;docker system prune&amp;amp;&amp;amp;docker volume prune
+&lt;/code>&lt;/pre>&lt;h3 id="cht-docker-composelog">cht-docker-compose.log&lt;/h3>
+&lt;p>This log will be output every time you call the script. It will be created and appended to in the directory where you specified your environment file (&lt;code>-e PATH/TO/env_file&lt;/code>).&lt;/p>
+&lt;p>There are three types of lines in this file. The first line will always be the Start line: &lt;code>item=&amp;quot;start&amp;quot;&lt;/code>. Then there will be a Status line: &lt;code>item=&amp;quot;status&amp;quot;&lt;/code>. Finally, there will be two lines, one for each docker container: &lt;code>item=&amp;quot;docker_logs&amp;quot;&lt;/code>.&lt;/p>
+&lt;h4 id="shared-head">Shared head&lt;/h4>
+&lt;p>All lines start with a date, PID and count:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>(none - first item)&lt;/td>
+&lt;td>value from &lt;code>date&lt;/code> command with &lt;code>DAY DATE MONTH YEAR TIME AM/PM&lt;/code>&lt;/td>
+&lt;td>&lt;code>Fri 15 Oct 2021 02:19:30 PM&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>pid&lt;/code>&lt;/td>
+&lt;td>process ID of the shell script. Will always be an integer&lt;/td>
+&lt;td>&lt;code>398399&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>count&lt;/code>&lt;/td>
+&lt;td>how many times the shell script has looped internally&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--start">item = &lt;code>start&lt;/code>&lt;/h4>
+&lt;p>When you first call the script, a line is output with generic information about the project. This is only shown once per call:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>start&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>URL&lt;/code>&lt;/td>
+&lt;td>the full URL of the instance, with port&lt;/td>
+&lt;td>&lt;code>https://192-168-68-17.local-ip.medicmobile.org:443&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>IP&lt;/code>&lt;/td>
+&lt;td>the IP address of the instance&lt;/td>
+&lt;td>&lt;code>192.168.68.17&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_https&lt;/code>&lt;/td>
+&lt;td>port used for &lt;code>https&lt;/code>&lt;/td>
+&lt;td>&lt;code>443&lt;/code> or &lt;code>8443&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_http&lt;/code>&lt;/td>
+&lt;td>port used for &lt;code>http&lt;/code>&lt;/td>
+&lt;td>&lt;code>80&lt;/code> or &lt;code>8080&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>project_name&lt;/code>&lt;/td>
+&lt;td>The user specified project name. This will be used in docker container and volume names&lt;/td>
+&lt;td>&lt;code>helper_test&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>total_containers&lt;/code>&lt;/td>
+&lt;td>Total docker containers running on the host. Useful for catching high load scenarios. Healthy is under &lt;code>10&lt;/code>.&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--status">item = &lt;code>status&lt;/code>&lt;/h4>
+&lt;p>For each internal loop of the script, each one taking 1-5 seconds, a status line is output:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>status&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CHT_count&lt;/code>&lt;/td>
+&lt;td>number of CHT contianers running for this project. Healthy is &lt;code>2&lt;/code>&lt;/td>
+&lt;td>&lt;code>2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>port_stat&lt;/code>&lt;/td>
+&lt;td>Status of the &lt;code>https&lt;/code> port. Healhty is &lt;code>open&lt;/code>&lt;/td>
+&lt;td>&lt;code>open&lt;/code> or &lt;code>closed&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>http_code&lt;/code>&lt;/td>
+&lt;td>If the &lt;code>https&lt;/code> port is open by the web server, what &lt;code>HTTP&lt;/code> response code is returned for a &lt;code>GET&lt;/code>. Healthy is &lt;code>200&lt;/code>. If you see &lt;code>000&lt;/code>, &lt;a href="#booting-with-no-connectivity">see workarounds&lt;/a>.&lt;/td>
+&lt;td>&lt;code>200&lt;/code> or &lt;code>404&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ssl_verify&lt;/code>&lt;/td>
+&lt;td>If the &lt;code>https&lt;/code> port is open by the web server, is the valid &lt;code>local-ip.medicmobile.org&lt;/code> certificate installed. Healthy is &lt;code>yes&lt;/code>&lt;/td>
+&lt;td>&lt;code>yes&lt;/code> or &lt;code>no&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>reboot_count&lt;/code>&lt;/td>
+&lt;td>How many times &lt;code>docker restart&lt;/code> has been called. Max is &lt;code>5&lt;/code>&lt;/td>
+&lt;td>&lt;code>3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>docker_call&lt;/code>&lt;/td>
+&lt;td>The docker action call to the script&lt;/td>
+&lt;td>&lt;code>up&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>last_msg&lt;/code>&lt;/td>
+&lt;td>Last message the user was shown&lt;/td>
+&lt;td>&lt;code>Running &amp;quot;down&amp;quot; then &amp;quot;up&amp;quot;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>load_now&lt;/code>&lt;/td>
+&lt;td>Load average for the past minute. Healthy can vary, but should be &amp;lt; &lt;code>10&lt;/code>&lt;/td>
+&lt;td>&lt;code>2.66&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>*_haproxy_1&lt;/code>&lt;/td>
+&lt;td>Name of container based on &lt;code>project_name&lt;/code>. Showing the &amp;ldquo;has booted&amp;rdquo; status, healthy is &lt;code>true&lt;/code>&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>*_medic-os_1&lt;/code>&lt;/td>
+&lt;td>Name of container based on &lt;code>project_name&lt;/code>. Showing the &amp;ldquo;has booted&amp;rdquo; status, healthy is &lt;code>true&lt;/code>&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="item--docker_logs">item = &lt;code>docker_logs&lt;/code>&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name in log&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;th>Example(s)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>item&lt;/code>&lt;/td>
+&lt;td>which log item this is&lt;/td>
+&lt;td>&lt;code>docker_logs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>container&lt;/code>&lt;/td>
+&lt;td>Container name based on &lt;code>project_name&lt;/code>&lt;/td>
+&lt;td>&lt;code>helper_test_medic-os_1&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>processes&lt;/code>&lt;/td>
+&lt;td>Number of process running in the container. Medic OS should have 60-90, Nginx 4-10&lt;/td>
+&lt;td>&lt;code>64&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>last_log&lt;/code>&lt;/td>
+&lt;td>Result from calling &lt;code>docker logs&lt;/code> on the container. Will never have &lt;code>&amp;quot;&lt;/code> in them and date may differ from start of line date&lt;/td>
+&lt;td>&lt;code>[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="sample">Sample&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;start&amp;#34;&lt;/span> &lt;span style="color:#000">URL&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;https://192-168-68-17.local-ip.medicmobile.org:443&amp;#34;&lt;/span> &lt;span style="color:#000">IP&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;192.168.68.17&amp;#34;&lt;/span> &lt;span style="color:#000">port_https&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;443&amp;#34;&lt;/span> &lt;span style="color:#000">port_http&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;80&amp;#34;&lt;/span> &lt;span style="color:#000">project_name&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test&amp;#34;&lt;/span> &lt;span style="color:#000">total_containers&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_medic-os_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;64&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_haproxy_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;4&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Oct 15 21:30:20 576ca039cd88 haproxy[25]: 172.20.0.3,200,GET,/medic/_design/medic,-,medic,&amp;#39;-&amp;#39;,21703,5,21402,&amp;#39;curl/7.68.0&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:26 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;1&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;status&amp;#34;&lt;/span> &lt;span style="color:#000">CHT_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">port_stat&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;open&amp;#34;&lt;/span> &lt;span style="color:#000">http_code&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;200&amp;#34;&lt;/span> &lt;span style="color:#000">ssl_verify&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;yes&amp;#34;&lt;/span> &lt;span style="color:#000">reboot_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;0&amp;#34;&lt;/span> &lt;span style="color:#000">docker_call&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;up&amp;#34;&lt;/span> &lt;span style="color:#000">last_msg&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Initializing&amp;#34;&lt;/span> &lt;span style="color:#000">load_now&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2.66&amp;#34;&lt;/span> &lt;span style="color:#000">helper_test_haproxy_1&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span> helper_test_medic-os_1&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_medic-os_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;67&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;[2021/10/15 19:53:39] Info: Horticulturalist has already bootstrapped&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;docker_logs&amp;#34;&lt;/span> &lt;span style="color:#000">container&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;helper_test_haproxy_1&amp;#34;&lt;/span> &lt;span style="color:#000">processes&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;4&amp;#34;&lt;/span> &lt;span style="color:#000">last_log&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Oct 15 21:30:27 576ca039cd88 haproxy[25]: 172.20.0.3,200,GET,/medic/_design/medic,-,medic,&amp;#39;-&amp;#39;,21703,5,21402,&amp;#39;curl/7.68.0&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Fri &lt;span style="color:#0000cf;font-weight:bold">15&lt;/span> Oct &lt;span style="color:#0000cf;font-weight:bold">2021&lt;/span> 02:30:28 PM PDT &lt;span style="color:#000">pid&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;410066&amp;#34;&lt;/span> &lt;span style="color:#000">count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">item&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;status&amp;#34;&lt;/span> &lt;span style="color:#000">CHT_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2&amp;#34;&lt;/span> &lt;span style="color:#000">port_stat&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;open&amp;#34;&lt;/span> &lt;span style="color:#000">http_code&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;200&amp;#34;&lt;/span> &lt;span style="color:#000">ssl_verify&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;yes&amp;#34;&lt;/span> &lt;span style="color:#000">reboot_count&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;0&amp;#34;&lt;/span> &lt;span style="color:#000">docker_call&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;up&amp;#34;&lt;/span> &lt;span style="color:#000">last_msg&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34; :) &amp;#34;&lt;/span> &lt;span style="color:#000">load_now&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;2.69&amp;#34;&lt;/span> &lt;span style="color:#000">helper_test_haproxy_1&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span> helper_test_medic-os_1&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="cookie-collisions">Cookie collisions&lt;/h2>
+&lt;p>The CHT stores its cookies based on the domain. This means if you&amp;rsquo;re running two concurrent instances on &lt;code>https://192-168-68-40.local-ip.medicmobile.org:8443&lt;/code> and &lt;code>https://192-168-68-40.local-ip.medicmobile.org:8440&lt;/code> (note different ports), the CHT would write the cookie under the same &lt;code>192-168-68-40.local-ip.medicmobile.org&lt;/code> domain. When logging out of one instance, you would get logged out of both and other consistencies.&lt;/p>
+&lt;p>To avoid this collision of cookies, you can use different IP addresses to access the instances. This works because of two reasons:&lt;/p>
+&lt;ol>
+&lt;li>the TLS certificate being used is valid for any subdomain of &lt;code>*.local-ip.medicmobile.org&lt;/code>. Further, the URL always resolves to the IP passed in the &lt;code>*&lt;/code> section, so you can use any IP&lt;/li>
+&lt;li>the IPs that are available to reference your &lt;code>localhost&lt;/code> are actually a &lt;code>/8&lt;/code> netmask, meaning &lt;a href="https://en.wikipedia.org/wiki/Localhost#Name_resolution">there are 16 million addresses&lt;/a> to choose from!&lt;/li>
+&lt;/ol>
+&lt;p>Using the above two reasons, these URLs could work to avoid the cookie collision:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>https://127-0-0-1.local-ip.medicmobile.org:8443&lt;/code>&lt;/li>
+&lt;li>&lt;code>https://127-0-0-2.local-ip.medicmobile.org:8440&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>This would result in the domains being &lt;code>127.0.0.1&lt;/code> and &lt;code>127.0.0.2&lt;/code> from the CHT&amp;rsquo;s perspective. When using a mobile device for testing, you&amp;rsquo;re limited to use the LAN ip output in the helper and can not use the &lt;code>127.x.x.x&lt;/code> IPs.&lt;/p></description></item><item><title>Hosting: SSL Cert Install in CHT 3.x</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/ssl-cert-install/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/3.x/ssl-cert-install/</guid><description>
+&lt;h2 id="requirements">Requirements&lt;/h2>
+&lt;ul>
+&lt;li>Installed CHT-Core 3.x via either &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/">Self Hosted&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/ec2-setup-guide/">EC2&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/local-setup/">Local Setup&lt;/a>, but must use &lt;code>docker-compose&lt;/code>.&lt;/li>
+&lt;li>Your own SSL certifications like Let&amp;rsquo;s Encrypt.&lt;/li>
+&lt;/ul>
+&lt;h2 id="copy-certs-into-medic-os-container">Copy certs into medic-os container&lt;/h2>
+&lt;p>On your server copy the &lt;code>.crt&lt;/code> and &lt;code>.key&lt;/code> files to the &lt;code>medic-os&lt;/code> container. The existing self signed &lt;code>.crt&lt;/code> and &lt;code>.key&lt;/code> files will be overwitten:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo docker cp /path/to/ssl.crt medic-os:/srv/settings/medic-core/nginx/private/default.crt
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo docker cp /path/to/ssl.key medic-os:/srv/settings/medic-core/nginx/private/default.key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="restart-services">Restart services&lt;/h2>
+&lt;p>Now that the &lt;code>.crt&lt;/code> and &lt;code>.key&lt;/code> files are in place, restart &lt;code>nginx&lt;/code> in the &lt;code>medic-os&lt;/code> container with:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>docker &lt;span style="color:#204a87">exec&lt;/span> -it medic-os /boot/svc-restart medic-core nginx
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="view-nginx-logs">View Nginx Logs&lt;/h2>
+&lt;p>To troubleshoot any problems with the new certificates, after running &lt;code>docker exec -it medic-os bash&lt;/code>, the &lt;code>nginx&lt;/code> log files can be found in &lt;code>/srv/storage/medic-core/nginx/logs/&lt;/code>, including:&lt;/p>
+&lt;ul>
+&lt;li>access.log&lt;/li>
+&lt;li>error-ssl.log&lt;/li>
+&lt;li>error.log&lt;/li>
+&lt;li>startup.log&lt;/li>
+&lt;/ul></description></item><item><title>Hosting: Offline Hosting of CHT 3.x Server</title><link>https://docs.communityhealthtoolkit.org/hosting/3.x/offline/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/3.x/offline/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This guide is not meant for a production CHT instance. Support may be added in the future an offline CHT server in a production environment. Please see the &amp;ldquo;Considerations&amp;rdquo; section below.&lt;/p>
+&lt;p>Proceed only if you have staff familiar with DNS, TLS Certs, DHCP, LAN topology and Linux in general. This is a complex deployment where mistakes are easy to make unless proper training is in place.&lt;/p>
+&lt;/div>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+This guide only applies to CHT 3.x.
+&lt;/div>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>The CHT is built as an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/offline-first/">Offline-First&lt;/a> application. This applies to clients, either browsers or Android applications, connecting to the CHT server. The server itself assumes it has Internet connectivity to provide services such as DNS, software updates and general use connectivity. This document explores what it looks like when the CHT server is offline without these services available.&lt;/p>
+&lt;p>Running a CHT server offline requires no modifications to the CHT itself. Instead, supporting services normally found online are replicated locally.&lt;/p>
+&lt;h2 id="considerations">Considerations&lt;/h2>
+&lt;p>An offline CHT server is most appropriate for a development environment. There are serious implications to consider before deploying an offline instance per our &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/#considerations">existing requirements&lt;/a>.&lt;/p>
+&lt;p>Additionally, if users are going to migrate between offline locations with the same domain name, always ensure different login and passwords are used for all users across instances. This will prevent a client from another CHT instance trying to synchronize with a CHT instance it shouldn&amp;rsquo;t synchronize with, possibly causing data corruption or privacy issues through unintended data access.&lt;/p>
+&lt;h2 id="requirements">Requirements&lt;/h2>
+&lt;p>A CHT instance is accessible offline when you can resolve the domain to an IP address, and a TLS certificate is on the CHT server with a common name (CN) that matches the domain name. On top of the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/">existing requirements&lt;/a>, the following aspects must also be considered.&lt;/p>
+&lt;h3 id="static-ip">Static IP&lt;/h3>
+&lt;p>The CHT server needs to be given a static IP so that DNS will always resolve to the correct host.&lt;/p>
+&lt;h3 id="tls-certificate">TLS Certificate&lt;/h3>
+&lt;p>Browsers might allow you to connect to a server with an invalid TLS certificate after you &lt;a href="https://www.ssl.com/guide/troubleshooting-ssl-tls-browser-errors-and-warnings/">bypass the warning&lt;/a>. Android apps however, like &lt;a href="https://github.com/medic/cht-android">CHT Android App&lt;/a>, require a valid TLS certificate to work correctly, therefore you would need to acquire a valid TLS certificate from a certificate authority (CA) and install it on your CHT server.&lt;/p>
+&lt;p>It is common to use &lt;a href="https://en.wikipedia.org/wiki/Let%27s_encrypt">Let&amp;rsquo;s Encrypt&lt;/a> to acquire certificates because they provide free certificates. Let&amp;rsquo;s Encrypt certificates expire after 90 days, so the server will need to be constantly updated with a new certificate. Other CAs provide certificates that expire after a year, so this concern will always apply.&lt;/p>
+&lt;p>After acquiring the certificate, if you are running a Docker-based CHT deployment, see &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/ssl-cert-install/">TLS instructions for Docker&lt;/a> to install the certificate.&lt;/p>
+&lt;h3 id="domain-name-server">Domain Name Server&lt;/h3>
+&lt;p>In order to match the static IP of the web server to the CN in the certificate, a Domain Name Server (DNS) must be used. This will allow any client on the LAN to easily connect to your CHT server without needing anything more than the domain name.&lt;/p>
+&lt;p>Most LANs will defer to the Internet Service Provider (ISP) to provide DNS, but there is no ISP in an offline scenario. Instead, one must be provided. This DNS server will then be configured to have an &lt;code>A&lt;/code> record (or &lt;code>AAAA&lt;/code> in the case of IPv6) to point to the CHT server.&lt;/p>
+&lt;h3 id="dynamic-host-configuration-protocol">Dynamic Host Configuration Protocol&lt;/h3>
+&lt;p>Any new client that connects to a network will get an IP address from a Dynamic Host Configuration Protocol (DHCP) server. It is critical that the DHCP server for the LAN the CHT is on instructs all clients to use the DNS server configured above.&lt;/p>
+&lt;h3 id="wi-fi-ap">Wi-Fi AP&lt;/h3>
+&lt;p>A Wi-FI Access Point (AP) needs to be deployed on the LAN so Android devices can connect to the CHT. This can be an AP included with the router or a standalone AP. If the AP is standalone, check that any DHCP or DNS servers that could conflict with the one above are disabled.&lt;/p>
+&lt;h2 id="benefits-over-other-solutions">Benefits Over Other Solutions&lt;/h2>
+&lt;p>An offline deployment may consider substituting some requirements above with these other solutions. Note that ngrok and local-ip.co require Internet connectivity, so are not an offline solution.&lt;/p>
+&lt;h3 id="ngrok">ngrok&lt;/h3>
+&lt;p>When an offline solution is deployed, traffic stays 100% local, whereas when using either &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/debugging/secure-sharing-of-developer-instance/">your own reverse proxy&lt;/a> or a third party provider like &lt;a href="https://ngrok.com/">ngrok&lt;/a>, traffic may traverse 100s or 1,000s of kilometers to ultimately reach the CHT server which is 10 meters away. This can help when Internet connectivity is very slow, very expensive per megabyte, or both.&lt;/p>
+&lt;h3 id="local-ipco">local-ip.co&lt;/h3>
+&lt;p>&lt;a href="http://local-ip.co/">local-ip.co&lt;/a>, and &lt;a href="https://local-ip.medicmobile.org/">related services&lt;/a>, offer both the TLS certificates and private keys for &lt;code>*.my.local-ip.co&lt;/code>. Additionally, the service has a DNS server that dynamically maps any IP you pass in the sub-sub-domain to the real world IP such that &lt;code>192-168-0-1.my.local-ip.co&lt;/code> would resolve to &lt;code>192.168.0.1&lt;/code>. This can make it very handy to deploy a development instance where all HTTP traffic remains local (unlike &lt;code>ngrok&lt;/code> above).&lt;/p>
+&lt;p>As the DNS traffic still needs to leave your network and return, it is not a viable solution for a truly offline CHT deployment.&lt;/p>
+&lt;h3 id="self-signed-certificates">Self-Signed Certificates&lt;/h3>
+&lt;p>Another option to consider is to &lt;a href="https://gist.github.com/fntlnz/cf14feb5a46b2eda428e000157447309">self-sign the certificates&lt;/a> and then either bypass the warnings in browsers or install the new CA root certificate on your devices. While this may work for a development environment with a single developer, it will be hard to scale to an environment where you&amp;rsquo;d like to easily provision many Android devices. The work will be much more than just installing an APK form the Play Store (or the slightly harder side load process).&lt;/p>
+&lt;p>This may only work on certain, older version of Android as well.&lt;/p>
+&lt;h3 id="no-dhcp-or-dns-server">No DHCP or DNS Server&lt;/h3>
+&lt;p>To avoid installing both the DHCP and DNS servers, an Android app that enables custom DNS entries, like &lt;a href="https://play.google.com/store/apps/details?id=com.burakgon.dnschanger">DNS Changer&lt;/a> could be used. As &lt;a href="https://stackoverflow.com/questions/6370017/mapping-a-hostname-to-an-ip-address-on-android">seen here&lt;/a>, on each Android device you could install this and add custom DNS entries to reach the TLS certificate on the CHT.&lt;/p>
+&lt;p>Like the self-signed certificate solution, this is hard to scale and would need to be complimented by editing &lt;code>/etc/hosts&lt;/code> files on desktop browsers.&lt;/p></description></item></channel></rss>

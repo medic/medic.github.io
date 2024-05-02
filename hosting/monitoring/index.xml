@@ -1,0 +1,997 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Monitoring and Alerting</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/</link><description>Recent content in Monitoring and Alerting on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/monitoring/index.xml" rel="self" type="application/rss+xml"/><item><title>Hosting: Introduction to monitoring and alerting</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/introduction/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/monitoring/introduction/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>This guide applies to all production instances of the CHT for both 3.x (beyond 3.9) and 4.x.&lt;/p>
+&lt;p>Be sure to see how to deploy a solution to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">monitor and alert on production CHT instances&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;p>Each deployment will experience different stresses on its resources. Be sure to tune any alerting levels in the case of a false positive so that you may avoid them in the future. Any thresholds for alerts, and even what is alerted on, is just a guideline, not a guarantee of uptime.&lt;/p>
+&lt;h2 id="monitoring-vs-alerting">Monitoring vs Alerting&lt;/h2>
+&lt;p>Monitoring allows CHT admins to see statistics about their server, often over time. This can be helpful when you want to be aware of growth in your deployment (eg number of active users or number of reports per region). It should not be assumed that these will be checked regularly enough to notice a problem, for example a spike in number of feedback documents.&lt;/p>
+&lt;p>Alerting is a push mechanism designed to notify users who can act on the alert. These can go over SMS, email, Slack, WhatsApp or any other channel to notify the right users.&lt;/p>
+&lt;p>The process of setting up monitoring and alerting should be done together. Monitoring sets the baseline and then alerting tells admins when the metric has gone beyond the baseline to a critical state. Certain metrics, like uptime for example, likely do not need to have a monitoring visualization on a dashboard, but the monitoring system should still be the authority to send an alert to denote when the service has restarted unexpectedly.&lt;/p>
+&lt;h2 id="outside-the-cht">Outside the CHT&lt;/h2>
+&lt;p>Be sure to monitor important items that the CHT depends on in order to be healthy. You should alert when any of these are close to their maximum (disk space) or minimum (days left of valid TLS certificate):&lt;/p>
+&lt;ul>
+&lt;li>Domain expiration with registrar&lt;/li>
+&lt;li>TLS certificate expiration&lt;/li>
+&lt;li>Disk &amp;amp; swap space&lt;/li>
+&lt;li>CPU utilization&lt;/li>
+&lt;li>Memory utilization&lt;/li>
+&lt;li>Network utilization&lt;/li>
+&lt;li>Process count&lt;/li>
+&lt;li>OS Uptime&lt;/li>
+&lt;/ul>
+&lt;h2 id="inside-the-cht">Inside the CHT&lt;/h2>
+&lt;p>The &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">monitoring API&lt;/a> was added in 3.9.0 and does not require any authentication and so can easily be used with third party tools as they do not need a CHT user account.&lt;/p>
+&lt;p>All metrics need to be monitored over time so that you can easily see longitudinal patterns when debugging an outage or slow down.&lt;/p>
+&lt;h3 id="specific-of-monitoring">Specific of monitoring&lt;/h3>
+&lt;h4 id="explosive-growth">Explosive Growth&lt;/h4>
+&lt;p>Many of the values in the monitoring API do not mean much in isolation. For example if an instance has 10,714,278 feedback docs, is that bad? If it&amp;rsquo;s years old and has thousands of users, then this is normal. If it is 4 months old and has 100 users, this is a dire problem!&lt;/p>
+&lt;p>You should monitor these metrics for unexpected growth as measured by percent change over 24 hours. Ideally this can be subjectively calculated when it is more than 5% growth than the prior day. They&amp;rsquo;re marked as &lt;code>growth&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="non-zero-values">Non-Zero Values&lt;/h4>
+&lt;p>Other values should always be zero, and you should alert when they are not. You may opt to alert only when they are non-zero for more than 24 hours. These are marked as &lt;code>non-zero&lt;/code> in the table below.&lt;/p>
+&lt;h4 id="zero-or-near-zero-values">Zero or Near Zero Values&lt;/h4>
+&lt;p>Finally, these values should always be &lt;em>not&lt;/em> zero, and you should alert when are zero or very close to it. You may opt to alert only when they are zero for more than 24 hours. They&amp;rsquo;re marked with &lt;code>zero&lt;/code> below.&lt;/p>
+&lt;h4 id="elements-types-and-samples">Elements, types and samples&lt;/h4>
+&lt;p>The names below are extrapolated from the paths in the JSON returned by the API and should be easy to find when viewing the Monitoring API URL on your CHT instance:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Example Value&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Conflict Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>23,318&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>16,254,271&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Medic Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>1.4366029665729645&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>15,756,449&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Sentinel Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.388733774539664&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>535&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Fragmentation&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>2.356411021364134&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CouchDB Users Meta Doc Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,761,549&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Feedback Count&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>10,714,368&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Due&lt;/td>
+&lt;td>&lt;code>growth&lt;/code>&lt;/td>
+&lt;td>3,807&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Messaging Outgoing State Failed&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outbound Push Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Sentinel Backlog&lt;/td>
+&lt;td>&lt;code>non-zero&lt;/code>&lt;/td>
+&lt;td>0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Date Uptime&lt;/td>
+&lt;td>&lt;code>zero&lt;/code>&lt;/td>
+&lt;td>1,626,508.148&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Hosting: CHT Watchdog Setup</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;p>Medic maintains CHT Watchdog which is an opinionated configuration of &lt;a href="https://prometheus.io/">Prometheus&lt;/a> (including &lt;a href="https://github.com/prometheus-community/json_exporter">json_exporter&lt;/a>) and &lt;a href="https://grafana.com/grafana/">Grafana&lt;/a> which can easily be deployed using Docker. It is supported on CHT 3.12 and later, including CHT 4.x. By using this solution a CHT deployment can easily get longitudinal monitoring and push alerts using Email, Slack or other mechanisms. All tools are open source and have no licensing fees.&lt;/p>
+&lt;p>The solution provides both an overview dashboard as well as a detail dashboard. Here is a portion of the overview dashboard:&lt;/p>
+&lt;p>&lt;img src="monitoring.and.alerting.screenshot.png" alt="Screenshot of Grafana Dashboard showing data from Prometheus">&lt;/p>
+&lt;p>&lt;a href="https://prometheus.io/docs/concepts/metric_types/">Prometheus supports&lt;/a> four metric types: Counter, Gauge, Histogram, and Summary. Currently, the CHT only provides Counter and Gauge type metrics. When building panels for Grafana dashboards, &lt;a href="https://prometheus.io/docs/prometheus/latest/querying/functions/">Prometheus Functions&lt;/a> can be used to manipulate the metric data. Refer to the &lt;a href="https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/">Grafana Documentation&lt;/a> for best practices on building dashboards.&lt;/p>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.docker.com/install/">Docker&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/compose/install/">Docker Compose&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git&lt;/a>&lt;/li>
+&lt;li>URL(s) of the CHT instance(s)&lt;/li>
+&lt;/ul>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Always run Watchdog on a different server than the CHT Core. This ensures Watchdog doesn&amp;rsquo;t fail if the CHT Core server fails and alerts will always be sent. The instructions assume you&amp;rsquo;re connecting over the public Internet and no special VPN or routing is required.
+&lt;/div>
+&lt;h3 id="setup">Setup&lt;/h3>
+&lt;p>These instructions have been tested against Ubuntu, but should work against any OS that meets the prerequisites. They follow a happy path assuming you need to only set a secure password and specify the URL(s) to monitor:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Run the following commands to clone this repository, initialize your &lt;code>.env&lt;/code> file, create a secure password and create your data directories:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git clone https://github.com/medic/cht-watchdog.git
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp cht-instances.example.yml cht-instances.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp grafana/grafana.example.ini grafana/grafana.ini
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>mkdir -p grafana/data &lt;span style="color:#ce5c00;font-weight:bold">&amp;amp;&amp;amp;&lt;/span> mkdir -p prometheus/data
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo apt install -y wamerican &lt;span style="color:#8f5902;font-style:italic"># ensures /usr/share/dict/words is present for shuf call below &lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp .env.example .env
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>shuf -n7 /usr/share/dict/words --random-source&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>/dev/random &lt;span style="color:#000;font-weight:bold">|&lt;/span> tr &lt;span style="color:#4e9a06">&amp;#39;\n&amp;#39;&lt;/span> &lt;span style="color:#4e9a06">&amp;#39;-&amp;#39;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> tr -d &lt;span style="color:#4e9a06">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span style="color:#000;font-weight:bold">|&lt;/span> cut -d&lt;span style="color:#4e9a06">&amp;#39;-&amp;#39;&lt;/span> -f1,2,3,4,5,6,7&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sed -i -e &lt;span style="color:#4e9a06">&amp;#34;s/password/&lt;/span>&lt;span style="color:#000">$password&lt;/span>&lt;span style="color:#4e9a06">/g&amp;#34;&lt;/span> .env
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Initial project structure created! To log into Grafana in the browser:&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34; username: medic&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">echo&lt;/span> &lt;span style="color:#4e9a06">&amp;#34; password: &lt;/span>&lt;span style="color:#4e9a06">${&lt;/span>&lt;span style="color:#000">password&lt;/span>&lt;span style="color:#4e9a06">}&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">;&lt;/span>&lt;span style="color:#204a87">echo&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If you&amp;rsquo;re using docker-compose v2.x, it doesn&amp;rsquo;t support relative paths and you&amp;rsquo;ll have to edit your &lt;code>.env&lt;/code> file to update paths to absolute path.&lt;/p>
+&lt;p>Note that in step 4 below you&amp;rsquo;ll need the username and password which is printed after you run the above command.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Edit the &lt;code>cht-instances.yml&lt;/code> file to have the URLs of your CHT instances. You may include as many URLs of CHT instances as you like.&lt;/p>
+&lt;p>Here is an example:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yml" data-lang="yml">&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://subsub.sub.example.com&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://cht.domain.com&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">https://website.org&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Run the following command to deploy the stack:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sh" data-lang="sh">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Grafana is available at &lt;a href="http://localhost:3000">http://localhost:3000&lt;/a>. See the output from step 1 for your username and password.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>If you would like to do more customizing of your deployment, see &lt;a href="#additional-configuration">&amp;ldquo;Additional Configuration&amp;rdquo;&lt;/a>.&lt;/p>
+&lt;h3 id="upgrading">Upgrading&lt;/h3>
+&lt;p>Before upgrading, you should back up both your current configuration settings as well as your Prometheus/Grafana data directories.&lt;/p>
+&lt;h4 id="prometheus-grafana-and-json-exporter">Prometheus, Grafana and JSON Exporter&lt;/h4>
+&lt;p>To upgrade these dependencies, update the version numbers set in your &lt;code>.env&lt;/code> file (or leave them set to &lt;code>latest&lt;/code>). Then run the following commands:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="cht-watchdog">CHT Watchdog&lt;/h4>
+&lt;p>When you see a new version in the &lt;a href="https://github.com/medic/cht-watchdog">GitHub repository&lt;/a>, first review the release notes and upgrade instructions. Then, run the following commands to deploy the new configuration (be sure to replace &lt;code>TAG&lt;/code> with the tag name associated with the release (e.g. &lt;code>1.1.0&lt;/code>)):&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git fetch
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git -c advice.detachedHead&lt;span style="color:#ce5c00;font-weight:bold">=&lt;/span>&lt;span style="color:#204a87">false&lt;/span> checkout TAG
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose down
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d --remove-orphans
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="additional-configuration">Additional Configuration&lt;/h3>
+&lt;p>When making any changes to your CHT Watchdog configuration (e.g. adding/removing instances from the &lt;code>cht-instances.yml&lt;/code> file) make sure to restart all services to pick up the changes:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose down
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="couch2pg-data">couch2pg Data&lt;/h4>
+&lt;p>With the &lt;a href="https://github.com/medic/cht-watchdog/releases/tag/1.1.0">release of 1.1.0&lt;/a>, Watchdog now supports easily ingesting &lt;a href="https://docs.communityhealthtoolkit.org/apps/tutorials/couch2pg-setup/">couch2pg&lt;/a> data read in from a Postgres database (supports Postgres &lt;code>&amp;gt;= 9.x&lt;/code>).&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Copy the two example config files so you can add the correct contents in them. Do so by running this code:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp exporters/postgres/postgres-instances.example.yml exporters/postgres/postgres-instances.yml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp exporters/postgres/postgres_exporter.example.yml exporters/postgres/postgres_exporter.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Edit &lt;code>postgres-instances.yml&lt;/code> you just created and add your target postgres connection URL along with the proper root URL for your CHT instance as the label value. For example, if your postgres server was &lt;code>db.example.com&lt;/code> and your CHT instance was &lt;code>cht.example.com&lt;/code> the config would be:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#000">db.example.com:5432/cht]&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">labels&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cht_instance&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cht.example.com&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Edit &lt;code>postgres_exporter.yml&lt;/code> so that the &lt;code>auth_modules&lt;/code> object for your Postgres instance has the proper username and password. Using our &lt;code>db.example.com&lt;/code> example from above and assuming a password of &lt;code>super-secret&lt;/code> and a username of &lt;code>pg_user&lt;/code>, the config would be:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">db.example.com:5432/cht&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#8f5902;font-style:italic"># Needs to match the target URL in postgres-instances.yml&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">type&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">userpass&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">userpass&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">username&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">pg_user&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">password&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">super-secret&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">options&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">sslmode&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">disable&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Start your instance up, being sure to include both the existing &lt;code>docker-compose.yml&lt;/code> and the &lt;code>docker-compose.postgres-exporter.yml&lt;/code> file:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f exporters/postgres/docker-compose.postgres-exporter.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Always run this longer version of the &lt;code>docker compose&lt;/code> command which specifies both compose files for all future &lt;a href="#upgrading">upgrades&lt;/a>.
+&lt;/div>
+&lt;h4 id="prometheus-retention-and-storage">Prometheus Retention and Storage&lt;/h4>
+&lt;p>By default, historical monitoring data will be stored in Prometheus (&lt;code>PROMETHEUS_DATA&lt;/code> directory) for 60 days (configurable by &lt;code>PROMETHEUS_RETENTION_TIME&lt;/code>). A longer retention time can be configured to allow for longer-term analysis of the data. However, this will increase the size of the Prometheus data volume. See the &lt;a href="https://prometheus.io/docs/prometheus/latest/storage/">Prometheus documentation&lt;/a> for more information.&lt;/p>
+&lt;p>Local storage is not suitable for storing large amounts of monitoring data. If you intend to store multiple years worth of metrics, you should consider integrating Prometheus with a &lt;a href="https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage/">Remote Storage&lt;/a>.&lt;/p>
+&lt;h4 id="alerts">Alerts&lt;/h4>
+&lt;p>This configuration includes number of pre-provisioned alert rules. Additional alerting rules (and other contact points) can be set in the Grafana UI.&lt;/p>
+&lt;p>See both the Grafana &lt;a href="https://grafana.com/docs/grafana/latest/alerting/">high level alert Documentation&lt;/a> and &lt;a href="https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/#provision-alert-rules">provisioning alerts in the UI&lt;/a> for more information.&lt;/p>
+&lt;h5 id="deleting-provisioned-alert-rules">Deleting provisioned alert rules&lt;/h5>
+&lt;p>The provisioned alert rules shipped with CHT Watchdog are intended to be the generally applicable for most CHT deployments. However, not all the alert rules will necessarily be useful for everyone. If you would like to delete any of the provisioned alert rules, you can do so with the following steps:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>In Grafana, navigate to &amp;ldquo;Alerting&amp;rdquo; and then &amp;ldquo;Alert Rules&amp;rdquo; and click the eye icon for the rule you want to delete. Copy the &lt;code>Rule UID&lt;/code> which can be found on the right and is a 10 character value like &lt;code>mASYtCQ2j&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Create a &lt;code>delete-rules.yml&lt;/code> file&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cp grafana/provisioning/alerting/delete-rules.example.yml grafana/provisioning/alerting/delete-rules.yml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Update your new &lt;code>delete-rules.yml&lt;/code> file to include the Rule UID(s) of the alert rule(s) you want to delete&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Restart Grafana&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>docker compose restart grafana
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>If you ever want to re-enable the alert rules you deleted, you can simply remove the Rule UID(s) from the &lt;code>delete-rules.yml&lt;/code> file and restart Grafana again.&lt;/p>
+&lt;h5 id="modifying-provisioned-alert-rules">Modifying provisioned alert rules&lt;/h5>
+&lt;p>The provisioned alert rules cannot be modified directly. Instead, you can copy the configuration of a provisioned alert into a new custom alert with the desired changes. Then, remove the provisioned alert.&lt;/p>
+&lt;ol>
+&lt;li>Open the alert rule you would like to modify in the Grafana alert rules UI and select the &amp;ldquo;Copy&amp;rdquo; button.&lt;/li>
+&lt;li>Update the copied alert rule with the desired changes and save it into a new Evaluation group.&lt;/li>
+&lt;li>&lt;a href="#deleting-provisioned-alert-rules">Remove the provisioned alert&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;h5 id="configuring-contact-points">Configuring Contact Points&lt;/h5>
+&lt;p>Grafana supports sending alerts via a number of different methods. Two likely options are Email and Slack.&lt;/p>
+&lt;h6 id="email">Email&lt;/h6>
+&lt;p>To support sending email alerts from Grafana, you must update the &lt;code>smtp&lt;/code> section of your &lt;code>grafana/grafana.ini&lt;/code> file with your SMTP server configuration. Then, in the web interface, add the desired recipient email addresses in the &lt;code>grafana-default-email&lt;/code> contact point settings.&lt;/p>
+&lt;h6 id="slack">Slack&lt;/h6>
+&lt;p>Slack alerts can be configured within the Grafana web GUI for the specific rules you would like to alert on.&lt;/p>
+&lt;h3 id="configuration-reference">Configuration Reference&lt;/h3>
+&lt;h4 id="environment-variables">Environment Variables&lt;/h4>
+&lt;p>All the variables in the &lt;code>.env&lt;/code> file:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Name&lt;/th>
+&lt;th>Default&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_ADMIN_USER&lt;/code>&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>&lt;/td>
+&lt;td>Username for the Grafana admin user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_ADMIN_PASSWORD&lt;/code>&lt;/td>
+&lt;td>&lt;code>password&lt;/code>&lt;/td>
+&lt;td>Password for the Grafana admin user&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>grafana/grafana-oss&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_PORT&lt;/code>&lt;/td>
+&lt;td>&lt;code>3000&lt;/code>&lt;/td>
+&lt;td>Port on the host where Grafana will be available&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_BIND&lt;/code>&lt;/td>
+&lt;td>&lt;code>127.0.0.1&lt;/code>&lt;/td>
+&lt;td>Interface Grafana will bind to. Change to &lt;code>0.0.0.0&lt;/code> if you want to expose to all interfaces.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_DATA&lt;/code>&lt;/td>
+&lt;td>&lt;code>./grafana/data&lt;/code>&lt;/td>
+&lt;td>The host directory where Grafana data will be stored&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>GRAFANA_PLUGINS&lt;/code>&lt;/td>
+&lt;td>&lt;code>grafana-discourse-datasource&lt;/code>&lt;/td>
+&lt;td>Comma separated list of plugins to install (e.g: &lt;code>grafana-clock-panel,grafana-simple-json-datasource&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>JSON_EXPORTER_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>prometheuscommunity/json-exporter&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_VERSION&lt;/code>&lt;/td>
+&lt;td>&lt;code>latest&lt;/code>&lt;/td>
+&lt;td>Version of the &lt;code>prom/prometheus&lt;/code> image&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_DATA&lt;/code>&lt;/td>
+&lt;td>&lt;code>./prometheus/data&lt;/code>&lt;/td>
+&lt;td>The host directory where Prometheus data will be stored&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PROMETHEUS_RETENTION_TIME&lt;/code>&lt;/td>
+&lt;td>&lt;code>60d&lt;/code>&lt;/td>
+&lt;td>Length of time that Prometheus will store data (e.g. &lt;code>15d&lt;/code>, &lt;code>6m&lt;/code>, &lt;code>1y&lt;/code>)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="cht-metrics">CHT Metrics&lt;/h4>
+&lt;p>All CHT metrics in Prometheus:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>OpenMetrics name&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>label(s)&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>cht_api_*&lt;/code>&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>API server metrics (see &lt;a href="https://www.npmjs.com/package/prometheus-api-metrics">prometheus-api-metrics&lt;/a>). Requires CHT Core 4.3.0 or later. Includes stats like server response time in seconds and response size in bytes.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_conflict_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of doc conflicts which need to be resolved manually.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_connected_users_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of users that have connected to the api recently. By default the time interval is 7 days. Otherwise it is equal to the connected_user_interval parameter value used when making the /monitoring request.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_doc_del_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of deleted docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_doc_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of docs in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_fragmentation&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The fragmentation of the db, lower is better, “1” is no fragmentation.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_couchdb_update_sequence&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of changes in the db.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_date_current_millis&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>The current server date in millis since the epoch, useful for ensuring the server time is correct.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_date_uptime_seconds&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>How long API has been running.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_feedback_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of feedback docs created usually indicative of client side errors.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_messaging_outgoing_last_hundred&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;code>group&lt;/code>, &lt;code>status&lt;/code>&lt;/td>
+&lt;td>Counts of last 100 messages that have received status updates.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_messaging_outgoing_total&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>status&lt;/code>&lt;/td>
+&lt;td>Counts of the total number of messages.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_outbound_push_backlog_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of changes yet to be processed by Outbound Push.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_replication_limit_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of users that exceeded the replication limit of documents.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_sentinel_backlog_count&lt;/code>&lt;/td>
+&lt;td>Gauge&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>Number of changes yet to be processed by Sentinel.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>cht_version&lt;/code>&lt;/td>
+&lt;td>N/A&lt;/td>
+&lt;td>&lt;code>app&lt;/code>, &lt;code>node&lt;/code>, &lt;code>couchdb&lt;/code>&lt;/td>
+&lt;td>Version information for the CHT instance (recorded in labels)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>couch2pg_progress_sequence&lt;/code>&lt;/td>
+&lt;td>Counter&lt;/td>
+&lt;td>&lt;code>medic&lt;/code>, &lt;code>medic-logs&lt;/code>, &lt;code>medic-sentinel&lt;/code>, &lt;code>medic-users-meta&lt;/code>, &lt;code>_users&lt;/code>&lt;/td>
+&lt;td>The number of db changes that have been processed by couch2pg. Requires &lt;a href="#couch2pg-data">couch2pg metrics&lt;/a> be enabled.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Hosting: Production CHT Watchdog</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/production/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/monitoring/production/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="what-it-means-to-run-in-production">What it means to run in production&lt;/h2>
+&lt;p>When you run CHT Watchdog in production, and it is publicly accessible on the Internet, and has mission-critical data on it, you should take extra precautions around security and backup. This mainly consists of:&lt;/p>
+&lt;ul>
+&lt;li>using TLS for all HTTP connections&lt;/li>
+&lt;li>using VPN or SSH for insecure protocols like &lt;code>ssl=false&lt;/code> in Postgres&lt;/li>
+&lt;li>ensuring if the server were to fail, you can recover the data&lt;/li>
+&lt;/ul>
+&lt;p>This guide assumes you have already &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/adding-tls-certificates/">set up TLS&lt;/a> on your CHT instance and have gone through &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">the Setup steps&lt;/a> to deploy an instance of CHT Watchdog on server with a static IP and DNS entry, &lt;code>monitor.example.com&lt;/code> for example.&lt;/p>
+&lt;div class="alert alert-primary" role="alert">
+&lt;h4 class="alert-heading">Note&lt;/h4>
+Always run Watchdog on a different server than the CHT Core. This ensures Watchdog doesn&amp;rsquo;t fail if the CHT Core server fails and alerts will always be sent. The instructions assume you&amp;rsquo;re connecting over the public Internet and no special VPN or routing is required.
+&lt;/div>
+&lt;h2 id="monitoring-over-tls">Monitoring over TLS&lt;/h2>
+&lt;p>All monitoring should happen over TLS. This means the &lt;code>cht-instances.yml&lt;/code> file should have all the URLs in it start with &lt;code> - https&lt;/code>.&lt;/p>
+&lt;h2 id="accessing-grafana-over-tls">Accessing Grafana over TLS&lt;/h2>
+&lt;p>By default, the &lt;code>docker-compose.yml&lt;/code> has the service bind to &lt;code>127.0.0.1&lt;/code>. This means if you deploy it on a remote server you can not access Grafana&amp;rsquo;s web UI because you are not on the localhost. The best solution to expose it to the Internet is to use a reverse proxy. Medic recommends using &lt;a href="https://caddyserver.com/">Caddy&lt;/a> for this, but any reverse proxy will suffice. A big benefit with Caddy is that with just two files you ensure all traffic, and critically, all login credentials, are always encrypted when being sent and it handles all TLS certificate management tasks for you.&lt;/p>
+&lt;h3 id="reverse-proxy-and-docker-files">Reverse Proxy and Docker files&lt;/h3>
+&lt;p>Assuming you have the DNS entry of &lt;code>monitor.example.com&lt;/code> pointing to your server, you would create the &lt;code>Caddyfile&lt;/code> file with this code.&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat &amp;gt; /root/Caddyfile &amp;lt;&amp;lt; EOF
+monitor.example.com {
+reverse_proxy grafana:3000
+}
+EOF
+&lt;/code>&lt;/pre>&lt;p>Using the awesome secure defaults of Caddy, this file will tell Caddy to:&lt;/p>
+&lt;ol>
+&lt;li>Create a free certificate for &lt;code>monitor.example.com&lt;/code> using &lt;a href="https://letsencrypt.org/">Let&amp;rsquo;s Encrypt&lt;/a> (and renew it!)&lt;/li>
+&lt;li>Redirect any requests to &lt;code>HTTP&lt;/code> to go to the &lt;code>HTTPS&lt;/code> port&lt;/li>
+&lt;li>Reverse proxy all traffic to the &lt;code>grafana&lt;/code> docker instance.&lt;/li>
+&lt;/ol>
+&lt;p>The reverse proxy will only work if the Caddy container is on the same docker network as Grafana. That&amp;rsquo;s where the &lt;code>caddy-compose.yml&lt;/code> file comes in, specifically using the &lt;code>cht-watchdog-net&lt;/code> network. Create the file with this code&lt;/p>
+&lt;pre tabindex="0">&lt;code>cat &amp;gt; /root/caddy-compose.yml &amp;lt;&amp;lt; EOF
+version: &amp;#34;3.9&amp;#34;
+services:
+caddy:
+image: caddy:2-alpine
+restart: unless-stopped
+ports:
+- &amp;#34;80:80&amp;#34;
+- &amp;#34;443:443&amp;#34;
+volumes:
+- /root/Caddyfile:/etc/caddy/Caddyfile
+networks:
+- cht-watchdog-net
+EOF
+&lt;/code>&lt;/pre>&lt;h3 id="running">Running&lt;/h3>
+&lt;p>To start the reverse proxy, us the following command. Note that on first run it will provision your certificates:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cd ~/cht-watchdog
+docker compose -f docker-compose.yml -f ../caddy-compose.yml up -d
+&lt;/code>&lt;/pre>&lt;p>Because both the CHT Watchdog and Caddy compose files have the &lt;code>restart: unless-stopped&lt;/code> setting, the services will start when the server first boots.&lt;/p>
+&lt;h3 id="upgrades">Upgrades&lt;/h3>
+&lt;p>Upgrades can be done along with upgrades to your CHT Watchdog docker images:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../caddy-compose.yml pull
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../caddy-compose.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="backup">Backup&lt;/h2>
+&lt;p>When you deployed your CHT Watchdog instance, you created two directories:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>~/cht-watchdog/grafana/data&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/cht-watchdog/prometheus/data&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>These are the only directories you need to back up. Whether you use something as simple as &lt;code>zip&lt;/code> + &lt;code>scp&lt;/code> + &lt;code>cron&lt;/code> or a more full-featured solution like &lt;a href="https://www.borgbackup.org/">borgbackup&lt;/a> or &lt;a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html">AWS Data Lifecycle Manager&lt;/a>, be sure you follow &lt;a href="https://en.wikipedia.org/wiki/Backup#Storage">the 3-2-1 backup rule&lt;/a>:&lt;/p>
+&lt;blockquote>
+&lt;p>The 3-2-1 rule can aid in the backup process. It states that there should be at least 3 copies of the data, stored on 2 different types of storage media, and one copy should be kept offsite, in a remote location&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="default-grafana-url">Default Grafana URL&lt;/h2>
+&lt;p>The default URL that Grafana uses is &lt;code>http://localhost:3000&lt;/code>. In a production environment, specifically when alerts are being sent, you need to tell Grafana what its URL is. Do this by editing the &lt;code>./grafana/grafana.ini&lt;/code> you created at install and set the &lt;code>root_url&lt;/code> value. In this example, we&amp;rsquo;ll set it to &lt;code>monitor.example.com&lt;/code>:&lt;/p>
+&lt;pre tabindex="0">&lt;code>#################################### Server ##############################
+[server]
+root_url = https://monitor.example.com/
+&lt;/code>&lt;/pre></description></item><item><title>Hosting: Custom Postgres metrics in CHT Watchdog</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/postgres-ingest/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/monitoring/postgres-ingest/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;p>After &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">setting up&lt;/a> your Watchdog instance and &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/production/">making it production ready&lt;/a>, you can include additional custom metrics from your deployment. These metrics should be ingested by Prometheus and then can be used to create new Grafana dashboards and alerts. Example use cases include monitoring and alerting on health metrics like CHW visits per county or household registration rates, etc.&lt;/p>
+&lt;p>This guide will walk you through adding a custom metric from Postgres &lt;em>data&lt;/em>. The following naming convention is used throughout to reference the relevant server instances: CHT Core (&lt;code>cht.example.com&lt;/code>), CHT Watchdog (&lt;code>watchdog.example.com&lt;/code>) and a Postgres server (&lt;code>db.example.com&lt;/code>).&lt;/p>
+&lt;h3 id="base-flow">Base Flow&lt;/h3>
+&lt;p>This is the initial basic flow of data from a CHT instance to Watchdog:&lt;/p>
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]
+end
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
+end
+mon_api --&amp;gt; json&lt;/pre>
+&lt;h3 id="postgres-flow">Postgres Flow&lt;/h3>
+&lt;p>This guide will have you deploy a &lt;a href="https://github.com/prometheus-community/postgres_exporter">Postgres Exporter&lt;/a> on your Watchdog server (&lt;code>watchdog.example.com&lt;/code>). This, in turn, will query your Postgres server (&lt;code>db.example.com&lt;/code>):&lt;/p>
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]
+end
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+postgres-exp[Postgres Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
+end
+subgraph db[&amp;#34;db.example.com&amp;#34;]
+postgres[&amp;#34;Postgres (5431)&amp;#34;]
+end
+mon_api --&amp;gt; json
+postgres --&amp;gt; postgres-exp&lt;/pre>
+&lt;p>Adding a custom Postgres metric&lt;/p>
+&lt;p>The following steps are all performed on the CHT Watchdog instance and assume you installed Watchdog in &lt;code>~/cht-watchdog&lt;/code>. Note that user credentials with READ access to your Postgres server are required.&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="#prepare-query-in-config-file">Prepare query in config file&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#adding-new-scrape-config">Adding new scrape config&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#add-new-postgres-exporter">Add new Postgres Exporter&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#configure-the-dashboard">Configure the dashboard&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#optional-add-dashboard-to-cht-dropdown-in-grafana">Optional: Add Dashboard to CHT Dropdown in Grafana&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;h3 id="prepare-query-in-config-file">Prepare query in config file&lt;/h3>
+&lt;p>Add a YAML file for with your query called &lt;code>~/custom-sql-queries.yml&lt;/code>. In this example we&amp;rsquo;ll be using a query from the &lt;a href="https://github.com/medic/cht-app-monitoring-data-ingest/">App Monitoring Data Ingestion repo&lt;/a>, but it can be any query as long as the user you&amp;rsquo;re using in the next step has access to the database and table:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">dwh_impact_replication_failure&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">query&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">|&lt;/span>&lt;span style="color:#8f5902;font-style:italic">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> SELECT
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> metric as reason,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> count as total
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> FROM
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> public.app_monitoring_replication_failure_reasons
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> WHERE
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic"> partner_name IN (&amp;#39;partner_name_here&amp;#39;)&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">metrics&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">reason&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">usage&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;LABEL&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">description&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Name of the failure&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">total&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">usage&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;GAUGE&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">description&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;Replication failure reasons&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This configuration will generate a metric named &lt;code>dwh_impact_replication_failure_total&lt;/code> with a label named &lt;code>reason&lt;/code> which contains the string key value identifying the aggregated reason for the given replication failures. These metric/label names are fully customizable, but to avoid confusion you should follow the Prometheus &lt;a href="https://prometheus.io/docs/practices/naming/">best practices&lt;/a> when choosing names.&lt;/p>
+&lt;h3 id="adding-new-scrape-config">Adding new scrape config&lt;/h3>
+&lt;p>Create the &lt;code>~/scrape_config.custom-sql.yml&lt;/code> file and point the config to our new Postgres Exporter (&lt;code>custom_sql_exporter:9187&lt;/code>). This will tell Prometheus to scrape the new data every 1 minute:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">scrape_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">job_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;custom-sql&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">scrape_interval&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">1m&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">static_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;custom_sql_exporter:9187&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="add-new-postgres-exporter">Add new Postgres Exporter&lt;/h3>
+&lt;p>In a new file, &lt;code>~/docker-compose.custom-sql.yml&lt;/code>, define your new Postgres exporter as well as add a mount to the existing Grafana and Prometheus services. Note that you will need to add the following environment variables to your Watchdog &lt;code>~/cht-watchdog/.env&lt;/code> file:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>CUSTOM_SQL_USER&lt;/code> - Postgres user to use when logging in&lt;/li>
+&lt;li>&lt;code>CUSTOM_SQL_PASS&lt;/code> - Password for &lt;code>CUSTOM_SQL_USER&lt;/code> above&lt;/li>
+&lt;li>&lt;code>CUSTOM_SQL_SERVER&lt;/code> - URL or IP for your Postgres server&lt;/li>
+&lt;li>&lt;code>CUSTOM_SQL_PORT&lt;/code> - Port of server, defaults to &lt;code>5432&lt;/code> it not declared.&lt;/li>
+&lt;li>&lt;code>CUSTOM_SQL_DATABASE&lt;/code> - Actual string of database name (eg &lt;code>extra_monitoring&lt;/code> or &lt;code>health_stats&lt;/code>), will be different for each install.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">prometheus&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">./scrape_config.custom-sql.yml:/etc/prometheus/scrape_configs/custom-sql.yml:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">custom_sql_exporter&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">prometheuscommunity/postgres-exporter:latest&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">command&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#8f5902;font-style:italic"># disables the collection of all metrics except for custom queries &lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.database&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.postmaster&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.process_idle&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.replication&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.replication_slot&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.stat_bgwriter&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.stat_database&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.statio_user_tables&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.stat_statements&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--no-collector.stat_user_tables&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--disable-default-metrics&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#39;--disable-settings-metrics&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">../custom-sql-queries.yml:/custom-sql-queries.yml&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">environment&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">DATA_SOURCE_NAME&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;postgresql://${CUSTOM_SQL_USER:-NO DB USER SPECIFIED}:${CUSTOM_SQL_PASS:-NO DB PASSWORD SPECIFIED}@${CUSTOM_SQL_SERVER:-.NO DB SERVER SPECIFIED}:${CUSTOM_SQL_PORT:-5432}/${CUSTOM_SQL_DATABASE:-.NO DB SPECIFIED}?sslmode=disable&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">PG_EXPORTER_EXTEND_QUERY_PATH&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;/custom-sql-queries.yml&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">restart&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">always&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-watchdog-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Launch Watchdog with the new compose file&lt;/p>
+&lt;p>Now that you&amp;rsquo;ve added the new configuration files, we can load it alongside the existing ones. Assuming you&amp;rsquo;ve followed the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">Watchdog Setup&lt;/a>, this would be:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-watchdog
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../docker-compose.custom-sql.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="configure-the-dashboard">Configure the dashboard&lt;/h3>
+&lt;p>Now that the new Postgres Exporter is running on your Watchdog instance and CHT Watchdog&amp;rsquo;s Prometheus has additional scrape configs to ingest the new metrics, we can now visualize it in a Grafana Dashboard and then alert on it:&lt;/p>
+&lt;ol>
+&lt;li>In the &amp;ldquo;Metric&amp;rdquo; field enter &lt;code>dwh_impact_replication_failure_total&lt;/code> from the step above where we defined &lt;code>custom-sql-queries.yml&lt;/code>&lt;/li>
+&lt;li>Click the blue &amp;ldquo;Run query&amp;rdquo; in the upper right.&lt;/li>
+&lt;li>We&amp;rsquo;ll make this a table, but you can configure the dashboard as desired.&lt;/li>
+&lt;li>Click &amp;ldquo;Add to dashboard&amp;rdquo;&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="explore.png" alt="Grafana showing data data explorer">&lt;/p>
+&lt;h3 id="optional-add-dashboard-to-cht-dropdown-in-grafana">Optional: Add Dashboard to CHT Dropdown in Grafana&lt;/h3>
+&lt;p>An additional optional step is to make your dashboard a peer of the existing &amp;ldquo;Admin Details&amp;rdquo; and &amp;ldquo;Admin Overview&amp;rdquo;. Do this by editing the JSON by finding the line with &lt;code>&amp;quot;graphTooltip&amp;quot;: 0,&lt;/code> and add this JSON after it:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;links&amp;#34;&lt;/span>&lt;span style="color:#a40000">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;asDropdown&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;external link&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;includeVars&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;keepTime&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tags&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;targetBlank&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;title&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;CHT Admin Extra SQL&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tooltip&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dashboards&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;url&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>&lt;span style="color:#a40000">,&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This will make your new dashboard show up natively with the two existing CHT dashboards:&lt;/p>
+&lt;p>&lt;img src="menu.png" alt="Grafana with a third &amp;ldquo;Admin Extra SQL&amp;rdquo; option showing in the existing CHT navigation menu">&lt;/p>
+&lt;h4 id="full-dashboard-json">Full Dashboard JSON&lt;/h4>
+&lt;p>For reference, here is the full JSON of the dashboard we created above as shown in the &amp;ldquo;Save&amp;rdquo; modal:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-JSON" data-lang="JSON">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;annotations&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;list&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;builtIn&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;datasource&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;grafana&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;uid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;-- Grafana --&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;enable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;hide&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;iconColor&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;rgba(0, 211, 255, 1)&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Annotations &amp;amp; Alerts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dashboard&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;editable&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;fiscalYearStartMonth&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;graphTooltip&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;links&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;asDropdown&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;icon&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;external link&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;includeVars&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;keepTime&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tags&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;targetBlank&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;title&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;CHT Admin Extra SQL&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tooltip&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dashboards&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;url&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;liveNow&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;panels&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;datasource&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;prometheus&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;uid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;PBFA97CFB590B2093&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;fieldConfig&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;defaults&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;custom&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;align&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;auto&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;cellOptions&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;auto&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;inspect&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;mappings&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;thresholds&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;mode&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;absolute&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;steps&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;color&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;green&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;color&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;red&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;unit&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;short&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;overrides&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;__name__&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.hidden&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;instance&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.hidden&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;job&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.hidden&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;server&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.hidden&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Time&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.hidden&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;matcher&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;byName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;failure&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;custom.width&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">462&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;gridPos&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;h&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">10&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;w&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">18&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;x&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;y&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;options&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;cellHeight&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;sm&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;footer&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;countRows&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;fields&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;reducer&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#4e9a06">&amp;#34;sum&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;show&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;showHeader&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;sortBy&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;desc&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;displayName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Value&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;pluginVersion&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;10.0.1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;targets&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;datasource&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;prometheus&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;uid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;PBFA97CFB590B2093&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;editorMode&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;builder&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;exemplar&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;expr&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dwh_impact_replication_failure_total&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;format&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;table&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;instant&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Q-e238fdbd-aed6-4215-a3e8-c611c6586c64-0&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;legendFormat&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;range&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">false&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;refId&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;A&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;title&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Replication failure reason&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;table&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;refresh&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;5s&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;schemaVersion&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">38&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;style&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;dark&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;tags&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;templating&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;list&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;time&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;from&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;now-5m&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;to&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;now&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;timepicker&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;timezone&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;title&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;CHT Admin Extra SQL&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;uid&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;a71db640-cc40-452c-aa92-222a9b49d43b&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;version&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">8&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;weekStart&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Hosting: Integrating CHT Watchdog</title><link>https://docs.communityhealthtoolkit.org/hosting/monitoring/integration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/monitoring/integration/</guid><description>
+&lt;div class="pageinfo pageinfo-primary">
+&lt;p>These instructions apply to both CHT 3.x (beyond 3.12) and CHT 4.x.&lt;/p>
+&lt;/div>
+&lt;h2 id="going-beyond-basic-setup">Going beyond basic setup&lt;/h2>
+&lt;p>After you have done the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">setup of CHT Watchdog&lt;/a> and configured it to run &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/production/">with TLS and have backups enabled&lt;/a>, you may want to extend it to scrape other Prometheus data sources so that Grafana can send alerts on non-CHT Core metrics.&lt;/p>
+&lt;p>This guide uses example instances of CHT Core (&lt;code>cht.example.com&lt;/code>) and CHT Watchdog (&lt;code>watchdog.example.com&lt;/code>). When deploying, be sure to replace with your own hostnames.&lt;/p>
+&lt;h3 id="default-flow">Default Flow&lt;/h3>
+&lt;p>Let&amp;rsquo;s look at how the default deployment of Watchdog works when configured to only gather metrics from &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">CHT Core&amp;rsquo;s monitoring API&lt;/a>:&lt;/p>
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]:::client_node
+end
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
+end
+mon_api --&amp;gt; json&lt;/pre>
+&lt;h3 id="additional-flows">Additional Flows&lt;/h3>
+&lt;p>Your Prometheus instance from CHT Watchog can ingest data from any &lt;a href="https://prometheus.io/docs/instrumenting/exporters/">supported data source&lt;/a> accessible via an HTTPS request. These data sources might be hosted on the same server as CHT Core or on a completely different server.&lt;/p>
+&lt;p>The focus of this guide is to collect metrics on Docker container usage and performance from the server hosting our CHT Core instance using &lt;a href="https://prometheus.io/docs/guides/cadvisor/">cAdvisor&lt;/a>.&lt;/p>
+&lt;pre class="mermaid">flowchart LR
+subgraph core[&amp;#34;cht.example.com&amp;#34;]
+mon_api[&amp;#34;Monitoring API (443)&amp;#34;]:::client_node
+cAdvisor:::client_node
+end
+subgraph watchdog[&amp;#34;watchdog.example.com&amp;#34;]
+json[JSON Exporter] --&amp;gt; Prometheus
+Prometheus --&amp;gt; Grafana
+end
+mon_api --&amp;gt; json
+cAdvisor[&amp;#34;cAdvisor (8443)&amp;#34;] --&amp;gt; Prometheus&lt;/pre>
+&lt;p>Note that because CHT Core is listening on port 443 already, we&amp;rsquo;ll have cAdvisor listen on port 8443.&lt;/p>
+&lt;p>By reading this guide you should not only be able to set up cAdvisor, but also be familiar with extending CHT Watchdog to support any other vital metrics.&lt;/p>
+&lt;h3 id="steps-to-new-integrations">Steps to new integrations&lt;/h3>
+&lt;p>While this is a specific example for cAdvisor, these same steps will be taken to extend Watchdog for other metrics:&lt;/p>
+&lt;ol>
+&lt;li>CHT Core: &lt;a href="#cadvisor-compose-file">Create both cAdvisor and Caddy Docker Compose files&lt;/a>&lt;/li>
+&lt;li>CHT Core: &lt;a href="#start-cadvisor-caddy-and-cht-core-with-docker">Start the Caddy and a cAdvisor containers along with the CHT Core&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#scrape-config">Adding new scrape and compose configs&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#load-new-compose-files-with-existing-ones">Restart the Prometheus and Grafana server to include the new scrape config mounts&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#on-cht-watchdog-import-grafana-dashboard">Importing an exising cAdvisor dashboard from &lt;code>grafana.com&lt;/code>&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;p>After completing these steps, we now have Docker metrics we can alert on:&lt;/p>
+&lt;p>&lt;a href="cadvisor.screenshot.png">&lt;img src="cadvisor.screenshot.png" alt="Screenshot of Grafana Dashboard showing data from Prometheus">&lt;/a>&lt;/p>
+&lt;p>Read on below on how to set this up!&lt;/p>
+&lt;h2 id="integrating-with-cadvisor">Integrating with cAdvisor&lt;/h2>
+&lt;h3 id="on-cht-core">On CHT Core&lt;/h3>
+&lt;h4 id="cadvisor-compose-file">cAdvisor Compose file&lt;/h4>
+&lt;p>On your CHT instance, add a Docker composer file for the new cAdvisor service. Note this also includes a Redis caching layer. Also note that we&amp;rsquo;re reducing cAdvisors CPU usage by adding 3 extra flags in the &lt;code>command&lt;/code> stanza. In our example, we&amp;rsquo;ve put this file in &lt;code>/home/ubuntu/cht/compose/cadvisor_compose.yml&lt;/code> with these contents:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;3.9&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">cadvisor&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">gcr.io/cadvisor/cadvisor:latest&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">cadvisor&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/:/rootfs:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/var/run:/var/run:rw&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/sys:/sys:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/var/lib/docker/:/var/lib/docker:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">depends_on&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">redis&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">command&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--housekeeping_interval=30s&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--docker_only=true&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,accelerator,hugetlb,referenced_memory,cpu_topology,resctrl&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">redis&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">redis:latest&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">container_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">redis&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="caddy-config-and-compose-files">Caddy Config and Compose files&lt;/h4>
+&lt;p>Like we did in the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/production/#accessing-grafana-over-tls">TLS section&lt;/a>, we&amp;rsquo;ll add both a &lt;code>/home/ubuntu/Caddyfile&lt;/code> and a &lt;code>/home/ubuntu/cht/compose/caddy-compose.yml&lt;/code>.&lt;/p>
+&lt;p>Starting with the &lt;code>Caddyfile&lt;/code>, let&amp;rsquo;s assume your server&amp;rsquo;s DNS entry is &lt;code>cht.example.com&lt;/code>. We can expose cAdvisor&amp;rsquo;s service running on localhost port &lt;code>8443&lt;/code> with this compose file. This tells Caddy to reverse proxy requests to the public interface to the private Docker network interface on port &lt;code>8080&lt;/code> where cAdvisor is running:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000">cht.example.com:8443 {&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">reverse_proxy cadvisor:8080&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>}&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Then we can add the compose file to run Caddy. Note that it&amp;rsquo;s mounting the config file we just created:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;3.9&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">caddy&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">image&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">caddy:2-alpine&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">restart&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">unless-stopped&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">ports&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#4e9a06">&amp;#34;8443:8443&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/home/ubuntu/Caddyfile:/etc/caddy/Caddyfile&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">networks&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">cht-net&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="start-cadvisor-caddy-and-cht-core-with-docker">Start cAdvisor, Caddy and CHT Core with Docker&lt;/h4>
+&lt;p>Now that we have all the config files in place, you need to have Docker start everything together. This is so that the containers can see each other on the same &lt;code>CHT Net&lt;/code> Docker network. You will need to specify each of the compose files every time you start, stop or restart CHT instance so all the services stay running and connected.&lt;/p>
+&lt;p>Assuming you followed the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/self-hosting/">production steps&lt;/a> to install the CHT, you use this Compose call to first stop all containers and then start them all up, including the new services:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker stop &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps --quiet&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that the CHT Upgrade Service will process all Docker Compose file in the &lt;code>/home/ubuntu/cht/compose&lt;/code> directory for us and we don&amp;rsquo;t need to explicity specify them in the &lt;code>docker compose up&lt;/code> command.&lt;/p>
+&lt;h3 id="on-cht-watchdog">On CHT Watchdog&lt;/h3>
+&lt;h4 id="scrape-config">Scrape config&lt;/h4>
+&lt;p>We&amp;rsquo;ll first create the &lt;code>~/cadvisor-prometheus-conf.yml&lt;/code> file and point the config to our CHT Core URL:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">scrape_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">job_name&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;cadvisor&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">scrape_interval&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000">5s&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">scheme&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#39;https&amp;#39;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">static_configs&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#204a87;font-weight:bold">targets&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#39;cht.example.com:8443&amp;#39;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>CHT Watchdog allows you to use additional Docker Compose files to add as many additional Prometheus scrape configs as are needed. Here, we&amp;rsquo;ll create one in &lt;code>~/cadvisor-compose.yml&lt;/code> pointing to our &lt;code>cadvisor-prometheus-conf.yml&lt;/code> file from above.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">version&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#4e9a06">&amp;#34;3.9&amp;#34;&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline">&lt;/span>&lt;span style="color:#204a87;font-weight:bold">services&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">prometheus&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>&lt;span style="color:#204a87;font-weight:bold">volumes&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f8f8f8;text-decoration:underline"> &lt;/span>- &lt;span style="color:#000">/root/cadvisor-prometheus-conf.yml:/etc/prometheus/scrape_configs/cadvisor.yml:ro&lt;/span>&lt;span style="color:#f8f8f8;text-decoration:underline">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="load-new-compose-files-with-existing-ones">Load new Compose files with existing ones&lt;/h4>
+&lt;p>Now that you&amp;rsquo;ve added the new configuration files, we can load it alongside the existing ones. Assuming you&amp;rsquo;ve followed the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/setup/">Watchdog Setup&lt;/a>, this would be:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> ~/cht-monitoring
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose -f docker-compose.yml -f ../cadvisor-compose.yml up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="import-grafana-dashboard">Import Grafana Dashboard&lt;/h4>
+&lt;p>Now that cAdvisor is running on your CHT Core instance and CHT Watchdog&amp;rsquo;s Prometheus has additional scrape configs to ingest the cAdvisor metrics, we can now visualize it in a Grafana Dashboard and then alert on it.&lt;/p>
+&lt;ol>
+&lt;li>Log into your Watchdog instance&lt;/li>
+&lt;li>Click the upper left hamburger menu and click &amp;ldquo;Dashboards&amp;rdquo;&lt;/li>
+&lt;li>Find the &amp;ldquo;New&amp;rdquo; button on the left, click and choose &amp;ldquo;Import&amp;rdquo; from the drop down&lt;/li>
+&lt;li>On the next page, scroll down to find &amp;ldquo;Import via grafana.com&amp;rdquo;, enter ID &lt;code>193&lt;/code> (for the &lt;a href="https://grafana.com/grafana/dashboards/193-docker-monitoring/">Docker monitoring&lt;/a> dashboard) and click &amp;ldquo;Load&amp;rdquo;&lt;/li>
+&lt;li>Confirm the &amp;ldquo;Name&amp;rdquo; and &amp;ldquo;Folder&amp;rdquo; values and select &amp;ldquo;Prometheus&amp;rdquo; as the data source in the dropdown. Finally, click the &amp;ldquo;Import&amp;rdquo; button at the bottom of the page.&lt;/li>
+&lt;/ol>
+&lt;p>That&amp;rsquo;s it! After following these steps, you should be looking at the cAdvisor dashboard &lt;a href="#steps-to-new-integrations">as shown above&lt;/a>. From here, you can both customize this dashboard as well as add alerts as needed.&lt;/p></description></item></channel></rss>
