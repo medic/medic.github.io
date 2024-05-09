@@ -88,6 +88,64 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;recipient&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;some recipients&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .assetlinks</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/assetlinks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/assetlinks/</guid><description>
+&lt;p>&lt;em>Requires CHT Core 4.7.0+, CHT Conf 3.22.0+, and CHT Android 1.3.0+&lt;/em>&lt;/p>
+&lt;p>When using a &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/branding/">custom flavor of cht-android&lt;/a> to connect to your CHT instance, the ecosystem supports using &lt;a href="https://docs.communityhealthtoolkit.org/apps/features/integrations/android/#sending-a-url">deep links&lt;/a> to open specific content in the app. (E.g. &lt;a href="https://docs.communityhealthtoolkit.org/apps/concepts/access/#magic-links-for-logging-in-token-login">token login links&lt;/a>). Security measures in Android require these deep links &lt;a href="https://developer.android.com/training/app-links/verify-android-applinks">be verified&lt;/a> either automatically or manually. This &lt;code>assetlinks&lt;/code> configuration enables auto-verification for your CHT links in your Android app. The provided JSON file will be served at &lt;code>https://&amp;lt;your CHT instance&amp;gt;/.well-known/assetlinks.json&lt;/code>. If you do not provide this configuration, users will be prompted to manually associate the CHT domain with your app.&lt;/p>
+&lt;p>For more information, see the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/branding/#android-app-links-verification">docs for building a new CHT Android flavor&lt;/a>.&lt;/p>
+&lt;p>Specify your digital asset links in the &lt;code>app_settings/assetlinks.json&lt;/code> file. The &lt;code>compile-app-settings&lt;/code> action in the &lt;code>cht-conf&lt;/code> will automatically include this configuration in your &lt;code>app_settings.json&lt;/code> file. Then, running the &lt;code>upload-app-settings&lt;/code> action will deploy it to the server.&lt;/p>
+&lt;h2 id="app_settingsjson-assetlinks">&lt;code>app_settings.json .assetlinks[]&lt;/code>&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>type&lt;/th>
+&lt;th>description&lt;/th>
+&lt;th>required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>relation[]&lt;/code>&lt;/td>
+&lt;td>&lt;code>Array&amp;lt;string&amp;gt;&lt;/code>&lt;/td>
+&lt;td>The array should contain only one element: the string &lt;code>delegate_permission/common.handle_all_urls&lt;/code>.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>target&lt;/code>&lt;/td>
+&lt;td>&lt;code>object&lt;/code>&lt;/td>
+&lt;td>Contains fields to identify associated apps.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>target.namespace&lt;/code>&lt;/td>
+&lt;td>&lt;code>string&lt;/code>&lt;/td>
+&lt;td>Must be set to &lt;code>android_app&lt;/code>.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>target.package_name&lt;/code>&lt;/td>
+&lt;td>&lt;code>string&lt;/code>&lt;/td>
+&lt;td>The &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/branding/#2-new-brand">application ID&lt;/a> declared in the app&amp;rsquo;s &lt;code>build.gradle&lt;/code> file.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>target.sha256_cert_fingerprints&lt;/code>&lt;/td>
+&lt;td>&lt;code>Array&amp;lt;string&amp;gt;&lt;/code>&lt;/td>
+&lt;td>The SHA256 fingerprints of your app’s signing certificate. You can get it with the Java utility &lt;code>keytool&lt;/code>, see how exactly in our &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/branding/#hosting-assetlinksjson-with-the-cht">Android guide&lt;/a>.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="code-sample">Code Sample&lt;/h2>
+&lt;p>This sample associates the Android app &lt;code>org.medicmobile.webapp.mobile&lt;/code> to a CHT instance and grants it link-opening rights to the Android app:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;relation&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;delegate_permission/common.handle_all_urls&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;target&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;namespace&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;android_app&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;package_name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;org.medicmobile.webapp.mobile&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;sha256_cert_fingerprints&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;62:BF:C1:78:24:D8:4D:5C:B4:E1:8B:66:98:EA:14:16:57:6F:A4:E5:96:CD:93:81:B2:65:19:71:A7:80:EA:4D&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: .contact_types</title><link>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/</guid><description>
 &lt;p>From 3.7.0 it is possible to configure what types of places and people are available by modifying the &lt;code>contact_types&lt;/code> array in the app settings. Each type has the following properties.&lt;/p>
 &lt;div class="alert alert-primary" role="alert">

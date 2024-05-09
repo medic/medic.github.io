@@ -219,4 +219,66 @@ Signer #1 certificate SHA-256 digest: 7f072b...
 &lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/publishing/">Release the flavor&lt;/a>.&lt;/li>
 &lt;/ol>
 &lt;h3 id="6-publish-the-app">6. Publish the app&lt;/h3>
-&lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p></description></item></channel></rss>
+&lt;p>The last step is to publish it in the Play Store, or whatever option best suit your needs. Checkout the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/android/publishing/">Publishing&lt;/a> page to see all the options available and instructions.&lt;/p>
+&lt;h2 id="android-app-links-verification">Android App Links verification&lt;/h2>
+&lt;p>&lt;em>Supported for CHT Core 4.7.0+ and CHT Android 1.3.0+&lt;/em>&lt;/p>
+&lt;p>Starting with Android 12, Android supports associating an app with a domain and automatically verifying this association. This allows deep links to immediately open content in the app. To get this working, you need to host a Digital Asset Links JSON file at &lt;code>https://&amp;lt;domain.name&amp;gt;/.well-known/assetlinks.json&lt;/code> containing some information about your app to associate it with your domain. More information is available on the &lt;a href="https://developer.android.com/training/app-links/verify-android-applinks">official Android docs&lt;/a>.&lt;/p>
+&lt;h3 id="hosting-assetlinksjson-with-the-cht">Hosting &lt;code>assetlinks.json&lt;/code> with the CHT&lt;/h3>
+&lt;p>Since CHT Core version 4.7.0, the CHT supports serving &lt;code>assetlinks.json&lt;/code> by adding it to your app settings.
+All you have to do to make the CHT serve your assetlinks at &lt;code>/.well-known/assetlinks.json&lt;/code> is to:&lt;/p>
+&lt;ol>
+&lt;li>Ensure your flavor of cht-android &lt;a href="#3-generate-a-new-keystore">has a valid keystore&lt;/a>.&lt;/li>
+&lt;li>Use the &lt;code>keytool&lt;/code> utility (included with your Java SDK) to get your app&amp;rsquo;s cert fingerprint:
+&lt;pre tabindex="0">&lt;code>keytool -list -v -keystore ./path/to/release-key.keystore
+# or alternatively:
+keytool -printcert -jarfile ./path/to/project.apk
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>Set the cert fingerprint in the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/assetlinks/">&lt;code>assetlinks&lt;/code> configuration&lt;/a> for your CHT instance and deploy it to your server with cht-conf.&lt;/li>
+&lt;/ol>
+&lt;h3 id="verifying-it-works">Verifying it works&lt;/h3>
+&lt;p>There are different ways to verify your setup works and we&amp;rsquo;ll go through a few of them in the next steps.&lt;/p>
+&lt;h4 id="using-android-debug-bridge-adb">Using Android Debug Bridge &lt;code>adb&lt;/code>&lt;/h4>
+&lt;ol>
+&lt;li>To install the &lt;code>adb&lt;/code> command, follow the instructions under the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/android/development-setup/#debug-tool-adb">Development Environment &amp;gt; Debug tool adb&lt;/a> section.&lt;/li>
+&lt;li>With the phone connected to your computer, open a command line session and write the following command: &lt;code>adb shell pm get-app-links &amp;lt;package_name&amp;gt;&lt;/code> where &lt;code>&amp;lt;package_name&amp;gt;&lt;/code> is your application ID.&lt;/li>
+&lt;/ol>
+&lt;p>The output of this command should look like this:&lt;/p>
+&lt;pre tabindex="0">&lt;code>&amp;lt;package_name&amp;gt;:
+ID: 01234567-89ab-cdef-0123-456789abcdef
+Signatures: [&amp;#34;62:BF:C1:78:24:D8:4D:5C:B4:E1:8B:66:98:EA:14:16:57:6F:A4:E5:96:CD:93:81:B2:65:19:71:A7:80:EA:4D&amp;#34;]
+Domain verification state:
+mobile.webapp.medicmobile.org: verified
+&lt;/code>&lt;/pre>&lt;p>The domain verification state for your CHT instance&amp;rsquo;s domain should show &lt;code>verified&lt;/code>.&lt;/p>
+&lt;h4 id="manually-testing-on-the-device">Manually testing on the device&lt;/h4>
+&lt;figure class="right col-6 col-md-4 col-lg-2">&lt;a href="android-12-prompt.png">
+&lt;img src="android-12-prompt.png"/> &lt;/a>
+&lt;/figure>
+&lt;p>Another way of verifying your Android app has been properly associated to your CHT instance&amp;rsquo;s domain is by opening
+the Android app on a device. You can run this test on a real device or with the emulator in Android Studio.&lt;/p>
+&lt;p>Opening the app for the first time should take you straight to the login page &lt;strong>without&lt;/strong> prompting you to link a domain to the app as shown in the following screenshot:&lt;/p>
+&lt;p>Additionally, clicking a link to your CHT instance should open the app immediately instead of opening the CHT instance in the default browser.&lt;/p>
+&lt;h3 id="use-case---a-single-android-app-for-many-cht-instances">Use case - a single Android app for many CHT instances&lt;/h3>
+&lt;p>For specific large deployment scenarios, you might publish a single Android app to serve multiple CHT instances.
+In this case, each CHT instance&amp;rsquo;s app settings will need to be configured with the same &lt;code>assetlinks.json&lt;/code> because
+they share the same Android app and hence the same &lt;code>package_name&lt;/code> and &lt;code>sha256_cert_fingerprints&lt;/code> properties.&lt;/p>
+&lt;p>When building your Android app, you will need to ensure the app&amp;rsquo;s manifest has &lt;code>&amp;lt;intent-filter android:autoverify=&amp;quot;true&amp;quot;&amp;gt;&lt;/code>
+with each CHT instance&amp;rsquo;s domain listed in it like so:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#8f5902;font-style:italic">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">&amp;lt;manifest&lt;/span> &lt;span style="color:#c4a000">xmlns:android=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;http://schemas.android.com/apk/res/android&amp;#34;&lt;/span> &lt;span style="color:#c4a000">xmlns:tools=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;http://schemas.android.com/tools&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;uses-permission&lt;/span> &lt;span style="color:#c4a000">android:name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34;&lt;/span> &lt;span style="color:#c4a000">tools:node=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;remove&amp;#34;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;application&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;activity&lt;/span> &lt;span style="color:#c4a000">android:name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;AppUrlIntentActivity&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:launchMode=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;singleInstance&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:exported=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;intent-filter&lt;/span> &lt;span style="color:#c4a000">android:autoVerify=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;action&lt;/span> &lt;span style="color:#c4a000">android:name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;android.intent.action.VIEW&amp;#34;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;category&lt;/span> &lt;span style="color:#c4a000">android:name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;android.intent.category.DEFAULT&amp;#34;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;category&lt;/span> &lt;span style="color:#c4a000">android:name=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;android.intent.category.BROWSABLE&amp;#34;&lt;/span> &lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;data&lt;/span> &lt;span style="color:#c4a000">android:scheme=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;https&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:host=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;first-cht-app.org&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:pathPattern=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;.*&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;data&lt;/span> &lt;span style="color:#c4a000">android:scheme=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;https&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:host=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;second-cht-app.org&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:pathPattern=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;.*&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;data&lt;/span> &lt;span style="color:#c4a000">android:scheme=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;https&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:host=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;third-cht-app.org&amp;#34;&lt;/span> &lt;span style="color:#c4a000">android:pathPattern=&lt;/span>&lt;span style="color:#4e9a06">&amp;#34;.*&amp;#34;&lt;/span>&lt;span style="color:#204a87;font-weight:bold">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;/intent-filter&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;/activity&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;lt;/application&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87;font-weight:bold">&amp;lt;/manifest&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
