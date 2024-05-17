@@ -135,8 +135,8 @@ X-CouchDB-Body-Time: 0
 &lt;p>Meanwhile, sentinel notices that you registers a pregnancy, and before you have a chance to change the LMP, sets up a bunch of recurring messages, editing the document.&lt;/p>
 &lt;p>Sentinel has now made a change to the first version of your document, and you&amp;rsquo;re trying to also make a change to the first version. These conflict.&lt;/p>
 &lt;h2 id="how-to-manage-conflicts">How to manage conflicts&lt;/h2>
-&lt;p>Conflicts will appear on the #downtime Slack channel, along with the other alerts. If a server you manage has a conflict, you should do the following:&lt;/p>
-&lt;h3 id="identify-why-conflicts-are-occuring">Identify why conflicts are occuring&lt;/h3>
+&lt;p>If a server you manage has a conflict, you should do the following:&lt;/p>
+&lt;h3 id="identify-why-conflicts-are-occurring">Identify why conflicts are occurring&lt;/h3>
 &lt;p>Take a look at the conflicts view, at &lt;code>https://yourserver/medic/_design/medic-conflicts/_view/conflicts&lt;/code>. Each entry in that view looks like this:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -155,7 +155,7 @@ X-CouchDB-Body-Time: 0
 &lt;p>If you get stuck feel free to escalate to a developer, who can take a look.&lt;/p>
 &lt;h3 id="if-appropriate-raise-a-bug">If appropriate, raise a bug&lt;/h3>
 &lt;p>If you determine (or just suspect) that the problem could be in our code or data structures, feel free to raise a bug to development. For example, historically read status has been stored against the document, which can easily cause conflicts if you create a document and then instantly view it with sentinel processing in the background.&lt;/p>
-&lt;p>While some conflicts are inevitable, we want to architect away from them as much as possible. Ideally tech leads would never have to resolve conflicts.&lt;/p>
+&lt;p>While some conflicts are inevitable, we want to architect away from them as much as possible.&lt;/p>
 &lt;h3 id="regardless-resolve-the-conflicts">Regardless, resolve the conflicts&lt;/h3>
 &lt;p>Now that you&amp;rsquo;ve diagnosed the problem, and perhaps reported a bug, you should resolve the conflict.&lt;/p>
 &lt;p>This is &lt;strong>extremely&lt;/strong> important. Conflicts cause saved changes to not appear against documents silently, and could cause important document changes (eg fixing someone&amp;rsquo;s EDD) to not occur.&lt;/p>
@@ -266,7 +266,7 @@ X-CouchDB-Body-Time: 0
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>In this example, there are two references to &lt;code>7FADDF76-55E4-4E50-9444-5E468E61EA83&lt;/code>, both in the &lt;code>1B7922A6-A6D6-C956-BBAE-DE5EB5A2E6C8&lt;/code> document, one at &lt;code>fields.inputs.contact._id&lt;/code> and one at &lt;code>fields.patient_id&lt;/code>.&lt;/p>
-&lt;p>If you get stuck, feel free to contact a developer (either a specific one, or just post in &lt;code>#development&lt;/code>) and they can help you out.&lt;/p></description></item><item><title>Apps: Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</guid><description>
+&lt;p>If you get stuck, feel free to raise a question in the &lt;a href="https://forum.communityhealthtoolkit.org">CHT forum&lt;/a> and people can help you out.&lt;/p></description></item><item><title>Apps: Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/guides/database/querying_apdex_telemetry/</guid><description>
 &lt;p>Added in &lt;code>4.7.0&lt;/code>, CHT now records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications.&lt;/p>
 &lt;p>Since Apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/performance/telemetry/">telemetry&lt;/a> system, it is possible to view Apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/data-flows-for-analytics/">analytics database&lt;/a>.&lt;/p>
 &lt;p>An example of an SQL to view the Apdex score:&lt;/p>
