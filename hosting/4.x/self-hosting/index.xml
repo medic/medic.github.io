@@ -399,9 +399,9 @@ Upgrading the CHT Upgrade Service will not cause a new CHT version to be install
 &lt;li>CNS-SEARCH-AND-SPBM&lt;/li>
 &lt;/ul>
 &lt;p>Now, on the VM settings, we can apply these roles as described in the above document.&lt;/p>
-&lt;p>Any provisioned VM in the previous step, should recieve CNS-VM role.
-The top-level vCenter server will recieve CNS-SEARCH-AND-SPBM role.
-Virtual-SAN should recieve CNS-DATASTORE.
+&lt;p>Any provisioned VM in the previous step, should receive CNS-VM role.
+The top-level vCenter server will receive CNS-SEARCH-AND-SPBM role.
+Virtual-SAN should receive CNS-DATASTORE.
 And all servers should have the READONLY role (this may already be active)&lt;/p>
 &lt;h3 id="enable-necessary-extra-parameters-on-all-vms">Enable Necessary Extra Parameters on all VMs&lt;/h3>
 &lt;p>Following along the above document, we want to verify VM Hardware Version is 15 or greater, and that disk.EnableUUID parameter is configured.&lt;/p>
@@ -495,7 +495,7 @@ govc ls /&amp;lt;datacenter-name&amp;gt;/vm \
 &lt;/code>&lt;/pre>&lt;h2 id="install-k3s">Install k3s&lt;/h2>
 &lt;h3 id="first-control-plane-vm">First Control-Plane VM&lt;/h3>
 &lt;p>SSH into your first control-plane VM that was provisioned and configured above and &lt;a href="https://docs.docker.com/engine/install/ubuntu/">install docker&lt;/a>.&lt;/p>
-&lt;p>For k3s version compatibiltiy with vCenter and vMware CPI/CSI, we will need to use k3s v1.25, cpi v1.25, and csi v2.7.2 per the &lt;code>curl&lt;/code> call below.&lt;/p>
+&lt;p>For k3s version compatibility with vCenter and vMware CPI/CSI, we will need to use k3s v1.25, cpi v1.25, and csi v2.7.2 per the &lt;code>curl&lt;/code> call below.&lt;/p>
 &lt;p>Run the following CLI command inside the control-plane VM, filling out these two specific values:&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>&amp;lt;TOKEN&amp;gt;&lt;/code>: Please generate a token ID, and save it. This will be required for the entirety of the k3s cluster existence and required to add additional servers to the k3s cluster&lt;/li>
@@ -574,7 +574,7 @@ namespace: kube-system
 data:
 # NOTE: this is just an example configuration, update with real values based on your environment
 vsphere.conf: |
-# Global properties in this section will be used for all specified vCenters unless overriden in VirtualCenter section.
+# Global properties in this section will be used for all specified vCenters unless overridden in VirtualCenter section.
 global:
 port: 443
 # set insecureFlag to true if the vCenter uses a self-signed cert
@@ -611,7 +611,7 @@ datacenters:
 &lt;pre tabindex="0">&lt;code>/usr/local/bin/k3s kubectl create namespace vmware-system-csi
 &lt;/code>&lt;/pre>&lt;/li>
 &lt;li>
-&lt;p>Taint your control-lane node servers by running the following command. This taint may already exist, if so, thats okay. Please replace &lt;code>&amp;lt;CONTROL_PLANE_SERVER&amp;gt;&lt;/code> with each of your control plane servers.&lt;/p>
+&lt;p>Taint your control-lane node servers by running the following command. This taint may already exist, if so, that&amp;rsquo;s okay. Please replace &lt;code>&amp;lt;CONTROL_PLANE_SERVER&amp;gt;&lt;/code> with each of your control plane servers.&lt;/p>
 &lt;pre tabindex="0">&lt;code>You can retrieve the names by running `/usr/local/bin/k3s kubectl get nodes -o wide`
 /usr/local/bin/k3s kubectl taint node &amp;lt;CONTROL_PLANE_SERVER&amp;gt; node-role.kubernetes.io/control-plane=:NoSchedule
 &lt;/code>&lt;/pre>&lt;/li>
@@ -680,7 +680,7 @@ status: {}
 &lt;p>Here are links to docs surrounding the kubernetes concepts that we use in a cht-core project deployed to a k3s cluster.&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/">Deployment&lt;/a> - This is the main kubernetes resource that contains information regarding all the cht services that will be deployed.&lt;/li>
-&lt;li>&lt;a href="https://kubernetes.io/docs/concepts/configuration/configmap/">ConfigMaps&lt;/a> - This contains configuration files, or credentials that containers can retrieve. If you edit the configmap, you should delete containers, which will trigger a new container to download your new edits to any configrations for that service&lt;/li>
+&lt;li>&lt;a href="https://kubernetes.io/docs/concepts/configuration/configmap/">ConfigMaps&lt;/a> - This contains configuration files, or credentials that containers can retrieve. If you edit the configmap, you should delete containers, which will trigger a new container to download your new edits to any configurations for that service&lt;/li>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/security/service-accounts/">ServiceAccounts&lt;/a> - This is used by the upgrade-service that is running inside the cht-core pods (as a container titled upgrade-service). This serviceAccount restricts the upgrade-service from interacting with any other cht-core projects outside of its namespace, and gives the upgrade-service permissions to talk to kubernetes API to upgrade container images when a CHT ADMIN clicks &lt;em>upgrade&lt;/em> through the Admin interface.&lt;/li>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Ingress&lt;/a> - This is what forwards traffic to a particular project or pods. In most use-cases, there is an nginx deployed outside of the k3s cluster than contains DNS entries for existing projects, and contains a proxy_pass parameter to send traffic based on host header to any of the k3s server IPs. Inside the k3s cluster, the traefik container and servicelb-traefik containers in kube-system namespace will handle forwarding traffic to the correct cht-core containers based on url&lt;/li>
 &lt;li>&lt;a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">Persistent Volume Claim&lt;/a> - This is where our project data will be stored. Important to ensure you have configured this correctly, with retain policies intact so the data is not deleted if the project is removed. It&amp;rsquo;s also vital to ensure you have a backup policy either set-up in VMware vCenter GUI or you have configured the csi-snapshotter that comes with vSphere CSI.&lt;/li>

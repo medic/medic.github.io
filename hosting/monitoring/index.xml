@@ -215,7 +215,7 @@ Always run Watchdog on a different server than the CHT Core. This ensures Watchd
 Always run this longer version of the &lt;code>docker compose&lt;/code> command which specifies both compose files for all future &lt;a href="#upgrading">upgrades&lt;/a>.
 &lt;/div>
 &lt;h4 id="couch2pg-data-remote">couch2pg Data (Remote)&lt;/h4>
-&lt;p>While not the default setup, and not what most deployments need, you may want to set up a way to monitor couch2pg data without sharing any Postgres credentials. Instead of sharing credentials, you expose an HTTP endpoint that requires no login or password. Of course, similar to CHT Core&amp;rsquo;s &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">Monitoring API&lt;/a>, this endpoint should be configured to not share sensitive information (since it will be publically accessible).&lt;/p>
+&lt;p>While not the default setup, and not what most deployments need, you may want to set up a way to monitor couch2pg data without sharing any Postgres credentials. Instead of sharing credentials, you expose an HTTP endpoint that requires no login or password. Of course, similar to CHT Core&amp;rsquo;s &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api/#get-apiv2monitoring">Monitoring API&lt;/a>, this endpoint should be configured to not share sensitive information (since it will be publicly accessible).&lt;/p>
 &lt;p>To run a remote instance of only the SQL Exporter on your Postgres server:&lt;/p>
 &lt;ol>
 &lt;li>Clone this repo: &lt;code>git clone git@github.com:medic/cht-watchdog.git&lt;/code> and &lt;code>cd&lt;/code> into &lt;code>cht-watchdog&lt;/code>&lt;/li>
@@ -901,7 +901,7 @@ Prometheus --&amp;gt; Grafana
 end
 mon_api --&amp;gt; json&lt;/pre>
 &lt;h3 id="additional-flows">Additional Flows&lt;/h3>
-&lt;p>Your Prometheus instance from CHT Watchog can ingest data from any &lt;a href="https://prometheus.io/docs/instrumenting/exporters/">supported data source&lt;/a> accessible via an HTTPS request. These data sources might be hosted on the same server as CHT Core or on a completely different server.&lt;/p>
+&lt;p>Your Prometheus instance from CHT Watchdog can ingest data from any &lt;a href="https://prometheus.io/docs/instrumenting/exporters/">supported data source&lt;/a> accessible via an HTTPS request. These data sources might be hosted on the same server as CHT Core or on a completely different server.&lt;/p>
 &lt;p>The focus of this guide is to collect metrics on Docker container usage and performance from the server hosting our CHT Core instance using &lt;a href="https://prometheus.io/docs/guides/cadvisor/">cAdvisor&lt;/a>.&lt;/p>
 &lt;pre class="mermaid">flowchart LR
 subgraph core[&amp;#34;cht.example.com&amp;#34;]
@@ -923,7 +923,7 @@ cAdvisor[&amp;#34;cAdvisor (8443)&amp;#34;] --&amp;gt; Prometheus&lt;/pre>
 &lt;li>CHT Core: &lt;a href="#start-cadvisor-caddy-and-cht-core-with-docker">Start the Caddy and a cAdvisor containers along with the CHT Core&lt;/a>&lt;/li>
 &lt;li>CHT Watchdog: &lt;a href="#scrape-config">Adding new scrape and compose configs&lt;/a>&lt;/li>
 &lt;li>CHT Watchdog: &lt;a href="#load-new-compose-files-with-existing-ones">Restart the Prometheus and Grafana server to include the new scrape config mounts&lt;/a>&lt;/li>
-&lt;li>CHT Watchdog: &lt;a href="#on-cht-watchdog-import-grafana-dashboard">Importing an exising cAdvisor dashboard from &lt;code>grafana.com&lt;/code>&lt;/a>&lt;/li>
+&lt;li>CHT Watchdog: &lt;a href="#on-cht-watchdog-import-grafana-dashboard">Importing an existing cAdvisor dashboard from &lt;code>grafana.com&lt;/code>&lt;/a>&lt;/li>
 &lt;/ol>
 &lt;p>After completing these steps, we now have Docker metrics we can alert on:&lt;/p>
 &lt;p>&lt;a href="cadvisor.screenshot.png">&lt;img src="cadvisor.screenshot.png" alt="Screenshot of Grafana Dashboard showing data from Prometheus">&lt;/a>&lt;/p>
@@ -979,7 +979,7 @@ cAdvisor[&amp;#34;cAdvisor (8443)&amp;#34;] --&amp;gt; Prometheus&lt;/pre>
 &lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#204a87">cd&lt;/span> /home/ubuntu/cht/upgrade-service
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker stop &lt;span style="color:#204a87;font-weight:bold">$(&lt;/span>docker ps --quiet&lt;span style="color:#204a87;font-weight:bold">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>docker compose up --detach
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that the CHT Upgrade Service will process all Docker Compose file in the &lt;code>/home/ubuntu/cht/compose&lt;/code> directory for us and we don&amp;rsquo;t need to explicity specify them in the &lt;code>docker compose up&lt;/code> command.&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Note that the CHT Upgrade Service will process all Docker Compose file in the &lt;code>/home/ubuntu/cht/compose&lt;/code> directory for us and we don&amp;rsquo;t need to explicitly specify them in the &lt;code>docker compose up&lt;/code> command.&lt;/p>
 &lt;h3 id="on-cht-watchdog">On CHT Watchdog&lt;/h3>
 &lt;h4 id="scrape-config">Scrape config&lt;/h4>
 &lt;p>We&amp;rsquo;ll first create the &lt;code>~/cadvisor-prometheus-conf.yml&lt;/code> file and point the config to our CHT Core URL:&lt;/p>
