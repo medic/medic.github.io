@@ -167,16 +167,14 @@
 &lt;p>Read more about setting up &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/setup/">setting up CHT Sync&lt;/a>.&lt;/p>
 &lt;!-- make updates to this diagram on the google slides: -->
 &lt;!-- https://docs.google.com/presentation/d/1j4jPsi-gHbiaLBfgYOyru1g_YV98PkBrx2zs7bwhoEQ/ -->
-&lt;figure class=" center col-16 col-lg-12">&lt;a href="cht-sync.png">
+&lt;figure class=" center col-8 col-lg-6">&lt;a href="cht-sync.png">
 &lt;img src="cht-sync.png"/> &lt;/a>
 &lt;/figure>
-&lt;p>&lt;a href="https://github.com/medic/cht-sync">CHT Sync&lt;/a> uses &lt;a href="https://www.elastic.co/logstash/">Logstash&lt;/a> and &lt;a href="https://postgrest.org/en/stable/">PostgREST&lt;/a> to replicate data from CouchDB to PostgreSQL in a real-time manner. It listens to changes in the CHT database, and updates the analytics database accordingly.
+&lt;p>&lt;a href="https://github.com/medic/cht-sync">CHT Sync&lt;/a> uses &lt;code>couch2pg&lt;/code> to replicate data from CouchDB to PostgreSQL in a real-time manner. It listens to changes in the CHT database, and updates the analytics database accordingly.
 It is not designed to be accessed by users, and it does not have a user interface. It is designed to be run on the same server as the CHT, but it can be run on a separate server if necessary.&lt;/p>
 &lt;p>As CHT Sync puts all new data into a PostgreSQL database into a single table that has a &lt;code>jsonb&lt;/code> column, this is not very useful for analytics. &lt;a href="https://github.com/medic/cht-pipeline">CHT Pipeline&lt;/a> is a set of SQL queries that transform the data in the &lt;code>jsonb&lt;/code> column into a more useful format. It uses &lt;a href="https://www.getdbt.com/">DBT&lt;/a> to define the models that are translated into PostgreSQL tables or views, which makes it easier to query the data in the analytics platform of choice.&lt;/p>
-&lt;h4 id="logstash">Logstash&lt;/h4>
-&lt;p>&lt;a href="https://www.elastic.co/logstash/">Logstash&lt;/a> streams data from CouchDB and forwards it to &lt;a href="https://postgrest.org/en/stable/">PostgREST&lt;/a>, ensuring real-time updates in PostgreSQL.&lt;/p>
-&lt;h4 id="postgrest">PostgREST&lt;/h4>
-&lt;p>&lt;a href="https://postgrest.org/en/stable/">PostgREST&lt;/a> acts as a RESTful API layer, by providing endpoints to store and retrieve the data in/from the PostgreSQL database.&lt;/p>
+&lt;h4 id="couch2pg">couch2pg&lt;/h4>
+&lt;p>&lt;a href="https://github.com/medic/cht-sync/tree/main/couch2pg">couch2pg&lt;/a> streams data from CouchDB and forwards it to PostgreSQL, ensuring real-time updates.&lt;/p>
 &lt;h4 id="postgresql">PostgreSQL&lt;/h4>
 &lt;p>A free and open source SQL database used for analytics queries. See more at the &lt;a href="https://www.postgresql.org">PostgreSQL&lt;/a> site.&lt;/p>
 &lt;h4 id="dbt">DBT&lt;/h4>
