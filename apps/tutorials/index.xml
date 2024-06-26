@@ -3594,7 +3594,346 @@ If your &lt;code>package.json&lt;/code> file does not already have them, add &lt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: Building A Complex Task (Optional)</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks-2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks-2/</guid><description>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Apps: Configuring the CHT User Management tool</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/user-management-tool/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/user-management-tool/</guid><description>
+&lt;p>The user management tool is a user-friendly web application used within CHT projects to manage users.&lt;/p>
+&lt;h2 id="required-resources">Required Resources&lt;/h2>
+&lt;h2 id="implementation-steps">Implementation Steps&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Clone the &lt;code>cht-user-management&lt;/code> repository.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Create a new folder under &lt;code>src/config&lt;/code> with your required instance eg. chis-znz&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Within that new folder create a &lt;code>config.json&lt;/code> file with the following parameters&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>domains&lt;/code>&lt;/td>
+&lt;td>Array&lt;/td>
+&lt;td>Controls the list of instances which the user can login to&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>domains.friendly&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Friendly name for the instance (eg. &amp;ldquo;Migori&amp;rdquo;)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>domains.domain&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Hostname for the instance (eg. &amp;ldquo;migori-echis.health.go.ke&amp;rdquo;)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>domains.useHttp&lt;/code>&lt;/td>
+&lt;td>boolean&lt;/td>
+&lt;td>Whether to make an insecure connection (http) to the hostname (defaults to false)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types&lt;/code>&lt;/td>
+&lt;td>Array&lt;/td>
+&lt;td>One element for each type of user which can be created by the system&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.name&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>The name of the contact_type as it &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">appears in the app&amp;rsquo;s base_settings.json&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.friendly&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Friendly name of the contact type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.contact_type&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>The contact_type of the primary contact. &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/hierarchy/">As defined in base_settings.json&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.contact_friendly&lt;/code>&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Friendly name of the primary contact type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.user_role&lt;/code>&lt;/td>
+&lt;td>string[]&lt;/td>
+&lt;td>A list of allowed &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/app-settings/user-roles/">user roles&lt;/a>. If only one is provided, it will be used by default.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.username_from_place&lt;/code>&lt;/td>
+&lt;td>boolean&lt;/td>
+&lt;td>When true, the username is generated from the place&amp;rsquo;s name. When false, the username is generated from the primary contact&amp;rsquo;s name. Default is false.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.hierarchy&lt;/code>&lt;/td>
+&lt;td>Array&lt;ConfigProperty>&lt;/td>
+&lt;td>Defines how this &lt;code>contact_type&lt;/code> is connected into the hierarchy. An element with &lt;code>level:1&lt;/code> (parent) is required and additional elements can be provided to support disambiguation. See &lt;a href="#ConfigProperty">ConfigProperty&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.hierarchy.level&lt;/code>&lt;/td>
+&lt;td>integer&lt;/td>
+&lt;td>The hierarchy element with &lt;code>level:1&lt;/code> is the parent, &lt;code>level:3&lt;/code> is the great grandparent.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.replacement_property&lt;/code>&lt;/td>
+&lt;td>Property&lt;/td>
+&lt;td>Defines how this &lt;code>contact_type&lt;/code> is described when being replaced. The &lt;code>property_name&lt;/code> is always &lt;code>replacement&lt;/code>. See &lt;a href="#ConfigProperty">ConfigProperty&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.place_properties&lt;/code>&lt;/td>
+&lt;td>Array&lt;ConfigProperty>&lt;/td>
+&lt;td>Defines the attributes which are collected and set on the user&amp;rsquo;s created place. See &lt;a href="#ConfigProperty">ConfigProperty&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.contact_properties&lt;/code>&lt;/td>
+&lt;td>Array&lt;ConfigProperty>&lt;/td>
+&lt;td>Defines the attributes which are collected and set on the user&amp;rsquo;s primary contact doc. See &lt;a href="#ConfigProperty">ConfigProperty&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>contact_types.deactivate_users_on_replace&lt;/code>&lt;/td>
+&lt;td>boolean&lt;/td>
+&lt;td>Controls what should happen to the defunct contact and user documents when a user is replaced. When &lt;code>false&lt;/code>, the contact and user account will be deleted. When &lt;code>true&lt;/code>, the contact will be unaltered and the user account will be assigned the role &lt;code>deactivated&lt;/code>. This allows for account restoration.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>logoBase64&lt;/code>&lt;/td>
+&lt;td>Image in base64&lt;/td>
+&lt;td>Logo image for your project&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;/li>
+&lt;li>
+&lt;p>Add reference to your configuration folder(that you have just added above) in &lt;code>src/config/config-factory.ts&lt;/code>. For example &lt;code>import znzConfig from './chis-znz'&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Configure the &lt;code>config.json&lt;/code> file.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="configproperty">ConfigProperty&lt;/h4>
+&lt;p>The ConfigProperty is a data structure used several times within the &lt;code>config.json&lt;/code> file and defines a property on an object. The ConfigProperty include:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Type&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>friendly_name&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Defines how this data will be labeled in CSV files and throughout the user experience.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>property_name&lt;/td>
+&lt;td>string&lt;/td>
+&lt;td>Defines how the value will be stored on the object.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>type&lt;/td>
+&lt;td>ConfigPropertyType&lt;/td>
+&lt;td>Defines the validation rules, and auto-formatting rules. See &lt;a href="#configpropertytype">ConfigPropertyType&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>parameter&lt;/td>
+&lt;td>any&lt;/td>
+&lt;td>See &lt;a href="#ConfigPropertyType">ConfigPropertyType&lt;/a>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>required&lt;/td>
+&lt;td>boolean&lt;/td>
+&lt;td>True if the object should not exist without this information.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="configpropertytype">ConfigPropertyType&lt;/h4>
+&lt;p>The &lt;code>ConfigPropertyType&lt;/code> defines a property&amp;rsquo;s validation rules and auto-formatting rules. The optional &lt;code>parameter&lt;/code> information alters the behavior of the &lt;code>ConfigPropertyType&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Type&lt;/th>
+&lt;th>Validation Rules&lt;/th>
+&lt;th>Auto Formatting Rules&lt;/th>
+&lt;th>Validator&lt;/th>
+&lt;th>Parameter&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>Must be defined&lt;/td>
+&lt;td>Removes double whitespaces, leading or trailing whitespaces, and any character which is not alphanumeric or &lt;code> ()\-'&lt;/code>&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>name&lt;/td>
+&lt;td>Must be defined&lt;/td>
+&lt;td>Same as string + title case + &lt;code>parameter&lt;/code> behavior&lt;/td>
+&lt;td>One or more regexes which are removed from the value when matched (eg. &lt;code>&amp;quot;parameter&amp;quot;: [&amp;quot;\\sCHU&amp;quot;]&lt;/code> will format &lt;code>this CHU&lt;/code> into &lt;code>This&lt;/code>)&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>regex&lt;/td>
+&lt;td>Must match the &lt;code>regex&lt;/code> captured by &lt;code>parameter&lt;/code>&lt;/td>
+&lt;td>Same as &lt;code>string&lt;/code>&lt;/td>
+&lt;td>A regex which must be matched to pass validation (eg. &lt;code>&amp;quot;parameter&amp;quot;: &amp;quot;^\\d{6}$&amp;quot;&lt;/code> will accept only 6 digit numbers)&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>phone&lt;/td>
+&lt;td>A valid phone number for the specified locality&lt;/td>
+&lt;td>Auto formatting provided by &lt;a href="https://github.com/google/libphonenumber">libphonenumber&lt;/a>&lt;/td>
+&lt;td>Two letter country code specifying the locality of phone number (eg. &lt;code>&amp;quot;parameter&amp;quot;: &amp;quot;KE&amp;quot;&lt;/code>)&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>generated&lt;/td>
+&lt;td>None. No user inputs.&lt;/td>
+&lt;td>Uses &lt;a href="https://liquidjs.com">LiquidJS&lt;/a> templates to generate data&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>&lt;a href="#The-Generated-ConfigPropertyType">Details&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_one&lt;/td>
+&lt;td>Single choice from a list of options&lt;/td>
+&lt;td>Same as &lt;code>string&lt;/code>&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>Dictionary where the keys are the option values and the values are the corresponding labels&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>select_multiple&lt;/td>
+&lt;td>Multiple choice from a list of options&lt;/td>
+&lt;td>Same as &lt;code>string&lt;/code>&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>Same as &lt;code>select_one&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>none&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>None&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="the-generated-configpropertytype">The Generated ConfigPropertyType&lt;/h4>
+&lt;p>ContactProperties with &lt;code>type: &amp;quot;generated&amp;quot;&lt;/code> use the &lt;a href="https://liquidjs.com">LiquidJS&lt;/a> template engine to populate a property with data. Here is an example of some configuration properties which use &lt;code>&amp;quot;type&amp;quot;: &amp;quot;generated&amp;quot;&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;place_properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;friendly_name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;CHP Area Name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;property_name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;generated&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;parameter&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;{{ contact.name }}&amp;#39;s Area&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;required&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;contact_properties&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;friendly_name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;CHP Name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;property_name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;required&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#204a87;font-weight:bold">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>The user will be prompted to input the contact&amp;rsquo;s name (CHP Name). The user is &lt;em>not&lt;/em> prompted to input the place&amp;rsquo;s name (CHP Area Name) because the place&amp;rsquo;s name will automatically be assigned a value. In this example, if the user puts &lt;code>john&lt;/code> as the contact&amp;rsquo;s name, then the place will be named &lt;code>John's Area&lt;/code>.&lt;/p>
+&lt;p>The data that is passed to the template is consistent with the properties defined in your configuration.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Value&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>place&lt;/td>
+&lt;td>Has the attributes from &lt;code>place_properties.property_name&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>contact&lt;/td>
+&lt;td>Has the attributes from &lt;code>contact_properties.property_name&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>lineage&lt;/td>
+&lt;td>Has the attributes from &lt;code>hierarchy.property_name&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="deployment">Deployment&lt;/h3>
+&lt;p>This tool is available via Docker by running &lt;code>docker compose up&lt;/code>. Set the &lt;a href="#environment-variables">Environment Variables&lt;/a>.&lt;/p>
+&lt;h2 id="development">Development&lt;/h2>
+&lt;p>Create an environment file by &lt;code>cp env.example .env&lt;/code>. Change &lt;code>INTERFACE&lt;/code> to &lt;code>127.0.0.1&lt;/code> and otherwise see &lt;a href="#environment-variables">Environment Variables&lt;/a> for more info.&lt;/p>
+&lt;p>Then run:&lt;/p>
+&lt;pre tabindex="0">&lt;code>npm run dev
+&lt;/code>&lt;/pre>&lt;p>or&lt;/p>
+&lt;pre tabindex="0">&lt;code>npm run build
+npm start
+&lt;/code>&lt;/pre>&lt;h2 id="environment-variables">Environment Variables&lt;/h2>
+&lt;p>The &lt;code>env.example&lt;/code> file has example values. Here&amp;rsquo;s what they mean:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Variable&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Sample&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>CONFIG_NAME&lt;/code>&lt;/td>
+&lt;td>Name of the configuration to use&lt;/td>
+&lt;td>&lt;code>chis-ke&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>EXTERNAL_PORT&lt;/code>&lt;/td>
+&lt;td>Port to use in docker compose when starting the web server&lt;/td>
+&lt;td>&lt;code>3000&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>PORT&lt;/code>&lt;/td>
+&lt;td>For localhost development environment&lt;/td>
+&lt;td>&lt;code>3000&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>COOKIE_PRIVATE_KEY&lt;/code>&lt;/td>
+&lt;td>A string used to two-way encryption of cookies. Production values need to be a secret. Suggest &lt;code>uuidgen&lt;/code> to generate&lt;/td>
+&lt;td>&lt;code>589a7f23-5bb2-4b77-ac78-f202b9b6d5e3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>INTERFACE&lt;/code>&lt;/td>
+&lt;td>Interface to bind to. Leave as &amp;lsquo;0.0.0.0&amp;rsquo; for prod, suggest &amp;lsquo;127.0.0.1&amp;rsquo; for development&lt;/td>
+&lt;td>&lt;code>127.0.0.1&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CHT_DEV_URL_PORT&lt;/code>&lt;/td>
+&lt;td>CHT instance when in &lt;code>NODE_ENV===dev&lt;/code>. Needs URL and port&lt;/td>
+&lt;td>&lt;code>192-168-1-26.local-ip.medicmobile.org:10463&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CHT_DEV_HTTP&lt;/code>&lt;/td>
+&lt;td>&amp;lsquo;false&amp;rsquo; for http &amp;rsquo;true&amp;rsquo; for https&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="publishing-new-docker-images">Publishing new docker images&lt;/h2>
+&lt;p>Docker images are hosted on &lt;a href="https://gallery.ecr.aws/medic/cht-user-management">AWS&amp;rsquo;s Elastic Container Registry (ECR)&lt;/a>. To publish a new version:&lt;/p>
+&lt;ol>
+&lt;li>Update the &lt;a href="https://github.com/medic/cht-user-management/blob/d992d5d6a911cdc21f610fa48a0ffb3e275bae0d/package.json#L3">version string&lt;/a> in the &lt;code>package.json&lt;/code>.&lt;/li>
+&lt;li>Submit a PR and have it merged to &lt;code>main&lt;/code>.&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/cht-user-management/blob/main/.github/workflows/docker-build.yml">Existing CI&lt;/a> will push an image to ECR.&lt;/li>
+&lt;/ol></description></item><item><title>Apps: Building A Complex Task (Optional)</title><link>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks-2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/apps/tutorials/tasks-2/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>Tasks prompt users to complete activities on a programmatic schedule. This tutorial will guide you through the development of an advanced task. This is an &lt;em>optional&lt;/em> tutorial and is not required to &lt;em>get started&lt;/em> with CHT Application development.&lt;/p>
 &lt;ul>
