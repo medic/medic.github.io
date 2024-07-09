@@ -710,47 +710,36 @@ determine if a transition has run.&lt;/p>
 &lt;li>finish your transition with &lt;code>callback(someError, false)&lt;/code>. The error will be logged to the sentinel log. This will not save the error on the &lt;code>change.doc&lt;/code>, so there will be no record that this transition ran. That particular &lt;code>change&lt;/code> will not go through transitions again, but if the same doc has another change in the future, since there is no record of the erroring transition having run, it will be rerun.&lt;/li>
 &lt;li>crash sentinel. When sentinel restarts, since that &lt;code>change&lt;/code> did not record a successful processing, it will be reprocessed. Transitions that did not save anything to the &lt;code>change.doc&lt;/code> will be rerun.&lt;/li>
 &lt;/ul></description></item><item><title>Core: How To Manage Translations</title><link>https://docs.communityhealthtoolkit.org/core/overview/translations/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/translations/</guid><description>
-&lt;p>Apps built with CHT Core are localized so that users can use it in the language of their choice. It is currently available in English, French, Hindi, Nepali, Spanish, and Swahili. The goal of this doc is to help our team manage these and future translations.&lt;/p>
+&lt;p>Apps built with CHT Core are localized so that users can use them in the language of their choice. Languages supported by default are English, French, Nepali, Spanish, and Swahili. The goal of this doc is to help the community manage these and future translations.&lt;/p>
 &lt;h2 id="overview">Overview&lt;/h2>
-&lt;p>Like the rest of our code, the translation files live in our GitHub repo. These translation files are &lt;a href="https://en.wikipedia.org/wiki/.properties">properties&lt;/a> files, which are a series of keys and their corresponding values. We use the English file as our default, and as such contains the entire set of keys. If any key is missing from another language file the English value is used.&lt;/p>
-&lt;p>In order to collaboratively edit the translations we use POEditor.com. Translators can be given access to specific languages so that we can more effectively edit language text to be included in CHT Core. Once the text is ready it can be exported from POEditor to GitHub and included in the next release of our app.&lt;/p>
-&lt;p>Note that &amp;ldquo;keys&amp;rdquo; in .properties files are referred to as &lt;code>terms&lt;/code> in POEditor.&lt;/p>
+&lt;p>Like the rest of the code the translation files live in the GitHub repo. These translation files are &lt;a href="https://en.wikipedia.org/wiki/.properties">properties files&lt;/a>, which are a series of keys and their corresponding values. The English file is used by default, and as such, it contains the entire set of keys. If any key is missing from another language file the English value is used.&lt;/p>
 &lt;h2 id="adding-new-languages">Adding new languages&lt;/h2>
 &lt;p>New languages must be added and configured in several places:&lt;/p>
 &lt;ul>
-&lt;li>&lt;em>In GitHub&lt;/em>
-&lt;ul>
-&lt;li>Create a new &lt;code>messages-XX.properties&lt;/code> file in the &lt;a href="https://github.com/medic/cht-core/tree/master/api/resources/translations">&lt;code>api/resources/translations&lt;/code>&lt;/a> folder, replacing XX with the 2 or 3 letter language code.&lt;/li>
-&lt;li>Add the language to the &lt;a href="https://github.com/medic/cht-core/blob/master/api/src/translations.js#L8">&lt;code>LOCAL_NAME_MAP&lt;/code> in api&lt;/a>. Use the language code for the key, and the local name followed by the English name for the language in brackets, eg: &amp;ldquo;fr: &amp;lsquo;Français (French)&amp;rsquo;&amp;rdquo;.&lt;/li>
-&lt;li>Import the moment language pack in the &lt;a href="https://github.com/medic/cht-core/blob/3.11.x/webapp/src/ts/main.ts#L23">main.ts file&lt;/a>. If moment doesn&amp;rsquo;t provide the required language pack you may need to contribute it upstream to the moment library.&lt;/li>
-&lt;/ul>
-&lt;/li>
+&lt;li>Create a new &lt;code>messages-xx.properties&lt;/code> file in the &lt;a href="https://github.com/medic/cht-core/tree/master/api/resources/translations">&lt;code>api/resources/translations&lt;/code>&lt;/a> folder, replacing &amp;ldquo;xx&amp;rdquo; with the 2 or 3 letter &lt;a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes">language code&lt;/a>.&lt;/li>
+&lt;li>Add the language to the &lt;a href="https://github.com/medic/cht-core/blob/e6d184946affc62773d569168216a5b913f38a30/api/src/translations.js#L17">&lt;code>LOCAL_NAME_MAP&lt;/code> in api&lt;/a>. Use the language code for the key, and the local name followed by the English name for the language in brackets, eg: &amp;ldquo;fr: &amp;lsquo;Français (French)&amp;rsquo;&amp;rdquo;.&lt;/li>
+&lt;li>Import the moment language pack in the &lt;a href="https://github.com/medic/cht-core/blob/e6d184946affc62773d569168216a5b913f38a30/webapp/src/ts/main.ts#L23">main.ts file&lt;/a>. If moment doesn&amp;rsquo;t provide the required language pack you may need to contribute it upstream to the moment library.&lt;/li>
 &lt;/ul>
 &lt;h2 id="adding-new-keys">Adding new keys&lt;/h2>
-&lt;p>In order to trace the addition of new terms and also updates to existing translations,
-the default translation file (messages-en.properties) must be updated directly.&lt;/p>
+&lt;ol>
+&lt;li>First check if an appropriate key already exists in &lt;a href="https://github.com/medic/cht-core/blob/master/api/resources/translations/messages-en.properties">&lt;code>messages-en.properties&lt;/code>&lt;/a>. Using existing keys when possible reduces the effort required to translate the app into a new language.&lt;/li>
+&lt;li>Create a new key and default English value.&lt;/li>
+&lt;li>Reach out to the community to translate the value into all supported languages. The CI will block merging PRs unless all values are provided.&lt;/li>
+&lt;li>Validate the translations are complete and correct by executing &lt;code>npm run lint-translations&lt;/code>.&lt;/li>
+&lt;/ol>
 &lt;h3 id="translating-static-text">Translating static text&lt;/h3>
-&lt;p>All text in the app is internationalised.&lt;/p>
-&lt;ul>
-&lt;li>Pick a key.
-&lt;ul>
-&lt;li>First check if an appropriate key already exists in messages-en.properties (medic/config/standard/translations).&lt;/li>
-&lt;li>Otherwise create a new key and default English value. Keys must be all lower case, dot separated, and descriptive but not verbose. The values should include as much text as possible (eg: trailing punctuation), and must not contain any markup. Don&amp;rsquo;t add any values for other languages as this will be done later in the POEditor app.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Use the translation. In angular this is done using angular-translate, and ideally using the &lt;a href="http://angular-translate.github.io/docs/#/guide/05_using-translate-directive">translate directive&lt;/a> to reduce the number of watchers, eg: &lt;code>&amp;lt;h3 translate&amp;gt;date.incorrect.title&amp;lt;/h3&amp;gt;&lt;/code>.&lt;/li>
-&lt;/ul>
-&lt;h3 id="translating-help-pages">Translating help pages&lt;/h3>
-&lt;p>Because help pages are too large to manage easily through the standard translation mechanism, and we want to include lots of markup, help pages are translated by providing md documents for each language. This isn&amp;rsquo;t yet up and running so ask for help.&lt;/p>
+&lt;p>In angular this is done using angular-translate, and ideally using the &lt;a href="http://angular-translate.github.io/docs/#/guide/05_using-translate-directive">translate directive&lt;/a> to reduce the number of watchers, eg: &lt;code>&amp;lt;h3 translate&amp;gt;date.incorrect.title&amp;lt;/h3&amp;gt;&lt;/code>.&lt;/p>
+&lt;p>Use the translation functions in the config module in &lt;a href="https://github.com/medic/cht-core/blob/e6d184946affc62773d569168216a5b913f38a30/api/src/config.js#L72">API&lt;/a> and &lt;a href="https://github.com/medic/cht-core/blob/e6d184946affc62773d569168216a5b913f38a30/sentinel/src/config.js#L88">Sentinel&lt;/a>.&lt;/p>
 &lt;h3 id="translating-configurations">Translating configurations&lt;/h3>
-&lt;p>Much of the app is configurable (eg: forms and schedules). Because the specifics of the configuration aren&amp;rsquo;t known during development time these can&amp;rsquo;t be provided via messages. Instead we allow configurers to provide a map of locale to value for each translated property. Then use the &lt;code>translateFrom&lt;/code> filter to translate from the configured map using the user&amp;rsquo;s language.&lt;/p>
+&lt;p>Much of the app is configurable (eg: forms and schedules). Because the specifics of the configuration aren&amp;rsquo;t known during development time, these can&amp;rsquo;t be provided via messages. Instead configurers can provide a map of locale to value for each translated property. Then use the &lt;code>translateFrom&lt;/code> filter to translate from the configured map using the user&amp;rsquo;s language.&lt;/p>
 &lt;h2 id="modifying-any-existing-translation-values">Modifying any existing translation values&lt;/h2>
-&lt;p>To be done &lt;em>only&lt;/em> by updating messages-en.properties, importing to POEditor through the CLI tool and updating the other language translations through the POEditor app.&lt;/p>
-&lt;h2 id="modifying-or-removing-translation-keys">Modifying or removing translation keys:&lt;/h2>
-&lt;p>To be done &lt;em>only&lt;/em> by updating messages-en.properties and importing to POEditor through the CLI tool.&lt;/p>
-&lt;h2 id="exporting-changes-from-poeditor-to-github">Exporting changes from POEditor to GitHub&lt;/h2>
-&lt;p>To be done &lt;em>only&lt;/em> by exporting all translations through the CLI tool.
-If you don&amp;rsquo;t have an API token, please contact a Medic developer. Please do not disclose this API token to anyone else.&lt;/p></description></item><item><title>Core: Roadmap</title><link>https://docs.communityhealthtoolkit.org/core/overview/roadmap/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/roadmap/</guid><description>
+&lt;ol>
+&lt;li>Update the default English value.&lt;/li>
+&lt;li>Reach out to the community to translate the value into all supported languages.&lt;/li>
+&lt;li>Validate the translations are complete and correct by executing &lt;code>npm run lint-translations&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="removing-translation-keys">Removing translation keys&lt;/h2>
+&lt;p>Carefully verify that the translation key isn&amp;rsquo;t used. This can be challenging if keys have been concatenated or generated because then you won&amp;rsquo;t be able to find the complete string in the source code. Once this has been confirmed, then simply remove the key and value from all translation files.&lt;/p></description></item><item><title>Core: Roadmap</title><link>https://docs.communityhealthtoolkit.org/core/overview/roadmap/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/roadmap/</guid><description>
 &lt;div class="pageinfo pageinfo-primary">
 &lt;p>The CHT is actively developed by &lt;a href="https://medic.org">Medic&lt;/a>, a non-profit organization that serves as the technical steward, alongside many &lt;a href="https://docs.communityhealthtoolkit.org/why-the-cht/#the-cht-community">partners in the CHT Community&lt;/a>.&lt;/p>
 &lt;/div>
