@@ -876,16 +876,16 @@ The &lt;code>trigger&lt;/code> implementation of the countdown timer is only sup
 &lt;/table>
 &lt;h2 id="cht-xpath-functions">CHT XPath Functions&lt;/h2>
 &lt;h3 id="add-date">&lt;code>add-date&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +4.0.0.&lt;/em>&lt;/p>
+&lt;p>&lt;em>Added in 4.0.0.&lt;/em>&lt;/p>
 &lt;p>Adds the provided number of years/months/days/hours/minutes to a date value.&lt;/p>
 &lt;pre tabindex="0">&lt;code>add-date(date, years, months, days, hours, minutes)
 &lt;/code>&lt;/pre>&lt;p>This function is useful for things like calculating a date that is a specific number of days in the future. For example, the following returns a date that is two weeks from now: &lt;code>add-date(today(), 0, 0, 14)&lt;/code>.&lt;/p>
 &lt;p>You can also add negative numbers to get dates in the past. This can be used to calculate a person&amp;rsquo;s birthdate date based on how many years/months old they are: &lt;code>add-date(today(), 0-${age_years}, 0-${age_months})&lt;/code>.&lt;/p>
 &lt;h3 id="chtdifference-in-days">&lt;code>cht:difference-in-days&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +4.7.0.&lt;/em>&lt;/p>
+&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
 &lt;p>Calculates the number of whole days between two dates.&lt;/p>
 &lt;h3 id="chtdifference-in-weeks">&lt;code>cht:difference-in-weeks&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +4.7.0.&lt;/em>&lt;/p>
+&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
 &lt;p>Calculates the number of whole calendar weeks between two dates.&lt;/p>
 &lt;h3 id="chtdifference-in-months">&lt;code>cht:difference-in-months&lt;/code>&lt;/h3>
 &lt;p>Calculates the number of whole calendar months between two dates. This is often used when determining a child&amp;rsquo;s age for immunizations or assessments.&lt;/p>
@@ -894,49 +894,19 @@ The &lt;code>trigger&lt;/code> implementation of the countdown timer is only sup
 For CHT versions lower than &lt;code>4.7.0&lt;/code>, the deprecated &lt;code>difference-in-months&lt;/code> function (without the &lt;code>cht&lt;/code> namespace) should be used.
 &lt;/div>
 &lt;h3 id="chtdifference-in-years">&lt;code>cht:difference-in-years&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +4.7.0.&lt;/em>&lt;/p>
+&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
 &lt;p>Calculates the number of whole calendar years between two dates.&lt;/p>
-&lt;h3 id="z-score">&lt;code>z-score&lt;/code>&lt;/h3>
-&lt;p>In Enketo forms you have access to an XPath function to calculate the z-score value for a patient. The function accesses table data stored in CouchDB.&lt;/p>
-&lt;p>The &lt;code>z-score&lt;/code> function takes four parameters:&lt;/p>
-&lt;ul>
-&lt;li>The name of z-score table to use, which corresponds to value of the database document&amp;rsquo;s &lt;code>_id&lt;/code> attribute.&lt;/li>
-&lt;li>Patient&amp;rsquo;s sex, which corresponds to the data object&amp;rsquo;s name. In the example below &lt;code>male&lt;/code> for this parameter corresponds to &lt;code>charts[].data.male&lt;/code> in the database document.&lt;/li>
-&lt;li>First parameter for the table lookup, such as age. Value maps to the &lt;code>key&lt;/code> value in the database document.&lt;/li>
-&lt;li>Second parameter for the table lookup, such as height. Value is compared against the &lt;code>points&lt;/code> in the database document.&lt;/li>
-&lt;/ul>
-&lt;h4 id="example-use">Example Use&lt;/h4>
-&lt;p>&lt;a href="https://github.com/medic/cht-core/blob/3.13.x/demo-forms/z-score.xml">This example XForm form&lt;/a> shows the use of the z-score function. To calculate the z-score for a patient given their sex, age, and weight the XPath calculation is as follows:&lt;/p>
-&lt;p>&lt;code>z-score('weight-for-age', ../my_sex, ../my_age, ../my_weight)&lt;/code>&lt;/p>
-&lt;p>The data used by this function needs to be added to CouchDB. The example below shows the structure of the database document. It creates a &lt;code>weight-for-age&lt;/code> table, where you can see that a male aged 0 at 2.08kg has a z-score of -3. Your database doc will be substantially larger, so you may find the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/zscore-table-to-json.js">conversion script&lt;/a> helpful to convert z-score tables to the required doc format.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;zscore-charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;weight-for-age&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;male&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;points&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">1.701&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">2.08&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">2.459&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">2.881&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">3.346&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">3.859&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">4.419&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">5.031&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#0000cf;font-weight:bold">5.642&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="parse-timestamp-to-date">&lt;code>parse-timestamp-to-date&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +3.13.0.&lt;/em>&lt;/p>
+&lt;h3 id="chtextension-lib">&lt;code>cht:extension-lib&lt;/code>&lt;/h3>
+&lt;p>&lt;em>Added in 4.2.0.&lt;/em>&lt;/p>
+&lt;p>This function invokes a configured &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension library&lt;/a>. The first parameter is a string with the name of the library to execute, and any remaining parameters are passed through as is. For example, to calculate an average of two numbers, the xpath could be: &lt;code>cht:extension-lib('average.js', /data/first, /data/second )&lt;/code>.&lt;/p>
+&lt;h3 id="chtstrip-whitespace">&lt;code>cht:strip-whitespace&lt;/code>&lt;/h3>
+&lt;p>&lt;em>Added in 4.10.0.&lt;/em>&lt;/p>
+&lt;p>Removes all whitespace characters from a string.&lt;/p>
+&lt;h3 id="chtvalidate-luhn">&lt;code>cht:validate-luhn&lt;/code>&lt;/h3>
+&lt;p>&lt;em>Added in 4.10.0.&lt;/em>&lt;/p>
+&lt;p>Validate a given number using the &lt;a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Luhn algorithm&lt;/a> to help detect typos. Provide the field as the first parameter and optionally include the expected string length in the second parameter. Returns &lt;code>true&lt;/code> if the number is valid.&lt;/p>
+&lt;h3 id="parse-timestamp-to-date">&lt;code>parse-timestamp-to-date&lt;/code>&lt;/h3>
+&lt;p>&lt;em>Added in 3.13.0.&lt;/em>&lt;/p>
 &lt;p>Use this function to parse from a timestamp number to a date. This is useful when using other XForm utility functions that receive date type as parameter, see example below:&lt;/p>
 &lt;table>
 &lt;thead>
@@ -969,13 +939,35 @@ For CHT versions lower than &lt;code>4.7.0&lt;/code>, the deprecated &lt;code>di
 &lt;/tbody>
 &lt;/table>
 &lt;h3 id="to-bikram-sambat">&lt;code>to-bikram-sambat&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +3.14.0.&lt;/em>&lt;/p>
+&lt;p>&lt;em>Added in 3.14.0.&lt;/em>&lt;/p>
 &lt;p>This function converts a &lt;code>date&lt;/code> to a &lt;code>string&lt;/code> containing the value of the date formatted according to the &lt;a href="https://en.wikipedia.org/wiki/Vikram_Samvat">Bikram Sambat&lt;/a> calendar.&lt;/p>
 &lt;p>See also: &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/forms/app/#cht-xform-widgets">Bikram Sambat Datepicker&lt;/a>&lt;/p>
-&lt;h3 id="chtextension-lib">&lt;code>cht:extension-lib&lt;/code>&lt;/h3>
-&lt;p>&lt;em>Available in +4.2.0.&lt;/em>&lt;/p>
-&lt;p>This function invokes a configured &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/extension-libs/">extension library&lt;/a>. The first parameter is a string with the name of the library to execute, and any remaining parameters are passed through as is. For example, to calculate an average of two numbers, the xpath could be: &lt;code>cht:extension-lib('average.js', /data/first, /data/second )&lt;/code>.&lt;/p>
-&lt;h2 id="input-data">Input data&lt;/h2>
+&lt;h3 id="z-score">&lt;code>z-score&lt;/code>&lt;/h3>
+&lt;p>In Enketo forms you have access to an XPath function to calculate the z-score value for a patient. The function accesses table data stored in CouchDB.&lt;/p>
+&lt;p>The &lt;code>z-score&lt;/code> function takes four parameters:&lt;/p>
+&lt;ul>
+&lt;li>The name of z-score table to use, which corresponds to value of the database document&amp;rsquo;s &lt;code>_id&lt;/code> attribute.&lt;/li>
+&lt;li>Patient&amp;rsquo;s sex, which corresponds to the data object&amp;rsquo;s name. In the example below &lt;code>male&lt;/code> for this parameter corresponds to &lt;code>charts[].data.male&lt;/code> in the database document.&lt;/li>
+&lt;li>First parameter for the table lookup, such as age. Value maps to the &lt;code>key&lt;/code> value in the database document.&lt;/li>
+&lt;li>Second parameter for the table lookup, such as height. Value is compared against the &lt;code>points&lt;/code> in the database document.&lt;/li>
+&lt;/ul>
+&lt;h4 id="example-use">Example Use&lt;/h4>
+&lt;p>&lt;a href="https://github.com/medic/cht-core/blob/3.13.x/demo-forms/z-score.xml">This example XForm form&lt;/a> shows the use of the z-score function. To calculate the z-score for a patient given their sex, age, and weight the XPath calculation is as follows:&lt;/p>
+&lt;p>&lt;code>z-score('weight-for-age', ../my_sex, ../my_age, ../my_weight)&lt;/code>&lt;/p>
+&lt;p>The data used by this function needs to be added to CouchDB. The example below shows the structure of the database document. It creates a &lt;code>weight-for-age&lt;/code> table, where you can see that a male aged 0 at 2.08kg has a z-score of -3. Your database doc will be substantially larger, so you may find the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/zscore-table-to-json.js">conversion script&lt;/a> helpful to convert z-score tables to the required doc format.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;_id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;zscore-charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;charts&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;weight-for-age&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;data&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;male&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;key&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">0&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#204a87;font-weight:bold">&amp;#34;points&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">1.701&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2.08&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2.459&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">2.881&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">3.346&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">3.859&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">4.419&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">5.031&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span> &lt;span style="color:#0000cf;font-weight:bold">5.642&lt;/span> &lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="input-data">Input data&lt;/h2>
 &lt;p>&lt;code>app&lt;/code> forms have access to a variety of &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/forms/form-inputs/#app-forms">input data&lt;/a> depending on the source of the form.&lt;/p>
 &lt;h2 id="cht-special-fields">CHT Special Fields&lt;/h2>
 &lt;p>Some fields in app forms control specific aspects of CHT Apps, either to bring data into forms or for a feature outside of the form.&lt;/p>
