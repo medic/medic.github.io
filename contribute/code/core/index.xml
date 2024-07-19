@@ -785,6 +785,8 @@ e2e-tests{E2E Tests}
 browser &amp;lt;--HTTPS--&amp;gt; cht-e2e
 e2e-tests &amp;lt;--wdio--&amp;gt; browser
 e2e-tests o--Pouch/HTTPS--o cht-e2e&lt;/pre>
+&lt;h3 id="how-to-write-automated-e2e-tests">How to write automated e2e tests&lt;/h3>
+&lt;p>Read the &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/core/style-guide-automated-e2e-tests/">style guide for automated tests&lt;/a> for guidelines on how to create new automated test cases for CHT-Core.&lt;/p>
 &lt;h3 id="debugging-e2e-tests">Debugging E2E tests&lt;/h3>
 &lt;p>End to end (e2e) tests can be really difficult to debug - sometimes they fail seemingly at random, and sometimes they only fail on certain environments (eg: ci but not locally). This can make reproducing and reliably fixing the issue challenging, so here are some tips to help!&lt;/p>
 &lt;h4 id="set-the-debug-flag">Set the &lt;code>DEBUG&lt;/code> flag&lt;/h4>
@@ -803,9 +805,27 @@ e2e-tests o--Pouch/HTTPS--o cht-e2e&lt;/pre>
 &lt;li>Stale element. This means the DOM element has been removed after it was found on the page but before trying to do something with it. Generally try to find the element just before it needs it to reduce the chance of this happening&lt;/li>
 &lt;/ul>
 &lt;h4 id="other-logs-and-screenshots">Other logs and screenshots&lt;/h4>
-&lt;p>There are logs and screenshots stored in the allure reports. &lt;a href="https://github.com/medic/cht-core/blob/master/TESTING.md#view-the-ci-report">Here&lt;/a> are the instructions to access that information.&lt;/p>
+&lt;p>GitHub actions will artifact all files in tests/logs. This is the directory any logs, results, images, etc&amp;hellip; should save to if you want to review them if a build fails.&lt;/p>
+&lt;h5 id="view-the-ci-report">View the CI report&lt;/h5>
+&lt;p>There are logs and screenshots stored in the allure reports when a job failed on the CI. To access to those logs follow these steps:&lt;/p>
+&lt;ul>
+&lt;li>Download the CI run artifact zip file located in the failed build&amp;rsquo;s &lt;code>Archive Results&lt;/code> section.
+&lt;figure class=" center col-12 col-lg-12">&lt;a href="archiveResultsSection.png">
+&lt;img src="archiveResultsSection.png"/> &lt;/a>
+&lt;/figure>
+&lt;/li>
+&lt;li>Extract the &lt;code>.zip&lt;/code> file.&lt;/li>
+&lt;li>From your cht-core directory, run &lt;code>npx allure open &amp;lt;path&amp;gt;/allure-report/&lt;/code>. Being &lt;code>&amp;lt;path&amp;gt;&lt;/code> the location where the zip file was extracted.&lt;/li>
+&lt;/ul>
 &lt;h4 id="running-just-the-failing-test">Running just the failing test&lt;/h4>
 &lt;p>Running e2e tests can be quite slow so to save time modify the &lt;code>specs&lt;/code> property of &lt;a href="https://github.com/medic/cht-core/blob/master/tests/e2e/default/wdio.conf.js#L7">&lt;code>/tests/e2e/**/wdio.conf.js&lt;/code>&lt;/a> so it only finds your test. You can also use &lt;code>describe.skip&lt;/code> and &lt;code>it.skip&lt;/code> to skip specific tests.&lt;/p>
+&lt;h5 id="intellij-based">IntelliJ Based&lt;/h5>
+&lt;ol>
+&lt;li>In a terminal, run &lt;code>npm run build-dev-watch&lt;/code>&lt;/li>
+&lt;li>In Intellij, open the &lt;a href="https://github.com/medic/cht-core/blob/master/package.json">package.json&lt;/a> file&lt;/li>
+&lt;li>Scroll to the scripts section and click the ▶ button next to &lt;code>wdio-local&lt;/code>&lt;/li>
+&lt;li>Select &lt;code>Debug 'wdio-local'&lt;/code>&lt;/li>
+&lt;/ol>
 &lt;h4 id="watching-the-test-run">Watching the test run&lt;/h4>
 &lt;p>Running the tests locally (e.g. with &lt;code>npm run wdio-local&lt;/code>) will allow you to watch it run but if you interact with the page the test will fail in unexpected ways. Furthermore the browser will close after a short timeout so you won&amp;rsquo;t be able to inspect the console or DOM. To do this, force quit the process running the test before it tears down and you will be able to navigate around the app, use Chrome dev tools, and inspect the docs in the database to (hopefully) work out what&amp;rsquo;s going wrong.&lt;/p>
 &lt;h4 id="running-the-upgrade-e2e-test-locally">Running the upgrade e2e test locally&lt;/h4>
@@ -842,8 +862,114 @@ Either run the test multiple times until you load all images, download images ma
 &lt;li>Manually downloaded the images. To download images manually, you can use either docker-compose or docker:
 &lt;ul>
 &lt;li>With docker, you&amp;rsquo;d do a docker pull &lt;image tag> for every image you want to download.&lt;/li>
-&lt;li>With docker-compose, you&amp;rsquo;d save all docker-compose files in a folder, do a docker-compose pull, and point to your files as a source. &lt;a href="https://docs.docker.com/engine/reference/commandline/compose_pull/">Compose pull documentation&lt;/a>&lt;/li>
+&lt;li>With docker-compose, you&amp;rsquo;d save all docker-compose files in a folder, do a docker-compose pull, and point to your files as a source. Read more on &lt;a href="https://docs.docker.com/engine/reference/commandline/compose_pull/">docker compose pull&lt;/a>&lt;/li>
 &lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="test-architecture">Test Architecture&lt;/h3>
+&lt;p>Our GitHub actions spin up an ubuntu-22.04 machine. They install software and then launch couchdb and horticulturalist in a docker container. This is needed to run our applications in the specific node versions we support, while allowing our test code to run in versions of node it supports. This creates a paradigm to keep in mind when writing tests. Tests run on the ubuntu machine.
+Any test code that starts a server or runs an executable is running outside of the horti container. The ports are exposed for all our services and horti has access to the cht-core root via a volume. Horti can also talk to the host by getting the gateway of the docker network.&lt;/p></description></item><item><title>Contribute: Style guide for automated tests</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/style-guide-automated-e2e-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/style-guide-automated-e2e-tests/</guid><description>
+&lt;p>There are three files that are the base of every new automated test case, the most important one is the &lt;code>spec&lt;/code> file, which contains the actual test that will be executed.&lt;/p>
+&lt;p>Automated tests cover different &lt;a href="https://github.com/medic/cht-core/tree/master/config">CHT Configs&lt;/a>, consider the following setups when writing a new test:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>default&lt;/strong>
+&lt;ul>
+&lt;li>Config file: &lt;a href="https://github.com/medic/cht-core/blob/master/tests/e2e/default/wdio.conf.js">&lt;code>../tests/e2e/default/wdio.conf.js&lt;/code>&lt;/a>&lt;/li>
+&lt;li>Name convention for the &lt;code>spec&lt;/code> file: &lt;code>../tests/e2e/default/*/&amp;lt;name&amp;gt;.wdio-spec.js&lt;/code>&lt;/li>
+&lt;li>Command to execute the tests that belong to this config: &lt;code>npm run wdio-local&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Important:&lt;/strong> Make sure the &lt;code>spec&lt;/code> file follows the name convention, otherwise the file won&amp;rsquo;t be executed.&lt;/p>
+&lt;h2 id="base-files-to-use">Base files to use&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>Page-object file. (&lt;code>../tests/page-objects/../enketo/&amp;lt;name&amp;gt;.wdio.page.js&lt;/code>)
+We are leveraging the &lt;a href="https://www.thoughtworks.com/insights/blog/using-page-objects-overcome-protractors-shortcomings">page object model&lt;/a> for structure. When identifying elements they should be added to a page object and not within a test file. Add functions that perform actions to the page within the page object. Keep expects outside of page objects. The tests should be self-documenting.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Data file.&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Create test data using the &lt;a href="https://github.com/medic/cht-core/blob/master/tests/factories/cht/contacts/place.js">&lt;code>place factory&lt;/code>&lt;/a>, the &lt;a href="https://github.com/medic/cht-core/blob/master/tests/factories/cht/users/users.js">&lt;code>user factory&lt;/code>&lt;/a> or the &lt;a href="https://github.com/medic/cht-core/blob/master/tests/factories/cht/contacts/person.js">&lt;code>person factory&lt;/code>&lt;/a> files.&lt;/p>
+&lt;p>Using the &amp;ldquo;factories&amp;rdquo; will allow you to create hierarchies, contacts and patients that are associated with specific places and with their specific attributes and information. It can create offline or online users that can be used to login with different roles. &lt;strong>Everything can be customised depending on the test requirements&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>e2e testing file. Use the correct name convention when working with the following configs:&lt;/p>
+&lt;ul>
+&lt;li>default: (&lt;code>../tests/e2e/default/*/&amp;lt;name&amp;gt;.wdio-spec.js&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;p>This file should contain &lt;strong>only&lt;/strong> the scenario setup and assertions of the test that is going to be executed. All the DOM queries, logging, contact creation and data assignments should be delegated to the Page Object file and the Data file. This will increase test readability and code reusability. For a better understanding follow these files as examples:&lt;/p>
+&lt;ul>
+&lt;li>default config: &lt;a href="https://github.com/medic/cht-core/blob/master/tests/e2e/default/enketo/pregnancy-visit.wdio-spec.js">&lt;code>../tests/e2e/default/enketo/pregnancy-visit.wdio-spec.js&lt;/code>&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="tips-to-write-test-cases">Tips to write test cases&lt;/h2>
+&lt;h3 id="file-structure-spec-files">File Structure (spec files)&lt;/h3>
+&lt;p>Test files should represent a feature within the application. Use &lt;code>describe&lt;/code> to identify the feature and to group test cases. Use &lt;code>it&lt;/code> to detail individual test cases covering the feature&amp;rsquo;s functionality.&lt;/p>
+&lt;p>Observe how the following example defines a &lt;code>describe&lt;/code> using the feature name &lt;code>Immunization Visit&lt;/code>. It contains two test cases which detail the expected results &lt;code>should add a new child under 2 years old&lt;/code> and &lt;code>should submit an immunization visit&lt;/code>.&lt;/p>
+&lt;p>Ex:&lt;/p>
+&lt;pre tabindex="0">&lt;code> describe(&amp;#39;Immunization Visit&amp;#39;, () =&amp;gt; {
+it(&amp;#39;should add a new child under 2 years old&amp;#39;, () =&amp;gt; { .... });
+it(&amp;#39;should submit an immunization visit&amp;#39;, () =&amp;gt; { .... });
+...
+});
+&lt;/code>&lt;/pre>&lt;h3 id="name-convention-and-file-location">Name convention and file location&lt;/h3>
+&lt;ul>
+&lt;li>Since every test is created by &lt;em>&amp;ldquo;selectors&amp;rdquo;&lt;/em>, it makes sense to locate them into a folder that represents the page being tested and not the feature. Please try to locate every test file in the correct folder.&lt;/li>
+&lt;li>Every file name should use &lt;code>dash-case&lt;/code> (&lt;code>-&lt;/code>). Do not use &lt;code>snake-case&lt;/code> (&lt;code>_&lt;/code>) nor &lt;code>camelCase&lt;/code>. Please consider the following examples:
+&lt;ul>
+&lt;li>Correct:
+&lt;ul>
+&lt;li>&lt;code>pregnancy-visit.wdio-spec.js&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Incorrect:
+&lt;ul>
+&lt;li>&lt;code>pregnancy_visit.wdio-spec.js&lt;/code>&lt;/li>
+&lt;li>&lt;code>pregnancyVisit.wdio-spec.js&lt;/code>&lt;/li>
+&lt;li>&lt;code>PregnancyVisit.wdio-spec.js&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Whenever possible avoid repeating the folder name in the file name. Please consider the following examples where the file is located in the path &lt;code>e2e/default/enketo&lt;/code>:
+&lt;ul>
+&lt;li>Correct:
+&lt;ul>
+&lt;li>&lt;code>pregnancy-visit.wdio-spec.js&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Incorrect:
+&lt;ul>
+&lt;li>&lt;code>pregnancy-visit-enketo.wdio-spec.js&lt;/code>&lt;/li>
+&lt;li>&lt;code>pregnancy-visit-default.wdio-spec.js&lt;/code>&lt;/li>
+&lt;li>&lt;code>pregnancy-visit-enketo-default.wdio-spec.js&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="adding-identifiers">Adding identifiers&lt;/h3>
+&lt;p>In some cases, adding a unique identifier to an element may be necessary. This could be a piece of data related to the element, or a unique name (which can be done by adding a &lt;code>test-&lt;/code> attribute to the app code).&lt;/p>
+&lt;p>Ex: &lt;code>attr.test-id=&amp;quot;{{ msg.key }}&amp;quot; &lt;/code> Will add a &lt;code>test-id&lt;/code> attribute with the data from the app.&lt;/p>
+&lt;p>Then it can be consumed in the test by getting an element by css. EX: &lt;code>element(by.css(`#message-list li[test-id=&amp;quot;${identifier}&amp;quot;]`)),&lt;/code>&lt;/p>
+&lt;p>Adding a test identifier is a good option for cases where a CSS selector would otherwise be fragile such as selecting based on an assumed element structure or selecting on CSS classes intended for visual design that may change.&lt;/p>
+&lt;h3 id="test-tags">Test tags&lt;/h3>
+&lt;p>You can tag mocha tests and update suites to only include or exclude certain tags (&lt;a href="https://github.com/mochajs/mocha/wiki/Tagging">Mocha Wiki&lt;/a>).&lt;/p>
+&lt;p>Existent tags:&lt;/p>
+&lt;h4 id="docker">@docker&lt;/h4>
+&lt;p>Tests that should run exclusively when running the suite over docker infrastructure. These tests will fail if run over k3d.&lt;/p>
+&lt;h3 id="notes">Notes:&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>We decided to separate every functionality in files/folders because we want to make sure that we can reuse as much code as possible. If something new is implemented and might be used for another test, then please isolate the code in a separate file, so it can be reused in future tests.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If the new test is not associated to a specific configuration, please locate the test inside the correct folder of the default config &lt;a href="https://github.com/medic/cht-core/tree/master/tests/e2e/default">&lt;code>e2e/default/*&lt;/code>&lt;/a>.&lt;/p>
 &lt;/li>
 &lt;/ul></description></item><item><title>Contribute: Developing on Windows</title><link>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/contribute/code/core/using-windows/</guid><description>
 &lt;p>We don&amp;rsquo;t actively support development on Windows, instead preferring MacOS or Linux.&lt;/p>
