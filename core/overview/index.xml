@@ -161,10 +161,194 @@
 &lt;h3 id="postgres-exporter">Postgres Exporter&lt;/h3>
 &lt;p>&lt;a href="https://github.com/prometheus-community/postgres_exporter">Postgres Exporter&lt;/a> allows Prometheus to scrape a Postgres database and at a predefined interval. The queries can be configured to ingest any relevant data needed.&lt;/p>
 &lt;h3 id="cht-core-framework--rdbms">CHT Core Framework &amp;amp; RDBMS&lt;/h3>
-&lt;p>For more information on these technologies, see &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/architecture/">CHT Core overview&lt;/a>.&lt;/p></description></item><item><title>Core: CHT Sync and CHT Pipeline</title><link>https://docs.communityhealthtoolkit.org/core/overview/cht-sync/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/cht-sync/</guid><description>
+&lt;p>For more information on these technologies, see &lt;a href="https://docs.communityhealthtoolkit.org/core/overview/architecture/">CHT Core overview&lt;/a>.&lt;/p></description></item><item><title>Core: CHT App Configurer</title><link>https://docs.communityhealthtoolkit.org/core/overview/cht-conf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/cht-conf/</guid><description>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;p>Read more about setting up &lt;a href="https://docs.communityhealthtoolkit.org/contribute/code/cht-conf/">CHT Conf&lt;/a>.&lt;/p>
+&lt;h2 id="currently-supported">Currently Supported&lt;/h2>
+&lt;p>The different items that are supported by CHT Conf include:&lt;/p>
+&lt;h3 id="settings">Settings&lt;/h3>
+&lt;ul>
+&lt;li>Compile app settings from:
+&lt;ul>
+&lt;li>tasks&lt;/li>
+&lt;li>rules&lt;/li>
+&lt;li>schedules&lt;/li>
+&lt;li>contact-summary&lt;/li>
+&lt;li>purge&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>App settings can also be defined in a more modular way by having the following files in app_settings folder:
+&lt;ul>
+&lt;li>base_settings.json&lt;/li>
+&lt;li>forms.json&lt;/li>
+&lt;li>schedules.json&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Backup app settings from server&lt;/li>
+&lt;li>Upload app settings to server&lt;/li>
+&lt;li>Upload resources to server&lt;/li>
+&lt;li>Upload custom translations to the server&lt;/li>
+&lt;li>Upload privacy policies to server&lt;/li>
+&lt;li>Upload branding to server&lt;/li>
+&lt;li>Upload partners to server&lt;/li>
+&lt;/ul>
+&lt;h3 id="forms">Forms&lt;/h3>
+&lt;ul>
+&lt;li>Fetch from Google Drive and save locally as &lt;code>.xlsx&lt;/code>&lt;/li>
+&lt;li>Backup from server&lt;/li>
+&lt;li>Delete all forms from server&lt;/li>
+&lt;li>Delete specific form from server&lt;/li>
+&lt;li>Upload all app or contact forms to server&lt;/li>
+&lt;li>Upload specified app or contact forms to server&lt;/li>
+&lt;/ul>
+&lt;h3 id="managing-data-and-images">Managing data and images&lt;/h3>
+&lt;ul>
+&lt;li>Convert CSV files with contacts and reports to JSON docs&lt;/li>
+&lt;li>Move contacts by downloading and making the changes locally first&lt;/li>
+&lt;li>Upload JSON files as docs on instance&lt;/li>
+&lt;li>Compress PNGs and SVGs in the current directory and its subdirectories&lt;/li>
+&lt;/ul>
+&lt;h3 id="editing-contacts-across-the-hierarchy">Editing contacts across the hierarchy.&lt;/h3>
+&lt;p>To edit existing couchdb documents, create a CSV file that contains the ids of the document you wish to update, and the columns of the document attribute(s) you wish to add/edit. By default, values are parsed as strings. To parse a CSV column as a JSON type.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Parameter&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>Required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>column(s)&lt;/td>
+&lt;td>Comma delimited list of columns you wish to add/edit. If this is not specified all columns will be added.&lt;/td>
+&lt;td>No&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>docDirectoryPath&lt;/td>
+&lt;td>This action outputs files to local disk at this destination&lt;/td>
+&lt;td>No. Default &lt;code>json-docs&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>file(s)&lt;/td>
+&lt;td>Comma delimited list of files you wish to process using edit-contacts. By default, contact.csv is searched for in the current directory and processed.&lt;/td>
+&lt;td>No.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>updateOfflineDocs&lt;/td>
+&lt;td>If passed, this updates the docs already in the docDirectoryPath instead of downloading from the server.&lt;/td>
+&lt;td>No.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="example">Example&lt;/h4>
+&lt;ol>
+&lt;li>
+&lt;p>Create a contact.csv file with your columns in the csv folder in your current path. The documentID column is a requirement. The documentID column contains the document IDs to be fetched from couchdb.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>documentID&lt;/th>
+&lt;th>is_in_emnch:bool&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>documentID1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>documentID2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>documentID3&lt;/td>
+&lt;td>true&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;/li>
+&lt;li>
+&lt;p>Use the following command to download and edit the documents:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --instance=*instance* edit-contacts -- --column=*is_in_emnch* --docDirectoryPath=*my_folder*
+&lt;/code>&lt;/pre>&lt;p>or this one to update already downloaded docs&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --instance=*instance* edit-contacts -- --column=*is_in_emnch* --docDirectoryPath=*my_folder* --updateOfflineDocs
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;li>
+&lt;p>Then upload the edited documents using the &lt;em>&lt;strong>upload-docs&lt;/strong>&lt;/em> command.&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht --instance=*instance* --upload-docs
+&lt;/code>&lt;/pre>&lt;/li>
+&lt;/ol>
+&lt;h2 id="project-layout">Project layout&lt;/h2>
+&lt;p>This tool expects a project to be structured as follows:&lt;/p>
+&lt;pre tabindex="0">&lt;code>example-project/
+.eslintrc
+app_settings.json
+contact-summary.js
+privacy-policies.json
+privacy-policies/
+language1.html
+…
+purge.js
+resources.json
+resources/
+icon-one.png
+…
+targets.js
+tasks.js
+task-schedules.json
+forms/
+app/
+my_project_form.xlsx
+my_project_form.xml
+my_project_form.properties.json
+my_project_form-media/
+[extra files]
+…
+contact/
+person-create.xlsx
+person-create.xml
+person-create-media/
+[extra files]
+…
+…
+…
+translations/
+messages-xx.properties
+…
+&lt;/code>&lt;/pre>&lt;p>If you are starting from scratch you can initialise the file layout using the initialise-project-layout action:&lt;/p>
+&lt;pre tabindex="0">&lt;code>cht initialise-project-layout
+&lt;/code>&lt;/pre>&lt;h3 id="derived-configs">Derived configs&lt;/h3>
+&lt;p>Configuration can be inherited from another project, and then modified. This allows the &lt;code>app_settings.json&lt;/code> and contained files (&lt;code>task-schedules.json&lt;/code>, &lt;code>targets.json&lt;/code> etc.) to be imported, and then modified.&lt;/p>
+&lt;p>To achieve this, create a file called &lt;code>settings.inherit.json&lt;/code> in your project&amp;rsquo;s root directory with the following format:&lt;/p>
+&lt;pre tabindex="0">&lt;code>{
+&amp;#34;inherit&amp;#34;: &amp;#34;../path/to/other/project&amp;#34;,
+&amp;#34;replace&amp;#34;: {
+&amp;#34;keys.to.replace&amp;#34;: &amp;#34;value-to-replace-it-with&amp;#34;
+},
+&amp;#34;merge&amp;#34;: {
+&amp;#34;complex.objects&amp;#34;: {
+&amp;#34;will_be_merged&amp;#34;: true
+}
+},
+&amp;#34;delete&amp;#34;: [
+&amp;#34;all.keys.listed.here&amp;#34;,
+&amp;#34;will.be.deleted&amp;#34;
+],
+&amp;#34;filter&amp;#34;: {
+&amp;#34;object.at.this.key&amp;#34;: [
+&amp;#34;will&amp;#34;,
+&amp;#34;keep&amp;#34;,
+&amp;#34;only&amp;#34;,
+&amp;#34;these&amp;#34;,
+&amp;#34;properties&amp;#34;
+]
+}
+}
+&lt;/code>&lt;/pre></description></item><item><title>Core: CHT Sync and CHT Pipeline</title><link>https://docs.communityhealthtoolkit.org/core/overview/cht-sync/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/core/overview/cht-sync/</guid><description>
 &lt;h2 id="overview">Overview&lt;/h2>
 &lt;p>CHT Sync is an integrated solution designed to enable data synchronization between CouchDB and PostgreSQL for the purpose of analytics. It combines several technologies to achieve this synchronization and provides an efficient workflow for data processing and visualization. The synchronization occurs in real-time, ensuring that the data displayed on dashboards is up-to-date.&lt;/p>
-&lt;p>Read more about setting up &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/setup/">setting up CHT Sync&lt;/a>.&lt;/p>
+&lt;p>Read more about setting up &lt;a href="https://docs.communityhealthtoolkit.org/apps/guides/data/analytics/setup/">CHT Sync&lt;/a>.&lt;/p>
 &lt;!-- make updates to this diagram on the google slides: -->
 &lt;!-- https://docs.google.com/presentation/d/1j4jPsi-gHbiaLBfgYOyru1g_YV98PkBrx2zs7bwhoEQ/ -->
 &lt;figure class=" center col-8 col-lg-6">&lt;a href="cht-sync.png">
