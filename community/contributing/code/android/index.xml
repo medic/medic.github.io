@@ -1,4 +1,201 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Contributing Android Code on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/</link><description>Recent content in Contributing Android Code on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/community/contributing/code/android/index.xml" rel="self" type="application/rss+xml"/><item><title>Android Dev Environment</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/development-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/android/development-setup/</guid><description>The following instructions allows you to setup a development environment for the CHT Android apps, and the CHT Gateway app as well.
-Finally, you will learn how to assemble the app, run the tests, and how to choose the right artifacts when installing or publishing the apps.
-Requirements Java 17+ (OpenJDK versions work). Android SDK, and optionally Android Studio. The adb command for debugging and get the logs. The source code.</description></item><item><title>Releasing</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/releasing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/android/releasing/</guid><description>All Medic&amp;rsquo;s Android projects automatically build, sign, and release builds via GitHub Actions. The following guide applies to any of these apps, although the last 2 are in maintenance mode (links pointing to the release sections):
-cht-android cht-gateway medic-collect rdt-capture Alpha for release testing Ensure all issues for this release have passed AT and been merged into master. You can also create an alpha release from a feature branch, to provide the needed .</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Contributing Android Code</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/</link><description>Recent content in Contributing Android Code on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/community/contributing/code/android/index.xml" rel="self" type="application/rss+xml"/><item><title>Android Dev Environment</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/development-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/android/development-setup/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Instructions for setting up the development environment
+&lt;/p>
+&lt;p>The following instructions allows you to setup a development environment for the &lt;strong>&lt;a href="https://github.com/medic/cht-android" target="_blank" rel="noopener">CHT Android&lt;/a>&lt;/strong> apps, and the &lt;strong>&lt;a href="https://github.com/medic/cht-gateway" target="_blank" rel="noopener">CHT Gateway&lt;/a>&lt;/strong> app as well.&lt;/p>
+&lt;p>Finally, you will learn how to assemble the app, run the tests, and how to choose the right artifacts when installing or publishing the apps.&lt;/p>
+&lt;h2>Requirements&lt;span class="hx-absolute -hx-mt-20" id="requirements">&lt;/span>
+&lt;a href="#requirements" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>Java 17+ (OpenJDK versions work).&lt;/li>
+&lt;li>Android SDK, and optionally Android Studio.&lt;/li>
+&lt;li>The &lt;code>adb&lt;/code> command for debugging and get the logs.&lt;/li>
+&lt;li>The source code. To run all the tests in the CHT Android app you need to clone also the submodules: &lt;code>git clone --recurse-submodules https://github.com/medic/cht-android.git&lt;/code>.&lt;/li>
+&lt;li>The &lt;code>make&lt;/code> command.&lt;/li>
+&lt;li>If you are going to build a new flavor (CHT Android), you also need to have installed: &lt;code>head&lt;/code>, &lt;code>xxd&lt;/code>, &lt;code>openssl&lt;/code> and &lt;code>apksigner&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Gradle&lt;/strong> is also used but it&amp;rsquo;s downloaded and installed in the user space the first time &lt;code>make&lt;/code> is executed. You can also build and launch the app with &lt;a href="#android-studio" >Android Studio&lt;/a>.&lt;/p>
+&lt;p>Below are the instructions of how to install and setup some of the tools required.&lt;/p>
+&lt;h2>Install&lt;span class="hx-absolute -hx-mt-20" id="install">&lt;/span>
+&lt;a href="#install" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Java&lt;span class="hx-absolute -hx-mt-20" id="java">&lt;/span>
+&lt;a href="#java" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Java 17+ needs to be installed. The &lt;code>bin/&lt;/code> folder of the JDK must added into the &lt;code>$PATH&lt;/code> environment variable, and it&amp;rsquo;s recommended to have &lt;code>$JAVA_HOME&lt;/code> pointing to the JDK folder as well.&lt;/p>
+&lt;p>To install different versions of Java and without the need to have root permissions, checkout &lt;a href="https://sdkman.io/" target="_blank" rel="noopener">Sdkman!&lt;/a>, if you are familiar with tools like &lt;code>nvm&lt;/code> or &lt;code>rvm&lt;/code>, this tool is pretty much the same for Java, and the command takes care of adding the selected JDK to the &lt;code>$PATH&lt;/code> variable and to set the &lt;code>$JAVA_HOME&lt;/code> variable when switching across different versions.&lt;/p>
+&lt;h3>Android Studio and the SDK&lt;span class="hx-absolute -hx-mt-20" id="android-studio-and-the-sdk">&lt;/span>
+&lt;a href="#android-studio-and-the-sdk" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Android Studio is the full package: the IDE based on IntelliJ IDEA, the Android SDK and the SDK Manager with the UI to manage different packages visually, while the SDK alone only includes the command line tools like the &lt;code>sdkmanager&lt;/code> CLI.&lt;/p>
+&lt;p>You don&amp;rsquo;t need the IDE to build the app or to install a &amp;ldquo;debug&amp;rdquo; version in a device, or get the logs, but it&amp;rsquo;s recommended if you also want to debug the app or modify the code.&lt;/p>
+&lt;ul>
+&lt;li>Android Studio: download from &lt;a href="https://developer.android.com/studio" target="_blank" rel="noopener">https://developer.android.com/studio&lt;/a>&lt;/li>
+&lt;li>Command line tools only: download from &lt;a href="https://developer.android.com/studio" target="_blank" rel="noopener">https://developer.android.com/studio&lt;/a>. Scroll down to the &amp;lsquo;Command Line Tools Only&amp;rsquo; section of the page.&lt;/li>
+&lt;/ul>
+&lt;p>If you install Android Studio it&amp;rsquo;s still recommended to download and setup the command line tools separately to be able to use them without the IDE.&lt;/p>
+&lt;p>The binary folder of the command also need to be added to the &lt;code>$PATH&lt;/code>, and &lt;code>$ANDROID_HOME&lt;/code> pointing to the root of the SDK. Moreover, the SDK requires to be stored in the &lt;code>$ANDROID_HOME&lt;/code> and inside a folder called &lt;code>latest&lt;/code>.&lt;/p>
+&lt;p>Here are the steps from the command line you can follow to install the CLI tools once downloaded the zip file:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir -p Android/Sdk/cmdline-tools
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">unzip commandlinetools-linux-7583922_latest.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mv cmdline-tools/ Android/Sdk/cmdline-tools/latest/&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Then, to add the environment variables required, you can add the following to your &lt;code>~/.bashrc&lt;/code> file:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ANDROID_HOME&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$HOME&lt;/span>&lt;span class="s2">/Android/Sdk&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">PATH&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$PATH&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="nv">$ANDROID_HOME&lt;/span>&lt;span class="s2">/cmdline-tools/latest/bin&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Debug tool &lt;code>adb&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="debug-tool-adb">&lt;/span>
+&lt;a href="#debug-tool-adb" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Old SDK distributions used to have it pre-packaged, now you have to install it separately. Once installed SDK following the steps above, you can install the latest version of &lt;code>adb&lt;/code> with:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sdkmanager --install platform-tools&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>If you also installed Android Studio you can use the &lt;a href="https://developer.android.com/studio/intro/update#sdk-manager" target="_blank" rel="noopener">SDK Manager&lt;/a> instead.&lt;/p>
+&lt;p>Finally edit again the &lt;code>$PATH&lt;/code> environment variable to add the adb path: &lt;code>$ANDROID_HOME/platform-tools&lt;/code>.&lt;/p>
+&lt;h3>&lt;code>apksigner&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="apksigner">&lt;/span>
+&lt;a href="#apksigner" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This tool is used automatically by the Android SDK for signing APKs, and to check the certificate of a given APK, so chances are that after installing the SDK following the steps above you already have it installed, but not configured in the &lt;code>$PATH&lt;/code> that is needed to manually check APKs signature.&lt;/p>
+&lt;p>The CLI is part of other CLI tolls under the &lt;code>build-tools&lt;/code> package, and multiple build tools package can be installed, so check what versions you have under the &lt;code>$ANDROID_HOME/build-tools&lt;/code> folder, and add the most up to date to the &lt;code>$PATH&lt;/code> folder. E.g. if you have the version 30.0.3 installed in you computer, apksigner should be installed at &lt;code>$ANDROID_HOME/build-tools/30.0.3/apksigner&lt;/code>, so add the &lt;code>$ANDROID_HOME/build-tools/30.0.3&lt;/code> folder to the &lt;code>$PATH&lt;/code> variable.&lt;/p>
+&lt;p>In case you don&amp;rsquo;t have it installed or want to install a newer version, checkout the versions available with &lt;code>sdkmanager --list&lt;/code>. You will see a table with a list of installed and available packages, not just the build tools.&lt;/p>
+&lt;p>To install the version 31.0.0: &lt;code>sdkmanager --install 'build-tools;31.0.0'&lt;/code>. Then update or add it to the &lt;code>$PATH&lt;/code> variable.&lt;/p>
+&lt;h2>Development&lt;span class="hx-absolute -hx-mt-20" id="development">&lt;/span>
+&lt;a href="#development" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Flavor selection&lt;span class="hx-absolute -hx-mt-20" id="flavor-selection">&lt;/span>
+&lt;a href="#flavor-selection" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Some &lt;code>make&lt;/code> targets support the flavor as &lt;code>make flavor=[Flavor] [task]&lt;/code>, where &lt;code>[Flavor]&lt;/code> is the branded version with the first letter capitalized. The &lt;code>[task]&lt;/code> is the action to execute: &lt;code>deploy&lt;/code>, &lt;code>assemble&lt;/code>, &lt;code>lint&lt;/code>, etc.&lt;/p>
+&lt;p>The default value for &lt;code>flavor&lt;/code> is &lt;code>Unbranded&lt;/code>, e.g. executing &lt;code>make deploy&lt;/code> will assemble and install that flavor, while executing &lt;code>make flavor=Medicmobilegamma deploy&lt;/code> will do the same for the &lt;em>Medicmobilegamma&lt;/em> brand.&lt;/p>
+&lt;p>See the &lt;a href="https://github.com/medic/cht-android/blob/master/Makefile" target="_blank" rel="noopener">Makefile&lt;/a> for more details.&lt;/p>
+&lt;h3>Build and assemble&lt;span class="hx-absolute -hx-mt-20" id="build-and-assemble">&lt;/span>
+&lt;a href="#build-and-assemble" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To build and assemble the apps within the console use:&lt;/p>
+&lt;pre>&lt;code>make assemble
+&lt;/code>&lt;/pre>
+&lt;p>The command above builds and assembles the &lt;em>debug&lt;/em> and &lt;em>release&lt;/em> APKs of the apps, and for the CHT-Android project the Unbranded flavor is built and assembled by default.&lt;/p>
+&lt;p>Each APK will be generated and stored in &lt;code>build/outputs/apk/[flavor]/[debug|release]/&lt;/code>, for example after assembling the &lt;em>Medicmobilegamma&lt;/em> flavor with &lt;code>make flavor=Medicmobilegamma assemble&lt;/code>, the &lt;em>release&lt;/em> versions of the APKs generated are stored in &lt;code>build/outputs/apk/medicmobilegamma/release/&lt;/code>.&lt;/p>
+&lt;p>To assemble other flavors, use the following command: &lt;code>make flavour=[Flavor] assemble&lt;/code>. See the &lt;a href="#flavor-selection" >Flavor selection&lt;/a> section for more details about &lt;code>make&lt;/code> commands.&lt;/p>
+&lt;p>To create the &lt;code>.aab&lt;/code> bundle file, use &lt;code>make bundle&lt;/code>, although signed versions are generated when &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/android/releasing/" >releasing&lt;/a>, and the Play Store requires the AAB to be signed with the right key.&lt;/p>
+&lt;p>To clean the APKs and compiled resources: &lt;code>make clean&lt;/code>.&lt;/p>
+&lt;h3>Testing&lt;span class="hx-absolute -hx-mt-20" id="testing">&lt;/span>
+&lt;a href="#testing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To execute unit tests and static analysis, run: &lt;code>make test&lt;/code>.&lt;/p>
+&lt;p>To generate a unit test coverage report, run: &lt;code>make test-coverage&lt;/code>.&lt;/p>
+&lt;p>Find the generated report in:
+&lt;code>build/reports/jacoco/makeUnbrandedDebugUnitTestCoverageReport/html/index.html&lt;/code>&lt;/p>
+&lt;h4>Static checks&lt;span class="hx-absolute -hx-mt-20" id="static-checks">&lt;/span>
+&lt;a href="#static-checks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>To only execute the &lt;strong>linter checks&lt;/strong>, run: &lt;code>make lint&lt;/code>.&lt;/p>
+&lt;h4>Instrumentation Tests&lt;span class="hx-absolute -hx-mt-20" id="instrumentation-tests">&lt;/span>
+&lt;a href="#instrumentation-tests" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The UI tests run on a device.&lt;/p>
+&lt;ol>
+&lt;li>Uninstall previous versions of the app, otherwise an &lt;code>InstallException: INSTALL_FAILED_VERSION_DOWNGRADE&lt;/code> can cause tests to fail.&lt;/li>
+&lt;li>Select English as default language in the device.&lt;/li>
+&lt;li>Ensure you meet all the &lt;a href="#requirements" >Requirements&lt;/a>.&lt;/li>
+&lt;li>Execute: &lt;code>make test-ui-all&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h4>Shell tests&lt;span class="hx-absolute -hx-mt-20" id="shell-tests">&lt;/span>
+&lt;a href="#shell-tests" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The project has bash tests that verify the Make targets used to create and manage the keystores used to sign the apps. Use &lt;code>make test-bash-keystore&lt;/code> to run them. In CI they are executed in Linux and MacOS VMs.&lt;/p>
+&lt;p>If you get an error like &lt;code>make: ./src/test/bash/bats/bin/bats: Command not found&lt;/code>, it&amp;rsquo;s because you cloned the project without the &lt;code>--recurse-submodules&lt;/code> git argument. Execute first &lt;code>git submodule update --init&lt;/code> to clone
+the submodules within the cht-android folder.&lt;/p>
+&lt;h4>Connecting to the server locally&lt;span class="hx-absolute -hx-mt-20" id="connecting-to-the-server-locally">&lt;/span>
+&lt;a href="#connecting-to-the-server-locally" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Refer to the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/#nginx-local-ip" >CHT Core Developer Guide&lt;/a>.&lt;/p>
+&lt;h4>Manually testing with older Android versions&lt;span class="hx-absolute -hx-mt-20" id="manually-testing-with-older-android-versions">&lt;/span>
+&lt;a href="#manually-testing-with-older-android-versions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>Later versions of the CHT, only support &lt;a href="https://docs.communityhealthtoolkit.org/releases/#dependencies" >running on Chrome/Webview 90+&lt;/a>. Some older versions of Android will not have a new enough Android System Webview to be able to run the CHT webapp. This is particularly true of emulated Android devices, which typically are configured to not receive updates. To test the CHT functionality on these devices you must manually upgrade the version of the Chrome/Webview apk used as the Android System Webview.&lt;/p>
+&lt;p>To upgrade the necessary apk on an emulated Android device:&lt;/p>
+&lt;ul>
+&lt;li>Start by using the &lt;code>Google APIs&lt;/code> variant of the Android image. The base AOSP image bakes in the &lt;code>com.android.webview&lt;/code> package, making it difficult to update.&lt;/li>
+&lt;li>Depending on your version of Android, you will need to manually download a new version of the apk (make sure to get the correct variant for your architecture):
+&lt;ul>
+&lt;li>For Android 7-9, you should download a new version of &lt;code>com.android.chrome&lt;/code> (e.g. from &lt;a href="https://www.apkmirror.com/apk/google-inc/chrome/" target="_blank" rel="noopener">apkMirror&lt;/a>).&lt;/li>
+&lt;li>For Android 10+, you should download a new version of &lt;code>com.google.android.webview&lt;/code> (e.g. from &lt;a href="https://www.apkmirror.com/apk/google-inc/android-system-webview/" target="_blank" rel="noopener">apkMirror&lt;/a>).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Then, you can use adb to install the apk into the device: &lt;code>adb install -r *your_apk*.apk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Testing using an Android 5-6 device can be more challenging. The &lt;code>com.android.webview&lt;/code> package seems to be baked into the system partition regardless of the image variant. It is possible use a custom ROM (e.g. CyanogenMod) with an upgraded WebView version on a physical device. Another approach to testing with older versions of Android is to simply test against an older version of the CHT (e.g. CHT &lt;code>3.x.&lt;/code> only requires Chrome/Webview 53). The functionality of cht-android can still be validated by interacting with this old CHT version.&lt;/p>
+&lt;p>If using the docker-helper to deploy CHT instances for testing with old Android versions, be aware that the &lt;code>local-ip.medicmobile.org&lt;/code> SSL certificates may not work with the device (because the root certificate is not recognized). On Android 5-6 you can manually install the root certificate via Settings &amp;gt; Security &amp;gt; Install from SD Card.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h3>Android Studio&lt;span class="hx-absolute -hx-mt-20" id="android-studio">&lt;/span>
+&lt;a href="#android-studio" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;a href="https://developer.android.com/studio" target="_blank" rel="noopener">Android Studio&lt;/a> can be used to build and launch the app instead. Be sure to select the right flavor from the &lt;em>Build Variants&lt;/em> dialog (see &lt;a href="https://developer.android.com/studio/run#changing-variant" target="_blank" rel="noopener">Change the build variant&lt;/a>). To launch the app in an emulator, you need to uncomment the code that has the strings for the &lt;code>x86&lt;/code> or the &lt;code>x86_64&lt;/code> architecture in the &lt;code>android&lt;/code> / &lt;code>splits&lt;/code> / &lt;code>include&lt;/code> sections of the &lt;code>build.gradle&lt;/code> file.&lt;/p>
+&lt;h3>Artifact formats&lt;span class="hx-absolute -hx-mt-20" id="artifact-formats">&lt;/span>
+&lt;a href="#artifact-formats" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When building the app there are two output formats you can use: Android App Bundle or APK.&lt;/p>
+&lt;h4>Android App Bundles&lt;span class="hx-absolute -hx-mt-20" id="android-app-bundles">&lt;/span>
+&lt;a href="#android-app-bundles" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;em>Only CHT Android&lt;/em>&lt;/p>
+&lt;p>The &lt;a href="https://github.com/medic/cht-android/blob/master/.github/workflows/publish.yml" target="_blank" rel="noopener">publish&lt;/a> script in CI produces multiple AABs for publishing to the &lt;strong>Google Play Store&lt;/strong>, so the generated &lt;code>.aab&lt;/code> files need to be uploaded instead of the &lt;code>.apk&lt;/code> files if the Play Store require so. Old apps published for the first time before Aug 1, 2021 can be updated with the APK format.
+If distributing AABs via the Play Store, upload all AABs and it will automatically choose the right one for the target device. The AABs are named as follows: &lt;code>cht-android-{version}-{brand}-release.aab&lt;/code>.&lt;/p>
+&lt;h4>APKs&lt;span class="hx-absolute -hx-mt-20" id="apks">&lt;/span>
+&lt;a href="#apks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>For compatibility with a wide range of devices, the &lt;a href="https://github.com/medic/cht-android/blob/master/.github/workflows/publish.yml" target="_blank" rel="noopener">publish&lt;/a> script in CI produces multiple APKs. The two variables are the instruction set used by the device&amp;rsquo;s CPU, and the supported Android version. When sideloading the application, it is essential to pick the correct APK or the application may crash.&lt;/p>
+&lt;p>If distributing APKs via the Play Store, upload all APKs and it will automatically choose the right one for the target device.&lt;/p>
+&lt;p>To help you pick which APK to install, you can find information about the version of Android and the CPU in the About section of the phone&amp;rsquo;s settings menu.&lt;/p>
+&lt;p>The APKs are named as follows: &lt;code>cht-android-{version}-{brand}-{instruction-set}-release.apk&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Instruction set&lt;/th>
+&lt;th>Android version&lt;/th>
+&lt;th>Notes&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>arm64-v8a&lt;/code>&lt;/td>
+&lt;td>5+&lt;/td>
+&lt;td>Preferred. Use this APK if possible.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>armeabi-v7a&lt;/code>&lt;/td>
+&lt;td>5+&lt;/td>
+&lt;td>Built as support for older devices, ignore if possible.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Releasing</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/android/releasing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/android/releasing/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Instructions for releasing Android Apps
+&lt;/p>
+&lt;p>All Medic&amp;rsquo;s Android projects automatically build, sign, and release builds via GitHub Actions. The following guide applies to any of these apps, although the last 2 are in maintenance mode (links pointing to the release sections):&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/medic/cht-android/releases" target="_blank" rel="noopener">cht-android&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/cht-gateway/releases" target="_blank" rel="noopener">cht-gateway&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-collect/releases" target="_blank" rel="noopener">medic-collect&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/rdt-capture/releases" target="_blank" rel="noopener">rdt-capture&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2>Alpha for release testing&lt;span class="hx-absolute -hx-mt-20" id="alpha-for-release-testing">&lt;/span>
+&lt;a href="#alpha-for-release-testing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>Ensure all issues for this release have passed AT and been merged into &lt;code>master&lt;/code>. You can also create an alpha release from a feature branch, to provide the needed &lt;code>.apk&lt;/code> files to the QA team.&lt;/li>
+&lt;li>Create a git tag starting with &lt;code>v&lt;/code> and ending with the alpha version, e.g. &lt;code>git tag v1.2.3-alpha.1&lt;/code>, and push the tag to GitHub (&lt;code>git push --tags&lt;/code>). For features branches, you can add the name of the branch or whatever keyword helps to identify the release, e.g. &lt;code>v1.2.3-alpha.dark-theme.4&lt;/code>.&lt;/li>
+&lt;li>Creating the tag will trigger the building and signing of the app in CI. The release-ready APKs are available for side-loading from the Releases section in the project (e.g. &lt;a href="https://github.com/medic/cht-android/releases" target="_blank" rel="noopener">CHT-Android Releases&lt;/a>), along with the AABs that the Google Play Store may require. Note that the created release on GitHub with the generated artifacts will not be explicitly linked to the tag because the release is in a draft state.&lt;/li>
+&lt;li>&lt;strong>Side-Load&lt;/strong>: for testing internally, or apps that are not published in the Play Store like Collect and Gateway: Navigate to the GitHub Releases page (linked above) and download the relevant APKs for distribution.&lt;/li>
+&lt;/ol>
+&lt;h2>Production release&lt;span class="hx-absolute -hx-mt-20" id="production-release">&lt;/span>
+&lt;a href="#production-release" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>Update the CHANGELOG with the details of what&amp;rsquo;s in this release.&lt;/li>
+&lt;li>Repeat steps 2-3 from the above &lt;a href="#alpha-for-release-testing" >alpha release section&lt;/a> with the naming convention &lt;code>v&amp;lt;major&amp;gt;.&amp;lt;minor&amp;gt;.&amp;lt;patch&amp;gt;&lt;/code>.&lt;/li>
+&lt;li>The CI build for the tag will create a new draft release on GitHub. Include the release notes from the CHANGELOG in the description of the release and publish the release on GitHub.&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/building/guides/android/publishing/" >Publish&lt;/a> in the Play Store. For the CHT-Android app, the &amp;ldquo;reference&amp;rdquo; apps (&lt;code>medicmobilegamma&lt;/code> and &lt;code>unbranded&lt;/code>) must be published in the Play Store. Other channels such as F-Droid can also be used to publish the app.&lt;/li>
+&lt;li>Announce the release on the &lt;a href="https://forum.communityhealthtoolkit.org" target="_blank" rel="noopener">CHT forum&lt;/a>, under the &amp;ldquo;Product - Releases&amp;rdquo; category.&lt;/li>
+&lt;/ol></description></item></channel></rss>

@@ -1,6 +1,670 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Production Hosting CHT 4.x - Single CouchDB Node on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/</link><description>Recent content in Production Hosting CHT 4.x - Single CouchDB Node on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>Adding TLS certificates in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/adding-tls-certificates/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/adding-tls-certificates/</guid><description>By default, CHT 4.x will create a self-signed certificate for every deployment. These instructions are for changing to either a pre-existing certificate or automatically creating and renewing a Certbot based certificate using ACME, like Let&amp;rsquo;s Encrypt.
-This guide assumes you&amp;rsquo;ve already met the hosting requirements, specifically around Docker being installed.
-Pre-existing certificateTo load your certificates into your CHT instance, we&amp;rsquo;ll be creating an interstitial container called cht-temp-tls which will enable you to copy your local certificate files into the native docker volume.</description></item><item><title>Viewing server logs in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/logs/</guid><description>CHT 4.x has the following services running via Docker and each can have its logs queried:
-nginx sentinel api haproxy couchdb healthcheck upgrade-service Setting log levelBy default, the CHT server logs are set to the info level. To change the log level to debug, you can set the NODE_ENV environment variable to development. A log level of debug can affect system performance and cause log files sizes to grow rapidly. It is recommended to temporarily set the log level to debug only when needed for troubleshooting.</description></item><item><title>Backups in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/backups/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/backups/</guid><description>This guide is about backups in CHT 4.x - there&amp;rsquo;s the self hosted guide for 3.x which includes backups for 3.x.
-IntroductionAs CHT 4.x uses a container per service, the only data that needs to be backed up is:
-CouchDB database Docker Compose and .env files TLS certificates This is because Docker containers are inherently stateless so all the important binaries are already stored in CHT&amp;rsquo;s Docker images. Docker Compose files, including the .</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Production Hosting CHT 4.x - Single CouchDB Node</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/</link><description>Recent content in Production Hosting CHT 4.x - Single CouchDB Node on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>Prerequisites for hosting CHT with Docker</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/prerequisites/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/prerequisites/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Prerequisites for hosting CHT with Docker
+&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Be sure you have followed &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/" >the requirements document&lt;/a> including installing Docker. This guide assumes you&amp;rsquo;re using the &lt;code>ubuntu&lt;/code> user and that it &lt;a href="https://askubuntu.com/a/477554" target="_blank" rel="noopener">has &lt;code>sudo-less&lt;/code> access to Docker&lt;/a>.&lt;/p>
+&lt;h2>Directory Structure&lt;span class="hx-absolute -hx-mt-20" id="directory-structure">&lt;/span>
+&lt;a href="#directory-structure" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Create the following directory structure:&lt;/p>
+&lt;div class="hextra-filetree hx-mt-6 hx-select-none hx-text-sm hx-text-gray-800 dark:hx-text-gray-300 not-prose">
+&lt;div class="hx-inline-block hx-rounded-lg hx-border hx-px-4 hx-py-2 dark:hx-border-neutral-800">
+&lt;li class="hx-group hx-flex hx-list-none hx-flex-col">
+&lt;button class="hextra-filetree-folder hx-inline-flex hx-cursor-pointer hx-items-center hx-py-1 hover:hx-opacity-60">
+&lt;span data-state="open" class="data-[state=open]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span data-state="open" class="data-[state=closed]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span class="ltr:hx-ml-1 rtl:hx-mr-1">/home/ubuntu/cht/&lt;/span>
+&lt;/button>
+&lt;ul data-state="open" class="ltr:hx-pl-5 rtl:hx-pr-5 data-[state=closed]:hx-hidden">
+&lt;li class="hx-group hx-flex hx-list-none hx-flex-col">
+&lt;button class="hextra-filetree-folder hx-inline-flex hx-cursor-pointer hx-items-center hx-py-1 hover:hx-opacity-60">
+&lt;span data-state="open" class="data-[state=open]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span data-state="open" class="data-[state=closed]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span class="ltr:hx-ml-1 rtl:hx-mr-1">compose/&lt;/span>
+&lt;/button>
+&lt;ul data-state="open" class="ltr:hx-pl-5 rtl:hx-pr-5 data-[state=closed]:hx-hidden">
+&lt;/ul>
+&lt;/li>
+&lt;li class="hx-group hx-flex hx-list-none hx-flex-col">
+&lt;button class="hextra-filetree-folder hx-inline-flex hx-cursor-pointer hx-items-center hx-py-1 hover:hx-opacity-60">
+&lt;span data-state="open" class="data-[state=open]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span data-state="open" class="data-[state=closed]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span class="ltr:hx-ml-1 rtl:hx-mr-1">certs/&lt;/span>
+&lt;/button>
+&lt;ul data-state="open" class="ltr:hx-pl-5 rtl:hx-pr-5 data-[state=closed]:hx-hidden">
+&lt;/ul>
+&lt;/li>
+&lt;li class="hx-group hx-flex hx-list-none hx-flex-col">
+&lt;button class="hextra-filetree-folder hx-inline-flex hx-cursor-pointer hx-items-center hx-py-1 hover:hx-opacity-60">
+&lt;span data-state="open" class="data-[state=open]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span data-state="open" class="data-[state=closed]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span class="ltr:hx-ml-1 rtl:hx-mr-1">couchdb/&lt;/span>
+&lt;/button>
+&lt;ul data-state="open" class="ltr:hx-pl-5 rtl:hx-pr-5 data-[state=closed]:hx-hidden">
+&lt;/ul>
+&lt;/li>
+&lt;li class="hx-group hx-flex hx-list-none hx-flex-col">
+&lt;button class="hextra-filetree-folder hx-inline-flex hx-cursor-pointer hx-items-center hx-py-1 hover:hx-opacity-60">
+&lt;span data-state="open" class="data-[state=open]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span data-state="open" class="data-[state=closed]:hx-hidden">&lt;svg width=1em xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>&lt;/svg>&lt;/span>
+&lt;span class="ltr:hx-ml-1 rtl:hx-mr-1">upgrade-service/&lt;/span>
+&lt;/button>
+&lt;ul data-state="open" class="ltr:hx-pl-5 rtl:hx-pr-5 data-[state=closed]:hx-hidden">
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/div>
+&lt;/div>
+&lt;p>By calling this &lt;code>mkdir&lt;/code> commands:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /home/ubuntu/cht/&lt;span class="o">{&lt;/span>compose,certs,upgrade-service,couchdb&lt;span class="o">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;ol>
+&lt;li>&lt;code>compose&lt;/code> - docker-compose files for cht-core and CouchDB&lt;/li>
+&lt;li>&lt;code>certs&lt;/code> - TLS certificates directory&lt;/li>
+&lt;li>&lt;code>upgrade-service&lt;/code> - where docker-compose file for the upgrade-service&lt;/li>
+&lt;li>&lt;code>couchdb&lt;/code> - the path for the docker-compose file of the upgrade-service (not used in multi-node)&lt;/li>
+&lt;/ol>
+&lt;h2>Download required docker-compose files&lt;span class="hx-absolute -hx-mt-20" id="download-required-docker-compose-files">&lt;/span>
+&lt;a href="#download-required-docker-compose-files" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The following 3 &lt;code>curl&lt;/code> commands download CHT version &lt;code>4.11.0&lt;/code> compose files, which you can change as needed. Otherwise, call:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.11.0/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic:medic:4.11.0/docker-compose/cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./upgrade-service/docker-compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Prepare Environment Variables file&lt;span class="hx-absolute -hx-mt-20" id="prepare-environment-variables-file">&lt;/span>
+&lt;a href="#prepare-environment-variables-file" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Prepare a &lt;code>.env&lt;/code> file by running this code:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">sudo apt install wamerican
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">uuid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>uuidgen&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">couchdb_secret&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>shuf -n7 /usr/share/dict/words --random-source&lt;span class="o">=&lt;/span>/dev/random &lt;span class="p">|&lt;/span> tr &lt;span class="s1">&amp;#39;\n&amp;#39;&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> tr -d &lt;span class="s2">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> cut -d&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> -f1,2,3,4,5,6,7&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">couchdb_password&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>shuf -n7 /usr/share/dict/words --random-source&lt;span class="o">=&lt;/span>/dev/random &lt;span class="p">|&lt;/span> tr &lt;span class="s1">&amp;#39;\n&amp;#39;&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> tr -d &lt;span class="s2">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> cut -d&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> -f1,2,3,4,5,6,7&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat &amp;gt; /home/ubuntu/cht/upgrade-service/.env &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PROJECT_NAME=cht
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_SECRET=${couchdb_secret}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DOCKER_CONFIG_PATH=/home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_DATA=/home/ubuntu/cht/couchdb
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PATH=/home/ubuntu/cht/compose
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_USER=medic
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_PASSWORD=${couchdb_password}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_UUID=${uuid}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"># &amp;lt;ADD_SERVERNAME_TO_HTTP_AGENT&amp;gt;: (optional, default: false, configures: api) Adds &amp;#39;servername&amp;#39; to HTTP agent for certificate issues in receiving traffic when proxying HTTPS-&amp;gt;HTTP in SNI environments with external TLS termination.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"># See &amp;#39;tls.connect(options[, callback])&amp;#39; (https://nodejs.org/api/tls.html). May resolve &amp;#39;ERR_TLS_CERT_ALTNAME_INVALID&amp;#39; error.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"># ADD_SERVERNAME_TO_HTTP_AGENT=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"># &amp;lt;PROXY_CHANGE_ORIGIN&amp;gt;: (optional, default: false, configures: api) See http-proxy (https://www.npmjs.com/package/http-proxy#options). Sets &amp;#39;changeOrigin&amp;#39; to &amp;#39;true&amp;#39; for HTTP clients. For certificate issues in proxying HTTP-&amp;gt;HTTPS
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"># PROXY_CHANGE_ORIGIN=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Note that secure passwords and UUIDs were generated on the first four calls and saved in the resulting &lt;code>.env&lt;/code> file. Uncomment optional items if required.&lt;/p>
+&lt;h2>Launch containers&lt;span class="hx-absolute -hx-mt-20" id="launch-containers">&lt;/span>
+&lt;a href="#launch-containers" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Important&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>This section has the first use of &lt;code>docker compose&lt;/code>. If you get an error calling this, double check &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/" >hosting requirements&lt;/a>.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>To start your CHT instance, run the following&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cd /home/ubuntu/cht/upgrade-service
+docker compose up --detach&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Docker will start the upgrade service, which in turn pulls the required images and starts all the services as defined by the compose files in &lt;code>/home/ubuntu/cht/compose&lt;/code>.&lt;/p>
+&lt;p>To follow the progress tail the log of the upgrade service container by running this:&lt;/p>
+&lt;p>&lt;code>docker logs -f upgrade-service_cht-upgrade-service_1&lt;/code>&lt;/p>
+&lt;p>To make sure everything is running correctly, call &lt;code>docker ps&lt;/code> and make sure that 7 CHT containers show:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8c1c22d526f3 public.ecr.aws/s5s3h4s7/cht-nginx:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;/docker-entrypoint.…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes 0.0.0.0:80-&amp;gt;80/tcp, :::80-&amp;gt;80/tcp, 0.0.0.0:443-&amp;gt;443/tcp, :::443-&amp;gt;443/tcp cht_nginx_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">f7b596be2721 public.ecr.aws/s5s3h4s7/cht-api:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;/bin/bash /api/dock…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes 5988/tcp cht_api_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">029cd86ac721 public.ecr.aws/s5s3h4s7/cht-sentinel:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;/bin/bash /sentinel…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes cht_sentinel_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">61ee1e0b377b public.ecr.aws/s5s3h4s7/cht-haproxy-healthcheck:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;/bin/sh -c \&amp;#34;/app/ch…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes cht_healthcheck_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">87415a2d91ea public.ecr.aws/s5s3h4s7/cht-haproxy:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;/entrypoint.sh -f /…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes 5984/tcp cht_haproxy_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">58454457467a public.ecr.aws/s5s3h4s7/cht-couchdb:4.0.1-4.0.1 &lt;span class="s2">&amp;#34;tini -- /docker-ent…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes 4369/tcp, 5984/tcp, 9100/tcp cht_couchdb_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">d01343658f3f public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest &lt;span class="s2">&amp;#34;node /app/src/index…&amp;#34;&lt;/span> &lt;span class="m">17&lt;/span> minutes ago Up &lt;span class="m">8&lt;/span> minutes upgrade-service-cht-upgrade-service-1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This should show related to the CHT core are running&lt;/p>
+&lt;ul>
+&lt;li>cht_nginx&lt;/li>
+&lt;li>cht_api&lt;/li>
+&lt;li>cht_sentinel&lt;/li>
+&lt;li>cht_couchdb&lt;/li>
+&lt;li>cht_healthcheck&lt;/li>
+&lt;li>cht_haproxy&lt;/li>
+&lt;li>cht-upgrade-service&lt;/li>
+&lt;/ul>
+&lt;p>Take note of the &lt;code>STATUS&lt;/code> column and make sure no errors are displayed there. If any container is restarting or mentioning any other error, check the logs using the &lt;code>docker logs &amp;lt;container-name&amp;gt;&lt;/code> command.&lt;/p>
+&lt;p>If all has gone well, nginx should now be listening at both port 80 and port 443. Port 80 has a permanent redirect to port 443, so you can only access the CHT using https.&lt;/p>
+&lt;p>To login as the &lt;code>medic&lt;/code> user in the web app, you can find your password with this command:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span class="p">|&lt;/span> cut -d&lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span> -f2&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>TLS Certificates&lt;span class="hx-absolute -hx-mt-20" id="tls-certificates">&lt;/span>
+&lt;a href="#tls-certificates" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>See the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/adding-tls-certificates/" >TLS Certificates page&lt;/a> for how to import your certificates.&lt;/p>
+&lt;h2>Upgrades&lt;span class="hx-absolute -hx-mt-20" id="upgrades">&lt;/span>
+&lt;a href="#upgrades" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>During upgrades, the CHT upgrade service updates the docker-compose files located in &lt;code>/home/ubuntu/cht/compose/&lt;/code>. This means that any and all changes made to the docker-compose files will be overwritten. If there is ever a need to make any changes to the docker-compose files, be sure to re-do them post upgrades or should consider implementing them outside of those docker-compose files.&lt;/p>
+&lt;h3>Upgrading the cht-upgrade-service&lt;span class="hx-absolute -hx-mt-20" id="upgrading-the-cht-upgrade-service">&lt;/span>
+&lt;a href="#upgrading-the-cht-upgrade-service" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;a href="https://github.com/medic/cht-upgrade-service" target="_blank" rel="noopener">CHT Upgrade Service&lt;/a> provides an interface between the CHT Core API and Docker to allow easy startup and one-click upgrades from the CHT Admin UI. Occasionally, the CHT Upgrade Service, itself, will need to be upgraded. If an upgrade is available, it is highly recommended that you install the upgrade for the CHT Upgrade Service before performing further upgrades on your CHT instance. This is done via the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Verify that the &lt;em>version&lt;/em> of the &lt;code>cht-upgrade-service&lt;/code> image in your &lt;code>./upgrade-service/docker-compose.yml&lt;/code> files is set to &lt;code>latest&lt;/code>.&lt;/li>
+&lt;li>Pull the latest &lt;code>cht-upgrade-service&lt;/code> image from Docker Hub and replace the current container by running the following command:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/upgrade-service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker compose pull
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker compose up --detach&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Important&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Upgrading the CHT Upgrade Service will not cause a new CHT version to be installed. The CHT Core and CouchDB containers are not affected.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Follow the &lt;a href="https://forum.communityhealthtoolkit.org/c/product/releases/26" target="_blank" rel="noopener">Product Releases channel&lt;/a> on the CHT forum to stay informed about new releases and upgrades.&lt;/p></description></item><item><title>Adding TLS certificates in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/adding-tls-certificates/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/adding-tls-certificates/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+How to add TLS certificates to your docker hosted CHT 4.x instance
+&lt;/p>
+&lt;p>By default, CHT 4.x will create a self-signed certificate for every deployment. These instructions are for changing to either a pre-existing certificate or automatically creating and renewing a &lt;a href="https://certbot.eff.org/" target="_blank" rel="noopener">Certbot&lt;/a> based certificate using &lt;a href="https://acmeclients.com/" target="_blank" rel="noopener">ACME&lt;/a>, like &lt;a href="https://letsencrypt.org/" target="_blank" rel="noopener">Let&amp;rsquo;s Encrypt&lt;/a>.&lt;/p>
+&lt;p>This guide assumes you&amp;rsquo;ve already met the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements/" >hosting requirements&lt;/a>, specifically around Docker being installed.&lt;/p>
+&lt;h2>Pre-existing certificate&lt;span class="hx-absolute -hx-mt-20" id="pre-existing-certificate">&lt;/span>
+&lt;a href="#pre-existing-certificate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To load your certificates into your CHT instance, we&amp;rsquo;ll be creating an interstitial container called &lt;code>cht-temp-tls&lt;/code> which will enable you to copy your local certificate files into the native docker volume.&lt;/p>
+&lt;h3>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>You have two files locally on your workstation in the directory you&amp;rsquo;re currently in:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>key.pem&lt;/code> - the private key for your TLS certificate&lt;/li>
+&lt;li>&lt;code>cert.pem&lt;/code> - both the public and any interstitial keys concatenated into one file&lt;/li>
+&lt;/ul>
+&lt;p>Also, be sure you have started your CHT instance once and all your volumes are created.&lt;/p>
+&lt;h3>Loading the certificate&lt;span class="hx-absolute -hx-mt-20" id="loading-the-certificate">&lt;/span>
+&lt;a href="#loading-the-certificate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>&lt;/svg>Tip&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>&lt;code>docker compose&lt;/code> should work, but you may need to use the older style &lt;code>docker-compose&lt;/code> if you get an error &lt;code>docker: 'compose' is not a docker command&lt;/code>.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;ol>
+&lt;li>
+&lt;p>Find the name of your &lt;code>cht-ssl&lt;/code> volume with this call:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker volume ls --filter &lt;span class="s2">&amp;#34;name=cht-ssl&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>It is very likely that &lt;code>cht_cht-ssl&lt;/code> is the name of our &lt;code>cht-ssl&lt;/code> volume.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Using the volume name found in step 1, start a container called &lt;code>temp&lt;/code> which allow us to copy files into the docker volume:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -d --rm --name temp -v cht_cht-ssl:/etc/nginx/private/ alpine tail -f /dev/null&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Copy the two pem files into the volume via the temporary container:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>docker cp key.pem temp:/etc/nginx/private/.
+docker cp cert.pem temp:/etc/nginx/private/.&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Stop the &lt;code>temp&lt;/code> container:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker &lt;span class="nb">kill&lt;/span> temp&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;/ol>
+&lt;p>Your certificates are now safely stored in the native docker volume. Restart your CHT instance the way you started it, being sure to set the correct &lt;code>CERTIFICATE_MODE&lt;/code> and &lt;code>SSL_VOLUME_MOUNT_PATH&lt;/code> per the &lt;a href="#prerequisites" >prerequisites&lt;/a>.&lt;/p>
+&lt;h2>Certbot certificate&lt;span class="hx-absolute -hx-mt-20" id="certbot-certificate">&lt;/span>
+&lt;a href="#certbot-certificate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;em>This Feature available on CHT 4.2.0 or later&lt;/em>&lt;/p>
+&lt;p>If you have a deployment with a static, public IP and a domain name pointing to that IP, you can have Certbot automatically create free TLS certificates by using &lt;a href="https://hub.docker.com/r/certbot/certbot/" target="_blank" rel="noopener">their Docker image&lt;/a>.&lt;/p>
+&lt;p>Assuming your CHT instance is running with the default self signed cert. Be sure to change &lt;code>cht.example.com&lt;/code> to your domain first though:&lt;/p>
+&lt;p>Assuming your CHT instance is &lt;strong>already running with the default self-signed cert&lt;/strong>:&lt;/p>
+&lt;ol>
+&lt;li>Edit the CHT&amp;rsquo;s environment file at &lt;code>/home/ubuntu/cht/upgrade-service/.env&lt;/code> so this line is present:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">CERTIFICATE_MODE&lt;/span>&lt;span class="o">=&lt;/span>AUTO_GENERATE&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+This will ensure the &lt;code>deploy.sh&lt;/code> script that certbot uses to deploy the certificates is available for use.&lt;/li>
+&lt;li>Restart your CHT instance to ensure the new &lt;code>CERTIFICATE_MODE&lt;/code> value takes effect:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/upgrade-service/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stop &lt;span class="k">$(&lt;/span>docker ps --filter &lt;span class="s2">&amp;#34;name=^cht*&amp;#34;&lt;/span> -q&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stop &lt;span class="k">$(&lt;/span>docker ps --filter &lt;span class="s2">&amp;#34;name=^upgrade-service*&amp;#34;&lt;/span> -q&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker compose up --detach&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Create certbot compose and env files by copying and pasting this code:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat &amp;gt; docker-compose.yml &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">version: &amp;#39;3.9&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">services:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> certbot:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> container_name: certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> hostname: certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> image: certbot/certbot
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - ssl-storage:/etc/nginx/private/
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - ssl-storage:/var/log/letsencrypt/
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> command: certonly --debug --deploy-hook /etc/nginx/private/deploy.sh --webroot -w /etc/nginx/private/certbot/ --domain \$DOMAIN --non-interactive --key-type rsa --agree-tos --register-unsafely-without-email \$STAGING
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> ssl-storage:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> name: \${CHT_SSL_VOLUME}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> external: true
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat &amp;gt; .env &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DOMAIN=cht.example.com
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">STAGING=
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_SSL_VOLUME=cht_cht-ssl
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">TZ=America/Whitehorse
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+Certbot only lets you create the identical certificates 5 times per 7 days. If you&amp;rsquo;re unsure of how this works you can change &lt;code>STAGING=&lt;/code> to &lt;code>STAGING=--staging&lt;/code> in the &lt;code>/home/ubuntu/cht/certbot/.env&lt;/code> file to do repeated tests. Be sure to change this back to &lt;code>STAGING=&lt;/code> when you&amp;rsquo;re ready to create production certificates.&lt;/li>
+&lt;li>Generate certs:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/certbot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker compose up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Run this command to find the name of your CHT ngnix container:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker ps --filter &lt;span class="s2">&amp;#34;name=nginx&amp;#34;&lt;/span> --format &lt;span class="s1">&amp;#39;{{ .Names }}&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Assuming the name is &lt;code>cht_nginx_1&lt;/code> from the prior step, reload your &lt;code>nginx&lt;/code> config with this command:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker &lt;span class="nb">exec&lt;/span> -it cht_nginx_1 nginx -s reload&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Attempt to renew your certificates once a week by adding this cronjob via &lt;code>crontab -e&lt;/code>. Certbot will only renew them as needed:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> * * &lt;span class="m">0&lt;/span> &lt;span class="nb">cd&lt;/span> /home/ubuntu/cht/certbot&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>docker compose up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;/ol>
+&lt;h2>Troubleshooting&lt;span class="hx-absolute -hx-mt-20" id="troubleshooting">&lt;/span>
+&lt;a href="#troubleshooting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Proxying&lt;span class="hx-absolute -hx-mt-20" id="proxying">&lt;/span>
+&lt;a href="#proxying" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
+&lt;strong class="hx-text-lg">ERR_TLS_CERT_ALTNAME_INVALID&lt;/strong>
+&lt;/summary>
+&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;p>When proxying to HTTPS from HTTP (for example where an ingress does TLS termination in an SNI environment and then the traffic is proxied to an HTTPS service (eg, haproxy)), not including a &lt;code>servername&lt;/code> for a request to the HTTPS server (eg, def.org) produces the following error:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;ERR_TLS_CERT_ALTNAME_INVALID&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;RequestError: Error [ERR_TLS_CERT_ALTNAME_INVALID]: Hostname/IP does not match certificate&amp;#39;s altnames:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Host: abc.com. is not in the cert&amp;#39;s altnames: DNS:def.org&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The addition of &lt;code>servername&lt;/code> resolves this error by providing routing information. See &lt;a href="https://nodejs.org/api/tls.html" target="_blank" rel="noopener">docs&lt;/a> for &lt;code>tls.connect(options[, callback])&lt;/code>: &amp;ldquo;Server name for the SNI (Server Name Indication) TLS extension. It is the name of the host being connected to, and must be a host name, and not an IP address.&amp;rdquo;.&lt;/p>
+&lt;p>A &lt;code>servername&lt;/code> parameter may be added to all requests to the haproxy/couchdb by setting the environment variable &lt;code>ADD_SERVERNAME_TO_HTTP_AGENT&lt;/code> to &lt;code>true&lt;/code>.&lt;/p>
+&lt;p>A similar change can be made for the http clients used in the application by setting &lt;code>PROXY_CHANGE_ORIGIN&lt;/code> to &lt;code>true&lt;/code>. This sets the &lt;code>changeOrigin&lt;/code> parameter of all the &lt;code>http-proxy&lt;/code> clients to &lt;code>true&lt;/code>, which &amp;ldquo;changes the origin of the host header to the target URL&amp;rdquo;. See &lt;a href="https://www.npmjs.com/package/http-proxy#options" target="_blank" rel="noopener">http-proxy: options&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/details></description></item><item><title>Viewing server logs in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/logs/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+What to do when you need to find server side errors in CHT 4.x
+&lt;/p>
+&lt;p>CHT 4.x has the following services running via Docker and each can have its logs queried:&lt;/p>
+&lt;ul>
+&lt;li>nginx&lt;/li>
+&lt;li>sentinel&lt;/li>
+&lt;li>api&lt;/li>
+&lt;li>haproxy&lt;/li>
+&lt;li>couchdb&lt;/li>
+&lt;li>healthcheck&lt;/li>
+&lt;li>upgrade-service&lt;/li>
+&lt;/ul>
+&lt;h2>Setting log level&lt;span class="hx-absolute -hx-mt-20" id="setting-log-level">&lt;/span>
+&lt;a href="#setting-log-level" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>By default, the CHT server logs are set to the &lt;code>info&lt;/code> level. To change the log level to &lt;code>debug&lt;/code>, you can set the &lt;code>NODE_ENV&lt;/code> environment variable to &lt;code>development&lt;/code>. A log level of &lt;code>debug&lt;/code> can affect system performance and cause log files sizes to grow rapidly. It is recommended to temporarily set the log level to &lt;code>debug&lt;/code> only when needed for troubleshooting.&lt;/p>
+&lt;h2>Viewing logs&lt;span class="hx-absolute -hx-mt-20" id="viewing-logs">&lt;/span>
+&lt;a href="#viewing-logs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First, find the actual names of the containers with the &lt;code>docker ps --format '{{.Names}}'&lt;/code> command which should show something like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht_nginx_1
+cht_sentinel_1
+cht_api_1
+cht_haproxy_1
+cht_healthcheck_1
+cht_couchdb_1
+upgrade-service-cht-upgrade-service-1&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>You can then use the &lt;code>docker logs&lt;/code> command to view the logs of any given container. For example, if we call &lt;code>docker logs cht_nginx_1&lt;/code> it will show ALL the logs from that container. To show only the last 5 lines, you can use the &lt;code>--tail&lt;/code> flag to specify the number of lines like this &lt;code>docker logs cht_nginx_1 --tail 5&lt;/code>. The result will look like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>10.131.161.1 - - [15/Feb/2023:21:08:35 &amp;#43;0000] &amp;#34;GET /medic/_changes?feed=longpoll&amp;amp;heartbeat=10000&amp;amp;since=115-g1AAAAH5eJyF0LENwjAQBVCLRIAEFBTMgESBCA0lrACJBzgnRXSKoKJmClaAxEswRZbIDCTHZ4GzXPzCT-d_rowx8zIqzDK_3fOycKdkf9jucJIKVyMybmVtxhQp6E-s23jfME00B-LdUWQIOBBxmJkG3gXJHHtfM8WaA2ncQ6RnGmsOZLjG5mLtk2mmSKAUCPHGSkxT3dZAiK_IR28A1AMhzta2wbko2iJe3ndMC92iaIfAzwrTmn8as5aY&amp;amp;limit=25 HTTP/1.1&amp;#34; 499 0 &amp;#34;https://10-131-161-159.local-ip.medicmobile.org/&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 &amp;#43;0000] &amp;#34;GET /medic-user-medic-meta/_changes?include_docs=true&amp;amp;feed=longpoll&amp;amp;heartbeat=10000&amp;amp;since=13-g1AAAAH5eJyF0LENwkAMhWETKGkoWIICERpKWAESD3BOiugUQUXNFKwAiZdgiiyRGUjMY4FYV_zFfbJ8VxPRspqXtCpu96Iq5ZTuD9sdTlrjKgkka-Y8htkE-hOWjWrrOBCVo9noOBATzMwcB5JLVG0cB9LKw2xwHMh4XdCF-TktgTIg5I0nubYBQr5mnxiSaTsAIWfmzp2LRTvkpdq7Fov2CH7WYOMP5CCWMg&amp;amp;limit=25 HTTP/1.1&amp;#34; 499 0 &amp;#34;https://10-131-161-159.local-ip.medicmobile.org/&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 &amp;#43;0000] &amp;#34;GET /fontawesome-webfont.woff2 HTTP/1.1&amp;#34; 304 0 &amp;#34;https://10-131-161-159.local-ip.medicmobile.org/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 &amp;#43;0000] &amp;#34;GET /fonts/NotoSans-Bold.ttf HTTP/1.1&amp;#34; 304 0 &amp;#34;https://10-131-161-159.local-ip.medicmobile.org/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&amp;#34;
+10.131.161.1 - - [15/Feb/2023:21:08:35 &amp;#43;0000] &amp;#34;GET /fonts/NotoSans-Regular.ttf HTTP/1.1&amp;#34; 200 221787 &amp;#34;https://10-131-161-159.local-ip.medicmobile.org/styles.css&amp;#34; &amp;#34;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Sometimes you may want to search the logs for a specific string. To search, use the pipe (&lt;code>|&lt;/code>) and &lt;code>grep&lt;/code> commands to do this. Here we search for all the times HA Proxy thought CouchDB wasn&amp;rsquo;t reachable (&lt;code>DOWN&lt;/code>) with this call &lt;code>docker logs cht_haproxy_1 2&amp;gt;&amp;amp;1 | grep 'DOWN'&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>&amp;lt;145&amp;gt;Feb 15 20:52:06 haproxy[25]: Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 208ms. 0 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.
+[WARNING] 045/205206 (25) : Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 208ms. 0 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.
+[WARNING] 045/205601 (25) : Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 207ms. 0 active and 0 backup servers left. 5 sessions active, 0 requeued, 0 remaining in queue.
+&amp;lt;145&amp;gt;Feb 15 20:56:01 haproxy[25]: Server couchdb-servers/couchdb is DOWN, reason: Layer7 wrong status, code: 0, info: &amp;#34;via agent : down&amp;#34;, check duration: 207ms. 0 active and 0 backup servers left. 5 sessions active, 0 requeued, 0 remaining in queue.&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>If you want to watch the logs for a specific container in real time, you can use the &lt;code>--follow&lt;/code> flag. This command would watch the requests come into API in realtime: &lt;code>docker logs cht_api_1 --follow&lt;/code>. It&amp;rsquo;s nice to couple this with the &lt;code>--tail&lt;/code> command so you only see the last 5 lines of the existing logs before watching for new lines with &lt;code>docker logs cht_api_1 --follow --tail 5&lt;/code> which would show this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>RES d17d71f5-2dcb-4ebb-bb0e-7874b3000570 10.131.161.1 - GET /medic/_design/medic-client/_view/reports_by_subject?keys=%5B%22557e79b8-2d99-4bd1-a4d6-a44491d483d8%22%5D HTTP/1.0 200 - 12.452 ms
+RES e43c5d7f-4e32-433a-a96d-ef991f4298a3 10.131.161.1 - GET /medic/_design/medic/_view/doc_summaries_by_id?keys=%5B%22557e79b8-2d99-4bd1-a4d6-a44491d483d8%22%5D HTTP/1.0 200 - 31.226 ms
+REQ c656ecc7-e6af-4564-ad63-2cab2c42844a 10.131.161.1 - GET /medic/_all_docs?include_docs=true&amp;amp;startkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%22&amp;amp;endkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%EF%BF%B0%22 HTTP/1.0
+RES c656ecc7-e6af-4564-ad63-2cab2c42844a 10.131.161.1 - GET /medic/_all_docs?include_docs=true&amp;amp;startkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%22&amp;amp;endkey=%22target~2023-02~557e79b8-2d99-4bd1-a4d6-a44491d483d8~%EF%BF%B0%22 HTTP/1.0 200 - 11.153 ms
+2023-02-15 21:54:49 DEBUG: Checking for a configured outgoing message service &lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div></description></item><item><title>Backups in CHT 4.x</title><link>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/backups/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/backups/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Which data to backup when hosting the CHT 4.x
+&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">This guide is about backups in CHT 4.x - there&amp;rsquo;s the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/3.x/self-hosting/#backup" >self hosted guide for 3.x&lt;/a> which includes backups for 3.x.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Introduction&lt;span class="hx-absolute -hx-mt-20" id="introduction">&lt;/span>
+&lt;a href="#introduction" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>As CHT 4.x uses a container per service, the only data that needs to be backed up is:&lt;/p>
+&lt;ul>
+&lt;li>CouchDB database&lt;/li>
+&lt;li>Docker Compose and &lt;code>.env&lt;/code> files&lt;/li>
+&lt;li>TLS certificates&lt;/li>
+&lt;/ul>
+&lt;p>This is because Docker containers are inherently stateless so all the important binaries are already stored in &lt;a href="https://gallery.ecr.aws/s5s3h4s7/" target="_blank" rel="noopener">CHT&amp;rsquo;s Docker images&lt;/a>. Docker Compose files, including the &lt;code>.env&lt;/code> file, store all of your deployment&amp;rsquo;s configuration. Finally, the TLS certificates should be backed up to reduce recovery time.&lt;/p>
+&lt;p>How to backup each of these three pieces of data is covered below.&lt;/p>
+&lt;p>Therefore, you do &lt;strong>not&lt;/strong> need to back up the docker images for:&lt;/p>
+&lt;ul>
+&lt;li>nginx&lt;/li>
+&lt;li>sentinel&lt;/li>
+&lt;li>api&lt;/li>
+&lt;li>haproxy&lt;/li>
+&lt;li>couchdb&lt;/li>
+&lt;li>healthcheck&lt;/li>
+&lt;li>upgrade-service&lt;/li>
+&lt;/ul>
+&lt;h2>Assumptions&lt;span class="hx-absolute -hx-mt-20" id="assumptions">&lt;/span>
+&lt;a href="#assumptions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>This guide assumes you have an Ubuntu server running CHT 4.x in Docker as described in our &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/production/docker/" >Self Hosting in CHT 4.x - Single CouchDB Node&lt;/a> guide. If you run &lt;code>docker ps --format '{{.Names}}'&lt;/code> you should see something like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht_nginx_1
+cht_sentinel_1
+cht_api_1
+cht_haproxy_1
+cht_healthcheck_1
+cht_couchdb_1
+upgrade-service-cht-upgrade-service-1&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>If you run &lt;code>docker volume ls&lt;/code> you should see something like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>DRIVER VOLUME NAME
+local cht_cht-credentials
+local cht_cht-ssl&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>Note&lt;/strong> - In the volumes listed above, there is no volume for CouchDB data. This is because the compose file declares this as a &lt;a href="https://docs.docker.com/storage/bind-mounts/" target="_blank" rel="noopener">bind mount&lt;/a>. Bind mounts use the host file system directly and do not show up in &lt;code>docker volume ls&lt;/code> calls. It&amp;rsquo;s therefore assumed your CouchDB data location is declared in &lt;code>/home/ubuntu/cht/upgrade-service/.env&lt;/code> which sets it with &lt;code>COUCHDB_DATA=/home/ubuntu/cht/couchdb&lt;/code>.&lt;/p>
+&lt;p>You should have SSH access to the server with &lt;code>root&lt;/code> access.&lt;/p>
+&lt;h3>Backup software&lt;span class="hx-absolute -hx-mt-20" id="backup-software">&lt;/span>
+&lt;a href="#backup-software" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>It&amp;rsquo;s assumed you are using which ever tool you&amp;rsquo;re familiar with which might include &lt;a href="https://rsync.samba.org/examples.html" target="_blank" rel="noopener">rsync&lt;/a>, &lt;a href="https://borgbackup.readthedocs.io/en/stable/" target="_blank" rel="noopener">borg&lt;/a>, &lt;a href="https://duplicity.gitlab.io/" target="_blank" rel="noopener">duplicity&lt;/a> or other solution. The locations of the backups should follow the 3-2-1 rule:&lt;/p>
+&lt;blockquote>
+&lt;p>There should be at least 3 copies of the data, stored on 2 different types of storage media, and one copy should be kept offsite, in a remote location. &lt;em>- &lt;a href="https://en.wikipedia.org/wiki/Backup" target="_blank" rel="noopener">Wikipedia&lt;/a>&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;p>Duplicity has the handy benefit of offering built in encryption using &lt;a href="https://gnupg.org/" target="_blank" rel="noopener">GPG&lt;/a>. Consider using this if you don&amp;rsquo;t have an existing solution for encrypted backups.&lt;/p>
+&lt;h2>CouchDB&lt;span class="hx-absolute -hx-mt-20" id="couchdb">&lt;/span>
+&lt;a href="#couchdb" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Caution&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>CouchDB backups, by necessity, will have PII and PHI. They should be safely stored to prevent unauthorized access including encrypting backups.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Assuming your CouchDB is stored in &lt;code>/home/ubuntu/cht/couchdb&lt;/code>, you should use these steps to back it up:&lt;/p>
+&lt;ol>
+&lt;li>While you don&amp;rsquo;t need to stop CouchDB to back it up, ensure you follow best practices to back it up. See the &lt;a href="https://docs.couchdb.org/en/stable/maintenance/backups.html" target="_blank" rel="noopener">CouchDB site&lt;/a> for more info. Note that Medic recommends NOT using replication for backup.&lt;/li>
+&lt;li>It is strongly recommended you encrypt your backups given the sensitivity of the contents. Do this now before copying the backup files to their long term location.&lt;/li>
+&lt;li>Backup the CouchDB files using the &lt;a href="#backup-software" >software specified above&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;h2>Docker Compose files&lt;span class="hx-absolute -hx-mt-20" id="docker-compose-files">&lt;/span>
+&lt;a href="#docker-compose-files" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Caution&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The &lt;code>.env&lt;/code> file contains cleartext passwords. It should be safely stored to prevent unauthorized access.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>All compose files, and the corresponding &lt;code>.env&lt;/code> file, are in these three locations:&lt;/p>
+&lt;ul>
+&lt;li>/home/ubuntu/cht/compose/*.yml&lt;/li>
+&lt;li>/home/ubuntu/cht/upgrade-service/*.yml&lt;/li>
+&lt;li>/home/ubuntu/cht/upgrade-service/.env&lt;/li>
+&lt;/ul>
+&lt;p>While all three of these are trivial to recreate by downloading them again, they may change over time so should be archived with your CouchDB data. Further, when there&amp;rsquo;s been a critical failure of a production CHT instance, you want to be sure to make the restore process as speedy as possible.&lt;/p>
+&lt;p>As all of these files are only read when Docker first loads a service, you can simply copy them whenever you want without stopping any of the CHT services. They should be copied with the same frequency and put in the same location as the CouchDB data using the &lt;a href="#backup-software" >backup software specified above&lt;/a>.&lt;/p>
+&lt;h2>TLS certificates&lt;span class="hx-absolute -hx-mt-20" id="tls-certificates">&lt;/span>
+&lt;a href="#tls-certificates" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Caution&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The &lt;code>.key&lt;/code> file is the private key for TLS certificate. It should be safely stored to prevent unauthorized access.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Like the compose files, the TLS certificate files can easily be regenerated or re-downloaded from your Certificate Authority, like Let&amp;rsquo;s Encrypt for example. However, you want to have a backup of the at the ready to ease the restore process.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Copy the cert and key files from the nginx container:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker cp cht_nginx_1:/etc/nginx/private/key.pem .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker cp cht_nginx_1:/etc/nginx/private/cert.pem .&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Back the up to the same location and frequency as the CouchDB data using the &lt;a href="#backup-software" >backup software specified above&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2>Testing backups&lt;span class="hx-absolute -hx-mt-20" id="testing-backups">&lt;/span>
+&lt;a href="#testing-backups" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A backup that isn&amp;rsquo;t tested, is effectively not a backup. For a backup to be successful, a complete restore from all locations in the 3-2-1 plan need to be fully tested and documented as to how a restore works. The more practiced and better documented the restore process, the less downtime a production CHT instance will have after data loss.&lt;/p></description></item></channel></rss>

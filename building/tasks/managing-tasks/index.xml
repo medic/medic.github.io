@@ -1,6 +1,403 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Managing tasks on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/</link><description>Recent content in Managing tasks on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/index.xml" rel="self" type="application/rss+xml"/><item><title>Passing data from a task into the app form</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</guid><description>This guide explains how to pass data from a task into the action application form.
-Prerequisites Complex Tasks Tutorial Application Forms Tutorial ScenarioLet&amp;rsquo;s look deeper at the scenario from the Complex Tasks Tutorial where we have an ANC follow-up task which recurs eight times, and we want to ask the user different questions on the first and last follow-up.
-Developing the taskFrom the Complex Tasks Tutorial, here is the task.</description></item><item><title>Querying Task Documents</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/query-task-data/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/query-task-data/</guid><description>This guide explains the data which results from tasks and how to query it.
-Write a PostgreSQL query to examine task data Build deeper understanding of task data Present some data considerations of which task authors should remain mindful Prerequisites Data Flows for Analytics Querying task dataThe task system running on each user&amp;rsquo;s device is powered by task documents and those task documents sync to the server and to PostgreSQL just like a contact or a report.</description></item><item><title>Understanding the parameters in the Task Schema</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/task-schema-parameters/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/task-schema-parameters/</guid><description>This guide explains the parameters available in the Task Schema and important constraints governing the design of tasks.
-Useful knowledge if you are stuck writing your first appliesIf predicate Understanding the data which is available in the task system and important constraints Understand the special significance of the appliesTo attribute Let&amp;rsquo;s synthesize some knowledge about CHT applications to help clarify what is happening within the task system:
-All contacts in CHT applications are organised into hierarchies.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing tasks</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/</link><description>Recent content in Managing tasks on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/index.xml" rel="self" type="application/rss+xml"/><item><title>Passing data from a task into the app form</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</guid><description>
+&lt;p>This guide explains how to pass data from a task into the action &lt;em>application form&lt;/em>.&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/complex-tasks/" >Complex Tasks Tutorial&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/building/tutorials/app-forms/" >Application Forms Tutorial&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2>Scenario&lt;span class="hx-absolute -hx-mt-20" id="scenario">&lt;/span>
+&lt;a href="#scenario" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Let&amp;rsquo;s look deeper at the scenario from the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/complex-tasks/" >Complex Tasks Tutorial&lt;/a> where we have an ANC follow-up task which recurs eight times, and we want to ask the user different questions on the first and last follow-up.&lt;/p>
+&lt;h2>Developing the task&lt;span class="hx-absolute -hx-mt-20" id="developing-the-task">&lt;/span>
+&lt;a href="#developing-the-task" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>From the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/complex-tasks/" >Complex Tasks Tutorial&lt;/a>, here is the task.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">DateTime&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">require&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;luxon&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">module&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exports&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;pnc-after-pregnancy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">icon&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;icon-follow-up&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;task.pnc_followup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesTo&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contacts&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesToType&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;patient&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesIf&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">userIsChw&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parent&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact_type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;chw_area&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">isDead&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">date_of_death&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">isMuted&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">muted&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">userIsChw&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">isDead&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">isMuted&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">mostRecentPregnancy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getMostRecentReport&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">reports&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;pregnancy&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">calculatedLmp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">mostRecentPregnancy&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getField&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">mostRecentPregnancy&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;g_details.estimated_lmp&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">lmp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">calculatedLmp&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">DateTime&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fromFormat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">calculatedLmp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;yyyy-MM-dd&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">lmp&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">lmp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isValid&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">events&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">26&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">34&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">36&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">38&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">40&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="c1">// follow-up weeks after LMP
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">weekAfterLmp&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="sb">`pnc-week-&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nx">weekAfterLmp&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">start&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">weekAfterLmp&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">30&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="mi">6&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">end&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">weekAfterLmp&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">30&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="mi">7&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="mi">14&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">dueDate&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">lmp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">plus&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">weeks&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">weekAfterLmp&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="nx">toJsDate&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">resolvedIf&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">report&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dueDate&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">start&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addDate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">dueDate&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">start&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">getTime&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">end&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">addDate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">dueDate&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">end&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">getTime&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">pncInWindow&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isFormSubmittedInWindow&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">reports&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;pnc_followup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">start&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">end&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">assessmentInWindow&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">Utils&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">isFormSubmittedInWindow&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">reports&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;assessment_followup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">start&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">end&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">pncInWindow&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nx">assessmentInWindow&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">actions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">form&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;pnc_followup&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">modifyContent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">content&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">contact&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">report&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">followupCount&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">definition&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">events&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">findIndex&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">event&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">content&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">t_followup_count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">followupCount&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>modifyContent&lt;span class="hx-absolute -hx-mt-20" id="modifycontent">&lt;/span>
+&lt;a href="#modifycontent" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Let&amp;rsquo;s take a look at the &lt;code>actions&lt;/code> section and specifically the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/" >modifyContent&lt;/a> attribute. This &lt;code>modifyContent&lt;/code> attribute allows the task to pass data from the task (in JavaScript) into the action app form (xlsx). The &lt;code>content&lt;/code> object is the object which binds to the &lt;code>inputs&lt;/code> section in the app form. You can pass data into the app form by assigning values onto this object.&lt;/p>
+&lt;p>This function calculates &lt;code>t_followup_count&lt;/code> to be the index of the event which is being completed. So the first task event (which appears after 12 weeks) is followup &lt;code>1&lt;/code>, and the task event after 34 weeks is followup &lt;code>5&lt;/code>.&lt;/p>
+&lt;h2>The action form&lt;span class="hx-absolute -hx-mt-20" id="the-action-form">&lt;/span>
+&lt;a href="#the-action-form" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In this sample app form &lt;code>survey&lt;/code>, the value of &lt;code>t_followup_count&lt;/code> is listed in the inputs section and the CHT &lt;em>binds&lt;/em> the data passed by the task onto this hidden variable. An example calculation &lt;code>is_first_followup&lt;/code> demonstrates how to use the value in the form&amp;rsquo;s logic. &lt;code>is_first_followup&lt;/code> will be true 12 weeks after the LMP date, and false on all other followups.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>field-list&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>t_followup_count&lt;/td>
+&lt;td>Data from task&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>is_first_followup&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>if(${t_follow_up_count}=&amp;lsquo;1&amp;rsquo;,true,false)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Querying Task Documents</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/query-task-data/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/query-task-data/</guid><description>
+&lt;p>This guide explains the data which results from tasks and how to query it.&lt;/p>
+&lt;ul>
+&lt;li>Write a PostgreSQL query to examine task data&lt;/li>
+&lt;li>Build deeper understanding of task data&lt;/li>
+&lt;li>Present some data considerations of which task authors should remain mindful&lt;/li>
+&lt;/ul>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data-flows-for-analytics/" >Data Flows for Analytics&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2>Querying task data&lt;span class="hx-absolute -hx-mt-20" id="querying-task-data">&lt;/span>
+&lt;a href="#querying-task-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The task system running on each user&amp;rsquo;s device is powered by &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task documents&lt;/a> and those task documents sync to the server and to PostgreSQL just like a contact or a report. Having task documents in PostgreSQL allows system administrators to analyse how users are interacting with tasks.&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data-flows-for-analytics/">Data flows for analytics&lt;/a>&lt;/p>
+&lt;h3>First Assessment Completion Rate&lt;span class="hx-absolute -hx-mt-20" id="first-assessment-completion-rate">&lt;/span>
+&lt;a href="#first-assessment-completion-rate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Working with the &lt;em>First Assessment&lt;/em> task from the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/simple-tasks/" >Configuring Tasks Tutorial&lt;/a>, let&amp;rsquo;s try to answer the question &lt;strong>What percentage of the scheduled &lt;em>first assessment&lt;/em> events have been completed?&lt;/strong>.&lt;/p>
+&lt;p>Let&amp;rsquo;s query data from the last three months to see how the &lt;em>first assessment&lt;/em> task is behaving in production:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">SELECT&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">date_trunc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;month&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">duedate&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">AS&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">due_date_month&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">task_state&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">count&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">useview_task&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;assessment-after-registration&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">and&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">duedate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;gt;=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">date_trunc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;month&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">now&lt;/span>&lt;span class="p">())&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;3 months&amp;#39;&lt;/span>&lt;span class="p">::&lt;/span>&lt;span class="nb">interval&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">and&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">duedate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">date_trunc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;month&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">now&lt;/span>&lt;span class="p">())&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;1 months&amp;#39;&lt;/span>&lt;span class="p">::&lt;/span>&lt;span class="nb">interval&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">GROUP&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">BY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">ORDER&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">BY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>For convenience, here is the task definition from the &lt;em>First Assessment&lt;/em> task in the tutorial:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">module&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">exports&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;assessment-after-registration&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;First Assessment&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">icon&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;icon-healthcare&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesTo&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contacts&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesToType&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;patient&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesIf&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">c&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parent&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact_type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;chw_area&amp;#39;&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">c&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">date_of_death&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">c&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">muted&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">actions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span> &lt;span class="nx">form&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;assessment&amp;#39;&lt;/span> &lt;span class="p">}],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">events&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">start&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">days&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">end&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}];&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>What is this code doing?&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>useview_task&lt;/code> - This is a materialized view of the data from the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
+&lt;li>&lt;code>task_state&lt;/code> - The meaning of each task state is explained in the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
+&lt;li>&lt;code>WHERE title&lt;/code> - The &lt;em>name&lt;/em> attribute in the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >task.js schema&lt;/a> is used exclusively in the task&amp;rsquo;s backend data. Here we limit the query to task documents resulting from our named task. The &lt;code>title&lt;/code> in postgres maps to the &lt;code>name&lt;/code> in JavaScript not the &lt;code>title&lt;/code> in JavaScript - which is confusing.&lt;/li>
+&lt;li>&lt;code>WHERE duedate&lt;/code> - One task document is created per event and this task has one event per contact which is due 7 days after the contact&amp;rsquo;s creation date. Here we limit the query to task documents which are &lt;em>due in the last 3 calendar months&lt;/em>.&lt;/li>
+&lt;/ul>
+&lt;h2>Understanding the data&lt;span class="hx-absolute -hx-mt-20" id="understanding-the-data">&lt;/span>
+&lt;a href="#understanding-the-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Here is a sample output from that query above. The query was executed some day in July (07), 2021.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>due_date_month&lt;/th>
+&lt;th>task_state&lt;/th>
+&lt;th>count&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>2021-05-01&lt;/td>
+&lt;td>Cancelled&lt;/td>
+&lt;td>6&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-05-01&lt;/td>
+&lt;td>Completed&lt;/td>
+&lt;td>749&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-05-01&lt;/td>
+&lt;td>Failed&lt;/td>
+&lt;td>226&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-06-01&lt;/td>
+&lt;td>Cancelled&lt;/td>
+&lt;td>3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-06-01&lt;/td>
+&lt;td>Completed&lt;/td>
+&lt;td>769&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-06-01&lt;/td>
+&lt;td>Draft&lt;/td>
+&lt;td>3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-06-01&lt;/td>
+&lt;td>Failed&lt;/td>
+&lt;td>177&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-07-01&lt;/td>
+&lt;td>Completed&lt;/td>
+&lt;td>1135&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-07-01&lt;/td>
+&lt;td>Draft&lt;/td>
+&lt;td>399&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-07-01&lt;/td>
+&lt;td>Failed&lt;/td>
+&lt;td>193&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2021-07-01&lt;/td>
+&lt;td>Ready&lt;/td>
+&lt;td>13&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Task docs from May and June are mostly in states &lt;code>Completed&lt;/code> or &lt;code>Failed&lt;/code>. In May, you could say with high confidence that the &lt;em>completion rate&lt;/em> for this task was 749/(749+226) or 76%. Task docs in July have end dates in the future still, so they are in state &lt;code>Draft&lt;/code> or &lt;code>Ready&lt;/code>.&lt;/p>
+&lt;p>&lt;strong>Why are tasks Cancelled?&lt;/strong> - A task document is cancelled when &lt;code>tasks.js&lt;/code> schedules the task event (&lt;code>appliesToType&lt;/code> and &lt;code>appliesIf&lt;/code> both pass), and later does not schedule the task event. So in this &lt;em>first assessment&lt;/em> scenario, a likely cause of task cancellation would be that a contact was deleted, muted, or dead. The task document is created when &lt;code>appliesIf&lt;/code> returns true. When the contact is muted, the task disappears from the UI, and the task document is moved to state &lt;em>Cancelled&lt;/em>.&lt;/p>
+&lt;p>&lt;strong>How can there be documents in state &amp;ldquo;Draft&amp;rdquo; in June?&lt;/strong> - The state &lt;em>Draft&lt;/em> means that the task event is &lt;em>scheduled in the future&lt;/em>. How can these documents with due dates in the past (June) be in a state which says they are in the future? &lt;strong>Task documents are calculated and updated on the &lt;em>user&amp;rsquo;s device&lt;/em>&lt;/strong>, so the most likely explanation is that the user hasn&amp;rsquo;t synced. &lt;a href="https://forum.communityhealthtoolkit.org/t/task-state-for-tasks-whose-enddate-is-in-the-past/1011" target="_blank" rel="noopener">Other potential explanations are possible&lt;/a>.&lt;/p>
+&lt;h2>Task data considerations&lt;span class="hx-absolute -hx-mt-20" id="task-data-considerations">&lt;/span>
+&lt;a href="#task-data-considerations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Performance&lt;span class="hx-absolute -hx-mt-20" id="performance">&lt;/span>
+&lt;a href="#performance" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Performance of CHT Applications is a major factor for many users and partners. The CHT Core is designed and tested to work on low-cost devices, but tasks have the potential to cause performance problems by creating too many task documents or performing excessive computations. Be mindful of the task documents which will be created by your tasks. Monitor the number of task documents being created in production.&lt;/p>
+&lt;h3>Completion vs Cancellation&lt;span class="hx-absolute -hx-mt-20" id="completion-vs-cancellation">&lt;/span>
+&lt;a href="#completion-vs-cancellation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A task can &amp;ldquo;disappear&amp;rdquo; because &lt;code>appliesIf&lt;/code> returns false or because &lt;code>resolvedIf&lt;/code> returns true. To the user the experience is identical - but the difference is in the data.&lt;/p>
+&lt;p>&lt;code>resolvedIf&lt;/code> should contain only your programmatic &lt;em>task success criteria&lt;/em>. Everything else should be in &lt;code>appliesIf&lt;/code>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Resultant State&lt;/th>
+&lt;th>appliesIf&lt;/th>
+&lt;th>resolvedIf&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Draft/Ready/Failed&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>false&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Completed&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>true&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Cancelled&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>-&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>Testing task document data&lt;span class="hx-absolute -hx-mt-20" id="testing-task-document-data">&lt;/span>
+&lt;a href="#testing-task-document-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;a href="http://docs.communityhealthtoolkit.org/cht-conf-test-harness/" target="_blank" rel="noopener">medic-conf-test-harness&lt;/a> is useful for making assertions about the expected behaviour of tasks in different user scenarios. The &lt;a href="https://docs.communityhealthtoolkit.org/cht-conf-test-harness/Harness.html#countTaskDocsByState" target="_blank" rel="noopener">countTaskDocsByState&lt;/a> interface is relevant for making assertions about task document creation and state.&lt;/p>
+&lt;h2>Frequently Asked Questions&lt;span class="hx-absolute -hx-mt-20" id="frequently-asked-questions">&lt;/span>
+&lt;a href="#frequently-asked-questions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/are-task-documents-indefinitely-on-users-devices/1432" target="_blank" rel="noopener">Are task documents indefinitely on user&amp;rsquo;s devices?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/task-state-for-tasks-whose-enddate-is-in-the-past/1011" target="_blank" rel="noopener">&amp;ldquo;State&amp;rdquo; for tasks whose endDate is in the past&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Understanding the parameters in the Task Schema</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/task-schema-parameters/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/task-schema-parameters/</guid><description>
+&lt;p>This guide explains the parameters available in the Task Schema and important constraints governing the design of tasks.&lt;/p>
+&lt;ul>
+&lt;li>Useful knowledge if you are stuck writing your first &lt;code>appliesIf&lt;/code> predicate&lt;/li>
+&lt;li>Understanding the data which is available in the task system and important constraints&lt;/li>
+&lt;li>Understand the special significance of the appliesTo attribute&lt;/li>
+&lt;/ul>
+&lt;p>Let&amp;rsquo;s synthesize some knowledge about CHT applications to help clarify what is happening within the task system:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>All contacts in CHT applications are organised into hierarchies. For more information, read the &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-management/contact-and-users-1/" >Contact and User Management Tutorial&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#contacts-persons-and-places" >schema for contact documents&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>All reports in the system are linked to one (and only one) contact. For more information, read &lt;a href="https://docs.communityhealthtoolkit.org/building/tutorials/app-forms/" >App Forms Tutorial&lt;/a> or the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#reports" >schema for report documents&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Documents are stored &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/hydration/" >minified&lt;/a> (not hydrated). All data that is passed into the tasks system is minified.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Settings which control the documents which are available on the user&amp;rsquo;s device are an important considerations to remember (eg &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/performance/replication/#depth" >replication depth&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/performance/purging/" >purging&lt;/a>) since both tasks can only process docs which are present on the device.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Important&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The code in &lt;code>tasks.js&lt;/code> runs on the user&amp;rsquo;s devices, not in the cloud and not on a server.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>An important constraint of the tasks system&lt;span class="hx-absolute -hx-mt-20" id="an-important-constraint-of-the-tasks-system">&lt;/span>
+&lt;a href="#an-important-constraint-of-the-tasks-system" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Every contact and every report on the user&amp;rsquo;s device is processed by tasks. That said, it is important to remember that this processing is scoped to happen &lt;strong>one contact at a time&lt;/strong>. The code in &lt;code>tasks.js&lt;/code> knows about one contact, but it is not possible to simultaneously know about that contact&amp;rsquo;s siblings, descendents, ancestors, etc.&lt;/p>
+&lt;p>With this constraint in mind, we can infer that tasks cannot know the answer to questions like:&lt;/p>
+&lt;ul>
+&lt;li>Is the sibling of this patient ill?&lt;/li>
+&lt;li>Does this family have active patients?&lt;/li>
+&lt;li>Are there cases of tuberculosis in a neighbouring household?&lt;/li>
+&lt;/ul>
+&lt;h2>The special significance of the appliesTo attribute&lt;span class="hx-absolute -hx-mt-20" id="the-special-significance-of-the-appliesto-attribute">&lt;/span>
+&lt;a href="#the-special-significance-of-the-appliesto-attribute" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >task.js schema&lt;/a> includes the noteworthy attribute &lt;code>appliesTo&lt;/code> which has two options: &lt;code>contacts&lt;/code> and &lt;code>reports&lt;/code>. This attribute is important! It changes the algorithm used to process the task, and the meaning of other attributes in the schema.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>&lt;/svg>Tip&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>&lt;code>appliesTo&lt;/code> is important. When you&amp;rsquo;re ready to write a task, one of the first thing you must decide is the &lt;code>appliesTo&lt;/code> value.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>The below algorithmic pseudocode explains the relationship between &lt;code>appliesTo&lt;/code> and the attributes &lt;code>appliesIf&lt;/code> and &lt;code>appliesToType&lt;/code>:&lt;/p>
+&lt;h3>appliesTo: &amp;lsquo;contacts&amp;rsquo;&lt;span class="hx-absolute -hx-mt-20" id="appliesto-contacts">&lt;/span>
+&lt;a href="#appliesto-contacts" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>algorithm appliesTo is &amp;#39;contacts&amp;#39;
+for contact of contacts:
+if contact.type is in task.appliesToType:
+if task.appliesIf(contact):
+create task events &lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;ul>
+&lt;li>&lt;code>appliesToType&lt;/code> filters based on the contact document&amp;rsquo;s &lt;code>contact_type&lt;/code> value&lt;/li>
+&lt;li>&lt;code>appliesIf&lt;/code> predicate is called once per contact (even if that contact has no reports)&lt;/li>
+&lt;li>&lt;code>appliesIf(c)&lt;/code> is passed information about the contact (&lt;code>c.contact&lt;/code>), and an array of all the contact&amp;rsquo;s reports (&lt;code>c.reports&lt;/code>)&lt;/li>
+&lt;li>&lt;code>events[].dueDate&lt;/code> defaults to the contact&amp;rsquo;s creation date&lt;/li>
+&lt;li>Results in up to one task schedule per contact&lt;/li>
+&lt;/ul>
+&lt;h3>appliesTo: &amp;lsquo;reports&amp;rsquo;&lt;span class="hx-absolute -hx-mt-20" id="appliesto-reports">&lt;/span>
+&lt;a href="#appliesto-reports" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>algorithm appliesTo is &amp;#39;reports&amp;#39;
+for contact of contacts:
+for report of contact.reports:
+if report.form is in task.appliesToType:
+if task.appliesIf(contact, report):
+create task events&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;ul>
+&lt;li>&lt;code>appliesToType&lt;/code> filters based on the report document&amp;rsquo;s &lt;code>form&lt;/code> value&lt;/li>
+&lt;li>&lt;code>appliesIf&lt;/code> predicate is called once per report&lt;/li>
+&lt;li>&lt;code>appliesIf(c, report)&lt;/code> is passed information about the contact (&lt;code>c.contact&lt;/code>), an array of all the contact&amp;rsquo;s reports (&lt;code>c.reports&lt;/code>), and the current report being iterated on &lt;code>report&lt;/code>&lt;/li>
+&lt;li>&lt;code>events[].dueDate&lt;/code> defaults to the report&amp;rsquo;s creation date&lt;/li>
+&lt;li>Can result in multiple, potentially overlapping task schedules per contact&lt;/li>
+&lt;/ul></description></item></channel></rss>

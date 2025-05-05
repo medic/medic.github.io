@@ -1,11 +1,669 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>couch2pg on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/</link><description>Recent content in couch2pg on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/couch2pg/index.xml" rel="self" type="application/rss+xml"/><item><title>Setup and Development</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/setup-and-devlopment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/setup-and-devlopment/</guid><description>CHT couch2pg is deprecated. For data synchronization, refer to CHT Sync.
-Create read-only replicas of CouchDB data inside PostgresSQL.
-The focus is specifically on CHT application data currently stored in CouchDB. If you are looking to have a read-only replica of CouchDB data for your application that isn&amp;rsquo;t the CHT, consider couch2pg.
-This version is built for medic/cht-core#3.0.0 and above. For replicating data from earlier versions, see the 2.0.x branch and associated tags.</description></item><item><title>Migration</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/migration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/migration/</guid><description>couch2pg is deprecated. For data synchronization, refer to CHT Sync.
-Assumptions &amp;amp; PrerequisitesThis guide assumes:
-Your CHT instance set up. Your Postgres server is set up. We&amp;rsquo;ll be using 10.195.130.93 in this documentation, but be sure to use your production Postgres address. The server needs to have pg_dump command available. Your CHT couch2pg (aka couch2pg) instance is set up. In this guide, we&amp;rsquo;ll assume it&amp;rsquo;s on the same server as the Postgres instance.</description></item><item><title>Local couch2pg Setup</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-setup/</guid><description>CHT couch2pg is deprecated. For data synchronization, refer to CHT Sync.
-This tutorial will take you through setting up a couch2pg service.
-By the end of the tutorial you should be able to:
-Set up a couch2pg service Run the couch2pg service CHT Couch2pg is a background process that moves data from Couchdb to Postgres through one way replication. It therefore, needs to have full read and write access to both the Postgres Database and Couchdb upstream.</description></item><item><title>Fixing couch2pg Memory Errors</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-oom-errors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-oom-errors/</guid><description>CHT couch2pg is deprecated. For data synchronization, refer to CHT Sync.
-Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors. To fix this, we need to delete this document so that couch2pg can proceed. Below are steps to follow to achieve this.
-Reduce the size of the replicated docs to a value of say 4 in the couch2pg.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – couch2pg</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/</link><description>Recent content in couch2pg on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/couch2pg/index.xml" rel="self" type="application/rss+xml"/><item><title>Setup and Development</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/setup-and-devlopment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/setup-and-devlopment/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+How to run and do development of CHT couch2pg
+&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">CHT couch2pg is deprecated. For data synchronization, refer to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" target="_blank" rel="noopener">CHT Sync&lt;/a>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Create read-only replicas of CouchDB data inside PostgresSQL.&lt;/p>
+&lt;p>The focus is specifically on &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener">CHT&lt;/a> application data currently stored in CouchDB. If you are looking to have a read-only replica of CouchDB data for your application that isn&amp;rsquo;t the CHT, consider &lt;a href="https://www.npmjs.com/package/couch2pg" target="_blank" rel="noopener">couch2pg&lt;/a>.&lt;/p>
+&lt;p>This version is built for medic/cht-core#3.0.0 and above. For replicating data from earlier versions, see the 2.0.x branch and associated tags.&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Clone&lt;span class="hx-absolute -hx-mt-20" id="clone">&lt;/span>
+&lt;a href="#clone" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>All steps below require you to have a local clone of the repo.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git clone https://github.com/medic/cht-couch2pg.git&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Node and npm&lt;span class="hx-absolute -hx-mt-20" id="node-and-npm">&lt;/span>
+&lt;a href="#node-and-npm" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>You will need to install the following to run locally, but not for docker:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://nodejs.org" target="_blank" rel="noopener">Node.js&lt;/a> 8.11.x up to 12.x.x. Must be an LTS release. LTS is designated with an even major version number.&lt;/li>
+&lt;li>&lt;a href="https://npmjs.com/" target="_blank" rel="noopener">npm&lt;/a> 6.x.x above&lt;/li>
+&lt;/ul>
+&lt;p>&lt;em>NOTE:&lt;/em> Currently, cht-couch2pg only runs in node versions 8, 10 and 12. Later versions of node have been known to fail.&lt;/p>
+&lt;h3>Database setup&lt;span class="hx-absolute -hx-mt-20" id="database-setup">&lt;/span>
+&lt;a href="#database-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;code>cht-couch2pg&lt;/code> supports PostgreSQL 9.4 and greater. The user passed in &lt;code>POSTGRESQL_URL&lt;/code> needs to have full creation rights on the database in &lt;code>POSTGRES_DB_NAME&lt;/code>.&lt;/p>
+&lt;h2>Running&lt;span class="hx-absolute -hx-mt-20" id="running">&lt;/span>
+&lt;a href="#running" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Locally with environment variables&lt;span class="hx-absolute -hx-mt-20" id="locally-with-environment-variables">&lt;/span>
+&lt;a href="#locally-with-environment-variables" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ol>
+&lt;li>&lt;code>cd&lt;/code> into it this repo&amp;rsquo;s directory where you cloned it.&lt;/li>
+&lt;li>Install dependencies:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm ci&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Export these four variables with the values you need.:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">POSTGRESQL_URL&lt;/span>&lt;span class="o">=&lt;/span>postgres://postgres:postgres@localhost:15432/postgres
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCHDB_URL&lt;/span>&lt;span class="o">=&lt;/span>https://admin:pass@localhost:5984/medic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_DOC_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_RETRY_COUNT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">5&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Run: &lt;code>node .&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>If you want to set and save all possible variables:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>cd&lt;/code> into it this repo&amp;rsquo;s directory where you cloned it.&lt;/li>
+&lt;li>Copy &lt;code>sample.env&lt;/code> to &lt;code>couch2pg.env&lt;/code>&lt;/li>
+&lt;li>Edit &lt;code>couch2pg.env&lt;/code> to have all the variables you need. Note that &lt;code>POSTGRESQL_URL&lt;/code> shouldn&amp;rsquo;t be edited as it&amp;rsquo;s defined by the variables above it. Be sure to change &lt;code>POSTGRES_SERVER_NAME&lt;/code> to where ever your postgress server is running. If it&amp;rsquo;s local, then use &lt;code>localost&lt;/code>. The default value of &lt;code>postgres&lt;/code> won&amp;rsquo;t work.&lt;/li>
+&lt;li>Run: &lt;code>. ./couch2pg.env&amp;amp;&amp;amp;node .&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3>In docker-compose&lt;span class="hx-absolute -hx-mt-20" id="in-docker-compose">&lt;/span>
+&lt;a href="#in-docker-compose" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The simplest way to run with &lt;code>docker-compose&lt;/code> is to specify the CouchDB instance that your CHT is using. The compose file will then create a dockerized PostgresSQL instance, connect to the CouchDB server and proceed to download all the data to the PostgresSQL instance:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>cd&lt;/code> into it this repo&amp;rsquo;s directory where you cloned it.&lt;/li>
+&lt;li>When starting the docker compose services, you need to set the URL for CouchDB in the &lt;code>COUCHDB_URL&lt;/code> env variable. This URL needs to be reachable the docker container (ie not &lt;code>localhost&lt;/code>). Ensuring you&amp;rsquo;re in the same directory where you ran the &lt;code>curl&lt;/code> call in the prior step, run:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCHDB_URL&lt;/span>&lt;span class="o">=&lt;/span>https://medic:password@192-168-68-26.my.local-ip.co:8442/medic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker-compose up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Connect to the PostgresSQL instance with login &lt;code>cht_couch2pg&lt;/code>, password &lt;code>cht_couch2pg_password&lt;/code> and database &lt;code>cht&lt;/code>. As these are insecure, do not use with production data. See below for how to harden these.&lt;/li>
+&lt;/ol>
+&lt;p>If you want to set all possible variables, or be able to store the variables in configuration file:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>cd&lt;/code> into it this repo&amp;rsquo;s directory where you cloned it.&lt;/li>
+&lt;li>Copy &lt;code>sample.env&lt;/code> to &lt;code>couch2pg.env&lt;/code>&lt;/li>
+&lt;li>Edit &lt;code>couch2pg.env&lt;/code> to have all the variables you need. Note that &lt;code>POSTGRESQL_URL&lt;/code> shouldn&amp;rsquo;t be edited as it&amp;rsquo;s defined by the variables above it. If you&amp;rsquo;re using the built-in PostgresSQL server, be sure to keep the &lt;code>POSTGRES_SERVER_NAME&lt;/code> set to &lt;code>postgres&lt;/code> as this is the correct internal service name in docker. Be sure to also set secure passwords for all PostgresSQL accounts.&lt;/li>
+&lt;li>Run docker and specify the environment file you just edited:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker-compose --env-file couch2pg.env up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>To connect to the PostgresSQL instance, use the server from &lt;code>POSTGRES_SERVER_NAME&lt;/code>, use login from &lt;code>COUCH2PG_USER&lt;/code>, password from &lt;code>COUCH2PG_USER_PASSWORD&lt;/code> and the database from &lt;code>POSTGRES_DB_NAME&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h3>Interactive&lt;span class="hx-absolute -hx-mt-20" id="interactive">&lt;/span>
+&lt;a href="#interactive" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Run it locally in interactive mode with &lt;code>node . -i&lt;/code> and you will see the ASCII art:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl"> ____ _ _ _____ ____ _ ____ ____
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> / ___&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_ _&lt;span class="p">|&lt;/span> / ___&lt;span class="p">|&lt;/span> ___ _ _ ___ &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>__ &lt;span class="p">|&lt;/span>___ &lt;span class="se">\ &lt;/span> &lt;span class="p">|&lt;/span> _ &lt;span class="se">\ &lt;/span> __ _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> _____ &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> / _ &lt;span class="se">\ &lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> / __&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>_ &lt;span class="se">\ &lt;/span> __&lt;span class="o">)&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="o">)&lt;/span> &lt;span class="p">|&lt;/span> / _&lt;span class="sb">`&lt;/span> &lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>___ &lt;span class="p">|&lt;/span> _ &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_____&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>___ &lt;span class="p">|&lt;/span> &lt;span class="o">(&lt;/span>_&lt;span class="o">)&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="o">(&lt;/span>__ &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> / __/ &lt;span class="p">|&lt;/span> __/ &lt;span class="p">|&lt;/span> &lt;span class="o">(&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="se">\_&lt;/span>___&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="se">\_&lt;/span>___&lt;span class="p">|&lt;/span> &lt;span class="se">\_&lt;/span>__/ &lt;span class="se">\_&lt;/span>_,_&lt;span class="p">|&lt;/span> &lt;span class="se">\_&lt;/span>__&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_____&lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span>_&lt;span class="p">|&lt;/span> &lt;span class="se">\_&lt;/span>_, &lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">|&lt;/span>___/ &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Instead of environment variables, you will be prompted to answer the following questions. For each question, you will be given suggestions for an answer:&lt;/p>
+&lt;ul>
+&lt;li>Enter CHT&amp;rsquo;s couch url&lt;/li>
+&lt;li>Enter cht-couch2pg postgres url&lt;/li>
+&lt;li>Select the number of minutes interval between checking for updates&lt;/li>
+&lt;li>Select the number of documents to grab concurrently. Increasing this number will cut down on HTTP GETs and may improve performance, decreasing this number will cut down on node memory usage, and may increase stability.&lt;/li>
+&lt;li>Select the number of document ids to grab per change limit request. Increasing this number will cut down on HTTP GETs and may improve performance, decreasing this number will cut down on node memory usage slightly, and may increase stability.&lt;/li>
+&lt;li>Select whether or not to have verbose logging.&lt;/li>
+&lt;li>Select how many times to internally retry continued unsuccessful runs before exiting. If unset cht-couch2pg will retry indefinitely. If set it will retry N times, and then exit with status code 1 indefinitely&lt;/li>
+&lt;li>Select the number of documents to grab concurrently from the users-meta database. Increasing this number will cut down on HTTP GETs and may improve performance, decreasing this number will cut down on node memory usage, and may increase stability. These documents are larger so set a limit lower than the docLimit&lt;/li>
+&lt;/ul>
+&lt;h3>Supported environment variables&lt;span class="hx-absolute -hx-mt-20" id="supported-environment-variables">&lt;/span>
+&lt;a href="#supported-environment-variables" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>All three methods of running cht-couch2pg listed above use these variables:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>COUCHDB_URL&lt;/code> - CouchDB instance URL with no trailing slash after &lt;code>/medic&lt;/code>, format: &lt;code>https://[user]:[password]@localhost:[port]/medic&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH2PG_SLEEP_MINS&lt;/code> - Number of minutes between synchronization. It defaults to &lt;code>60&lt;/code>.&lt;/li>
+&lt;li>&lt;code>COUCH2PG_DOC_LIMIT&lt;/code> - Number of documents cht-couch2pg fetches from CouchDB everytime. Suggested: &lt;code>1000&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH2PG_RETRY_COUNT&lt;/code> - Number of times cht-couch2pg will retry synchronizing documents from CouchDB after experiencing an error&lt;/li>
+&lt;li>&lt;code>COUCH2PG_USERS_META_DOC_LIMIT&lt;/code> - Number of documents to grab concurrently from the users-meta database. These documents are larger so set a limit lower than the docLimit. It defaults to &lt;code>50&lt;/code>.&lt;/li>
+&lt;li>&lt;code>COUCH2PG_CHANGES_LIMIT&lt;/code> - The number of document ids to fetch per change limit request. Suggested: &lt;code>100&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH2PG_USER&lt;/code> - The user that couch2pg will use to login in to the CouchDB server. Suggested &lt;code>cht_couch2pg&lt;/code>&lt;/li>
+&lt;li>&lt;code>COUCH2PG_USER_PASSWORD&lt;/code> - The password that couch2pg will use to login in to the CouchDB server.&lt;/li>
+&lt;li>&lt;code>POSTGRES_SERVER_NAME&lt;/code> - The server or IP where the postgres server is. This should be set to &lt;code>postgres&lt;/code> when using docker.&lt;/li>
+&lt;li>&lt;code>POSTGRES_USER_NAME&lt;/code> - The admin user for postgres in docker. Suggested: &lt;code>postgres_root&lt;/code>&lt;/li>
+&lt;li>&lt;code>POSTGRES_PASSWORD&lt;/code> - The admin password for postgres in docker.&lt;/li>
+&lt;li>&lt;code>POSTGRES_DB_NAME&lt;/code> - The name of the PostgreSQL database to sync to.. Suggested: &lt;code>cht&lt;/code>&lt;/li>
+&lt;li>&lt;code>POSTGRES_PORT&lt;/code> - Port where PostgresSQL can be found. Suggested: &lt;code>5432&lt;/code>&lt;/li>
+&lt;li>&lt;code>POSTGRESQL_URL&lt;/code> - PostgresSQL instance URL, format: &lt;code>postgres://[user]:[password]@localhost:[port]/[database name]&lt;/code>&lt;/li>
+&lt;li>&lt;code>SYNC_DB_MEDIC&lt;/code> - Whether to sync the content of the &lt;code>medic&lt;/code> database. Suggested: &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>SYNC_DB_SENTINEL&lt;/code> - Whether to sync the content of the &lt;code>medic-sentinel&lt;/code> database. Suggested: &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>SYNC_DB_USER_META&lt;/code> - Whether to sync the content of the &lt;code>medic-users-meta&lt;/code> database. Suggested: &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>SYNC_DB_LOGS&lt;/code> - Whether to sync the content of &lt;code>medic-logs&lt;/code> database. Suggested: &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>SYNC_DB_USERS&lt;/code> - Whether to sync the CouchDB &lt;code>_users&lt;/code> database without security information. Suggested: &lt;code>true&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2>Known issues&lt;span class="hx-absolute -hx-mt-20" id="known-issues">&lt;/span>
+&lt;a href="#known-issues" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Error &amp;ldquo;Checksum failed for migration &amp;hellip;&amp;rdquo; when upgrading from 3.2.0 to latest&lt;span class="hx-absolute -hx-mt-20" id="error-checksum-failed-for-migration--when-upgrading-from-320-to-latest">&lt;/span>
+&lt;a href="#error-checksum-failed-for-migration--when-upgrading-from-320-to-latest" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>An SQL migration file was changed in version 3.2.0. This made upgrades from 3.1.x impossible, with the process crashing upon startup after the upgrade. See more &lt;a href="https://github.com/medic/cht-couch2pg/issues/78" target="_blank" rel="noopener">details about the error&lt;/a>.&lt;/p>
+&lt;p>This was fixed in version 3.2.1, by reverting the changes made to the migration file.
+Fresh installations of 3.2.0 should execute this SQL before upgrading:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">UPDATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">xmlforms_migrations&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">SET&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">md5&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;e0535c9fe3faef6e66a31691deebf1a8&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">version&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;201606200952&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">AND&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">md5&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;40187aa5ee95eda0e154ecefd7512cda&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>See more details about the error in &lt;a href="https://github.com/medic/cht-couch2pg/issues/78" target="_blank" rel="noopener">#78&lt;/a>.&lt;/p>
+&lt;h3>Error installing deps &lt;code>ERR! ... node-pre-gyp install --fallback-to-build&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="error-installing-deps-err--node-pre-gyp-install---fallback-to-build">&lt;/span>
+&lt;a href="#error-installing-deps-err--node-pre-gyp-install---fallback-to-build" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When installing Node.js dependencies locally or building the docker image, you might get an error like:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! code ELIFECYCLE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! errno &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ERR! node-libcurl@1.3.3 install: &lt;span class="sb">`&lt;/span>node-pre-gyp install --fallback-to-build&lt;span class="sb">`&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>It is probably related to a gcc library that is failing with some versions of Node and npm, try with Node 10 without updating the &lt;code>npm&lt;/code> version that comes with it.&lt;/p>
+&lt;h2>Tests&lt;span class="hx-absolute -hx-mt-20" id="tests">&lt;/span>
+&lt;a href="#tests" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Run tests with docker-compose:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose -f docker-compose.test.yml build cht-couch2pg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker-compose -f docker-compose.test.yml run cht-couch2pg grunt test&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Run tests in interactive watch mode with: &lt;code>docker-compose -f docker-compose.test.yml run cht-couch2pg npm run watch&lt;/code>&lt;/p>
+&lt;p>Run entrypoint script tests with&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose -f docker-compose.test.yml run cht-couch2pg ./tests/bash/bats/bin/bats /app/tests/bash/test.bats&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Releasing&lt;span class="hx-absolute -hx-mt-20" id="releasing">&lt;/span>
+&lt;a href="#releasing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>Create a pull request with prep for the new release.&lt;/li>
+&lt;li>Get the pull request reviewed and approved.&lt;/li>
+&lt;li>When doing the squash and merge, make sure that your commit message is clear and readable and follows the strict format described in the commit format section below. If the commit message does not comply, automatic release will fail.&lt;/li>
+&lt;li>In case you are planning to merge the pull request with a merge commit, make sure that every commit in your branch respects the format.&lt;/li>
+&lt;/ol>
+&lt;h3>Commit format&lt;span class="hx-absolute -hx-mt-20" id="commit-format">&lt;/span>
+&lt;a href="#commit-format" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The commit format should follow this &lt;a href="https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular" target="_blank" rel="noopener">conventional-changelog angular preset&lt;/a>. Examples are provided below.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Type&lt;/th>
+&lt;th>Example commit message&lt;/th>
+&lt;th>Release type&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Bug fixes&lt;/td>
+&lt;td>fix(#123): infinite loop when materialized views doesn&amp;rsquo;t exist&lt;/td>
+&lt;td>patch&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Performance&lt;/td>
+&lt;td>perf(#789): Refresh materialized views faster&lt;/td>
+&lt;td>patch&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Features&lt;/td>
+&lt;td>feat(#456): Support real-time sync&lt;/td>
+&lt;td>minor&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Non-code&lt;/td>
+&lt;td>chore(#123): update README&lt;/td>
+&lt;td>none&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Breaking&lt;/td>
+&lt;td>perf(#2): remove support for pg 7 &lt;br/> BREAKING CHANGE: postgres 7 no longer supported&lt;/td>
+&lt;td>major&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>Migration</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/migration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/migration/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Migrating from one couch2pg instance to another, including Postgres data
+&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">CHT couch2pg is deprecated. For data synchronization, refer to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" target="_blank" rel="noopener">CHT Sync&lt;/a>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Assumptions &amp;amp; Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="assumptions--prerequisites">&lt;/span>
+&lt;a href="#assumptions--prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>This guide assumes:&lt;/p>
+&lt;ul>
+&lt;li>Your CHT instance set up.&lt;/li>
+&lt;li>Your Postgres server is set up. We&amp;rsquo;ll be using &lt;code>10.195.130.93&lt;/code> in this documentation, but be sure to use your production Postgres address. The server needs to have &lt;code>pg_dump&lt;/code> command available.&lt;/li>
+&lt;li>Your CHT couch2pg (aka couch2pg) instance is set up. In this guide, we&amp;rsquo;ll assume it&amp;rsquo;s on the same server as the Postgres instance.&lt;/li>
+&lt;li>You want to move both couch2pg instance and the Postgres data to a new server&lt;/li>
+&lt;/ul>
+&lt;p>Further, be sure you meet the following prerequisites:&lt;/p>
+&lt;ul>
+&lt;li>Have provisioned a new Postgres server. The server needs to have &lt;code>pg_restore&lt;/code> command available.&lt;/li>
+&lt;li>Have access to existing Postgres server to be able to dump the data&lt;/li>
+&lt;li>Have access to couch2pg instance, including the CHT Core credentials it&amp;rsquo;s using&lt;/li>
+&lt;li>Have 3x the disk space as your data on both the old and new server - see below&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Note:&lt;/strong> If you don&amp;rsquo;t mind waiting and don&amp;rsquo;t want to deal with the trouble of copying large data files around as documented on this page, it will be easier to set up a clean &lt;a href="https://docs.communityhealthtoolkit.org/hosting/couch2pg/setup-and-devlopment/" >install of couch2pg&lt;/a>&lt;/p>
+&lt;h3>Time to copy&lt;span class="hx-absolute -hx-mt-20" id="time-to-copy">&lt;/span>
+&lt;a href="#time-to-copy" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Copying and loading large amounts of Postgres data can take a long time. If you make a mistake, going back to the first step can take more time. Don&amp;rsquo;t plan a production migration without doing at least one dry run! Do more dry runs until your confident that everything works as expected.&lt;/p>
+&lt;p>Consider keeping your old couch2pg system running alongside your new one. This will allow you to fail over to the old one easily and it will be up to date with data from your CHT instance. It is safe to run multiple couch2pg instances against the same CHT instance.&lt;/p>
+&lt;p>When you&amp;rsquo;re confident the new system is up and running, is stable and performant, go ahead and decommission the old system.&lt;/p>
+&lt;h3>Disk space prerequisites&lt;span class="hx-absolute -hx-mt-20" id="disk-space-prerequisites">&lt;/span>
+&lt;a href="#disk-space-prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>You need 3 times the database size of free disk space on both the old and new Postgres servers. The 3x number comes from 3 sources of data:&lt;/p>
+&lt;ul>
+&lt;li>Existing Postgres database&lt;/li>
+&lt;li>Dump of this same data via &lt;code>pg_dump&lt;/code>&lt;/li>
+&lt;li>making a compressed copy with &lt;code>gzip&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>While you may not fully need all of 3x the disk space, having the extra space will be important to ensure you don&amp;rsquo;t accidentally fill up the disk on a production instance.&lt;/p>
+&lt;p>For example, on a Postgres server with &lt;code>400GB&lt;/code> disk with millions of documents in Postgres:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>175GB&lt;/code> - Existing Postgres database&lt;/li>
+&lt;li>&lt;code>175GB&lt;/code> - Dump of this same data via &lt;code>pg_dump&lt;/code>&lt;/li>
+&lt;li>~&lt;code>60GB&lt;/code> - making a compressed copy with &lt;code>gzip&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>The server is healthy woth just over 40% of the disk used day to day. However, if you make a copy of the data (&lt;code>175GB&lt;/code> + &lt;code>175GB&lt;/code> = &lt;code>350GB&lt;/code>), you now have the disk over 85% full with only 50GB free. You very likely will not have room to compress the data (&lt;code>175GB&lt;/code> + &lt;code>175GB&lt;/code> + &lt;code>60GB&lt;/code> = &lt;code>410GB&lt;/code>).&lt;/p>
+&lt;p>The best work around is to increase the size of your Postgres server assuming you&amp;rsquo;re on a cloud provider that offers this. Another work around can be to run &lt;code>pg_dump&lt;/code> from another computer with more disk space, but note that this will send the uncompressed data over the network which may take a long time. The same is true doing the restore over the network - it will be much slower than if you did it locally.&lt;/p>
+&lt;p>To show disk use of all databases, run this command, being sure to replace &lt;code>couch2pg&lt;/code> with your user:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">psql -U couch2pg -c &lt;span class="s1">&amp;#39;\l+&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Instructions&lt;span class="hx-absolute -hx-mt-20" id="instructions">&lt;/span>
+&lt;a href="#instructions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Current Postgres data and couch2pg config&lt;span class="hx-absolute -hx-mt-20" id="current-postgres-data-and-couch2pg-config">&lt;/span>
+&lt;a href="#current-postgres-data-and-couch2pg-config" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ol>
+&lt;li>SSH to your postgres server&lt;/li>
+&lt;li>Connect to the &lt;code>cht&lt;/code> database and run this query:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">select&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">count&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">from&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">couchdb&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+We&amp;rsquo;ll use this in the next server to validate data was imported. On large datasets this may take a long while to run.&lt;/li>
+&lt;li>Create a tarball of your database. This assumes you&amp;rsquo;re using the default &lt;code>cht&lt;/code> name for your database with a username of &lt;code>couch2pg&lt;/code>. Replace with your database and username if they&amp;rsquo;re different:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">pg_dump -U couch2pg -d cht -F tar -f couch2pg.tar
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip couch2pg.tar&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;strong>Note&lt;/strong> - If you get errors like &lt;code>query failed: ERROR: permission denied&lt;/code> - run this command as the &lt;code>postgres&lt;/code> user.&lt;/li>
+&lt;li>Check the size of the gzip - we&amp;rsquo;ll use this in the next section: &lt;code>ls -al couch2pg.tar.gz&lt;/code>&lt;/li>
+&lt;li>Copy the resulting &lt;code>couch2pg.tar.gz&lt;/code> file to your computer - &lt;code>scp&lt;/code> is good for this!&lt;/li>
+&lt;li>Check the values for all the environment variables for couch2pg. For example, here&amp;rsquo;s what our current couch2pg has for it&amp;rsquo;s config. In our case the &lt;code>POSTGRESQL_URL&lt;/code> is &lt;code>localhost&lt;/code> because we&amp;rsquo;re on the same server as the Postgres server. Be sure to use &lt;code>POSTGRESQL_URL&lt;/code> and &lt;code>COUCHDB_URL&lt;/code> that match your deployment:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">POSTGRESQL_URL&lt;/span>&lt;span class="o">=&lt;/span>postgres://couch2pg:passwordHere1@localhost:5432/cht
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCHDB_URL&lt;/span>&lt;span class="o">=&lt;/span>https://medic:passwordHere2@192-168-68-23.local-ip.medicmobile.org:10443/medic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCH2PG_SLEEP_MINS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">360&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCH2PG_DOC_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCH2PG_CHANGES_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">5000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCH2PG_RETRY_COUNT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">COUCH2PG_USERS_META_DOC_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">50&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;/ol>
+&lt;h3>New Postgres server and couch2pg instance&lt;span class="hx-absolute -hx-mt-20" id="new-postgres-server-and-couch2pg-instance">&lt;/span>
+&lt;a href="#new-postgres-server-and-couch2pg-instance" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ol>
+&lt;li>Copy the &lt;code>couch2pg.tar.gz&lt;/code> file to the new Postgres server&lt;/li>
+&lt;li>SSH to the new Postgres server&lt;/li>
+&lt;li>Make sure the gzip&amp;rsquo;s bytes on disk exactly match the one from step 4 in the prior section: &lt;code>ls -al couch2pg.tar.gz&lt;/code>&lt;/li>
+&lt;li>Uncompress the file: &lt;code>gunzip couch2pg.tar.gz&lt;/code>&lt;/li>
+&lt;li>Ensure your have a &lt;code>cht&lt;/code> database already created on your new Postgres instance: &lt;code>CREATE DATABASE cht;&lt;/code>&lt;/li>
+&lt;li>Stop &lt;code>couch2pg&lt;/code> if it is running&lt;/li>
+&lt;li>Load the data from the dump file, again be sure to use the current user if &lt;code>couch2pg&lt;/code> is the same for you:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">pg_restore -U couch2pg -d cht couch2pg.tar&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Connect to the &lt;code>cht&lt;/code> database and run this query:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">select&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">count&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">from&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">couchdb&lt;/span>&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+This should match the same number as on step 2 above. On large datasets this may take a long while to run.&lt;/li>
+&lt;li>Start couch2pg, being sure to use the exact same environment variables as step 6 above, but possibly with different &lt;code>POSTGRES_*&lt;/code> values if they&amp;rsquo;ve changed for the new Postgres server&lt;/li>
+&lt;li>Check the logs of couch2pg and ensure there&amp;rsquo;s no errors.&lt;/li>
+&lt;/ol>
+&lt;h3>Dashboards&lt;span class="hx-absolute -hx-mt-20" id="dashboards">&lt;/span>
+&lt;a href="#dashboards" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Check the logs of couch2pg. Be sure there&amp;rsquo;s no errors and that materialized views are updating as expected. Complex materialized views can take hours to update. Don&amp;rsquo;t hesitate to let multiple periods of &lt;code>COUCH2PG_SLEEP_MINS&lt;/code> (how frequently couch2pg runs) pass to ensure no errors occur.&lt;/p>
+&lt;p>Double check data is synchronizing by running a SQL query one of your dashboards uses. Make sure the data is both accurate and up to date. When you are confident the data is valid and working correctly, change any downstream sources, like Superset or Klipfolio, to use the new Postgres server IP and credentials&lt;/p>
+&lt;p>If at a later date you find there&amp;rsquo;s substantial errors, you can always change your downstream sources back to using the old Postgres server and attempt the migration again, fixing errors where needed.&lt;/p>
+&lt;h3>Cleanup&lt;span class="hx-absolute -hx-mt-20" id="cleanup">&lt;/span>
+&lt;a href="#cleanup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When you&amp;rsquo;re 100% sure the migration was successful - don&amp;rsquo;t rush this part! - be sure to clean up file, servers and services that may still be running:&lt;/p>
+&lt;ul>
+&lt;li>Delete any &lt;code>*.tar&lt;/code> and &lt;code>*.tar.gz&lt;/code> files on the old Postgres server, on your computer and on the new Postgres server&lt;/li>
+&lt;li>Stop couch2pg running on the old service&lt;/li>
+&lt;li>If the data is truly not needed, drop the &lt;code>cht&lt;/code> database on the old Postgres server&lt;/li>
+&lt;li>Delete any backups of the old server and service&lt;/li>
+&lt;/ul></description></item><item><title>Local couch2pg Setup</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-setup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-setup/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Setting up a Couch2pg service to download data from CouchDB to Postgres database
+&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">CHT couch2pg is deprecated. For data synchronization, refer to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" target="_blank" rel="noopener">CHT Sync&lt;/a>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>This tutorial will take you through setting up a couch2pg service.&lt;/p>
+&lt;p>By the end of the tutorial you should be able to:&lt;/p>
+&lt;ul>
+&lt;li>Set up a couch2pg service&lt;/li>
+&lt;li>Run the couch2pg service&lt;/li>
+&lt;/ul>
+&lt;p>&lt;a href="https://github.com/medic/cht-couch2pg" target="_blank" rel="noopener">CHT Couch2pg&lt;/a> is a background process that moves data from Couchdb to Postgres through one way replication. It therefore, needs to have full read and write access to both the Postgres Database and Couchdb upstream. It is built in nodejs and can be set up as a background process using systemd. Review this &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/architecture/#overview" >architecture diagram&lt;/a> to get a conceptual understanding of how couch2pg works.&lt;/p>
+&lt;h2>Brief Overview of key environmental variables&lt;span class="hx-absolute -hx-mt-20" id="brief-overview-of-key-environmental-variables">&lt;/span>
+&lt;a href="#brief-overview-of-key-environmental-variables" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;em>COUCHDB_URL&lt;/em> is the CouchDB instance URL with no trailing slash after &lt;code>/medic&lt;/code>, format: &lt;code>https://[user]:[password]@localhost:[port]/medic&lt;/code>&lt;/p>
+&lt;p>&lt;em>POSTGRESQL_URL&lt;/em> is the PostgreSQL instance URL, format: &lt;code>postgres://[user]:[password]@localhost:[port]/[database name]&lt;/code>&lt;/p>
+&lt;p>&lt;em>COUCH2PG_SLEEP_MINS&lt;/em> is the interval size in minutes Couch2pg will use to poll Couchdb.&lt;/p>
+&lt;p>&lt;em>COUCH2PG_DOC_LIMIT&lt;/em> is the number of documents Couch2pg will fetch in each query.&lt;/p>
+&lt;p>&lt;em>COUCH2PG_RETRY_COUNT&lt;/em> is the amount of times couch2pg should retry a failed connection before it fails.&lt;/p>
+&lt;p>&lt;em>COUCH2PG_CHANGES_LIMIT&lt;/em> is the number of changes to query since the last sync operation.&lt;/p>
+&lt;p>To read more about environmental variables, see the &lt;a href="https://github.com/medic/cht-couch2pg#readme" target="_blank" rel="noopener">CHT Couch2pg readme&lt;/a>.&lt;/p>
+&lt;h2>Required Resources&lt;span class="hx-absolute -hx-mt-20" id="required-resources">&lt;/span>
+&lt;a href="#required-resources" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Before you begin, you need to have some useful software and tools that are required for things to work:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://nodejs.org/en/" target="_blank" rel="noopener">nodejs&lt;/a> 8 up to 12.&lt;/li>
+&lt;li>&lt;a href="https://www.npmjs.com/get-npm" target="_blank" rel="noopener">npm&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL&lt;/a> 9.4 or later&lt;/li>
+&lt;/ul>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>You should have a functioning &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/" >CHT instance installed locally&lt;/a>&lt;/p>
+&lt;p>You should have a working database with a user that has full creation rights on the database. A database &lt;code>POSTGRES_DB_NAME&lt;/code> and &lt;code>couch2pg&lt;/code> user can be created and access granted using the following query:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>CREATE DATABASE POSTGRES_DB_NAME;
+CREATE USER couch2pg WITH ENCRYPTED PASSWORD &amp;#39;mypassword&amp;#39;;
+GRANT ALL PRIVILEGES ON DATABASE POSTGRES_DB_NAME TO couch2pg;&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>All steps below require you to have a local clone of the repo.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git clone https://github.com/medic/cht-couch2pg.git&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Setting up with environment variables&lt;span class="hx-absolute -hx-mt-20" id="setting-up-with-environment-variables">&lt;/span>
+&lt;a href="#setting-up-with-environment-variables" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>
+&lt;p>Change directory into the repo&amp;rsquo;s directory where you cloned it: &lt;code>cd /path/to/cht-couch2pg&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Install dependencies: &lt;code>npm ci&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Export the four variables with the correct values:&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">POSTGRESQL_URL&lt;/span>&lt;span class="o">=&lt;/span>postgres://&lt;span class="o">[&lt;/span>user&lt;span class="o">]&lt;/span>:&lt;span class="o">[&lt;/span>password&lt;span class="o">]&lt;/span>@localhost:&lt;span class="o">[&lt;/span>port&lt;span class="o">]&lt;/span>/&lt;span class="o">[&lt;/span>database name&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCHDB_URL&lt;/span>&lt;span class="o">=&lt;/span>https://&lt;span class="o">[&lt;/span>user&lt;span class="o">]&lt;/span>:&lt;span class="o">[&lt;/span>password&lt;span class="o">]&lt;/span>@localhost:&lt;span class="o">[&lt;/span>port&lt;span class="o">]&lt;/span>/medic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_DOC_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_RETRY_COUNT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_SLEEP_MINS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">120&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH2PG_CHANGES_LIMIT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1000&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;ol start="4">
+&lt;li>Run: &lt;code>node .&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>If you want to set and save all possible variables:&lt;/p>
+&lt;ol start="5">
+&lt;li>
+&lt;p>Copy &lt;code>sample.env&lt;/code> to &lt;code>couch2pg.env&lt;/code>: &lt;code>cp sample.env couch2pg.env&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Edit &lt;code>couch2pg.env&lt;/code> to have all the variables you need.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;code>POSTGRESQL_URL&lt;/code> shouldn&amp;rsquo;t be edited as it is defined by the variables above it.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;ol start="7">
+&lt;li>Run: &lt;code>. ./couch2pg.env &amp;amp;&amp;amp; node .&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">ℹ️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">To run cht-couch2pg in interactive mode, use &lt;code>node . -i&lt;/code>. You will be prompted to answer questions to capture the same the environmental variables. For each question, you will be given suggestions for an answer.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Using docker compose&lt;span class="hx-absolute -hx-mt-20" id="using-docker-compose">&lt;/span>
+&lt;a href="#using-docker-compose" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The simplest way to run couch2pg is with &lt;code>docker compose&lt;/code> which only needs configuration of the CouchDB instance URL. The compose file will then create a PostgreSQL container, connect to the CouchDB server and proceed to download couchDB documents to the PostgreSQL container:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Change directory into the repo&amp;rsquo;s directory where you cloned it: &lt;code>cd /path/to/cht-couch2pg&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Set the URL for CouchDB in the &lt;code>COUCHDB_URL&lt;/code> env variable. e.g.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCHDB_URL&lt;/span>&lt;span class="o">=&lt;/span>https://medic:password@192-168-68-26.local-ip.medicmobile.org:8442/medic&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The CouchDB URL needs to be reachable from the docker container (i.e. not localhost).&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;ol start="3">
+&lt;li>
+&lt;p>Run: &lt;code>docker compose up&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Connect to the PostgreSQL instance with login &lt;code>cht_couch2pg&lt;/code>, password &lt;code>cht_couch2pg_password&lt;/code> and database &lt;code>cht&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>To set all possible variables or store the variables in configuration file, follow steps 5 and 6 above. To connect to the PostgreSQL instance, use the server from &lt;code>POSTGRES_SERVER_NAME&lt;/code>, use login from &lt;code>COUCH2PG_USER&lt;/code>, password from &lt;code>COUCH2PG_USER_PASSWORD&lt;/code> and the database from &lt;code>POSTGRES_DB_NAME&lt;/code>.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Known issues&lt;span class="hx-absolute -hx-mt-20" id="known-issues">&lt;/span>
+&lt;a href="#known-issues" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>Node version compatibility&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>Version 14 and 16 have been known to fail silently, and you can conveniently switch between node versions using &lt;a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;ol start="2">
+&lt;li>Postgres authentication&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>
+&lt;p>If the error &lt;code>Error: Unknown authenticationOk message typeMessage { name: 'authenticationOk', length: 23 }&lt;/code> is observed, it is because Postgres is setup to use a different password encryption algorithm compared to what Couch2pg uses. Couch2pg was made to work with &lt;code>md5&lt;/code> which is the default method in Postgres v10-13. However, on postgres v14 the default method is &lt;code>scram-sha-256&lt;/code> detailed in the &lt;a href="https://postgresqlco.nf/doc/en/param/password_encryption/14/" target="_blank" rel="noopener">notes&lt;/a>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The setting can be updated in the Postgres configuration file which is in &lt;code>/etc/postgresql/14/main/postgres.conf&lt;/code> in Ubuntu 20.04. The key &lt;code>password_encryption&lt;/code> should be set to md5. After updating the setting, restart the Postgres service.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To confirm that the role used with couch2pg has an md5 encrypted password use the query &lt;code>SELECT rolname, rolpassword FROM pg_authid&lt;/code>. The role password should start with md5.&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>Fixing couch2pg Memory Errors</title><link>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-oom-errors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/couch2pg/couch2pg-oom-errors/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Dealing with out-of-memory errors in couch2pg
+&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">CHT couch2pg is deprecated. For data synchronization, refer to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" target="_blank" rel="noopener">CHT Sync&lt;/a>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Some times when couch2pg is replicating documents to postgres, it encounters very large info docs that are larger than the memory allocation of the document sync array and causes out-of-memory errors.
+To fix this, we need to delete this document so that couch2pg can proceed. Below are steps to follow to achieve this.&lt;/p>
+&lt;ol>
+&lt;li>Reduce the size of the replicated docs to a value of say 4 in the couch2pg.conf file so that you can get within the range of the failing document.&lt;/li>
+&lt;li>Clone the existing &lt;a href="https://github.com/medic/couch2pg" target="_blank" rel="noopener">couch2pg&lt;/a> repo so that you can run couch2pg locally&lt;/li>
+&lt;li>Edit the file &lt;code>lib/importer.js&lt;/code> in the couch2pg source code to be able to log the doc-id of the problem doc&lt;/li>
+&lt;li>Edit just logs doc_ids to the console, around line 100 of importer.js &lt;code>console.log(row.doc._id);&lt;/code>&lt;/li>
+&lt;li>Get the remote couch2pg environment variable settings and export them into your profile terminal&lt;/li>
+&lt;li>Create an ssh reverse tunnel from the postgres server to your laptop&lt;/li>
+&lt;li>Run couch2pg locally so that you can see the doc-ids on console till it fails&lt;/li>
+&lt;li>From the ids printed on console try loading the docs in the couchdb web access(Futon or Fauxton), the problem doc is usually big and won&amp;rsquo;t load&lt;/li>
+&lt;li>This will help you identify the problem doc&lt;/li>
+&lt;li>Curl the document to your pc and back it up&lt;/li>
+&lt;li>Back up the document for further analysis&lt;/li>
+&lt;li>Delete the document using curl
+&lt;code>curl --head &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;&amp;quot;&lt;/code>
+This returns something like&lt;/li>
+&lt;/ol>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Content-Length: 307
+Content-Type: application/json
+Date: Tue, 25 Jun 2019 11:58:29 GMT
+ETag: &amp;#34;2-6beeb38da9b096bacfe2fa769e5171be&amp;#34;
+Server: CouchDB/2.3.1 (Erlang OTP/21)
+X-Couch-Request-ID: e4aa7a8696
+X-CouchDB-Body-Time: 0&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The ETag is the rev. Delete document with curl: &lt;code>curl -X DELETE &amp;quot;&amp;lt;HOST&amp;gt;/&amp;lt;DB&amp;gt;/&amp;lt;DOC_ID&amp;gt;?rev=&amp;lt;THE_REV&amp;gt;&amp;quot;&lt;/code>&lt;/p></description></item></channel></rss>

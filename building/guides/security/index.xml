@@ -1,5 +1,139 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/</link><description>Recent content in Security on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/guides/security/index.xml" rel="self" type="application/rss+xml"/><item><title>Securely onboarding users at scale</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/securely-onboarding-users-at-scale/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/security/securely-onboarding-users-at-scale/</guid><description>This document shows how to achieve a high level of credential management security for a CHT deployment. Implementers need to know when ease of use is more important than a more secure system. By reading this document you should be able to know when to make the &amp;ldquo;more secure&amp;rdquo; vs &amp;ldquo;easier to use&amp;rdquo; trade off.
-No system is perfectly secure - be prepared to remediate a security breach!
-When a CHT deployment will support hundreds of users or more, secure credential management becomes critical.</description></item><item><title>Securing Android Devices</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/</guid><description>To secure an android device you should enable at least a pin code lock on the device, enable FDE (full disc encryption) and setup remote wiping capabilities by enabling mobile device management.
-PIN Setup and FDEInstructions are slightly different per device. Enabling FDE has the added benefit that you must also lock the device with a pin code or password.
-Android 5.0 or laterOpen the Security menu under settings. On unmodified versions of Android, this can be found under Settings &amp;gt; Personal &amp;gt; Security.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Security</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/</link><description>Recent content in Security on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/guides/security/index.xml" rel="self" type="application/rss+xml"/><item><title>Securely onboarding users at scale</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/securely-onboarding-users-at-scale/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/security/securely-onboarding-users-at-scale/</guid><description>
+&lt;p>This document shows how to achieve a high level of credential management security for a CHT deployment. Implementers need to know when ease of use is more important than a more secure system. By reading this document you should be able to know when to make the &amp;ldquo;more secure&amp;rdquo; vs &amp;ldquo;easier to use&amp;rdquo; trade off.&lt;/p>
+&lt;p>No system is perfectly secure - be prepared to remediate a security breach!&lt;/p>
+&lt;p>When a CHT deployment will support hundreds of users or more, secure credential management becomes critical. Patient data is sensitive and should never be accessed in any way by unauthorized parties. By following best practices and preparing for the worst case scenario of a password breach, patient data can be kept safe and CHWs can be kept online and able to deliver care.&lt;/p>
+&lt;h2>Before starting&lt;span class="hx-absolute -hx-mt-20" id="before-starting">&lt;/span>
+&lt;a href="#before-starting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Secure devices&lt;span class="hx-absolute -hx-mt-20" id="secure-devices">&lt;/span>
+&lt;a href="#secure-devices" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Firstly, ensure that the CHWs&amp;rsquo; devices are secure: they all employ disk encryption and require a password or PIN to unlock and use. See our &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/" target="_blank" rel="noopener">Securing Android Devices document&lt;/a> for more information. As well, an &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/android/publishing/#mobile-device-management" target="_blank" rel="noopener">MDM&lt;/a> may be used to enforce disk encryption and device unlock protocols.&lt;/p>
+&lt;h3>Secure administrative users&lt;span class="hx-absolute -hx-mt-20" id="secure-administrative-users">&lt;/span>
+&lt;a href="#secure-administrative-users" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>CHT administrators have the ability to create and delete users and push new configurations to the CHT so they should take extra precautions in managing their password. They should use a &lt;a href="https://en.wikipedia.org/wiki/Passphrase" target="_blank" rel="noopener">strong passphrase&lt;/a> (instead of a password) that is unique to their CHT login. They should use a &lt;a href="https://en.wikipedia.org/wiki/Password_manager" target="_blank" rel="noopener">password manager&lt;/a> to store this passphrase.
+By following these steps, unauthorized people are less likely to be able to access administrator accounts.&lt;/p>
+&lt;h3>Secure passwords&lt;span class="hx-absolute -hx-mt-20" id="secure-passwords">&lt;/span>
+&lt;a href="#secure-passwords" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When generating passwords for CHWs, do not use a formula which repeats itself (eg &lt;code>password123&lt;/code> for user A, &lt;code>password234&lt;/code> for user B etc.). Do not use the CHW information such as username, email or phone number in the password. Train CHWs to not re-use passwords.&lt;/p>
+&lt;p>For a reference application showing secure password generation, see &lt;code>generatePassword()&lt;/code> in the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/bulk-password-update-export.js" target="_blank" rel="noopener">CHT Core scripts directory&lt;/a>. This will generate a truly random 14 character password with uppercase (&lt;code>A-Z&lt;/code>), lowercase (&lt;code>a-z&lt;/code>), numerical (&lt;code>0-9&lt;/code>) and one special character (&lt;code>-&lt;/code>).&lt;/p>
+&lt;p>To generate a password that is easier to remember, type and speak over a phone, consider using &lt;a href="https://en.wikipedia.org/wiki/Diceware" target="_blank" rel="noopener">Diceware passphrases&lt;/a>. For added accessibility, use a word list from the CHWs native language if it is not English. This will make the words easier to spell and more likely to be remembered, but still secure.&lt;/p>
+&lt;h2>Spreadsheet use&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-use">&lt;/span>
+&lt;a href="#spreadsheet-use" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Most deployments manage users in a spreadsheet shared either in Google Docs or other cloud service. It is convenient to have a canonical shared location to access the data. This is an acceptable, but not ideal, solution as it ensures changes are instantly shared while still ensuring a number of key security requirements. For an ideal solution, see &lt;a href="#ideal-practice-1-only-magic-links" >&amp;ldquo;Ideal&amp;rdquo; below&lt;/a>.&lt;/p>
+&lt;p>Of paramount importance:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Never&lt;/strong> enable anonymous access to the URL for the spreadsheet. You &lt;strong>must always require authentication&lt;/strong> to access user credential lists&lt;/li>
+&lt;li>Audit regularly who has access to the shared spreadsheet. Consider setting up an alert every time a new person is granted access&lt;/li>
+&lt;li>Reduce the total number of users that need access by breaking up user lists by logical group. For example, each sub-county could have its own user spreadsheet. That way the user credentials are only shared with the local administrators who need it&lt;/li>
+&lt;li>Refrain from printing spreadsheets of users and passwords. They can be lost, stolen or easily photographed when shown in public&lt;/li>
+&lt;li>If you ever need to download a plaintext CSV with username and password, ensure the computer also has disk encryption enabled and requires a password to unlock&lt;/li>
+&lt;li>Do not keep downloaded CSV plaintext copies of credentials. Instead, delete and re-download them from the authorized, authenticated cloud server as needed&lt;/li>
+&lt;/ul>
+&lt;h2>Transmitting credentials&lt;span class="hx-absolute -hx-mt-20" id="transmitting-credentials">&lt;/span>
+&lt;a href="#transmitting-credentials" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>When it comes time get a username and password onto a device or to a remote user, be sure to use mediums that are secure. One of the main concerns is credentials being found long after they were sent.&lt;/p>
+&lt;ul>
+&lt;li>A best practice is for the sender to add a credential to a shared password manager. The person receiving the credentials can then securely open the password manager.&lt;/li>
+&lt;li>If no password manager is available, consider sending the password via &lt;a href="https://onetimesecret.com/" target="_blank" rel="noopener">One Time Secret&lt;/a>&lt;/li>
+&lt;li>To send credentials in to many CHWs, consider using &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/#magic-links-for-logging-in-token-login" target="_blank" rel="noopener">token login&lt;/a>.&lt;/li>
+&lt;li>For sending large lists of credentials, as mentioned above, using a cloud provider like Google Sheets, is a good way to have an audit trail and still provide easy, remote access.&lt;/li>
+&lt;/ul>
+&lt;h2>Example scenarios&lt;span class="hx-absolute -hx-mt-20" id="example-scenarios">&lt;/span>
+&lt;a href="#example-scenarios" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Ideal practice 1: Only Magic Links&lt;span class="hx-absolute -hx-mt-20" id="ideal-practice-1-only-magic-links">&lt;/span>
+&lt;a href="#ideal-practice-1-only-magic-links" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Create a spreadsheet with all your users&amp;rsquo; data. Included is a username but NOT a password. When users are created in bulk via &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/csv-to-docs/#creating-csv-files-for-users" target="_blank" rel="noopener">the command line&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/users-bulk-load/" target="_blank" rel="noopener">bulk user upload&lt;/a>, have a &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/#magic-links-for-logging-in-token-login" target="_blank" rel="noopener">token login&lt;/a> sent to the user via an SMS gateway. This avoids the problem of passwords being stored in clear text in the spreadsheet or on a printed version. The token login links can only be used once and are only valid for 24 hours.&lt;/p>
+&lt;h3>Ideal practice 2: Unknown passwords, reset during provision&lt;span class="hx-absolute -hx-mt-20" id="ideal-practice-2-unknown-passwords-reset-during-provision">&lt;/span>
+&lt;a href="#ideal-practice-2-unknown-passwords-reset-during-provision" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>An alternate and also secure approach, is to bulk create the users as described above, not use magic links, and use random passwords that you do not save after giving users the credentials. Train the users on changing their password after they&amp;rsquo;ve logged in for the first time. This makes it harder for a password to be leaked because the password list isn&amp;rsquo;t kept. Additionally, as users are trained to change their password, a leaked list is likely not useful as all passwords have changed.&lt;/p>
+&lt;h3>Acceptable practice: Shared list, limited access, unique passwords&lt;span class="hx-absolute -hx-mt-20" id="acceptable-practice-shared-list-limited-access-unique-passwords">&lt;/span>
+&lt;a href="#acceptable-practice-shared-list-limited-access-unique-passwords" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>For deployments that are centrally provisioning devices, it is acceptable for generate a &lt;a href="#secure-passwords" >strong password&lt;/a> per user in a centrally accessible, &lt;a href="#spreadsheet-use" >secure spreadsheet&lt;/a>. Working off a computer to view the spreadsheet, provision each device. Do not to print the list of credentials.&lt;/p>
+&lt;h3>Worst practice: Shared list, anonymous access, similar passwords&lt;span class="hx-absolute -hx-mt-20" id="worst-practice-shared-list-anonymous-access-similar-passwords">&lt;/span>
+&lt;a href="#worst-practice-shared-list-anonymous-access-similar-passwords" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Create all users with near identical passwords (eg &lt;code>password123&lt;/code>, &lt;code>passord234&lt;/code>, &lt;code>password345&lt;/code> etc.) that are then printed out, shared via email or posted to a public URL which requires no authentication. Send an SMS to the CHW with username, password and URL of the device.&lt;/p>
+&lt;p>There&amp;rsquo;s many failures here:&lt;/p>
+&lt;ul>
+&lt;li>Passwords are predictable and easy to guess&lt;/li>
+&lt;li>Credential lists are shared too widely&lt;/li>
+&lt;li>Users will have their credentials in SMS which may be easily discovered weeks or months later by an unauthorized party&lt;/li>
+&lt;/ul>
+&lt;h2>Remediation of security failure&lt;span class="hx-absolute -hx-mt-20" id="remediation-of-security-failure">&lt;/span>
+&lt;a href="#remediation-of-security-failure" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>By knowing what the security threats are you can know the most helpful steps to remediate them to limit the damage done to the CHT deployment, the privacy of the patients and the security of CHWs.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Users who have their password changed can continue to use the CHT to deliver care. They need to &lt;em>keep their device offline&lt;/em> though. After a password change, when a CHW attempts to sync, they will be prompted to log in. At that point, they will not be able to continue using the CHT until they log in.
+No data will be lost if they log in as the &lt;em>same user&lt;/em>.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h3>Credential list shared on internet&lt;span class="hx-absolute -hx-mt-20" id="credential-list-shared-on-internet">&lt;/span>
+&lt;a href="#credential-list-shared-on-internet" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If an online list of credentials is leaked to unauthorized parties, or worse, the Internet at large in the form of being indexed by a search engine, you need to change all passwords as soon as possible for any user on the leaked list. Per the note above, changing a password will log the user out immediately unless they are offline. Having supervisors encourage a user to switch their device to offline mode (turn off all data) is a good way to ensure they can continue to deliver care so they&amp;rsquo;re not locked out.&lt;/p>
+&lt;h3>Programmatic password reset&lt;span class="hx-absolute -hx-mt-20" id="programmatic-password-reset">&lt;/span>
+&lt;a href="#programmatic-password-reset" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Medic &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/bulk-password-update-export.js" target="_blank" rel="noopener">has published a script&lt;/a> to easily change all passwords for a list of users. Administrators will then be responsible to log CHWs back in by &lt;a href="#transmitting-credentials" >securely sending&lt;/a> them their password.&lt;/p>
+&lt;p>Additionally, this script could be updated to immediately send a &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/#magic-links-for-logging-in-token-login" target="_blank" rel="noopener">token login&lt;/a> link to the user. There would be no need to change the password as this is done automatically for you. Note that users would need their phone numbers recorded in the CHT to receive a token login link. Here&amp;rsquo;s an example &lt;code>curl&lt;/code> command to send a token login link for the &lt;code>mary&lt;/code> user:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl https://medic:password@cht.example.com/api/v1/users/mary &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -X POST -H &lt;span class="s2">&amp;#34;Content-Type: application/json&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -d &lt;span class="s1">&amp;#39;{&amp;#34;token_login&amp;#34;:true}&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Audit who has changed their password&lt;span class="hx-absolute -hx-mt-20" id="audit-who-has-changed-their-password">&lt;/span>
+&lt;a href="#audit-who-has-changed-their-password" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If you have instructed all users to manually change their password, CHT administrators can search their server logs to see which users have made the update. First find a list of all running services that have the word &lt;code>haproxy&lt;/code> in it:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker ps --filter &lt;span class="s2">&amp;#34;name=haproxy&amp;#34;&lt;/span> --format &lt;span class="s1">&amp;#39;{{.Names}}&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Then, assuming your service is called &lt;code>cht_haproxy_1&lt;/code>, run this command to find all password changes in the past 24 hours:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker logs cht_haproxy_1 --since 24h 2&amp;gt;&lt;span class="p">&amp;amp;&lt;/span>&lt;span class="m">1&lt;/span> &lt;span class="p">|&lt;/span> grep password_scheme&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Here is an example event showing user &lt;code>mary&lt;/code> having changed their password on Feb 9 18:47:&lt;/p>
+&lt;p>&lt;code>Feb 9 18:47:08 haproxy[12]: 172.22.0.2,couchdb,201,15,0,0,PUT,/_users/org.couchdb.user%3Amary,api,medic,'{&amp;quot;_id&amp;quot;:&amp;quot;org.couchdb.user:mary&amp;quot;,&amp;quot;_rev&amp;quot;:&amp;quot;3-d3dd14f3026942245ce3881adfcd513e&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;mary&amp;quot;,&amp;quot;type&amp;quot;:&amp;quot;user&amp;quot;,&amp;quot;roles&amp;quot;:[&amp;quot;chw&amp;quot;],&amp;quot;facility_id&amp;quot;:&amp;quot;14046008-f796-4418-9ff2-12c2ef77b478&amp;quot;,&amp;quot;password_scheme&amp;quot;:&amp;quot;***&amp;quot;,&amp;quot;iterations&amp;quot;:10,&amp;quot;derived_key&amp;quot;:&amp;quot;f846a7a20209592c613c09ea4405170735c7a557&amp;quot;,&amp;quot;salt&amp;quot;:&amp;quot;bbb089e5fc459c2ca1088c8316e0cc99&amp;quot;,&amp;quot;password&amp;quot;:&amp;quot;***&amp;quot;}',411,15,86,'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'&lt;/code>&lt;/p>
+&lt;h2>Frequently Asked Questions&lt;span class="hx-absolute -hx-mt-20" id="frequently-asked-questions">&lt;/span>
+&lt;a href="#frequently-asked-questions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/best-practices-for-user-management-at-scale/1668/1" target="_blank" rel="noopener">Best practices for user management at scale?&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/send-magic-link-via-mobile-bundle/2760/2" target="_blank" rel="noopener">Is it possible to send Magic Link to users using their own mobile bundles instead of setting up a messaging gateway?&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Securing Android Devices</title><link>https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/</guid><description>
+&lt;p>To secure an android device you should enable at least a pin code lock on the device, enable FDE (full disc encryption) and setup remote wiping capabilities by enabling mobile device management.&lt;/p>
+&lt;h2>PIN Setup and FDE&lt;span class="hx-absolute -hx-mt-20" id="pin-setup-and-fde">&lt;/span>
+&lt;a href="#pin-setup-and-fde" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Instructions are slightly different per device. Enabling FDE has the added benefit that you must also lock the device with a pin code or password.&lt;/p>
+&lt;h3>Android 5.0 or later&lt;span class="hx-absolute -hx-mt-20" id="android-50-or-later">&lt;/span>
+&lt;a href="#android-50-or-later" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Open the &lt;code>Security&lt;/code> menu under settings. On unmodified versions of Android, this
+can be found under &lt;code>Settings&lt;/code> &lt;code>&amp;gt;&lt;/code> &lt;code>Personal&lt;/code> &lt;code>&amp;gt;&lt;/code> &lt;code>Security&lt;/code>. Choose &lt;code>Encrypt Phone&lt;/code>, &lt;code>Encrypt Tablet&lt;/code>, or &lt;code>Encrypt Device&lt;/code>. If you haven&amp;rsquo;t already set a PIN
+or passcode for the lock screen, you will be prompted to do so. Remember this
+PIN and do not write it down.&lt;/p>
+&lt;figure>&lt;a href="encrypt-50.jpg">&lt;img src="https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/encrypt-50.jpg"
+alt="Screenshot for Android 5.0">&lt;/a>&lt;figcaption>
+&lt;p>Screenshot for Android 5.0&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;h3>Android 4.4 or earlier&lt;span class="hx-absolute -hx-mt-20" id="android-44-or-earlier">&lt;/span>
+&lt;a href="#android-44-or-earlier" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>First, you&amp;rsquo;ll need to set up a PIN. Navigate to &lt;code>Settings&lt;/code> &lt;code>&amp;gt;&lt;/code> &lt;code>Security&lt;/code> &lt;code>&amp;gt;&lt;/code>
+&lt;code>Screen Lock&lt;/code>, and set a numeric PIN for the device of &lt;em>at least&lt;/em> four digits.
+Remember this PIN and do not write it down.&lt;/p>
+&lt;p>Then, open the &lt;code>Security&lt;/code> menu under settings. On unmodified versions of
+Android, this can be found under &lt;code>Settings&lt;/code> &lt;code>&amp;gt;&lt;/code> &lt;code>Personal&lt;/code> &lt;code>&amp;gt;&lt;/code> &lt;code>Security&lt;/code>.
+On some devices, the exact menu layout may have been modified by the hardware
+manufacturer. Choose &lt;code>Encrypt Phone&lt;/code> or &lt;code>Encrypt Tablet&lt;/code>.&lt;/p>
+&lt;figure>&lt;a href="encrypt-44.jpg">&lt;img src="https://docs.communityhealthtoolkit.org/building/guides/security/securing-android/encrypt-44.jpg"
+alt="Screenshot for Android 4.4">&lt;/a>&lt;figcaption>
+&lt;p>Screenshot for Android 4.4&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;h3>Android Versions before 3.0&lt;span class="hx-absolute -hx-mt-20" id="android-versions-before-30">&lt;/span>
+&lt;a href="#android-versions-before-30" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Android does not support disk encryption in versions earlier than 3.0
+(Honeycomb). If you have one of these devices, we recommend that you do not use it.&lt;/p>
+&lt;h2>Mobile device management&lt;span class="hx-absolute -hx-mt-20" id="mobile-device-management">&lt;/span>
+&lt;a href="#mobile-device-management" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Using mobile device management (MDM) software allows administrators to remotely manage mobile devices, which often includes the option to delete apps and data from lost or stolen mobile devices.&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/android/publishing/#mobile-device-management">Publishing &amp;gt; Mobile Device Management&lt;/a>&lt;/p></description></item></channel></rss>

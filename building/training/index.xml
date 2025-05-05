@@ -1,1 +1,257 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Training on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/building/training/</link><description>Recent content in Training on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/training/index.xml" rel="self" type="application/rss+xml"/><item><title>CHT training resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training/</guid><description>CHT training processIn the implementation of CHT supported community health programs, health care workers such as CHWs, CHW supervisors and facility based health care providers need training to help equip them with the required knowledge and skills to effectively carry out their roles and responsibilities. For most deployments, program leads and ministry of health officials may also need training for them to perform their roles, oversee and supervise the community health programs.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Training</title><link>https://docs.communityhealthtoolkit.org/building/training/</link><description>Recent content in Training on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/training/index.xml" rel="self" type="application/rss+xml"/><item><title>Onboarding Using a Training App</title><link>https://docs.communityhealthtoolkit.org/building/training/onboarding/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/onboarding/</guid><description>
+&lt;p>When onboarding new users, having a dedicated CHT app and instance for training can be helpful; it allows new users to do training exercises with mock data to get familiar with the app, while not having the data from their training interfering with the future use of their CHT app. Different approaches are possible, such as only entering real patient data during training, or manually deleting all the training data, but these methods are less practical for large deployments.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The suggestions in this guide should be assessed and adapted as needed to benefit a deployment. It is important that users don&amp;rsquo;t accidentally use the wrong app. The &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/training-instance/" >troubleshooting guide&lt;/a> can help to monitor and remediate training data being in the production instance, or the opposite.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Setting up a training app&lt;span class="hx-absolute -hx-mt-20" id="setting-up-a-training-app">&lt;/span>
+&lt;a href="#setting-up-a-training-app" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A separate Android App can be created for training, which would point to a CHT instance dedicated to training. The training instance should have the same configuration as the production instance, and have users created for training. To differentiate the Android app used for training from the production one, create a duplicate of &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/android/" >your flavor&lt;/a> and modify the following aspects&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Border &amp;amp; Message&lt;/strong>: Consider adding a distinctive border and message when using the training app. This can be done by setting the build config field &lt;code>IS_TRAINING_APP&lt;/code> to &lt;code>true&lt;/code>, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L212-L216" target="_blank" rel="noopener">&lt;code>build.gradle&lt;/code>&lt;/a> for the training version of the Gamma app.&lt;/li>
+&lt;li>&lt;strong>CHT Instance&lt;/strong>: In your flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file set the &lt;code>app_host&lt;/code> string to be the URL of your training instance, as seen in the &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L3" target="_blank" rel="noopener">Gamma Training app&lt;/a>. If left the same as the production app both training and production data will end up in your production instance.&lt;/li>
+&lt;li>&lt;strong>Launcher icons&lt;/strong>: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/li>
+&lt;li>&lt;strong>App name&lt;/strong>: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code>CHW App [TRAINING VERSION]&lt;/code> may display as &lt;code>CHW App...&lt;/code> so it would be better to use &lt;code>[TRAINING] CHW App&lt;/code>. The app name is set in the flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L4" target="_blank" rel="noopener">the Gamma training app&lt;/a>.&lt;/li>
+&lt;li>&lt;strong>App ID&lt;/strong>: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code>applicationId&lt;/code>, as seen &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L214" target="_blank" rel="noopener">in &lt;code>build.gradle&lt;/code> for the Gamma training app&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;div class="hextra-cards hx-mt-4 hx-gap-4 hx-grid not-prose" style="--hextra-cards-grid-cols: 3;">
+&lt;figure class="right col-6 col-lg-4">&lt;a href="training-app.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/onboarding/training-app.png"
+alt="CHT training app with border and message">&lt;/a>
+&lt;/figure>
+&lt;/div>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Keeping the &lt;code>applicationId&lt;/code> values the same will make it impossible to have both the training and production apps installed at the same time on a device. If you have a way to install the production app after the training is complete then you may choose to do this to prevent users from using the wrong app.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Switching from training to production app&lt;span class="hx-absolute -hx-mt-20" id="switching-from-training-to-production-app">&lt;/span>
+&lt;a href="#switching-from-training-to-production-app" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To avoid having production data in the training app, it is encouraged to &lt;strong>remove&lt;/strong> the training app from the device once training is complete.&lt;/p>
+&lt;p>If the production app can always be installed after the use of the training is complete, then using the same &lt;code>applicationId&lt;/code> guarantees that only one of the apps is installed at any given time.&lt;/p>
+&lt;p>Changing passwords for the training users in an attempt to lock them out is not recommended. In some circumstances a user would be able to continue to use the training app for production use and not have the data sync back to the server.&lt;/p>
+&lt;p>It is preferable to remove the training app from devices, and &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/training-instance/" >monitor the training instance for unexpected activity&lt;/a> that can be brought over to the production instance if needed.&lt;/p></description></item><item><title>Training Cards</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards/</guid><description>
+&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>&lt;em>Training Cards&lt;/em> help health workers learn about changes to CHT apps remotely, directly in their app. Training content might include information about a newly deployed feature, changes to a &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/care-guides/" >care guide&lt;/a>, or simply a reminder about an underused feature or workflow. They are perfect for training on a very specific topic and are not meant to replace a comprehensive onboarding program.&lt;/p>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/" >Template training content&lt;/a> for new CHT features is made available from time to time. These templates can be customized to the local context.&lt;/p>
+&lt;figure class="col-12 col-lg-10">&lt;a href="training-deck.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-deck.png">&lt;/a>
+&lt;/figure>
+&lt;h2>Accessing&lt;span class="hx-absolute -hx-mt-20" id="accessing">&lt;/span>
+&lt;a href="#accessing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>When health workers open or reload their app, configured training cards will automatically show on top of all other content in the app. If it is not a convenient time to complete the training, they can cancel out at any time and will be prompted again the next day they open their app (training will start from the beginning).&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>If there are multiple training sets configured to start on the same day, the CHT will determine the order alphabetically based on the form ID. Subsequent training sets will only be displayed once the previous ones are either completed or no longer valid the next day the app is opened.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Training materials can also be accessed in the training page found in the auxiliary menu for users to revisit as needed. Completed training is displayed with a green checkmark. &lt;em>Added in 4.15.0&lt;/em>.&lt;/p>
+&lt;figure class="col-10 col-lg-10">&lt;a href="training-materials-page.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-materials-page.png">&lt;/a>
+&lt;/figure>
+&lt;h2>Completing&lt;span class="hx-absolute -hx-mt-20" id="completing">&lt;/span>
+&lt;a href="#completing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Health workers read through each card one by one in a predefined sequence, tapping “Next” on each card. When they are finished reading all cards, they tap “Submit” on the last card. The training set is now considered complete and they can continue using their app. Completed training sets show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/features/reports/#main-list" >main list&lt;/a> of the Reports tab and they won’t be asked to complete this set again. If there are additional training sets to complete, they will be shown the next day the app is opened.&lt;/p>
+&lt;h2>Monitoring&lt;span class="hx-absolute -hx-mt-20" id="monitoring">&lt;/span>
+&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>As mentioned above, completed training sets will show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/features/reports/#main-list" >main list&lt;/a> of the Reports tab. These reports are available in &lt;a href="https://docs.communityhealthtoolkit.org/building/features/supervision/#supervisor-dashboards" >analytics&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/building/features/supervision/#chw-aggregate-targets" >aggregate targets&lt;/a> , and can trigger supervision workflows and &lt;a href="https://docs.communityhealthtoolkit.org/building/features/supervision/#supervisor-tasks" >tasks&lt;/a>.&lt;/p>
+&lt;h2>Configurability&lt;span class="hx-absolute -hx-mt-20" id="configurability">&lt;/span>
+&lt;a href="#configurability" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Training cards can be shown to any user associated to a contact. A “set” of training cards represents a collection of individual training cards, generally covering a single training topic. The list below highlights some of the key areas of customization:&lt;/p>
+&lt;ul>
+&lt;li>Number of sets&lt;/li>
+&lt;li>Number of cards in a set&lt;/li>
+&lt;li>Content of each individual card (text, images, etc…)&lt;/li>
+&lt;li>When health workers will start seeing a set (specific start date)&lt;/li>
+&lt;li>How long the set will be available (# of days, relative to the start date)&lt;/li>
+&lt;li>Which users will see the set (based on user roles)&lt;/li>
+&lt;/ul></description></item><item><title>Training Cards Resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</guid><description>
+&lt;h2>Best practices&lt;span class="hx-absolute -hx-mt-20" id="best-practices">&lt;/span>
+&lt;a href="#best-practices" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>If you are deploying new &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >trainings cards&lt;/a>, here are some best practices to follow:&lt;/p>
+&lt;ul>
+&lt;li>When deploying training cards for the first time, provide guidance in advance as to what users should expect from the cards and how to use them&lt;/li>
+&lt;li>Test training card content with a small set of users to ensure learnability and understanding before deploying to your live instance&lt;/li>
+&lt;li>Test on a physical device to see what content will look like on different screen sizes&lt;/li>
+&lt;li>Keep content to a minimum and try to have as few cards as possible&lt;/li>
+&lt;li>Ensure images aren&amp;rsquo;t confused with UI elements: Add outlines or shadows indicating they&amp;rsquo;re for demonstrative purposes only. Never include navigation buttons in your screenshots (e.g., &amp;ldquo;Next&amp;rdquo; or &amp;ldquo;Cancel&amp;rdquo;).&lt;/li>
+&lt;li>Make sure users know who to contact if they run into issues&lt;/li>
+&lt;li>Establish success criteria for the training cards&lt;/li>
+&lt;/ul>
+&lt;p>Some examples of data to monitor include:&lt;/p>
+&lt;ul>
+&lt;li>Users who have completed the training within X days&lt;/li>
+&lt;li>Outliers, ex. users who have seen the cards multiple times and not completed the training&lt;/li>
+&lt;li>The intended users have received the training&lt;/li>
+&lt;/ul>
+&lt;h2>Examples&lt;span class="hx-absolute -hx-mt-20" id="examples">&lt;/span>
+&lt;a href="#examples" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Below is a list of training cards that you can use in your project to train users about new updates in CHT. Read the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >step by step guide&lt;/a> to deploy the training cards.&lt;/p>
+&lt;h3>Floating Action Button&lt;span class="hx-absolute -hx-mt-20" id="floating-action-button">&lt;/span>
+&lt;a href="#floating-action-button" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>The additive actions (creating reports, places, people, etc&amp;hellip;) have moved from the bottom action bar to a Floating Action Button. Use this training to introduce the change to your users.&lt;/p>
+&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/floating-action-button" target="_blank" rel="noopener">here&lt;/a>.&lt;/p>
+&lt;figure class="left col-10">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/floating-action-button.png">
+&lt;/figure>
+&lt;br clear="all">
+&lt;h3>More Options Menu&lt;span class="hx-absolute -hx-mt-20" id="more-options-menu">&lt;/span>
+&lt;a href="#more-options-menu" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
+&lt;p>The Edit, Delete and Export actions have been moved to the More Options menu. Use this training to introduce the change to your users.&lt;/p>
+&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/more-options" target="_blank" rel="noopener">here&lt;/a>.&lt;/p>
+&lt;figure class="left col-10">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/more-options.png">
+&lt;/figure>
+&lt;br clear="all">
+&lt;p>Once you have downloaded the training card files, follow the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >step by step guide&lt;/a> to learn how to edit the &lt;code>properties file&lt;/code> to configure:&lt;/p>
+&lt;ul>
+&lt;li>The &lt;code>roles&lt;/code> of users who can view the training cards&lt;/li>
+&lt;li>The &lt;code>start_date&lt;/code> to define the training start day (when the training cards should show)&lt;/li>
+&lt;/ul></description></item><item><title>CHT training resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training/</guid><description>
+&lt;h2>CHT training process&lt;span class="hx-absolute -hx-mt-20" id="cht-training-process">&lt;/span>
+&lt;a href="#cht-training-process" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In the implementation of CHT supported community health programs, health care workers such as CHWs, CHW supervisors and facility based health care providers need training to help equip them with the required knowledge and skills to effectively carry out their roles and responsibilities. For most deployments, program leads and ministry of health officials may also need training for them to perform their roles, oversee and supervise the community health programs. End user training needs to be well planned and implemented using standardized training methods and approaches which take into account the capacity of end users.&lt;/p>
+&lt;p>For most community health programs, CHW training is divided into two major sections consisting of basic modules and technical modules. For basic module training, CHWs are trained on basic skills such as leadership, communication and counselling, basic health promotion practices and basic lifesaving skills. For technical training, end users are trained in the following common areas to help improve their skills and delivery:&lt;/p>
+&lt;ul>
+&lt;li>Thematic training - this training focuses on the health program areas of interest, this will vary from one program to another depending on the specific health areas users are expected to support. For example, for an MNCH program, users will be trained in ANC, PNC and immunization.&lt;/li>
+&lt;li>Hardware and software training - users are trained on how they can operate an android phone, reboot the hardware, install and reinstall applications and how they can log into the CHT app. This training is critical for end users who have never interacted with a smart phone before.&lt;/li>
+&lt;li>CHT tool training - this involves training users on how they can use different CHT tools (SMS, mobile and web applications) to guide them to deliver health care services.&lt;/li>
+&lt;li>Skill development - users are trained on interpersonal communication, listening skills, capacity building skills and how they can promote healthy behaviour change.&lt;/li>
+&lt;li>Behavioural - the users are taught how to build relations in the community and how to work within diverse communities.&lt;/li>
+&lt;/ul>
+&lt;p>Proper training of health care workers leads to increased job satisfaction ensuring health care workers are able to provide high quality care.&lt;/p>
+&lt;p>This guide highlights some of the considerations and steps for planning and conducting end user training. It is based on the learnings from many collaborative trainings that have been conducted over the years. Some of the training resources have been co-created with various implementing partners and ministries of health. This guide can help partners learn how they can plan and conduct training.&lt;/p>
+&lt;p>The CHT training process comprises a series of steps highlighted below that need to be followed systematically to ensure an efficient training programme.&lt;/p>
+&lt;ul>
+&lt;li>Training needs assessment - this is the first step prior to conducting the training to help understand the users needs, behaviour, roles and how they perform their responsibilities. At this stage, information on the literacy and numerical skills of end users, demographics (age, gender, language of instruction), potential program champions is collected, this information helps inform the training approach, duration and methods of training. To collect the needs assessment information, various methods can be used including observation, interviews,focused group discussions and surveys.&lt;/li>
+&lt;li>Define the training objectives - In this step, the training outcomes are defined, these are things end users should be able to do as a result of the training.&lt;/li>
+&lt;li>Develop a training plan or checklist - The checklist lists the tasks, activities and resources needed to train the end users&lt;/li>
+&lt;li>Create the training materials and resources&lt;/li>
+&lt;li>Conduct the training - Different training approaches can be adopted. Training can be done in person or virtually. It includes direct training of end users, training of trainers (ToT) model which involves training program champions to cascade the training, use of &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >CHT training cards&lt;/a> in which users are able to access training resources in-app, remote online training and self learning through a learning management system.&lt;/li>
+&lt;li>Evaluate the training - In this stage, the training outcomes are assessed to determine if the training has achieved the expected outcomes. The learning objectives will help to determine the evaluation process that would be most appropriate.&lt;/li>
+&lt;/ul>
+&lt;h2>Pre training preparation&lt;span class="hx-absolute -hx-mt-20" id="pre-training-preparation">&lt;/span>
+&lt;a href="#pre-training-preparation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Before training is done, a training preparation checklist is prepared to ensure all items listed below are catered to.&lt;/p>
+&lt;h4>Tech preparation&lt;span class="hx-absolute -hx-mt-20" id="tech-preparation">&lt;/span>
+&lt;a href="#tech-preparation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
+&lt;li>Set up application instance (training &amp;amp; production instances)&lt;/li>
+&lt;li>Create user accounts for all personas depending on the specific project&lt;/li>
+&lt;li>Set up users&amp;rsquo; phones to ensure applications like Playstore and other related tools are available&lt;/li>
+&lt;/ul>
+&lt;h4>Logistics&lt;span class="hx-absolute -hx-mt-20" id="logistics">&lt;/span>
+&lt;a href="#logistics" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
+&lt;li>Identify the total number of participants. It is recommended that the ratio of facilitators to participants should be 1:10 and each training class should have a maximum of 30 participants.&lt;/li>
+&lt;li>Confirm and organize training venue. The venue should be well ventilated, have adequate lighting, good sanitation and security and be at a central location for easy access. It is recommended that the training of the CHWs takes place in a community setting such as schools, churches or mosques while training of CHAs and program teams can happen in a facility or hotel.&lt;/li>
+&lt;li>Phone preparation
+&lt;ul>
+&lt;li>Procure phones for the training with &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/" >minimum specs requirements&lt;/a>&lt;/li>
+&lt;li>Ensure phones are fully charged prior to training&lt;/li>
+&lt;li>Guide users on how to obtain and register SIM cards&lt;/li>
+&lt;li>Load airtime into phones&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Pack phones, chargers and any other applicable hardware to take to the training venue&lt;/li>
+&lt;li>Prepare the inventory with end-users names, SIM numbers and phone IMEI numbers&lt;/li>
+&lt;li>Prepare the mobile and SIM handover form with a documented mobile and SIM Management guideline handout&lt;/li>
+&lt;li>Confirm availability of electricity, mobile network and internet at the training venue&lt;/li>
+&lt;li>Invite the partner or ministry of health to lead the training&lt;/li>
+&lt;li>Organize a facilitators pre-planning meeting to assign each facilitator sessions they will be covering.&lt;/li>
+&lt;li>Facilitators should visit the training site prior to the training to make sure the site is ready for the planned training.&lt;/li>
+&lt;li>Organize and process payment forms, if applicable, for:
+&lt;ul>
+&lt;li>Trainer and co-trainer allowance&lt;/li>
+&lt;li>Participation allowance&lt;/li>
+&lt;li>Travel allowance for participants&lt;/li>
+&lt;li>Venue costs and other expenses&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4>Training materials&lt;span class="hx-absolute -hx-mt-20" id="training-materials">&lt;/span>
+&lt;a href="#training-materials" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
+&lt;li>Prepare training materials&lt;/li>
+&lt;li>Prepare training agenda with daily training schedule. This should contain the trainer responsibilities and activities - &lt;a href="https://docs.google.com/spreadsheets/d/1_oqbWhXoQy51WdUgyGTbnMpkPyugVmwT/edit?usp=drive_link&amp;amp;ouid=101053816538187800670&amp;amp;rtpof=true&amp;amp;sd=true" target="_blank" rel="noopener">here is an example of a training schedule&lt;/a>&lt;/li>
+&lt;li>Prepare screenshots or posters of training materials as backup&lt;/li>
+&lt;li>Finalize user guides - &lt;a href="https://drive.google.com/file/d/1T4OPfSnCzJPSpXEEVe7a6_8gq2MkS6sB/view?usp=drive_link" target="_blank" rel="noopener">here is an example of a user guide&lt;/a>&lt;/li>
+&lt;li>Finalize on the trainer and co-trainer resources&lt;/li>
+&lt;li>Translate training materials and arrange for a translator, if required&lt;/li>
+&lt;li>Organize supplies and stationery (markers, pens, notebooks, meta cards, tape, newsprint, index cards, handouts, take-home guides, projector and other required training equipment)&lt;/li>
+&lt;li>Print training materials such as the ones listed below:
+&lt;ul>
+&lt;li>Posters as a backup in case there is no electricity&lt;/li>
+&lt;li>User guides&lt;/li>
+&lt;li>Evaluations which include pre-tests and post-tests - &lt;a href="https://docs.google.com/document/d/1t5tqrk0m3c-5YJJBrteqU8sNsoDc3UT1WrXfy8NLNtw" target="_blank" rel="noopener">here is an example of a pre/post test&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2>Training&lt;span class="hx-absolute -hx-mt-20" id="training">&lt;/span>
+&lt;a href="#training" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Conducting a training&lt;span class="hx-absolute -hx-mt-20" id="conducting-a-training">&lt;/span>
+&lt;a href="#conducting-a-training" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Training should be approached in a cohesive and integrated manner, starting with the initial training of the end users, followed by regular refresher training, with continuous support, supervision and mentorship. Training is usually carried out collaboratively by the implementing partners, ministry of health officials and project implementers.&lt;/p>
+&lt;p>Different training approaches can be used to train end users. Several factors determine the training approach that is to be used, this includes the number of trainees and facilitators, user demographics, learning objectives, training environment and the available resources. The training approaches include: the training of trainers (ToT) model, direct end-user training and remote training. The ToT model is used to train a large pool of end users. For this model, a cadre of end users are trained as ToTs and after the training they are expected to cascade, reinforce and support the training of other end users. Direct training involves a trainer conducting an in-person training of end users while for the remote training, end users are trained online or they can access the training resources on their devices.&lt;/p>
+&lt;h3>Training delivery methods&lt;span class="hx-absolute -hx-mt-20" id="training-delivery-methods">&lt;/span>
+&lt;a href="#training-delivery-methods" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>There are a number of training methods that can be used to train end users. Blended training, participatory and interactive techniques can be used to make the training effective. The table below has a list of some of the delivery methods.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Method&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Role play&lt;/td>
+&lt;td>Learners act out the different roles they are assigned. Following the skit, there are discussions and conclusions related to the topic.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Presentations&lt;/td>
+&lt;td>A facilitator delivers content through oral, video and visual aids.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Demonstrations&lt;/td>
+&lt;td>A skill is demonstrated with a goal of facilitating understanding, eliciting comments and explanations.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Pair work&lt;/td>
+&lt;td>Participants are able to work in pairs so that participants with low confidence are able to learn from other participants.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Case studies&lt;/td>
+&lt;td>A facilitator presents facts about a theoretical case or scenario and learners are asked to intervene and make suggestions, followed by a conclusion about the case.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Interactive simulations&lt;/td>
+&lt;td>This method provides an opportunity for learners to practise a certain task for example how to register a new households on CHT.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Teachbacks&lt;/td>
+&lt;td>Trainees pick a topic or a skill they have learned in one of the sessions and teach it to their peers.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Question and answer&lt;/td>
+&lt;td>The learners are provided with a set of questions which they are expected to answer so as to establish their prior level of understanding of a certain topic.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Hands-on practice&lt;/td>
+&lt;td>Learners get to experience and practise what they have learned, for example a learner will get the experience of navigating a digital app.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Individual work and assessments&lt;/td>
+&lt;td>Participants work individually to answer written or oral questions about a topic that has already been covered in the training.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Flip charts&lt;/td>
+&lt;td>These are wall and board hangings that can serve as visual aids to reinforce learning.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Group assessments&lt;/td>
+&lt;td>Learners work together to answer questions or complete assigned tasks aimed at assessing knowledge of topics already covered in the training.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2>Post training activities&lt;span class="hx-absolute -hx-mt-20" id="post-training-activities">&lt;/span>
+&lt;a href="#post-training-activities" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>After every day of training, facilitators should conduct training evaluation to discuss what went well and the areas to improve on the subsequent training days. After the completion of the training, ministries of health, implementing partners and CHT users agree on a date when the project can go live. Below are the critical activities that take place before go-live.&lt;/p>
+&lt;ul>
+&lt;li>Participants are informed when the project will go live. In most cases, the project goes live a few weeks after the training&lt;/li>
+&lt;li>Participants are trained on how to install the production application&lt;/li>
+&lt;li>Paricipants are reminded to uninstall the training application&lt;/li>
+&lt;li>User accounts are created on the production instance and credentials shared&lt;/li>
+&lt;li>Users are informed on technical support structure to support with post-training issues&lt;/li>
+&lt;li>Users are sensitized on privacy and security best practices&lt;/li>
+&lt;/ul>
+&lt;h2>Evaluation&lt;span class="hx-absolute -hx-mt-20" id="evaluation">&lt;/span>
+&lt;a href="#evaluation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Evaluation assesses whether the training objectives have been achieved. Evaluation of the training involves assessing the effect of the training observed against a set standard considered as an indication of learning. A common model used to evaluate the training consists of the following four levels:&lt;/p>
+&lt;ul>
+&lt;li>Level 1 - this is the participants reaction towards the learning usually performed through a feedback survey, participants can evaluate the training content, facilitators, training approaches and the training venue. Trainers use this feedback to improve the training content and approach&lt;/li>
+&lt;li>Level 2 - This measures what learners have learnt and what they are able to perform as a result of the training. This can be done during the training through pre and post tests, simulations, practical tests and tasks&lt;/li>
+&lt;li>Level 3 - After the training event, the learners are evaluated if they are able to apply what they have learned when working. This can be done through observations, learning and interviews&lt;/li>
+&lt;li>Level 4 - This is concerned with the extent to which changes in behaviour after the training contribute to improved results and increased impact. This can be done after a series of training and refresher trainings and it requires before and after the training comparison&lt;/li>
+&lt;/ul></description></item></channel></rss>

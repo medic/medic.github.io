@@ -1,12 +1,1678 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Forms on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/building/forms/</link><description>Recent content in Forms on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/forms/index.xml" rel="self" type="application/rss+xml"/><item><title>app</title><link>https://docs.communityhealthtoolkit.org/building/forms/app/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/app/</guid><description>App forms are used for care guides within the web app, whether accessed in browser or via the Android app. When a user completes an app form, the contents are saved in the database with the type data_record. These docs are known in the app as Reports.
-App forms are defined by the following files:
-A XML form definition using a CHT-enhanced ODK XForm format A XLSForm form definition, easier to write and converts to the XForm (optional) Meta information in the {form_name}.</description></item><item><title>contact</title><link>https://docs.communityhealthtoolkit.org/building/forms/contact/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/contact/</guid><description>Contact forms are used to create and edit contacts (persons and places). Each contact-type should ideally have two forms; one for creation, and another for editing.
-These forms are stored in the forms/contact sub-folder of the project config directory. The naming convention used should be &amp;lt;contact_type_id-{create|edit}&amp;gt;.xlsx.
-Form detailsSurvey sheetTo collect information about the contact, use a top-level group with the id of the contact_type as the name of the group (e.</description></item><item><title>collect</title><link>https://docs.communityhealthtoolkit.org/building/forms/collect/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/collect/</guid><description>ODK XForms are used to render forms in the Medic Collect Android app. These forms cannot use any CHT-specific XForm notations. All Medic Collect forms are processed as SMS (even when submitted over a wifi) therefore a corresponding JSON form with matching fields is used to interpret the incoming report.
-Collect forms must be in the forms/collect folder to be processed by cht-conf&amp;rsquo;s convert-collect-forms and upload-collect-forms actions. Once uploaded to the server, they can be downloaded by the Medic Collect app.</description></item><item><title>Setting Form Properties</title><link>https://docs.communityhealthtoolkit.org/building/forms/form-properties/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/form-properties/</guid><description>This tutorial will take you through how to write the &amp;lt;form_name&amp;gt;.properties.json file.
-The &amp;lt;form_name&amp;gt;.properties.json file allows you to add logic that ensures that the right action appears for the right contacts (people and places). For instance, an assessment form for children under-5 will only appear for person contacts on the CHT whose age is less than 5.
-You will be adding meta-data and context to an assessment workflow that allows Community Health Workers to conduct a health assessment for children under the age of 5.</description></item><item><title>Versioning forms</title><link>https://docs.communityhealthtoolkit.org/building/forms/versioning/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/versioning/</guid><description>Added in cht-core 3.15.0 and cht-conf 3.10.0
-When uploading app or contact xforms, cht-conf 3.10.0+ will automatically generate a version and include it in the form doc&amp;rsquo;s xmlVersion property. The version has two properties.
-Property Description time The time that the form was uploaded to the server in millis since the epoch. sha256 A hash of the xform content. For example:
-&amp;#34;xmlVersion&amp;#34;: { &amp;#34;time&amp;#34;: 1658717177750, &amp;#34;sha256&amp;#34;: &amp;#34;6f0bbfe5a9a9ebeb25784165879afec5e311b197cbd76ade5698c83c22dd9a8f&amp;#34; } When a user fills in a form with an xmlVersion property, the version is copied in to the report doc as the form_version property.</description></item><item><title>Expression Functions</title><link>https://docs.communityhealthtoolkit.org/building/forms/_partial_expression_functions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/_partial_expression_functions/</guid><description>The following functions are available for use in JavaScript expressions:
-Signature Description ageInDays(contact) Returns the current age of the given contact in days. ageInMonth(contact) Returns the current age of the given contact in months. ageInYears(contact) Returns the current age of the given contact in years. levenshteinEq(string0, string1, threshold = 3) (Added 4.19.0) Returns true if the Levenshtein distance between the given strings is less than or equal to the given threshold.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Forms</title><link>https://docs.communityhealthtoolkit.org/building/forms/</link><description>Recent content in Forms on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/forms/index.xml" rel="self" type="application/rss+xml"/><item><title>app</title><link>https://docs.communityhealthtoolkit.org/building/forms/app/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/app/</guid><description>
+&lt;p>App forms are used for care guides within the web app, whether accessed in browser or via the Android app. When a user completes an app form, the contents are saved in the database with the type &lt;code>data_record&lt;/code>. These docs are known in the app as &lt;a href="https://docs.communityhealthtoolkit.org/building/features/reports/" >Reports&lt;/a>.&lt;/p>
+&lt;p>App forms are defined by the following files:&lt;/p>
+&lt;ul>
+&lt;li>A XML form definition using a CHT-enhanced ODK XForm format&lt;/li>
+&lt;li>A XLSForm form definition, easier to write and converts to the XForm (optional)&lt;/li>
+&lt;li>Meta information in the &lt;code>{form_name}.properties.json&lt;/code> file (optional)&lt;/li>
+&lt;li>Media files in the &lt;code>{form_name}-media&lt;/code> directory (optional). How to &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/multimedia/" >include multimedia files&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;h2>XForm&lt;span class="hx-absolute -hx-mt-20" id="xform">&lt;/span>
+&lt;a href="#xform" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A CHT-enhanced version of the ODK XForm standard is supported.&lt;/p>
+&lt;p>Data needed during the completion of the form (eg patient&amp;rsquo;s name, prior information) is passed into the &lt;code>inputs&lt;/code> group. Reports that have at least one of &lt;code>place_id&lt;/code>, &lt;code>patient_id&lt;/code>, and &lt;code>patient_uuid&lt;/code> at the top level will be associated with that contact.&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/#care-guides">Passing contact data to care guides&lt;/a>&lt;/p>
+&lt;p>A typical form ends with a summary group (eg &lt;code>group_summary&lt;/code>, or &lt;code>group_review&lt;/code>) where important information is shown to the user before they submit the form.&lt;/p>
+&lt;p>In between the &lt;code>inputs&lt;/code> and the closing group is the form flow - a collection of questions that can be grouped into pages. All data fields submitted with a form are stored, but often important information that will need to be accessed from the form is brought to the top level. To make sure forms are properly associated to a contact, make sure at least one of &lt;code>place_id&lt;/code>, &lt;code>patient_id&lt;/code>, and &lt;code>patient_uuid&lt;/code> is stored at the top level of the form.&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/design/best-practices/#content-and-layout">Content and Layout&lt;/a>&lt;/p>
+&lt;h2>XLSForm&lt;span class="hx-absolute -hx-mt-20" id="xlsform">&lt;/span>
+&lt;a href="#xlsform" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Since writing raw XML can be tedious, we suggest creating the forms using the &lt;a href="http://xlsform.org/" target="_blank" rel="noopener">XLSForm standard&lt;/a>, and using the &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">cht-conf&lt;/a> command line configurer tool to &lt;a href="#build" >convert them to XForm format&lt;/a>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>relevant&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>calculate&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>inputs&lt;/td>
+&lt;td>Inputs&lt;/td>
+&lt;td>./source = &amp;lsquo;user&amp;rsquo;&lt;/td>
+&lt;td>field-list&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>source&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>source_id&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>task_id&lt;/td>
+&lt;td>Task_ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>contact&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>Patient ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>select-contact type-person&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>patient_id&lt;/td>
+&lt;td>Medic ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>hidden&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>Patient Name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>hidden&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>_id&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>../inputs/contact/_id&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>patient_id&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>../inputs/contact/patient_id&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>calculate&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>../inputs/contact/name&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>group_summary&lt;/td>
+&lt;td>Summary&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>field-list summary&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>note&lt;/td>
+&lt;td>r_patient_info&lt;/td>
+&lt;td>**${patient_name}** ID: ${r_patient_id}&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>note&lt;/td>
+&lt;td>r_followup&lt;/td>
+&lt;td>Follow Up &amp;lt;i class=&amp;ldquo;fa fa-flag&amp;rdquo;&amp;gt;&amp;lt;/i&amp;gt;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>note&lt;/td>
+&lt;td>r_followup_note&lt;/td>
+&lt;td>${r_followup_instructions}&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>Note:&lt;/strong> If the form uses a file picker to upload any type of file, and it is accessed by using CHT Android, then include the &lt;code>READ_EXTERNAL_STORAGE&lt;/code> permission in order to access the files in the device. To enable this permission add the following line in the branded app&amp;rsquo;s &lt;code>AndroidManifest.xml&lt;/code>.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;uses-permission&lt;/span> &lt;span class="na">android:name=&lt;/span>&lt;span class="s">&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Supported XLSForm Meta Fields&lt;span class="hx-absolute -hx-mt-20" id="supported-xlsform-meta-fields">&lt;/span>
+&lt;a href="#supported-xlsform-meta-fields" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;a href="http://xlsform.org/" target="_blank" rel="noopener">XLSForm&lt;/a> has a number of &lt;a href="https://xlsform.org/en/#metadata" target="_blank" rel="noopener">data type options&lt;/a> available for meta data collection, of which the following are supported in CHT app forms:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>element&lt;/th>
+&lt;th>description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>start&lt;/code>&lt;/td>
+&lt;td>A timestamp of when the form entry was started, which occurs when the form is fully loaded.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>end&lt;/code>&lt;/td>
+&lt;td>A timestamp of when the form entry ended, which is when the user hits the Submit button.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>today&lt;/code>&lt;/td>
+&lt;td>Day on which the form entry was started.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2>XPath&lt;span class="hx-absolute -hx-mt-20" id="xpath">&lt;/span>
+&lt;a href="#xpath" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Calculations are achieved within app forms using XPath statements in the &amp;ldquo;calculate&amp;rdquo; field of XForms and XLSForms. CHT apps support XPath from the &lt;a href="https://getodk.github.io/xforms-spec" target="_blank" rel="noopener">ODK XForm spec&lt;/a>, which is based on a subset of &lt;a href="https://www.w3.org/TR/1999/REC-xpath-19991116/" target="_blank" rel="noopener">XPath 1.0&lt;/a>, and is evaluated by &lt;a href="https://github.com/enketo/enketo/tree/main/packages/openrosa-xpath-evaluator" target="_blank" rel="noopener">&lt;code>openrosa-xpath-evaluator&lt;/code>&lt;/a>. The ODK XForm documentation provides useful notes about the available &lt;a href="https://getodk.github.io/xforms-spec/#xpath-operators" target="_blank" rel="noopener">operators&lt;/a> and &lt;a href="https://getodk.github.io/xforms-spec/#xpath-functions" target="_blank" rel="noopener">functions&lt;/a>. Additionally, &lt;a href="#cht-xpath-functions" >CHT specific functions&lt;/a> are available for forms in CHT apps.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Important&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The &lt;code>+&lt;/code> operator for string concatenation is deprecated and will be removed in a future version. You are strongly encouraged to use the &lt;a href="https://getodk.github.io/xforms-spec/#fn:concat" target="_blank" rel="noopener">&lt;code>concat()&lt;/code>&lt;/a> function instead.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>CHT XForm Widgets&lt;span class="hx-absolute -hx-mt-20" id="cht-xform-widgets">&lt;/span>
+&lt;a href="#cht-xform-widgets" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Some XForm widgets have been added or modified for use in CHT applications. The code for these widgets can be found in the &lt;a href="https://github.com/medic/cht-core/tree/master/webapp/src/js/enketo/widgets" target="_blank" rel="noopener">CHT Core Framework repository&lt;/a>.&lt;/p>
+&lt;h3>Bikram Sambat Datepicker&lt;span class="hx-absolute -hx-mt-20" id="bikram-sambat-datepicker">&lt;/span>
+&lt;a href="#bikram-sambat-datepicker" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Calendar widget using Bikram Sambat calendar, which is used by default for appropriate languages. The CHT documentation includes a &lt;a href="https://docs.communityhealthtoolkit.org/bikram-sambat/" target="_blank" rel="noopener">conversion tool&lt;/a> to check the conversion between Gregorian and Bikram Sambat dates.
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/#to-bikram-sambat">`to-bikram-sambat` XPath function&lt;/a>&lt;/p>
+&lt;/p>
+&lt;h3>Countdown Timer&lt;span class="hx-absolute -hx-mt-20" id="countdown-timer">&lt;/span>
+&lt;a href="#countdown-timer" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A visual timer widget that starts when tapped/clicked, and has an audible alert when done. To use it, first make sure you have the &lt;a href="https://getodk.github.io/xforms-spec/#namespaces" target="_blank" rel="noopener">&lt;code>namespaces&lt;/code> column&lt;/a> in the &amp;ldquo;settings&amp;rdquo; tab of your XLSForm populated with a value that includes &lt;code>cht=https://communityhealthtoolkit.org&lt;/code>. Then, you can add the timer as a &lt;code>trigger&lt;/code> field with the &lt;em>appearance&lt;/em> set to &lt;code>countdown-timer&lt;/code>. The duration of the timer (in seconds) can be set in a column named &lt;em>instance::cht:duration&lt;/em> (the default value is &lt;code>60&lt;/code>).&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>instance::cht:duration&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>trigger&lt;/td>
+&lt;td>countdown-timer&lt;/td>
+&lt;td>30&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>If you want to make the timer mandatory so users must wait for the timer to complete before continuing to the next page or submitting the form, you can populate the &lt;em>required&lt;/em> column with an XPath expression as you would do for any other required question. A value of &lt;code>&amp;quot;OK&amp;quot;&lt;/code> will be set for the &lt;code>trigger&lt;/code> field when the timer completes.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The &lt;code>trigger&lt;/code> implementation of the countdown timer is only supported for CHT versions &lt;code>4.7.0+&lt;/code>. For older CHT versions, the deprecated &lt;code>note&lt;/code> implementation of the countdown timer can be used. However, it does not support setting a value in the &lt;em>required&lt;/em> column. To use the deprecated countdown timer, create a &lt;code>note&lt;/code> field with the &lt;em>appearance&lt;/em> set to &lt;code>countdown-timer&lt;/code>. The duration of the timer (in seconds) can be set in the &lt;code>default&lt;/code> column. If this value is not set, the timer will be set to 60 seconds.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h3>Contact Selector&lt;span class="hx-absolute -hx-mt-20" id="contact-selector">&lt;/span>
+&lt;a href="#contact-selector" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A dropdown field to search and select a person or place, and save their UUID in the report. The contact&amp;rsquo;s data will also be mapped to fields with matching names within the containing group. If the contact selector&amp;rsquo;s appearance includes &lt;code>bind-id-only&lt;/code>, the associated data fields are not mapped. See &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/form-inputs/#contact-selector" >the form input guide&lt;/a> for an example.&lt;/p>
+&lt;h3>Rapid Diagnostic Test Capture&lt;span class="hx-absolute -hx-mt-20" id="rapid-diagnostic-test-capture">&lt;/span>
+&lt;a href="#rapid-diagnostic-test-capture" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Take a picture of a Rapid Diagnotistic Test and save it with the report. Works with &lt;a href="https://github.com/medic/rdt-capture/" target="_blank" rel="noopener">rdt-capture Android application&lt;/a>. To use create a string field with appearance &lt;code>mrdt-verify&lt;/code>.&lt;/p>
+&lt;h3>Display Base64 Image&lt;span class="hx-absolute -hx-mt-20" id="display-base64-image">&lt;/span>
+&lt;a href="#display-base64-image" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Available in +3.13.0.&lt;/em>&lt;/p>
+&lt;p>To display an image based on a field containing the Base64 encode value, add the appearance &lt;code>display-base64-image&lt;/code> to a field type &lt;code>text&lt;/code>.&lt;/p>
+&lt;h3>Android App Launcher&lt;span class="hx-absolute -hx-mt-20" id="android-app-launcher">&lt;/span>
+&lt;a href="#android-app-launcher" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Available in +3.13.0 and in Android device only.&lt;/em>&lt;/p>
+&lt;p>A widget to launch an Android app that receives and sends data back to an app form in CHT-Core.&lt;/p>
+&lt;p>This widget requires the &lt;code>cht-android&lt;/code> app in order to work, and will be disabled for users running the CHT in a browser. This widget requires the &lt;code>READ_EXTERNAL_STORAGE&lt;/code> permission in CHT Android to work properly, to enable this permission add the following line in the branded app&amp;rsquo;s &lt;code>AndroidManifest.xml&lt;/code>.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;uses-permission&lt;/span> &lt;span class="na">android:name=&lt;/span>&lt;span class="s">&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Use the Android App Launcher widget in a form to configure an intent to launch an Android app installed in the mobile device. The widget will send values from input fields type &lt;code>text&lt;/code> to the app and will assign the app&amp;rsquo;s response into output fields type &lt;code>text&lt;/code>. The only supported field type is &lt;code>text&lt;/code>. The widget will automatically display a button to launch the app.&lt;/p>
+&lt;p>To define the widget, create a &lt;code>group&lt;/code> with the appearance &lt;code>android-app-launcher&lt;/code>, then define the &lt;a href="https://developer.android.com/reference/android/content/Intent" target="_blank" rel="noopener">Android intent&lt;/a> fields with type &lt;code>text&lt;/code>. The fields &lt;code>action&lt;/code>, &lt;code>category&lt;/code>, &lt;code>type&lt;/code>, &lt;code>uri&lt;/code>, &lt;code>packageName&lt;/code> and &lt;code>flags&lt;/code> are optional. Every Android app has specific ways of launching with intents, so check the app&amp;rsquo;s documentation and assign the corresponding values in the &lt;code>default&lt;/code> column. See example below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>repeat_count&lt;/th>
+&lt;th>default&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-launcher&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>action&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>android.media.action.IMAGE_CAPTURE&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>category&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>type&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>uri&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>packageName&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>flags&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>To define the widget&amp;rsquo;s input fields and send data as Android Intent&amp;rsquo;s &lt;code>extras&lt;/code>, create a group inside the widget with the appearance &lt;code>android-app-inputs&lt;/code>. In order to assign the app&amp;rsquo;s response to the widget&amp;rsquo;s output fields, create a group with the appearance &lt;code>android-app-outputs&lt;/code>.&lt;/p>
+&lt;p>&lt;strong>Important to remember:&lt;/strong> The fields inside the input and the output groups should to match in name and location to what the Android app receives and returns, otherwise the communication between the widget and the Android app won&amp;rsquo;t work properly.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>repeat_count&lt;/th>
+&lt;th>default&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-launcher&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>action&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>android.media.action.IMAGE_CAPTURE&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>location&lt;/td>
+&lt;td>Location&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>destination&lt;/td>
+&lt;td>Destination&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>picture&lt;/td>
+&lt;td>Picture&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>date&lt;/td>
+&lt;td>Date&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>To instruct the widget to process nested data objects, create a new group inside the input or the output group with the appearance &lt;code>android-app-object&lt;/code>. Objects cannot be assigned to a field, it should be a group with fields to map the properties to fields that share the same name.&lt;/p>
+&lt;p>&lt;strong>Important to remember:&lt;/strong> The nested group&amp;rsquo;s name should match in name and location to what the Android app receives and returns, otherwise it won&amp;rsquo;t be able to find the nested object.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>repeat_count&lt;/th>
+&lt;th>default&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-launcher&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>action&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>android.media.action.IMAGE_CAPTURE&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>location&lt;/td>
+&lt;td>Location&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>photo_configuration&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-object&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>aperture&lt;/td>
+&lt;td>Aperture&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>shutter_speed&lt;/td>
+&lt;td>Shutter Speed&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>photo_configuration&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>picture&lt;/td>
+&lt;td>Picture&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>date&lt;/td>
+&lt;td>Date&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>To instruct the widget to process an array of strings or numbers, create a new &lt;code>repeat&lt;/code> with fix size in the &lt;code>repeat_count&lt;/code> column and place it inside the input or the output group with the appearance &lt;code>android-app-value-list&lt;/code>, then create 1 field type &lt;code>text&lt;/code> to store every array&amp;rsquo;s value, &lt;em>only 1 field is allowed&lt;/em>. To process an array of objects, use the appearance &lt;code>android-app-object-list&lt;/code> instead.&lt;/p>
+&lt;p>&lt;strong>Important to remember:&lt;/strong> The &lt;code>repeat&lt;/code>&amp;rsquo;s name should match in name and location to what the Android app receives and returns, otherwise it won&amp;rsquo;t be able to find the array.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>repeat_count&lt;/th>
+&lt;th>default&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-launcher&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>action&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>android.media.action.IMAGE_CAPTURE&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>flags&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>268435456&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>location&lt;/td>
+&lt;td>Location&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin repeat&lt;/td>
+&lt;td>photo_filters&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-value-list&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>filter&lt;/td>
+&lt;td>Filter&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end repeat&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-inputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>date&lt;/td>
+&lt;td>Date&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin repeat&lt;/td>
+&lt;td>capture&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-object-list&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>light_percentage&lt;/td>
+&lt;td>Light&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>contrast_percentage&lt;/td>
+&lt;td>Contrast&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>patient_details&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>android-app-object&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>picture&lt;/td>
+&lt;td>Patient picture&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>patient_id&lt;/td>
+&lt;td>Patient ID&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>text&lt;/td>
+&lt;td>patient_name&lt;/td>
+&lt;td>Patient name&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>patient_details&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end repeat&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app-outputs&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>camera-app&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>Phone number input&lt;span class="hx-absolute -hx-mt-20" id="phone-number-input">&lt;/span>
+&lt;a href="#phone-number-input" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When accepting telephone numbers in a form, the phone widget validates the given phone number is valid for the server&amp;rsquo;s configured locale and can optionally check to see if a duplicate contact already exists with the same phone number.&lt;/p>
+&lt;p>To use the widget, create a &lt;code>string&lt;/code> field with the appearance &lt;code>numbers tel&lt;/code>. This will produce a text box input field in the form where the user can enter the phone number. Values entered for this field will be rejected if they are not valid phone numbers for the server&amp;rsquo;s configured &lt;code>default_country_code&lt;/code> (as determined by the &lt;a href="https://github.com/google/libphonenumber" target="_blank" rel="noopener">google-libphonenumber&lt;/a> library). Additionally, valid input will be normalized to the &lt;code>E164&lt;/code> format (e.g. &lt;code>+1234567890&lt;/code>) before storing it in the form data model.&lt;/p>
+&lt;p>The widget can also reject phone numbers that are already associated with an existing contact. (A contact already exists with the same phone number value in its &lt;code>phone&lt;/code> field.) To enable this duplicate checking for a particular field, first make sure you have the &lt;a href="https://getodk.github.io/xforms-spec/#namespaces" target="_blank" rel="noopener">&lt;code>namespaces&lt;/code> column&lt;/a> in the &amp;ldquo;settings&amp;rdquo; tab of your XLSForm populated with a value that includes &lt;code>cht=https://communityhealthtoolkit.org&lt;/code>. Then, in the &amp;ldquo;survey&amp;rdquo; tab, add a column called &lt;code>instance::cht:unique_tel&lt;/code> and set the value to &lt;code>true&lt;/code> for the phone number field.&lt;/p>
+&lt;p>A validation failure, either for an invalid or duplicate phone number will prevent the form from being submitted. To also display an error message to the user, set &lt;code>true&lt;/code> in the &lt;code>constraint&lt;/code> column for the phone number field and enter localized messages in the desired &lt;code>constraint_message::xx&lt;/code> columns.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>appearance&lt;/th>
+&lt;th>instance::cht:unique_tel&lt;/th>
+&lt;th>constraint&lt;/th>
+&lt;th>constraint_message::en&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>numbers tel&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>true&lt;/td>
+&lt;td>Please enter a valid phone number.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Configuring a phone input as a &lt;code>string&lt;/code> field with the &lt;code>tel&lt;/code> &lt;em>appearance&lt;/em> is only supported for CHT versions &lt;code>4.11.0+&lt;/code>. For older CHT versions, a phone input can be configured by setting &lt;code>tel&lt;/code> in the &lt;em>type&lt;/em> column (without any &lt;em>appearance&lt;/em> value). This deprecated implementation cannot be configured via the &lt;code>instance::cht:unique_tel&lt;/code> column and instead will always reject numbers that match the &lt;code>phone&lt;/code> field on an existing contact.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>CHT XPath Functions&lt;span class="hx-absolute -hx-mt-20" id="cht-xpath-functions">&lt;/span>
+&lt;a href="#cht-xpath-functions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>&lt;code>add-date&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="add-date">&lt;/span>
+&lt;a href="#add-date" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.0.0.&lt;/em>&lt;/p>
+&lt;p>Adds the provided number of years/months/days/hours/minutes to a date value.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>add-date(date, years, months, days, hours, minutes)&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This function is useful for things like calculating a date that is a specific number of days in the future. For example, the following returns a date that is two weeks from now: &lt;code>add-date(today(), 0, 0, 14)&lt;/code>.&lt;/p>
+&lt;p>You can also add negative numbers to get dates in the past. This can be used to calculate a person&amp;rsquo;s birthdate date based on how many years/months old they are: &lt;code>add-date(today(), 0-${age_years}, 0-${age_months})&lt;/code>.&lt;/p>
+&lt;h3>&lt;code>cht:difference-in-days&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtdifference-in-days">&lt;/span>
+&lt;a href="#chtdifference-in-days" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
+&lt;p>Calculates the number of whole days between two dates.&lt;/p>
+&lt;h3>&lt;code>cht:difference-in-weeks&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtdifference-in-weeks">&lt;/span>
+&lt;a href="#chtdifference-in-weeks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
+&lt;p>Calculates the number of whole calendar weeks between two dates.&lt;/p>
+&lt;h3>&lt;code>cht:difference-in-months&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtdifference-in-months">&lt;/span>
+&lt;a href="#chtdifference-in-months" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Calculates the number of whole calendar months between two dates. This is often used when determining a child&amp;rsquo;s age for immunizations or assessments.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>For CHT versions lower than &lt;code>4.7.0&lt;/code>, the deprecated &lt;code>difference-in-months&lt;/code> function (without the &lt;code>cht&lt;/code> namespace) should be used.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h3>&lt;code>cht:difference-in-years&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtdifference-in-years">&lt;/span>
+&lt;a href="#chtdifference-in-years" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.7.0.&lt;/em>&lt;/p>
+&lt;p>Calculates the number of whole calendar years between two dates.&lt;/p>
+&lt;h3>&lt;code>cht:extension-lib&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtextension-lib">&lt;/span>
+&lt;a href="#chtextension-lib" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.2.0.&lt;/em>&lt;/p>
+&lt;p>This function invokes a configured &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/extension-libs/" >extension library&lt;/a>. The first parameter is a string with the name of the library to execute, and any remaining parameters are passed through as is. For example, to calculate an average of two numbers, the xpath could be: &lt;code>cht:extension-lib('average.js', /data/first, /data/second )&lt;/code>.&lt;/p>
+&lt;h3>&lt;code>cht:strip-whitespace&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtstrip-whitespace">&lt;/span>
+&lt;a href="#chtstrip-whitespace" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.10.0.&lt;/em>&lt;/p>
+&lt;p>Removes all whitespace characters from a string.&lt;/p>
+&lt;h3>&lt;code>cht:validate-luhn&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="chtvalidate-luhn">&lt;/span>
+&lt;a href="#chtvalidate-luhn" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 4.10.0.&lt;/em>&lt;/p>
+&lt;p>Validate a given number using the &lt;a href="https://en.wikipedia.org/wiki/Luhn_algorithm" target="_blank" rel="noopener">Luhn algorithm&lt;/a> to help detect typos. Provide the field as the first parameter and optionally include the expected string length in the second parameter. Returns &lt;code>true&lt;/code> if the number is valid.&lt;/p>
+&lt;h3>&lt;code>parse-timestamp-to-date&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="parse-timestamp-to-date">&lt;/span>
+&lt;a href="#parse-timestamp-to-date" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 3.13.0.&lt;/em>&lt;/p>
+&lt;p>Use this function to parse from a timestamp number to a date. This is useful when using other XForm utility functions that receive date type as parameter, see example below:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label&lt;/th>
+&lt;th>calculation&lt;/th>
+&lt;th>default&lt;/th>
+&lt;th>&amp;hellip;&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>start_date_time&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>1628945040308&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>start_date_time_formatted&lt;/td>
+&lt;td>Started on:&lt;/td>
+&lt;td>format-date-time(&lt;strong>parse-timestamp-to-date(${start_date_time})&lt;/strong>, &amp;ldquo;%e/%b/%Y %H:%M:%S&amp;rdquo;)&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>&lt;code>to-bikram-sambat&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="to-bikram-sambat">&lt;/span>
+&lt;a href="#to-bikram-sambat" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Added in 3.14.0.&lt;/em>&lt;/p>
+&lt;p>This function converts a &lt;code>date&lt;/code> to a &lt;code>string&lt;/code> containing the value of the date formatted according to the &lt;a href="https://en.wikipedia.org/wiki/Vikram_Samvat" target="_blank" rel="noopener">Bikram Sambat&lt;/a> calendar.&lt;/p>
+&lt;p>See also: &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/#cht-xform-widgets" >Bikram Sambat Datepicker&lt;/a>&lt;/p>
+&lt;h3>&lt;code>z-score&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="z-score">&lt;/span>
+&lt;a href="#z-score" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In Enketo forms you have access to an XPath function to calculate the z-score value for a patient. The function accesses table data stored in CouchDB.&lt;/p>
+&lt;p>The &lt;code>z-score&lt;/code> function takes four parameters:&lt;/p>
+&lt;ul>
+&lt;li>The name of z-score table to use, which corresponds to value of the database document&amp;rsquo;s &lt;code>_id&lt;/code> attribute.&lt;/li>
+&lt;li>Patient&amp;rsquo;s sex, which corresponds to the data object&amp;rsquo;s name. In the example below &lt;code>male&lt;/code> for this parameter corresponds to &lt;code>charts[].data.male&lt;/code> in the database document.&lt;/li>
+&lt;li>First parameter for the table lookup, such as age. Value maps to the &lt;code>key&lt;/code> value in the database document.&lt;/li>
+&lt;li>Second parameter for the table lookup, such as height. Value is compared against the &lt;code>points&lt;/code> in the database document.&lt;/li>
+&lt;/ul>
+&lt;h4>Example Use&lt;span class="hx-absolute -hx-mt-20" id="example-use">&lt;/span>
+&lt;a href="#example-use" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;a href="https://github.com/medic/cht-core/blob/3.13.x/demo-forms/z-score.xml" target="_blank" rel="noopener">This example XForm form&lt;/a> shows the use of the z-score function. To calculate the z-score for a patient given their sex, age, and weight the XPath calculation is as follows:&lt;/p>
+&lt;p>&lt;code>z-score('weight-for-age', ../my_sex, ../my_age, ../my_weight)&lt;/code>&lt;/p>
+&lt;p>The data used by this function needs to be added to CouchDB. The example below shows the structure of the database document. It creates a &lt;code>weight-for-age&lt;/code> table, where you can see that a male aged 0 at 2.08kg has a z-score of -3. Your database doc will be substantially larger, so you may find the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/zscore-table-to-json.js" target="_blank" rel="noopener">conversion script&lt;/a> helpful to convert z-score tables to the required doc format.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;zscore-charts&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;charts&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;weight-for-age&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;data&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;male&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;points&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="mf">1.701&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.08&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.459&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.881&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.346&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">3.859&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">4.419&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">5.031&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">5.642&lt;/span> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Input data&lt;span class="hx-absolute -hx-mt-20" id="input-data">&lt;/span>
+&lt;a href="#input-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;code>app&lt;/code> forms have access to a variety of &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/form-inputs/#app-forms" >input data&lt;/a> depending on the source of the form.&lt;/p>
+&lt;h2>CHT Special Fields&lt;span class="hx-absolute -hx-mt-20" id="cht-special-fields">&lt;/span>
+&lt;a href="#cht-special-fields" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Some fields in app forms control specific aspects of CHT Apps, either to bring data into forms or for a feature outside of the form.&lt;/p>
+&lt;h3>Quintiles&lt;span class="hx-absolute -hx-mt-20" id="quintiles">&lt;/span>
+&lt;a href="#quintiles" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;code>NationalQuintile&lt;/code> and &lt;code>UrbanQuintile&lt;/code> fields on a form will be assigned to all people belonging to the place. This is helpful when household surveys have quintile information which could be used to target health services for individuals.
+&lt;p>&lt;em>Read More&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/wealth-quintiles/">Tracking Wealth Quintiles&lt;/a>&lt;/p>
+&lt;/p>
+&lt;h3>UHC Mode&lt;span class="hx-absolute -hx-mt-20" id="uhc-mode">&lt;/span>
+&lt;a href="#uhc-mode" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When the &lt;code>visited_contact_uuid&lt;/code> field is set at the top level of a form, this form is counted as a household visit in &lt;a href="https://docs.communityhealthtoolkit.org/building/features/uhc-mode/" >UHC Mode&lt;/a>. This field must be a &lt;code>calculate&lt;/code> field with the place UUID of the visited contact. You may run into performance issues if you configure this to look at forms submitted very frequently.
+&lt;p>&lt;em>Read More&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/uhc-mode/">Configuring UHC Mode&lt;/a>&lt;/p>
+&lt;/p>
+&lt;h2>Uploading Binary Attachments&lt;span class="hx-absolute -hx-mt-20" id="uploading-binary-attachments">&lt;/span>
+&lt;a href="#uploading-binary-attachments" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Forms can include arbitrary binary data which is submitted and included in the doc as an attachment. If this is an image type it&amp;rsquo;ll then be displayed inline in the report UI.&lt;/p>
+&lt;p>To mark an element as having binary data add an extra column in the XLSForm called &lt;code>instance::type&lt;/code> and specify &lt;code>binary&lt;/code> in the element&amp;rsquo;s row.&lt;/p>
+&lt;h2>Properties&lt;span class="hx-absolute -hx-mt-20" id="properties">&lt;/span>
+&lt;a href="#properties" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The meta information in the &lt;code>{form_name}.properties.json&lt;/code> file defines the form&amp;rsquo;s title and icon, as well as when and where the form should be available.&lt;/p>
+&lt;h3>&lt;code>forms/app/{form_name}.properties.json&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="formsappform_namepropertiesjson">&lt;/span>
+&lt;a href="#formsappform_namepropertiesjson" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>description&lt;/th>
+&lt;th>required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>title&lt;/code>&lt;/td>
+&lt;td>The form&amp;rsquo;s title seen in the app. Uses a localization array using the 2-letter code, not the translation keys discussed in the &lt;a href="https://docs.communityhealthtoolkit.org/building/translations/localizing/" >Localization section&lt;/a>.&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>icon&lt;/code>&lt;/td>
+&lt;td>Icon associated with the form. The value is the image&amp;rsquo;s key in the &lt;code>resources.json&lt;/code> file, as described in the &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/resources/#icons" >Icons section&lt;/a>&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>subject_key&lt;/code>&lt;/td>
+&lt;td>Override the default report list title with a custom translation key. The translation uses a summary of the report as the evaluation context so you can include report fields in your value, for example: &lt;code>Case registration {{case_id}}&lt;/code>. Useful properties available in the summary include: &lt;code>from&lt;/code> (the phone number of the sender), &lt;code>phone&lt;/code> (the phone number of the report contact), &lt;code>form&lt;/code> (the form code), &lt;code>subject.name&lt;/code> (the name of the subject), and &lt;code>case_id&lt;/code> (the generated case id). Defaults to the name of the report subject.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>hidden_fields&lt;/code>&lt;/td>
+&lt;td>Array of Strings of form fields to hide in the view report UI in the app. This is only applied to future reports and will not change how existing reports are displayed.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context&lt;/code>&lt;/td>
+&lt;td>The context defines when and where the form should be available in the app&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.person&lt;/code>&lt;/td>
+&lt;td>Boolean determining if the form can be seen in the Action list for a person&amp;rsquo;s profile. This is still subject to the &lt;code>expression&lt;/code>.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.place&lt;/code>&lt;/td>
+&lt;td>Boolean determining if the form can be seen in the Action list for a person&amp;rsquo;s profile. This is still subject to the &lt;code>expression&lt;/code>.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.expression&lt;/code>&lt;/td>
+&lt;td>A JavaScript expression which is evaluated when a contact profile or the reports tab is viewed. If the expression evaluates to true, the form will be listed as an available action. The inputs &lt;code>contact&lt;/code>, &lt;code>user&lt;/code>, and &lt;code>summary&lt;/code> are available. By default, forms are not shown on the reports tab, use &lt;code>&amp;quot;expression&amp;quot;: &amp;quot;!contact&amp;quot;&lt;/code> to show the form on the Reports tab since there is no contact for this scenario.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.permission&lt;/code>&lt;/td>
+&lt;td>String permission key required to allow the user to view and submit this form. If blank, this defaults to allowing all access.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>Expression functions&lt;span class="hx-absolute -hx-mt-20" id="expression-functions">&lt;/span>
+&lt;a href="#expression-functions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>
+&lt;p>The following functions are available for use in JavaScript expressions:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Signature&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>ageInDays(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in days.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInMonth(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in months.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInYears(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in years.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>levenshteinEq(string0, string1, threshold = 3)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Returns &lt;code>true&lt;/code> if the &lt;a href="https://en.wikipedia.org/wiki/Levenshtein_distance" target="_blank" rel="noopener">Levenshtein distance&lt;/a> between the given strings is less than or equal to the given threshold. Otherwise &lt;code>false&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>normalizedLevenshteinEq(string0, string1, threshold = 0.42857142857142855)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Similar to the &lt;code>levenshteinEq&lt;/code> function except the distance value is &amp;ldquo;normalized&amp;rdquo; (by dividing by the length of the longest string) before comparing to the threshold. &lt;a href="#normalized-levenshtein-equality" >See below&lt;/a> for more details.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4>Normalized Levenshtein Equality&lt;span class="hx-absolute -hx-mt-20" id="normalized-levenshtein-equality">&lt;/span>
+&lt;a href="#normalized-levenshtein-equality" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>In cases where the length of the input strings can vary greatly, the &lt;code>normalizedLevenshteinEq&lt;/code> function can be preferable to the &lt;code>levenshteinEq&lt;/code> function. The &lt;code>normalizedLevenshteinEq&lt;/code> function divides the Levenshtein distance by the length of the longest string before comparing the result to the threshold. In effect, this makes the matching more strict for shorter strings (the actual distance must be shorter for them to be considered equal) and more lenient for longer strings (the actual distance can be longer, but the strings will still be considered equal).&lt;/p>
+&lt;p>This can help make the same threshold limit value appropriate for use across a greater variety of string lengths. For example, if the threshold is set to &lt;code>0.3&lt;/code>, then an actual distance of &lt;code>2&lt;/code> would be considered equal (when using &lt;code>normalizedLevenshteinEq&lt;/code>) for strings of length &lt;code>9&lt;/code>, but not for two strings of length &lt;code>5&lt;/code>. (Because &lt;code>(2 / 9 = 0.2222) &amp;lt;= 0.3&lt;/code> and &lt;code>(2 / 5 = 0.4) &amp;gt; 0.3&lt;/code>.)&lt;/p>
+&lt;p>When using normalized Levenshtein equality, make sure you consider the behavior of a particular threshold value at the edges of your expected string length range. For example, the distance between &lt;code>far&lt;/code> and &lt;code>car&lt;/code> is &lt;code>1&lt;/code>. If you want your logic to consider &lt;code>john&lt;/code> and &lt;code>jon&lt;/code> as equal, you will need to use a normalized Levenshtein equality threshold of at least &lt;code>1 / 4 = 0.25&lt;/code>. However, for strings with a length of &lt;code>25&lt;/code>, that threshold will allow a distance of &lt;code>5&lt;/code> to be considered equal.&lt;/p>
+&lt;h3>Code sample&lt;span class="hx-absolute -hx-mt-20" id="code-sample">&lt;/span>
+&lt;a href="#code-sample" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In this sample properties file, the associated form would only show on a person&amp;rsquo;s page, and only if their sex is unspecified or female and they are between 10 and 65 years old:&lt;/p>
+&lt;h4>&lt;code>forms/app/pregnancy.properties.json&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="formsapppregnancypropertiesjson">&lt;/span>
+&lt;a href="#formsapppregnancypropertiesjson" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;locale&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;en&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;content&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;New Pregnancy&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;locale&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;hi&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;content&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;नई गर्भावस्था&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;pregnancy-1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;hidden_fields&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;private&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;internal&amp;#34;&lt;/span> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;context&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;place&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expression&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type === &amp;#39;person&amp;#39; &amp;amp;&amp;amp; (!contact.sex || contact.sex === &amp;#39;female&amp;#39;) &amp;amp;&amp;amp; (!contact.date_of_birth || (ageInYears(contact) &amp;gt;= 10 &amp;amp;&amp;amp; ageInYears(contact) &amp;lt; 65))&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;permission&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;can_register_pregnancies&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Build&lt;span class="hx-absolute -hx-mt-20" id="build">&lt;/span>
+&lt;a href="#build" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Convert and build the app forms into your application using the &lt;code>convert-app-forms&lt;/code> and &lt;code>upload-app-forms&lt;/code> actions in &lt;code>cht-conf&lt;/code>.&lt;/p>
+&lt;pre>&lt;code>cht --local convert-app-forms upload-app-forms
+&lt;/code>&lt;/pre></description></item><item><title>contact</title><link>https://docs.communityhealthtoolkit.org/building/forms/contact/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/contact/</guid><description>
+&lt;p>Contact forms are used to create and edit contacts (persons and places). Each contact-type should ideally have two forms; one for creation, and another for editing.&lt;/p>
+&lt;p>These forms are stored in the &lt;code>forms/contact&lt;/code> sub-folder of the project config directory. The naming convention used should be &lt;code>&amp;lt;contact_type_id-{create|edit}&amp;gt;.xlsx&lt;/code>.&lt;/p>
+&lt;h2>Form details&lt;span class="hx-absolute -hx-mt-20" id="form-details">&lt;/span>
+&lt;a href="#form-details" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Survey sheet&lt;span class="hx-absolute -hx-mt-20" id="survey-sheet">&lt;/span>
+&lt;a href="#survey-sheet" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To collect information about the contact, use a top-level group with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/" >id of the contact_type&lt;/a> as the &lt;code>name&lt;/code> of the group (e.g. &lt;code>person&lt;/code> when adding or editing a person contact). Information in this group will be saved to the contact&amp;rsquo;s document in the database.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>label::en&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>begin group&lt;/td>
+&lt;td>person&lt;/td>
+&lt;td>NO_LABEL&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>parent&lt;/td>
+&lt;td>Parent Id&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hidden&lt;/td>
+&lt;td>type&lt;/td>
+&lt;td>Contact Type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>name&lt;/td>
+&lt;td>Full Name&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;hellip;&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>end group&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The &lt;code>parent&lt;/code>, &lt;code>type&lt;/code>, and &lt;code>name&lt;/code> fields are mandatory on forms that are adding contacts. &lt;code>parent&lt;/code> will be automatically populated with the id of the parent contact. &lt;code>type&lt;/code> will be automatically set to the contact_type id when saving the new contact.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>For edit forms, the name of the top-level group should still match the contact_type id of the contact, but only the relevant fields for editing need to be specified in the form.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h4>Input data&lt;span class="hx-absolute -hx-mt-20" id="input-data">&lt;/span>
+&lt;a href="#input-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;code>contact&lt;/code> forms have access to a variety of &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/form-inputs/#app-forms" >input data&lt;/a>.&lt;/p>
+&lt;h3>Settings sheet&lt;span class="hx-absolute -hx-mt-20" id="settings-sheet">&lt;/span>
+&lt;a href="#settings-sheet" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;code>form_id&lt;/code> should follow the pattern &lt;code>contact:CONTACT_TYPE_ID:ACTION&lt;/code> where CONTACT_TYPE_ID is the contact_type id for the contact and ACTION is &lt;code>create&lt;/code> or &lt;code>edit&lt;/code>. (e.g. &lt;code>contact:clinic:create&lt;/code>)&lt;/p>
+&lt;h2>Properties&lt;span class="hx-absolute -hx-mt-20" id="properties">&lt;/span>
+&lt;a href="#properties" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The meta information in the &lt;code>{contact_type_id}-{create|edit}.properties.json&lt;/code> file defines additional configuration controlling when the form is available and checks that will be performed when submitting the form.&lt;/p>
+&lt;h3>&lt;code>forms/contact/{contact_type_id}-{create|edit}.properties.json&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="formscontactcontact_type_id-createeditpropertiesjson">&lt;/span>
+&lt;a href="#formscontactcontact_type_id-createeditpropertiesjson" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;th>required&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>context&lt;/code>&lt;/td>
+&lt;td>&lt;em>Added in &lt;code>3.10&lt;/code>.&lt;/em> The contact form context defines when the form should be available in the app. Note: this applies only to the contact form, not the contacts themselves.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.expression&lt;/code>&lt;/td>
+&lt;td>A JavaScript expression evaluated when a contact profile is viewed. This can limit which users have access to the contact form. &lt;a href="#context-expression" >See below&lt;/a> for more details.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>context.permission&lt;/code>&lt;/td>
+&lt;td>String permission key required to allow the user to view and submit this form. If blank, this defaults to allowing all access.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>duplicate_check&lt;/code>&lt;/td>
+&lt;td>&lt;em>Added in &lt;code>4.19&lt;/code>.&lt;/em> Allows for configuring or disabling the &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-management/contacts/#duplicate-contact-detection" >duplicate detection logic&lt;/a> for a particular contact type.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>duplicate_check.expression&lt;/code>&lt;/td>
+&lt;td>A JavaScript expression evaluated when submitting the contact form. The expression defines the logic used for determining when a contact is considered to be a duplicate. &lt;a href="#duplicate-check-expression" >See below&lt;/a> for more details.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>duplicate_check.disabled&lt;/code>&lt;/td>
+&lt;td>Boolean determining if the duplicate check should be run when submitting this contact form. Default is &lt;code>false&lt;/code>.&lt;/td>
+&lt;td>no&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4>Context Expression&lt;span class="hx-absolute -hx-mt-20" id="context-expression">&lt;/span>
+&lt;a href="#context-expression" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>The contact form context expression can be used to limit which users have access to the contact form. If the expression evaluates to &lt;code>true&lt;/code>, the form will be listed as an available action on the proper contact profiles.&lt;/p>
+&lt;p>In the expression, the &lt;code>user&lt;/code> input is available. (Note that unlike in the &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/#formsappform_namepropertiesjson" >app form expressions&lt;/a>, the &lt;code>contact&lt;/code> and &lt;code>summary&lt;/code> inputs are &lt;a href="https://github.com/medic/cht-core/issues/6612" target="_blank" rel="noopener">not currently available&lt;/a> for contact form expressions.)&lt;/p>
+&lt;h4>Duplicate Check Expression&lt;span class="hx-absolute -hx-mt-20" id="duplicate-check-expression">&lt;/span>
+&lt;a href="#duplicate-check-expression" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>The duplicate check expression is a boolean check executed against each of the &lt;em>sibling contacts&lt;/em> of the contact being created/modified. &amp;ldquo;Sibling contacts&amp;rdquo; are contacts of the same type that share the same parent contact. When the expression evaluates to &lt;code>true&lt;/code>, the contact being created/edited will be considered a duplicate of the existing sibling.&lt;/p>
+&lt;p>In the expression, both the &lt;code>current&lt;/code> contact doc (the contact currently being created/edited) and the &lt;code>existing&lt;/code> sibling contact doc are available. The default duplicate expression is:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">levenshteinEq&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">current&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">existing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">ageInYears&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">current&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="nx">ageInYears&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">existing&lt;/span>&lt;span class="p">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This expression will consider contacts to be duplicate if the &lt;a href="https://en.wikipedia.org/wiki/Levenshtein_distance" target="_blank" rel="noopener">Levenshtein distance&lt;/a> between the two names is less than or equal to 3 (meaning the names are very similar or exactly the same) and (for persons) if the contacts have the same age (in years).&lt;/p>
+&lt;p>When designing custom duplicate check expressions, consider how the contact data collected might evolve over time. If properties are added/removed/renamed on the contact doc, your duplicate expression logic will need to account for this if it references these properties (e.g. support for falling-back to older properties to ensure broader compatibility).&lt;/p>
+&lt;p>Always consider the nature and quality of your data. As data quality improves (e.g., consistent naming conventions), duplicate check expressions for some contact types can be refined to reduce both false positives and false negatives.&lt;/p>
+&lt;h5>Customizing the duplicate contact error message&lt;span class="hx-absolute -hx-mt-20" id="customizing-the-duplicate-contact-error-message">&lt;/span>
+&lt;a href="#customizing-the-duplicate-contact-error-message" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h5>&lt;p>The default message shown to the user when a duplicate contact is found &lt;a href="https://docs.communityhealthtoolkit.org/building/translations/overview/" >can be modified&lt;/a> by adding a custom translation for the &lt;code>duplicate_check.contact.duplication_message&lt;/code> key.&lt;/p>
+&lt;p>Additionally, different messages can be shown for different contact types by setting &lt;code>duplicate_check.contact.${contact_type_id}.duplication_message&lt;/code> keys. This can be useful if you want to prompt the user with the likely reason the duplicate contacts matched based on your custom duplicate check expression logic.&lt;/p>
+&lt;h4>Expression functions&lt;span class="hx-absolute -hx-mt-20" id="expression-functions">&lt;/span>
+&lt;a href="#expression-functions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>
+&lt;p>The following functions are available for use in JavaScript expressions:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Signature&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>ageInDays(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in days.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInMonth(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in months.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInYears(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in years.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>levenshteinEq(string0, string1, threshold = 3)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Returns &lt;code>true&lt;/code> if the &lt;a href="https://en.wikipedia.org/wiki/Levenshtein_distance" target="_blank" rel="noopener">Levenshtein distance&lt;/a> between the given strings is less than or equal to the given threshold. Otherwise &lt;code>false&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>normalizedLevenshteinEq(string0, string1, threshold = 0.42857142857142855)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Similar to the &lt;code>levenshteinEq&lt;/code> function except the distance value is &amp;ldquo;normalized&amp;rdquo; (by dividing by the length of the longest string) before comparing to the threshold. &lt;a href="#normalized-levenshtein-equality" >See below&lt;/a> for more details.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4>Normalized Levenshtein Equality&lt;span class="hx-absolute -hx-mt-20" id="normalized-levenshtein-equality">&lt;/span>
+&lt;a href="#normalized-levenshtein-equality" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>In cases where the length of the input strings can vary greatly, the &lt;code>normalizedLevenshteinEq&lt;/code> function can be preferable to the &lt;code>levenshteinEq&lt;/code> function. The &lt;code>normalizedLevenshteinEq&lt;/code> function divides the Levenshtein distance by the length of the longest string before comparing the result to the threshold. In effect, this makes the matching more strict for shorter strings (the actual distance must be shorter for them to be considered equal) and more lenient for longer strings (the actual distance can be longer, but the strings will still be considered equal).&lt;/p>
+&lt;p>This can help make the same threshold limit value appropriate for use across a greater variety of string lengths. For example, if the threshold is set to &lt;code>0.3&lt;/code>, then an actual distance of &lt;code>2&lt;/code> would be considered equal (when using &lt;code>normalizedLevenshteinEq&lt;/code>) for strings of length &lt;code>9&lt;/code>, but not for two strings of length &lt;code>5&lt;/code>. (Because &lt;code>(2 / 9 = 0.2222) &amp;lt;= 0.3&lt;/code> and &lt;code>(2 / 5 = 0.4) &amp;gt; 0.3&lt;/code>.)&lt;/p>
+&lt;p>When using normalized Levenshtein equality, make sure you consider the behavior of a particular threshold value at the edges of your expected string length range. For example, the distance between &lt;code>far&lt;/code> and &lt;code>car&lt;/code> is &lt;code>1&lt;/code>. If you want your logic to consider &lt;code>john&lt;/code> and &lt;code>jon&lt;/code> as equal, you will need to use a normalized Levenshtein equality threshold of at least &lt;code>1 / 4 = 0.25&lt;/code>. However, for strings with a length of &lt;code>25&lt;/code>, that threshold will allow a distance of &lt;code>5&lt;/code> to be considered equal.&lt;/p>
+&lt;h3>Code sample&lt;span class="hx-absolute -hx-mt-20" id="code-sample">&lt;/span>
+&lt;a href="#code-sample" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In this sample properties file, the person create form would only be accessible for CHW Supervisors with the &lt;code>can_export_contacts&lt;/code> permission. Additionally, a new person should not have the exact same name as an existing sibling contact.&lt;/p>
+&lt;h4>&lt;code>forms/contact/person-create.properties.json&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="formscontactperson-createpropertiesjson">&lt;/span>
+&lt;a href="#formscontactperson-createpropertiesjson" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;context&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expression&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;user.role === &amp;#39;chw_supervisor&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;permission&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;can_export_contacts&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;duplicate_check&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expression&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;current.name === existing.name&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Generic contact forms&lt;span class="hx-absolute -hx-mt-20" id="generic-contact-forms">&lt;/span>
+&lt;a href="#generic-contact-forms" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>If your place contact forms are similar across all levels of your specified project hierarchy, you can templatise the form creation process. You will need to create the following files in &lt;code>forms/contact&lt;/code>: &lt;code>place-types.json&lt;/code>, &lt;code>PLACE_TYPE-create.xlsx&lt;/code> and &lt;code>PLACE_TYPE-edit.xlsx&lt;/code>.&lt;/p>
+&lt;p>&lt;code>place-types.json&lt;/code> maps the place contact_type id to a human-readable description that will be shown on the app&amp;rsquo;s user interface.&lt;/p>
+&lt;p>Both &lt;code>PLACE_TYPE-create.xlsx&lt;/code> and &lt;code>PLACE_TYPE-edit.xlsx&lt;/code> will contain two placeholder values &lt;code>PLACE_TYPE&lt;/code> and &lt;code>PLACE_NAME&lt;/code> which will be replaced by the keys and values specified in &lt;code>place-types.json&lt;/code> respectively during form conversion. Also, copies of the different place-type forms will be created (if they don&amp;rsquo;t exist) during the form conversion process with &lt;code>PLACE_TYPE&lt;/code> being replaced with the keys specified in &lt;code>place-types.json&lt;/code>.&lt;/p>
+&lt;p>Convert and build the contact forms into your application using the &lt;code>convert-contact-forms&lt;/code> and &lt;code>upload-contact-forms&lt;/code> actions in &lt;code>cht-conf&lt;/code>.&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;code>cht --local convert-contact-forms upload-contact-forms&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;p>For examples on how to structure the above files you can have a look at the &lt;a href="https://github.com/medic/cht-core/tree/master/config/default/forms/contact" target="_blank" rel="noopener">default&lt;/a> configuration in CHT-core.&lt;/p>
+&lt;h2>Creating person and place contacts in the same form&lt;span class="hx-absolute -hx-mt-20" id="creating-person-and-place-contacts-in-the-same-form">&lt;/span>
+&lt;a href="#creating-person-and-place-contacts-in-the-same-form" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Contact forms for creating a place can also optionally create one or more person-type documents. One of these person contacts can be linked to the created place as the primary contact.&lt;/p>
+&lt;p>Below is a simple structure of a place form showing all the necessary components.&lt;/p>
+&lt;figure>&lt;a href="place-contact-form-survey.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/contact/place-contact-form-survey.png">&lt;/a>
+&lt;/figure>
+&lt;p>Section 1 is similar to what has been described earlier for person forms.&lt;/p>
+&lt;p>Section 2 specifies the contact that will be linked to the place being created. &lt;code>parent&lt;/code>, &lt;code>type&lt;/code> and &lt;code>contact_type&lt;/code> and &lt;code>name&lt;/code> are mandatory. This also applies to the place-type definition in section 4. &lt;code>contact&lt;/code> on the other hand is not mandatory for the successful creation of a place. It is usually more convenient to create a place and its primary contact at the same time.&lt;/p>
+&lt;p>You can also create additional contacts linked to the place being created when you have a structure similar to that shown in section 3.&lt;/p></description></item><item><title>collect</title><link>https://docs.communityhealthtoolkit.org/building/forms/collect/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/collect/</guid><description>
+&lt;p>ODK XForms are used to render forms in the Medic Collect Android app. These forms cannot use any CHT-specific XForm notations. All Medic Collect forms are processed as SMS (even when submitted over a wifi) therefore a corresponding JSON form with matching fields is used to interpret the incoming report.&lt;/p>
+&lt;p>Collect forms must be in the &lt;code>forms/collect&lt;/code> folder to be processed by &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">&lt;code>cht-conf&lt;/code>&lt;/a>&amp;rsquo;s &lt;code>convert-collect-forms&lt;/code> and &lt;code>upload-collect-forms&lt;/code> actions. Once uploaded to the server, they can be downloaded by the Medic Collect app. These forms can also be included in Medic Collect builds for users without a data connection to get forms.&lt;/p>
+&lt;p>XForms require a couple minor changes to be compatible with Medic Collect so that they can properly be received by a Medic instance. The changes can be done either manually in the XForm&amp;rsquo;s XML, or automatically with XLSForm forms using &lt;code>cht-conf&lt;/code>.&lt;/p>
+&lt;h3>Automatic changes with XLSForms&lt;span class="hx-absolute -hx-mt-20" id="automatic-changes-with-xlsforms">&lt;/span>
+&lt;a href="#automatic-changes-with-xlsforms" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If using a &lt;a href="http://xlsform.org/" target="_blank" rel="noopener">XLSForm&lt;/a> and using &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">&lt;code>cht-conf&lt;/code>&lt;/a> to convert to XForm, the necessary fields will be automatically added to the resulting XForm. You can override the default prefix and separator by declaring &lt;code>sms_keyword&lt;/code> and &lt;code>sms_separator&lt;/code> respectively in the Settings tab.&lt;/p>
+&lt;h3>Manual changes in XForm&lt;span class="hx-absolute -hx-mt-20" id="manual-changes-in-xform">&lt;/span>
+&lt;a href="#manual-changes-in-xform" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Collect forms need &lt;code>prefix&lt;/code> and &lt;code>delimiter&lt;/code> values added to the XForm&amp;rsquo;s XML. This is done where the form ID is declared in the instance&amp;rsquo;s data model. For example, the following:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>&amp;lt;instance&amp;gt;
+&amp;lt;data id=&amp;#34;myform&amp;#34; &amp;gt;
+...&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>becomes:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>&amp;lt;instance&amp;gt;
+&amp;lt;data id=&amp;#34;myform&amp;#34; prefix=&amp;#34;J1!FORM_CODE!&amp;#34; delimiter=&amp;#34;#&amp;#34;&amp;gt;
+...&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Note that &lt;code>FORM_CODE&lt;/code> should be replaced with the form code as defined in the JSON forms version of the form. If the form code is &lt;code>ABCD&lt;/code> the prefix value would be &lt;code>J1!ABCD!&lt;/code>, resulting in &lt;code>prefix=&amp;quot;J1!ABCD!&amp;quot;&lt;/code>. In case you are curious, the &lt;code>J1&lt;/code> lets the CHT server know that version 1 of the JavaRosa parser should be used on the incoming SMS.&lt;/p></description></item><item><title>Configuring</title><link>https://docs.communityhealthtoolkit.org/building/forms/configuring/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/configuring/</guid><description>
+&lt;div class="section-pages-list">
+&lt;h3>Content in this section &lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/uhc-mode/">Configuring UHC Mode&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/additional-docs/">Creating Additional Docs from App Forms&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/app-form-sms/">Making Calls and Sending SMS from App Forms&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/google-drive/">Fetching forms from Google Drive&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/form-inputs/">Input data available in forms&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/multimedia/">Including Multimedia in Forms&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/wealth-quintiles/">Tracking Wealth Quintiles&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/report-titles/">Customizing Titles in the Reports List&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;/div></description></item><item><title>Setting Form Properties</title><link>https://docs.communityhealthtoolkit.org/building/forms/form-properties/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/form-properties/</guid><description>
+&lt;p>This tutorial will take you through how to write the &lt;code>&amp;lt;form_name&amp;gt;.properties.json&lt;/code> file.&lt;/p>
+&lt;p>The &lt;code>&amp;lt;form_name&amp;gt;.properties.json&lt;/code> file allows you to add logic that ensures that the right action appears for the right contacts (people and places). For instance, an assessment form for children under-5 will only appear for person contacts on the CHT whose age is less than 5.&lt;/p>
+&lt;p>You will be adding meta-data and context to an assessment workflow that allows Community Health Workers to conduct a health assessment for children under the age of 5.&lt;/p>
+&lt;h2>Brief Overview of Key Concepts&lt;span class="hx-absolute -hx-mt-20" id="brief-overview-of-key-concepts">&lt;/span>
+&lt;a href="#brief-overview-of-key-concepts" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;em>&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/#formsappform_namepropertiesjson" >Form context&lt;/a>&lt;/em> defines when and where the form should be available in the app.&lt;/p>
+&lt;h2>Required Resources&lt;span class="hx-absolute -hx-mt-20" id="required-resources">&lt;/span>
+&lt;a href="#required-resources" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>You should have a functioning &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/" >CHT instance with &lt;code>cht-conf&lt;/code> installed locally&lt;/a>, completed a &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/#3-create-and-upload-a-blank-project" >project folder&lt;/a> setup, and an &lt;a href="https://docs.communityhealthtoolkit.org/building/tutorials/app-forms/" >assessment form&lt;/a>.&lt;/p>
+&lt;h2>Implementation Steps&lt;span class="hx-absolute -hx-mt-20" id="implementation-steps">&lt;/span>
+&lt;a href="#implementation-steps" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Create a new file in the same folder as your &lt;code>assessment.xlsx&lt;/code> file and name it &lt;code>assessment.properties.json&lt;/code>.&lt;/p>
+&lt;h3>1. Define the Form&amp;rsquo;s Title&lt;span class="hx-absolute -hx-mt-20" id="1-define-the-forms-title">&lt;/span>
+&lt;a href="#1-define-the-forms-title" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Edit the &lt;code>assessment.properties.json&lt;/code> file and add a &lt;code>title&lt;/code> key with the value corresponding to the desired file title.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Assessment&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>2. Define the Form&amp;rsquo;s Icon&lt;span class="hx-absolute -hx-mt-20" id="2-define-the-forms-icon">&lt;/span>
+&lt;a href="#2-define-the-forms-icon" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Add a &lt;code>resources&lt;/code> folder in your project folder and put your preferred icon for assessment in it. Name the icon file &lt;code>icon-healthcare-assessment.png&lt;/code> if it is a &lt;code>png&lt;/code> file or &lt;code>icon-healthcare-assessment.svg&lt;/code> if it is an &lt;code>svg&lt;/code> file.&lt;/p>
+&lt;p>Create a &lt;code>resources.json&lt;/code> &lt;em>file&lt;/em> in your project folder and add key/value pairs for your icon resources.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon-healthcare-assessment&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;icon-healthcare-assessment.png&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/design/interface/">Interface&lt;/a>&lt;/p>
+&lt;p>Add an &lt;code>icon&lt;/code> key in the &lt;code>assessment.properties.json&lt;/code> file. Pick the key of the icon you require from the &lt;code>resources.json&lt;/code> file and add it as the &lt;code>icon&lt;/code> value.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Assessment&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;icon-healthcare-assessment&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>3. Define the Form&amp;rsquo;s Context&lt;span class="hx-absolute -hx-mt-20" id="3-define-the-forms-context">&lt;/span>
+&lt;a href="#3-define-the-forms-context" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>First, add a &lt;code>context&lt;/code> key in the &lt;code>assessment.properties.json&lt;/code> file. Next, add an object with &lt;code>person&lt;/code>, &lt;code>place&lt;/code> and &lt;code>expression&lt;/code> keys. Then, add the boolean value &lt;code>true&lt;/code> for the &lt;code>person&lt;/code> key, the boolean value &lt;code>false&lt;/code> for the &lt;code>place&lt;/code> key and the expression &lt;code>ageInYears(contact) &amp;lt; 5&lt;/code> for the &lt;code>expression&lt;/code> key.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;title&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Assessment&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;icon-healthcare-assessment&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;context&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;place&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expression&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;ageInYears(contact) &amp;lt; 5&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>4. Upload resources and the &lt;code>&amp;lt;form_name&amp;gt;.properties.json&lt;/code> File&lt;span class="hx-absolute -hx-mt-20" id="4-upload-resources-and-the-form_namepropertiesjson-file">&lt;/span>
+&lt;a href="#4-upload-resources-and-the-form_namepropertiesjson-file" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Run the following command from the root folder to upload the resources folder and &lt;code>resources.json&lt;/code> file:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">cht --url&lt;span class="o">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs upload-resources&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Run the following command from the root folder to upload the &lt;code>assessment.properties.json&lt;/code> file:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">cht --url&lt;span class="o">=&lt;/span>https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs upload-app-forms -- assessment&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Be sure to replace the values &lt;code>&amp;lt;username&amp;gt;&lt;/code> and &lt;code>&amp;lt;password&amp;gt;&lt;/code> with the actual username and password of your test instance.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Once you successfully upload the &lt;code>assessment.properties.json&lt;/code> file, &amp;lsquo;Assessment&amp;rsquo; will appear as an action &lt;em>only&lt;/em> for person contacts who are less that 5 years old. Additionally, the &lt;code>icon-healthcare-assessment&lt;/code> icon will now show alongside the action name.&lt;/p>
+&lt;h2>Frequently Asked Questions&lt;span class="hx-absolute -hx-mt-20" id="frequently-asked-questions">&lt;/span>
+&lt;a href="#frequently-asked-questions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/can-you-associate-an-icon-to-a-xml-form/88" target="_blank" rel="noopener">Can you associate an icon to a xml form?&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Versioning forms</title><link>https://docs.communityhealthtoolkit.org/building/forms/versioning/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/versioning/</guid><description>
+&lt;p>&lt;em>Added in cht-core 3.15.0 and cht-conf 3.10.0&lt;/em>&lt;/p>
+&lt;p>When uploading app or contact xforms, cht-conf 3.10.0+ will automatically generate a version and include it in the form doc&amp;rsquo;s
+&lt;code>xmlVersion&lt;/code> property. The version has two properties.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Property&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>time&lt;/code>&lt;/td>
+&lt;td>The time that the form was uploaded to the server in millis since the epoch.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>sha256&lt;/code>&lt;/td>
+&lt;td>A hash of the xform content.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>For example:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;xmlVersion&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;time&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1658717177750&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sha256&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;6f0bbfe5a9a9ebeb25784165879afec5e311b197cbd76ade5698c83c22dd9a8f&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>When a user fills in a form with an &lt;code>xmlVersion&lt;/code> property, the version is copied in to the report doc as the &lt;code>form_version&lt;/code>
+property. For example, the snippet above would generate a property like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;form_version&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;time&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1658717177750&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sha256&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;6f0bbfe5a9a9ebeb25784165879afec5e311b197cbd76ade5698c83c22dd9a8f&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This can be used to determine the version of the form that was used to submit the report. If you upload multiple
+versions of a form over time you can use logic to have the CHT and integrated systems to enable backwards compatibility so
+they behave the same regardless of which version of the form was used.&lt;/p>
+&lt;p>For example, if a property was modified between versions then the logic may look something like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">let&lt;/span> &lt;span class="nx">patientName&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">form_version&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">1658717177750&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">patientName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">first_name&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s1">&amp;#39; &amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">last_name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">patientName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div></description></item><item><title>Expression Functions</title><link>https://docs.communityhealthtoolkit.org/building/forms/_partial_expression_functions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/_partial_expression_functions/</guid><description>
+&lt;p>The following functions are available for use in JavaScript expressions:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Signature&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>ageInDays(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in days.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInMonth(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in months.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ageInYears(contact)&lt;/code>&lt;/td>
+&lt;td>Returns the current age of the given contact in years.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>levenshteinEq(string0, string1, threshold = 3)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Returns &lt;code>true&lt;/code> if the &lt;a href="https://en.wikipedia.org/wiki/Levenshtein_distance" target="_blank" rel="noopener">Levenshtein distance&lt;/a> between the given strings is less than or equal to the given threshold. Otherwise &lt;code>false&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>normalizedLevenshteinEq(string0, string1, threshold = 0.42857142857142855)&lt;/code>&lt;/td>
+&lt;td>&lt;em>(Added &lt;code>4.19.0&lt;/code>)&lt;/em> Similar to the &lt;code>levenshteinEq&lt;/code> function except the distance value is &amp;ldquo;normalized&amp;rdquo; (by dividing by the length of the longest string) before comparing to the threshold. &lt;a href="#normalized-levenshtein-equality" >See below&lt;/a> for more details.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4>Normalized Levenshtein Equality&lt;span class="hx-absolute -hx-mt-20" id="normalized-levenshtein-equality">&lt;/span>
+&lt;a href="#normalized-levenshtein-equality" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>In cases where the length of the input strings can vary greatly, the &lt;code>normalizedLevenshteinEq&lt;/code> function can be preferable to the &lt;code>levenshteinEq&lt;/code> function. The &lt;code>normalizedLevenshteinEq&lt;/code> function divides the Levenshtein distance by the length of the longest string before comparing the result to the threshold. In effect, this makes the matching more strict for shorter strings (the actual distance must be shorter for them to be considered equal) and more lenient for longer strings (the actual distance can be longer, but the strings will still be considered equal).&lt;/p>
+&lt;p>This can help make the same threshold limit value appropriate for use across a greater variety of string lengths. For example, if the threshold is set to &lt;code>0.3&lt;/code>, then an actual distance of &lt;code>2&lt;/code> would be considered equal (when using &lt;code>normalizedLevenshteinEq&lt;/code>) for strings of length &lt;code>9&lt;/code>, but not for two strings of length &lt;code>5&lt;/code>. (Because &lt;code>(2 / 9 = 0.2222) &amp;lt;= 0.3&lt;/code> and &lt;code>(2 / 5 = 0.4) &amp;gt; 0.3&lt;/code>.)&lt;/p>
+&lt;p>When using normalized Levenshtein equality, make sure you consider the behavior of a particular threshold value at the edges of your expected string length range. For example, the distance between &lt;code>far&lt;/code> and &lt;code>car&lt;/code> is &lt;code>1&lt;/code>. If you want your logic to consider &lt;code>john&lt;/code> and &lt;code>jon&lt;/code> as equal, you will need to use a normalized Levenshtein equality threshold of at least &lt;code>1 / 4 = 0.25&lt;/code>. However, for strings with a length of &lt;code>25&lt;/code>, that threshold will allow a distance of &lt;code>5&lt;/code> to be considered equal.&lt;/p></description></item></channel></rss>

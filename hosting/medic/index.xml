@@ -1,3 +1,1014 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>At Medic on Community Health Toolkit</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/</link><description>Recent content in At Medic on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/medic/index.xml" rel="self" type="application/rss+xml"/><item><title>Migration from CHT 3.x to CHT 4.x in EKS - Kubernetes</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/data-migration-3x-eks-to-4x-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/medic/data-migration-3x-eks-to-4x-eks/</guid><description>Like the Deploy to EKS guide, this guide is meant for Medic Teammates migrating Medic hosted CHT Core deployments. However, given there may be other users who will benefit from understanding the process, this document is published for all to read.
-CHT Core hosting architecture differs entirely between 3.x and 4.x. When both versions are running in Kubernetes, migrating data requires specific steps using the couchdb-migration tool. This tool interfaces with CouchDB to update shard maps and database metadata.</description></item><item><title>Deploy CHT Core on Medic hosted EKS</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/deploy-on-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/medic/deploy-on-eks/</guid><description>While not directly available to the public who might be doing CHT Core development, having Medic&amp;rsquo;s process for using our Amazon Elastic Kubernetes Service (AWS EKS) publicly documented will help Medic employees new to EKS. As well, hopefully external developers looking to re-use Medic tools and process to use EKS will find it helpful.
-While these instructions assume you work at Medic and have access to private GitHub repositories, many of the tools are fully open source.</description></item></channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – At Medic</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/</link><description>Recent content in At Medic on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/medic/index.xml" rel="self" type="application/rss+xml"/><item><title>Migration from CHT 3.x to CHT 4.x in EKS - Kubernetes</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/data-migration-3x-eks-to-4x-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/medic/data-migration-3x-eks-to-4x-eks/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Guide to migrate existing data from CHT 3.x on EKS to CHT 4.x on EKS (Kubernetes Environments)
+&lt;/p>
+&lt;p>Like the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/medic/deploy-on-eks/" >Deploy to EKS guide&lt;/a>, this guide is meant for Medic Teammates migrating Medic hosted CHT Core deployments. However, given there may be other users who will benefit from understanding the process, this document is published for all to read.&lt;/p>
+&lt;p>CHT Core hosting architecture differs entirely between 3.x and 4.x. When both versions are running in Kubernetes, migrating data requires specific steps using the &lt;a href="https://github.com/medic/couchdb-migration" target="_blank" rel="noopener">couchdb-migration&lt;/a> tool. This tool interfaces with CouchDB to update shard maps and database metadata.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>&lt;/svg>Tip&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>If after upgrading you get an error, &lt;code>Cannot convert undefined or null to object&lt;/code> - see &lt;a href="https://github.com/medic/cht-core/issues/8040" target="_blank" rel="noopener">issue #8040&lt;/a> for a work around. This only affects CHT 4.0.0, 4.0.1, 4.1.0 and 4.1.1. It was fixed in CHT 4.2.0.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Initial Setup&lt;span class="hx-absolute -hx-mt-20" id="initial-setup">&lt;/span>
+&lt;a href="#initial-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set your namespace&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">NAMESPACE&lt;/span>&lt;span class="o">=&lt;/span>&amp;lt;your-namespace&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Access the Source CouchDB (3.x)&lt;span class="hx-absolute -hx-mt-20" id="access-the-source-couchdb-3x">&lt;/span>
+&lt;a href="#access-the-source-couchdb-3x" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># List all pods to find medic-os pod&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n &lt;span class="nv">$NAMESPACE&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Access the medic-os pod&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">exec&lt;/span> -it -n &lt;span class="nv">$NAMESPACE&lt;/span> &amp;lt;medic-os-pod-name&amp;gt; -- bash&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Set Up Migration Tool Inside 3.x Pod&lt;span class="hx-absolute -hx-mt-20" id="set-up-migration-tool-inside-3x-pod">&lt;/span>
+&lt;a href="#set-up-migration-tool-inside-3x-pod" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Once inside the pod, install required dependencies:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Add node apt repository and update apt&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -fsSL https://deb.nodesource.com/setup_16.x &lt;span class="p">|&lt;/span> bash -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Ensure nodejs, npm and git are installed&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install -y nodejs npm git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># clone repository&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/medic/couchdb-migration.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> couchdb-migration
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ci --omit&lt;span class="o">=&lt;/span>dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create a global symlink to enable running commands directly&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Note: This may require sudo if npm&amp;#39;s global directories aren&amp;#39;t writable&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm link&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Run Pre-Migration Commands on 3.x&lt;span class="hx-absolute -hx-mt-20" id="run-pre-migration-commands-on-3x">&lt;/span>
+&lt;a href="#run-pre-migration-commands-on-3x" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>While still &lt;code>exec&lt;/code>ed in the &lt;code>medic-os&lt;/code> container, get credentials from 1Password and set them inside the pod:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ADMIN_USER&lt;/span>&lt;span class="o">=&lt;/span>&amp;lt;admin_username_from_1password&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ADMIN_PASSWORD&lt;/span>&lt;span class="o">=&lt;/span>&amp;lt;admin_password_from_1password&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set COUCH_URL&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH_URL&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;http://&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">ADMIN_USER&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">ADMIN_PASSWORD&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">@localhost:5984&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Verify connection&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s &lt;span class="nv">$COUCH_URL&lt;/span>/_up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Pre-index views to minimize downtime:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">pre-index-views &amp;lt;desired CHT version&amp;gt;&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-amber-200 hx-bg-amber-100 hx-text-amber-900 dark:hx-border-amber-200/30 dark:hx-bg-amber-900/30 dark:hx-text-amber-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>&lt;/svg>Warning&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>If pre-indexing is omitted, 4.x API will fail to respond to requests until all views are indexed. For large databases, this could take many hours or days.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Save CouchDB configuration:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">get-env&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Save the output containing:&lt;/p>
+&lt;ul>
+&lt;li>CouchDB secret (used for encrypting passwords and session tokens)&lt;/li>
+&lt;li>CouchDB server UUID (used for replication checkpointing)&lt;/li>
+&lt;li>CouchDB admin credentials&lt;/li>
+&lt;/ul>
+&lt;p>You can now exit the medic-os container by running &lt;code>exit&lt;/code>.&lt;/p>
+&lt;h2>Clone the 3.x Data Volume&lt;span class="hx-absolute -hx-mt-20" id="clone-the-3x-data-volume">&lt;/span>
+&lt;a href="#clone-the-3x-data-volume" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First, identify the volume ID from your 3.x data:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Get the PVC name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pvc -n &lt;span class="nv">$NAMESPACE&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Get the volume ID from the PVC&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">VOLUME_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>kubectl get pvc &amp;lt;your-3x-pvc-name&amp;gt; -n &lt;span class="nv">$NAMESPACE&lt;/span> -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;{.spec.volumeName}&amp;#39;&lt;/span>&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">EBS_VOLUME_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>kubectl get pv &lt;span class="nv">$VOLUME_ID&lt;/span> -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;{.spec.awsElasticBlockStore.volumeID}&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> cut -d&lt;span class="s1">&amp;#39;/&amp;#39;&lt;/span> -f4&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;Your 3.x EBS Volume ID is: &lt;/span>&lt;span class="nv">$EBS_VOLUME_ID&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create a snapshot of the 3.x volume&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">SNAPSHOT_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>aws ec2 create-snapshot &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --region eu-west-2 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --volume-id &lt;span class="nv">$EBS_VOLUME_ID&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --description &lt;span class="s2">&amp;#34;CHT 3.x to 4.x migration snapshot&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --query &lt;span class="s1">&amp;#39;SnapshotId&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --output text&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;Created snapshot: &lt;/span>&lt;span class="nv">$SNAPSHOT_ID&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Wait for the snapshot to complete&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">aws ec2 &lt;span class="nb">wait&lt;/span> snapshot-completed --snapshot-ids &lt;span class="nv">$SNAPSHOT_ID&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set cluster-specific variables&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># For development:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">AVAILABILITY_ZONE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;eu-west-2b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">CLUSTER_NAME&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;dev-cht-eks&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># For production, comment out above and uncomment below:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># AVAILABILITY_ZONE=&amp;#34;eu-west-2a&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># CLUSTER_NAME=&amp;#34;prod-cht-eks&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create a new volume from the snapshot&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">NEW_VOLUME_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>aws ec2 create-volume &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --region eu-west-2 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --availability-zone &lt;span class="nv">$AVAILABILITY_ZONE&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --snapshot-id &lt;span class="nv">$SNAPSHOT_ID&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --volume-type gp2 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --query &lt;span class="s1">&amp;#39;VolumeId&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --output text&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;Created new volume: &lt;/span>&lt;span class="nv">$NEW_VOLUME_ID&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Tag the new volume for Kubernetes use&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">aws ec2 create-tags &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --resources &lt;span class="nv">$NEW_VOLUME_ID&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --tags &lt;span class="nv">Key&lt;/span>&lt;span class="o">=&lt;/span>kubernetes.io/cluster/&lt;span class="nv">$CLUSTER_NAME&lt;/span>,Value&lt;span class="o">=&lt;/span>owned &lt;span class="nv">Key&lt;/span>&lt;span class="o">=&lt;/span>KubernetesCluster,Value&lt;span class="o">=&lt;/span>&lt;span class="nv">$CLUSTER_NAME&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Verify your tags took effect&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">aws ec2 describe-volumes --region eu-west-2 --volume-id &lt;span class="nv">$NEW_VOLUME_ID&lt;/span> &lt;span class="p">|&lt;/span> jq &lt;span class="s1">&amp;#39;.Volumes[0].Tags&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Deploy CHT 4.x with Existing Data&lt;span class="hx-absolute -hx-mt-20" id="deploy-cht-4x-with-existing-data">&lt;/span>
+&lt;a href="#deploy-cht-4x-with-existing-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Create a &lt;code>values.yaml&lt;/code> file using the volume ID from the previous step:&lt;/p>
+&lt;p>For single node deployment, create a YAML file with this contents, being sure to update:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&lt;/code> (&lt;em>two occurrences&lt;/em>)&lt;/li>
+&lt;li>&lt;code>&amp;lt;version&amp;gt;&lt;/code> - 4.x version you&amp;rsquo;re upgrading to&lt;/li>
+&lt;li>&lt;code>&amp;lt;password&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;secret&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;admin-user&amp;gt;&lt;/code> - needs to be the same as used in 3.x - likely &lt;code>medic&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;uuid&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;size&amp;gt;&lt;/code> - Size of original 3.x EBS volume, eg &lt;code>100Mi&lt;/code> for 100 Megabytes or &lt;code>100Gi&lt;/code> for 100 Gigabytes (&lt;em>two occurrences&lt;/em>)&lt;/li>
+&lt;li>&lt;code>&amp;lt;toleration-value&amp;gt;&lt;/code> - For production use &lt;code>prod-couchdb-only&lt;/code>, for dev use &lt;code>dev-couchdb-only&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;groupname&amp;gt;&lt;/code> - For production use &lt;code>prod-cht-alb&lt;/code>, for dev use &lt;code>dev-cht-alb&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;environment&amp;gt;&lt;/code> - For production use &lt;code>prod&lt;/code>, for dev use &lt;code>dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;maintainers&amp;gt;&lt;/code> - For production use &lt;code>SRE&lt;/code>, for dev use &lt;code>QA&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;url&amp;gt;&lt;/code> - For production use &lt;code>your-url.app.medicmobile.org&lt;/code>, for dev use &lt;code>your-url.dev.medicmobile.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>load_balancer&lt;/code> - For dev, use: &lt;code>dualstack.k8s-devchtalb-3eb0781cbb-694321496.eu-west-2.elb.amazonaws.com&lt;/code> For prod, use: &lt;code>k8s-prodchtalb-dcc00345ac-1792311525.eu-west-2.elb.amazonaws.com&lt;/code>&lt;/li>
+&lt;li>&lt;code>certificate&lt;/code> - Inquire what the latest certificates are. For 2024 dev, use: &lt;code>arn:aws:iam::720541322708:server-certificate/2024-wildcard-dev-medicmobile-org-chain&lt;/code>. For 2024 prod, use: &lt;code>arn:aws:iam::720541322708:server-certificate/2024-wildcard-app-medicmobile-org-chain&lt;/code>.&lt;/li>
+&lt;li>&lt;code>&amp;lt;volume-ID&amp;gt;&lt;/code> - &lt;code>NEW_VOLUME_ID&lt;/code> from previous step, is volume containing 3.x data&lt;/li>
+&lt;/ul>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">project_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">namespace&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">chtversion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;version&amp;gt; &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">upstream_servers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">docker_registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;public.ecr.aws/medic&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">builds_url&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;https://staging.dev.medicmobile.org/_couch/builds_4&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">upgrade_service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tag&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0.32&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">couchdb&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;password&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">secret&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;secret&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;admin_user&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uuid&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;uuid&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clusteredCouch_enabled&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">couchdb_node_storage_size&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;size&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">toleration&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">key&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;toleration-value&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">operator&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Equal&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">effect&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;NoSchedule&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">ingress&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">groupname&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;groupname&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Environment=&amp;lt;environment&amp;gt;,Team=&amp;lt;maintainers&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">certificate&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;certificate&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">host&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;url&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hosted_zone_id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Z3304WUAJTCM7P&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">load_balancer&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;load_balancer&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;remote&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">cluster_type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;eks&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">cert_source&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;eks-medic&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">couchdb_data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingDataAvailable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dataPathOnDiskForCouchDB&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;storage/medic-core/couchdb/data&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">partition&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">ebs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeID-1&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;volume-ID&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeSize&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;size&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>A Note about the following section:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">couchdb_data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingDataAvailable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dataPathOnDiskForCouchDB&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;storage/medic-core/couchdb/data&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Use subPath from 3.x instance&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">partition&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The value for partition is usually &lt;code>&amp;quot;0&amp;quot;&lt;/code> - not partitioned. If you would like to change this, you can go to your 3.x pod and run &lt;code>df -h&lt;/code> and observe if the existing data is on a specific partition. You then update this value to be the partition number.&lt;/p>
+&lt;p>For a clustered deployment, create a YAML file with this contents, being sure to update:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&lt;/code> (two occurrences)&lt;/li>
+&lt;li>&lt;code>&amp;lt;version&amp;gt;&lt;/code> - 4.x version you&amp;rsquo;re upgrading too&lt;/li>
+&lt;li>&lt;code>&amp;lt;password&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;secret&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;admin_user&amp;gt;&lt;/code> - needs to be the same as used in 3.x - likely &lt;code>medic&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;uuid&amp;gt;&lt;/code> - retrieved from &lt;code>get-env&lt;/code> call above&lt;/li>
+&lt;li>&lt;code>&amp;lt;size&amp;gt;&lt;/code> - Size of original 3.x EBS volume, eg &lt;code>100Mi&lt;/code> for 100 Megabytes or &lt;code>100Gi&lt;/code> for 100 Gigabytes (&lt;em>two occurrences&lt;/em>)&lt;/li>
+&lt;li>&lt;code>&amp;lt;toleration-value&amp;gt;&lt;/code> - For production use &lt;code>prod-couchdb-only&lt;/code>, for dev use &lt;code>dev-couchdb-only&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;groupname&amp;gt;&lt;/code> - For production use &lt;code>prod-cht-alb&lt;/code>, for dev use &lt;code>dev-cht-alb&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;environment&amp;gt;&lt;/code> - For production use &lt;code>prod&lt;/code>, for dev use &lt;code>dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;maintainers&amp;gt;&lt;/code> - For production use &lt;code>SRE&lt;/code>, for dev use &lt;code>QA&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;url&amp;gt;&lt;/code> - For production use &lt;code>your-url.app.medicmobile.org&lt;/code>, for dev use &lt;code>your-url.dev.medicmobile.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;load_balancer&amp;gt;&lt;/code> - For dev, use: &lt;code>dualstack.k8s-devchtalb-3eb0781cbb-694321496.eu-west-2.elb.amazonaws.com&lt;/code> For prod, use: &lt;code>k8s-prodchtalb-dcc00345ac-1792311525.eu-west-2.elb.amazonaws.com&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;certificate&amp;gt;&lt;/code> - Inquire what the latest certificates are. For 2024 dev, use: &lt;code>arn:aws:iam::720541322708:server-certificate/2024-wildcard-dev-medicmobile-org-chain&lt;/code>. For 2024 prod, use: &lt;code>arn:aws:iam::720541322708:server-certificate/2024-wildcard-app-medicmobile-org-chain&lt;/code>.&lt;/li>
+&lt;li>&lt;code>&amp;lt;volume-ID&amp;gt;&lt;/code> - &lt;code>NEW_VOLUME_ID&lt;/code> from previous step, is volume containing 3.x data&lt;/li>
+&lt;/ul>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">project_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">namespace&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;your-namespace-defined-in-NAMESPACE&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">chtversion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;version&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">upstream_servers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">docker_registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;public.ecr.aws/medic&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">builds_url&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;https://staging.dev.medicmobile.org/_couch/builds_4&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">upgrade_service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tag&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0.32&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">couchdb&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;password&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">secret&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;secret&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">user&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;admin_user&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uuid&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;uuid&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clusteredCouch_enabled&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">couchdb_node_storage_size&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;size&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">clusteredCouch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Only relevant if clusteredCouch_enabled is true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">noOfCouchDBNodes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">toleration&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">key&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;toleration-value&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">operator&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Equal&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">value&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">effect&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;NoSchedule&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">ingress&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">groupname&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;groupname&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Environment=&amp;lt;environment&amp;gt;,Team=&amp;lt;maintainers&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">certificate&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;certificate&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">host&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;url&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hosted_zone_id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Z3304WUAJTCM7P&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">load_balancer&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;load_balancer&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;remote&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">cluster_type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;eks&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">cert_source&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;eks-medic&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Only need to specify nodes if deploying on k3s and want to use specific nodes for CouchDB pods&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c">#nodes:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># node-1: &amp;lt;worker-node-1-name&amp;gt; # Only for k3s deployments&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># node-2: &amp;lt;worker-node-2-name&amp;gt; # Only for k3s deployments&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># node-3: &amp;lt;worker-node-3-name&amp;gt; # Only for k3s deployments&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">couchdb_data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingDataAvailable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dataPathOnDiskForCouchDB&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;storage/medic-core/couchdb/data&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Use subPath from 3.x instance&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">partition&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">ebs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeID-1&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;volume-ID&amp;gt;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeID-2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Leave empty for secondary nodes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeID-3&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Leave empty for tertiary nodes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingEBSVolumeSize&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;&amp;lt;size&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>A Note about the following section:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">couchdb_data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">preExistingDataAvailable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dataPathOnDiskForCouchDB&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;storage/medic-core/couchdb/data&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Use subPath from 3.x instance&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">partition&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The value for partition is usually &lt;code>&amp;quot;0&amp;quot;&lt;/code> - not partitioned. If you would like to change this, you can go to your 3.x pod and run &lt;code>df -h&lt;/code> and observe if the existing data is on a specific partition. You then update this value to be the partition number.&lt;/p>
+&lt;p>Deploy using cht-deploy script from cht-core repository:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> cht-core/scripts/deploy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./cht-deploy -f PATH_TO/values.yaml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Verify Deployment and Run Migration Commands&lt;span class="hx-absolute -hx-mt-20" id="verify-deployment-and-run-migration-commands">&lt;/span>
+&lt;a href="#verify-deployment-and-run-migration-commands" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First verify CouchDB is running properly:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Check pod status&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n &lt;span class="nv">$NAMESPACE&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># For single node check CouchDB is up&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">exec&lt;/span> -it -n &lt;span class="nv">$NAMESPACE&lt;/span> &lt;span class="k">$(&lt;/span>kubectl get pod -n &lt;span class="nv">$NAMESPACE&lt;/span> -l cht.service&lt;span class="o">=&lt;/span>couchdb -o name&lt;span class="k">)&lt;/span> -- &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> curl -s http://localhost:5984/_up
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># For clustered setup (check all nodes)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">exec&lt;/span> -it -n &lt;span class="nv">$NAMESPACE&lt;/span> &lt;span class="k">$(&lt;/span>kubectl get pod -n &lt;span class="nv">$NAMESPACE&lt;/span> -l cht.service&lt;span class="o">=&lt;/span>couchdb-1 -o name&lt;span class="k">)&lt;/span> -- &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> curl -s http://localhost:5984/_up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Access the new CouchDB pod based on your deployment type.&lt;/p>
+&lt;p>For single node:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">exec&lt;/span> -it -n &lt;span class="nv">$NAMESPACE&lt;/span> &lt;span class="k">$(&lt;/span>kubectl get pod -n &lt;span class="nv">$NAMESPACE&lt;/span> -l cht.service&lt;span class="o">=&lt;/span>couchdb -o name&lt;span class="k">)&lt;/span> -- bash&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>For clustered setup (always use couchdb-1):&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">kubectl &lt;span class="nb">exec&lt;/span> -it -n &lt;span class="nv">$NAMESPACE&lt;/span> &lt;span class="k">$(&lt;/span>kubectl get pod -n &lt;span class="nv">$NAMESPACE&lt;/span> -l cht.service&lt;span class="o">=&lt;/span>couchdb-1 -o name&lt;span class="k">)&lt;/span> -- bash&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Once inside the pod, set up the migration tool again:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -fsSL https://deb.nodesource.com/setup_16.x &lt;span class="p">|&lt;/span> bash -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install -y nodejs npm git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/medic/couchdb-migration.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> couchdb-migration
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm ci --omit&lt;span class="o">=&lt;/span>dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Create a global symlink to enable running commands directly&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Note: This may require sudo if npm&amp;#39;s global directories aren&amp;#39;t writable&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm link
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set up CouchDB connection&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ADMIN_USER&lt;/span>&lt;span class="o">=&lt;/span>&amp;lt;admin_username_from_1password&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ADMIN_PASSWORD&lt;/span>&lt;span class="o">=&lt;/span>&amp;lt;admin_password_from_1password&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">COUCH_URL&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;http://&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">ADMIN_USER&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">ADMIN_PASSWORD&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">@localhost:5984&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Verify CouchDB is up and responding&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">check-couchdb-up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>For single node deployment:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">move-node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">verify&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>For clustered deployment:&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Caution&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>For clustered setups, shards must be moved both in software (using the migration commands) and physically (the actual data must be moved between EBS volumes). Follow the instructions from shard-move-instructions carefully.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Generate distribution matrix&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">shard_matrix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>generate-shard-distribution-matrix&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Get movement instructions&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">shard-move-instructions &lt;span class="nv">$shard_matrix&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># After moving shards according to instructions&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">move-shards &lt;span class="nv">$shard_matrix&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Remove old node from cluster&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">remove-node couchdb@127.0.0.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Verify the migration&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">verify&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div></description></item><item><title>Deploy CHT Core on Medic hosted EKS</title><link>https://docs.communityhealthtoolkit.org/hosting/medic/deploy-on-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/medic/deploy-on-eks/</guid><description>
+&lt;p
+class="not-prose hx-text-xl hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl"
+>
+Setting up a cloud hosted deployment of CHT Core on Medic&amp;rsquo;s AWS EKS infrastructure
+&lt;/p>
+&lt;p>While not directly available to the public who might be doing CHT Core development, having Medic&amp;rsquo;s process for using our &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html" target="_blank" rel="noopener">Amazon Elastic Kubernetes Service&lt;/a> (AWS EKS) publicly documented will help Medic employees new to EKS. As well, hopefully external developers looking to re-use Medic tools and process to use EKS will find it helpful.&lt;/p>
+&lt;p>While these instructions assume you work at Medic and have access to private GitHub repositories, many of the tools are fully open source.&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Command Line&lt;span class="hx-absolute -hx-mt-20" id="command-line">&lt;/span>
+&lt;a href="#command-line" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Be sure you have these tools installed and repos cloned:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html" target="_blank" rel="noopener">awscli&lt;/a>: version &lt;code>2&lt;/code> or newer&lt;/li>
+&lt;li>&lt;a href="https://kubernetes.io/docs/tasks/tools" target="_blank" rel="noopener">kubectl&lt;/a>: Must be within one minor version of cluster. If cluster is &lt;code>1.24.x&lt;/code>, use &lt;code>1.23.x&lt;/code>, &lt;code>1.24.x&lt;/code> or &lt;code>1.25.x&lt;/code>.&lt;/li>
+&lt;li>&lt;a href="https://helm.sh/docs/intro/install/" target="_blank" rel="noopener">helm&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://jqlang.github.io/jq/download/" target="_blank" rel="noopener">jq&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://nodejs.org/en/download" target="_blank" rel="noopener">node&lt;/a> version &lt;code>22&lt;/code> or later. Be sure that &lt;code>npm&lt;/code> was installed as well with &lt;code>node&lt;/code> (it normally is)&lt;/li>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/" target="_blank" rel="noopener">Medic Infra&lt;/a> repo cloned&lt;/li>
+&lt;/ul>
+&lt;h4>Optional: Autocomplete&lt;span class="hx-absolute -hx-mt-20" id="optional--autocomplete">&lt;/span>
+&lt;a href="#optional--autocomplete" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>Both &lt;code>helm&lt;/code> and &lt;code>kubectl&lt;/code> have autocomplete libraries. For power users and beginners alike, it adds a lot of discoverability. This code is for &lt;code>zsh&lt;/code>, but &lt;code>bash&lt;/code>, &lt;code>fish&lt;/code> and &lt;code>powershell&lt;/code> are supported as well:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">source&lt;/span> &amp;lt;&lt;span class="o">(&lt;/span>kubectl completion &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>basename &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$SHELL&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">source&lt;/span> &amp;lt;&lt;span class="o">(&lt;/span>helm completion &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>basename &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$SHELL&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>See &lt;a href="https://helm.sh/docs/helm/helm_completion_bash/" target="_blank" rel="noopener">helm&lt;/a> and &lt;a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-shell-autocompletion" target="_blank" rel="noopener">kubectl&lt;/a> docs to automatically loading these on every new session.&lt;/p>
+&lt;h3>Request permission&lt;span class="hx-absolute -hx-mt-20" id="request-permission">&lt;/span>
+&lt;a href="#request-permission" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>By default, Medic teammates do not have EKS access and must file a ticket to request it:&lt;/p>
+&lt;ol>
+&lt;li>&lt;a href="https://github.com/medic/medic-infrastructure/issues/new" target="_blank" rel="noopener">Create a ticket&lt;/a> to get your DNS and Namespace created for EKS, which should match each other. As an example, a &lt;code>mrjones-dev&lt;/code> name space would match &lt;code>mrjones.dev.medicmobile.org&lt;/code> DNS. The ticket should include requesting EKS access to be granted.&lt;/li>
+&lt;li>Once the ticket in step one is complete, follow the &lt;a href="https://github.com/medic/medic-infrastructure/blob/master/terraform/aws/dev/eks/access/README.md" target="_blank" rel="noopener">CLI setup guide&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>NB&lt;/strong> - Security key (e.g. Yubikey) users need to add a TOTP MFA (Time-based, One-Time Password Multi-Factor Authentication) too! CLI requires the TOTP values (6-digit number) and security keys are not supported. Security keys can only be used on web logins.&lt;/p>
+&lt;h3>First time setup&lt;span class="hx-absolute -hx-mt-20" id="first-time-setup">&lt;/span>
+&lt;a href="#first-time-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>These steps only need to be run once!&lt;/p>
+&lt;p>After you have created a ticket per &amp;ldquo;Request permission&amp;rdquo; above, you should get a link to sign up for AWS. Click the link and:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Create new password ensure it&amp;rsquo;s 10+ characters including one alpha (&lt;code>a-z&lt;/code>) and one special (&lt;code>~!@#$%^&amp;amp;*_-+=`|\(){}[]:;&amp;quot;'&amp;lt;&amp;gt;,.?/&lt;/code>) character.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Setup MFA. In top-right corner of browser, there is a drop-down menu with your &lt;code>username @ medic&lt;/code>. Click that and then on &amp;ldquo;My Security Credentials&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Assign an MFA device and give it the &lt;strong>same name&lt;/strong> as your username: In AWS web GUI, click your name in upper right:&lt;/p>
+&lt;ol>
+&lt;li>Security Credentials&lt;/li>
+&lt;li>scroll down to &amp;ldquo;Multi-factor authentication (MFA)&amp;rdquo;&lt;/li>
+&lt;li>click &amp;ldquo;Assign MFA device&amp;rdquo;&lt;/li>
+&lt;li>enter a &amp;ldquo;Device name&amp;rdquo; (should match username)&lt;/li>
+&lt;li>&amp;ldquo;Select MFA device&amp;rdquo; that you&amp;rsquo;re using&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>
+&lt;p>Create Access Keys for Command Line Interface: In AWS web GUI, click your name in upper right -&amp;gt; Security Credentials -&amp;gt; scroll down to &amp;ldquo;Access keys&amp;rdquo; -&amp;gt; click &amp;ldquo;Create access key&amp;rdquo; -&amp;gt; for use case choose &amp;ldquo;Command Line Interface&amp;rdquo; -&amp;gt; click &amp;ldquo;Next&amp;rdquo; -&amp;gt; enter description and click &amp;ldquo;Create access key&amp;rdquo;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run &lt;code>aws configure&lt;/code> and place appropriate access keys during prompts. Use &lt;code>eu-west-2&lt;/code> region. It should look like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ aws configure
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AWS Access Key ID &lt;span class="o">[&lt;/span>None&lt;span class="o">]&lt;/span>: &amp;lt;ACCESS-KEY-HERE&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AWS Secret Access Key &lt;span class="o">[&lt;/span>None&lt;span class="o">]&lt;/span>: &amp;lt;SECRET-HERE&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Default region name &lt;span class="o">[&lt;/span>None&lt;span class="o">]&lt;/span>: eu-west-2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Default output format &lt;span class="o">[&lt;/span>None&lt;span class="o">]&lt;/span>:&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Run the Update Kubeconfig command, assuming username is &lt;code>mrjones&lt;/code> and namespace is &lt;code>mrjones-dev&lt;/code> - be sure to place these with yours: &lt;code>aws eks update-kubeconfig --name dev-cht-eks --profile mrjones --region eu-west-2&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2>Starting and stopping (aka deleting)&lt;span class="hx-absolute -hx-mt-20" id="starting-and-stopping-aka-deleting">&lt;/span>
+&lt;a href="#starting-and-stopping-aka-deleting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
+&lt;li>
+&lt;p>Login with &lt;code>eks-aws-mfa-login&lt;/code> script in the &lt;a href="https://github.com/medic/medic-infrastructure/tree/master/terraform/aws/dev/eks/access" target="_blank" rel="noopener">infra repo&lt;/a>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./eks-aws-mfa-login USERNAME TOTP_HERE&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Ensure you&amp;rsquo;re using dev EKS cluster:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/dev-cht-eks&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>If get an error &lt;code>no context exists with the name&lt;/code>, change &lt;code>use-context&lt;/code> to &lt;code>set-context&lt;/code> in the command. This will create the entry the first time. Subsequent calls should use &lt;code>use-context&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Create a new &lt;code>values.yaml&lt;/code> file by &lt;a href="https://github.com/medic/helm-charts/blob/main/charts/cht-chart-4x/values.yaml" target="_blank" rel="noopener">copying this one&lt;/a>. Be sure to update these values after you create it:&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Single node CouchDB&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Multi node CouchDB&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;ul>
+&lt;li>&lt;code>&amp;lt;your-project-name&amp;gt;&lt;/code> and &lt;code>&amp;lt;your-namespace&amp;gt;&lt;/code> - set both &lt;code>USERNAME-dev&lt;/code> - for example &lt;code>mrjones-dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;password-value&amp;gt;&lt;/code> - put in a strong - this instance is exposed to the Internet! *&lt;/li>
+&lt;li>&lt;code>&amp;lt;subdomain&amp;gt;&lt;/code> - your &lt;code>username&lt;/code>. For example: &lt;code>mrjones.dev.medicmobile.org&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;ul>
+&lt;li>&lt;code>&amp;lt;your-project-name&amp;gt;&lt;/code> and &lt;code>&amp;lt;your-namespace&amp;gt;&lt;/code> - set both &lt;code>USERNAME-dev&lt;/code> - for example &lt;code>mrjones-dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>&amp;lt;password-value&amp;gt;&lt;/code> - put in a strong - this instance is exposed to the Internet! *&lt;/li>
+&lt;li>&lt;code>&amp;lt;subdomain&amp;gt;&lt;/code> - your &lt;code>username&lt;/code>. For example: &lt;code>mrjones.dev.medicmobile.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>clusteredCouch_enabled&lt;/code> - set to &lt;code>true&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;em>* Note some characters are unsupported in &lt;code>password&lt;/code>: &lt;code>:&lt;/code>, &lt;code>@&lt;/code>, &lt;code>&amp;quot;&lt;/code>, &lt;code>'&lt;/code>, etc. Be sure to enclose it in quotes &lt;code>&amp;quot;&amp;quot;&lt;/code> and do not use spaces in your password. Your deployment will succeed but you won&amp;rsquo;t be able to log into the CHT instance.&lt;/em>
+5. Ensure you have the latest code of &lt;code>cht-core&lt;/code> &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener">repo&lt;/a>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git checkout master&lt;span class="p">;&lt;/span>git pull origin&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;ol start="6">
+&lt;li>Ensure you have &lt;code>node&lt;/code> dependencies installed for &lt;code>cht-deploy&lt;/code> script:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> scripts/deploy&lt;span class="p">;&lt;/span>npm install&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Run deploy, being sure to update &lt;code>PATH_TO&lt;/code> to be where you saved it in the prior step:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-deploy -f PATH_TO/values.yaml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>Delete it when you&amp;rsquo;re done:
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">helm delete USERNAME-dev --namespace USERNAME-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;/ol>
+&lt;h2>Cloning a Medic hosted instance&lt;span class="hx-absolute -hx-mt-20" id="cloning-a-medic-hosted-instance">&lt;/span>
+&lt;a href="#cloning-a-medic-hosted-instance" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Sometimes a Medic teammate will need to run tests on data from an instance hosted in a Medic &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html" target="_blank" rel="noopener">EKS&lt;/a> deployment. When cloning a production instance, use extreme caution as it will have real PII/PHI in it. This includes, but is not limited to:&lt;/p>
+&lt;ul>
+&lt;li>Using a secure password&lt;/li>
+&lt;li>Only ever share credentials over 1Password&lt;/li>
+&lt;li>Deleting the instances, volume and snapshot when they&amp;rsquo;re no longer being used&lt;/li>
+&lt;/ul>
+&lt;p>Otherwise, as Medic has selected AWS as it&amp;rsquo;s provider to host production instances, making clones is safe when the above basic security measures are followed.&lt;/p>
+&lt;h3>Overview&lt;span class="hx-absolute -hx-mt-20" id="overview">&lt;/span>
+&lt;a href="#overview" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The cloning process assumes you have access to EKS and to the snapshots and volumes you wish to clone and create. This is not a permission granted to normal teammates who use EKS, so check with SRE as needed.&lt;/p>
+&lt;p>After checking your permissions, first find a snapshot of the data you&amp;rsquo;re wanting to clone. Only production data has automated snapshots, so when cloning a development instance, manually create a snapshot first. After finding the snapshot and its ID (e.g. &lt;code>snap-081d1cc18de16d8c7&lt;/code>), create a new volume from this snapshot. Now label the volume so it&amp;rsquo;s flagged for EKS use. Finally, put your newly created volume ID (e.g. &lt;code>vol-047f57544f4085fb2&lt;/code>) in a &lt;code>values.yml&lt;/code> file to use with &lt;code>helm&lt;/code> and the &lt;a href="https://github.com/medic/cht-core/tree/master/scripts/deploy" target="_blank" rel="noopener">deploy&lt;/a> script.&lt;/p>
+&lt;p>Read on below for the exact steps on how to do this.&lt;/p>
+&lt;h3>Steps&lt;span class="hx-absolute -hx-mt-20" id="steps">&lt;/span>
+&lt;a href="#steps" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Note that a number of these steps can be done either on the command line or in the AWS web admin GUI. Do it the way you feel most comfortable!&lt;/p>
+&lt;p>Always always be sure of which &lt;code>context&lt;/code> you&amp;rsquo;re working on! Start off by setting your &lt;code>context&lt;/code> to &lt;code>dev-cht-eks&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/dev-cht-eks&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>And then follow these steps:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Find the ID of the snapshot by using the production URL to retrieve the ID and date of the latest snapshot. Be sure to replace &lt;code>moh-foo.app&lt;/code> with the real URL of the instance (note: this doesn&amp;rsquo;t matter what &lt;code>context&lt;/code> you&amp;rsquo;re on):&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">aws ec2 describe-snapshots --region&lt;span class="o">=&lt;/span>eu-west-2 --filters &lt;span class="s2">&amp;#34;Name=tag:Address,Values=&amp;#39;moh-foo.app.medicmobile.org&amp;#39;&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> jq &lt;span class="s1">&amp;#39;.Snapshots[0]&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This should result with the following JSON from which you can both verify it is current, but also that it is the correct instance to get the &lt;code>SnapshotId&lt;/code> value from. This JSON truncated for brevity:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Description&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Created for policy: policy-43210483209 schedule: Default Schedule&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;SnapshotId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;snap-432490821280432092&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;StartTime&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2024-08-18T15:52:59.831000+00:00&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;State&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;completed&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;VolumeId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;vol-4392148120483212&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;VolumeSize&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">900&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Tags&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Address&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;moh-foo.app.medicmobile.org&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Production: moh-foo.app.medicmobile.org&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Description&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;4x foo production for bar&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Now that you found your snapshot ID, create a volume from it. Being sure to replace &lt;code>snap-432490821280432092&lt;/code> with your ID, call:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">aws ec2 create-volume --region eu-west-2 --availability-zone eu-west-2b --snapshot-id snap-432490821280432092&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Be sure to grab the &lt;code>VolumeId&lt;/code> from the resulting JSON, &lt;code>vol-f9dsa0f9sad09f0dsa&lt;/code> in this case:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;AvailabilityZone&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;eu-west-2b&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;CreateTime&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2024-08-23T21:31:27+00:00&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Encrypted&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Size&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">900&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;SnapshotId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;snap-432490821280432092&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;State&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;creating&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;VolumeId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;vol-f9dsa0f9sad09f0dsa&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Iops&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2700&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Tags&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;VolumeType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;gp2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;MultiAttachEnabled&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Run &lt;code>describe-volumes&lt;/code> until that volume has a &lt;code>State&lt;/code> of &lt;code>available&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">aws ec2 describe-volumes --region eu-west-2 --volume-id vol-f9dsa0f9sad09f0dsa &lt;span class="p">|&lt;/span> jq &lt;span class="s1">&amp;#39;.Volumes[0].State&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;available&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Once you have that volume created and &lt;code>available&lt;/code>, tag it with &lt;code>kubernetes.io/cluster/dev-cht-eks: owned&lt;/code> and &lt;code>KubernetesCluster: dev-cht-eks&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">aws ec2 create-tags --resources vol-f9dsa0f9sad09f0dsa --tags &lt;span class="nv">Key&lt;/span>&lt;span class="o">=&lt;/span>kubernetes.io/cluster/dev-cht-eks,Value&lt;span class="o">=&lt;/span>owned &lt;span class="nv">Key&lt;/span>&lt;span class="o">=&lt;/span>KubernetesCluster,Value&lt;span class="o">=&lt;/span>dev-cht-eks&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>You can verify your tags took effect by calling &lt;code>describe-volumes&lt;/code> again:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">aws ec2 describe-volumes --region eu-west-2 --volume-id vol-f9dsa0f9sad09f0dsa &lt;span class="p">|&lt;/span> jq &lt;span class="s1">&amp;#39;.Volumes[0].Tags&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Which should result in this JSON:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;kubernetes.io/cluster/dev-cht-eks&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;owned&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;KubernetesCluster&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dev-cht-eks&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Switch to the production cluster and then find the &lt;code>subPath&lt;/code> of the deployment you made the snapshot from. The &lt;code>COUCH-DB-NAME&lt;/code> is usually &lt;code>cht-couchdb&lt;/code>. But, it can sometimes be &lt;code>cht-couchdb-1&lt;/code> (check &lt;code>./troubleshooting/list-deployments &amp;lt;your-namespace&amp;gt;&lt;/code> if you still don&amp;rsquo;t know). Including the &lt;code>use-context&lt;/code>, the two calls are below. Note that &lt;code>troubleshooting&lt;/code> directory is in the &lt;a href="https://github.com/medic/cht-core/tree/master/scripts/deploy/troubleshooting" target="_blank" rel="noopener">CHT Core repo&lt;/a>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/prod-cht-eks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./troubleshooting/get-volume-binding &amp;lt;DEPLOYMENT&amp;gt; &amp;lt;COUCH-DB-NAME&amp;gt; &lt;span class="p">|&lt;/span> jq &lt;span class="s1">&amp;#39;.subPath&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Which shows the path like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;storage/medic-core/couchdb/data&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Create a &lt;code>values.yml&lt;/code> file from &lt;a href="https://github.com/medic/helm-charts/blob/main/charts/cht-chart-4x/values.yaml" target="_blank" rel="noopener">this template&lt;/a> and edit the following fields:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>project_name&lt;/code> - likely your username followed by &lt;code>-dev&lt;/code>. For example &lt;code>mrjones-dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>namespace&lt;/code> - likely the same as project name, your user followed by &lt;code>-dev&lt;/code>. For example &lt;code>mrjones-dev&lt;/code>&lt;/li>
+&lt;li>&lt;code>chtversion&lt;/code> - this should match the version you cloned from&lt;/li>
+&lt;li>&lt;code>password&lt;/code> - this should match the version you cloned from&lt;/li>
+&lt;li>&lt;code>secret&lt;/code> - this should match the version you cloned from&lt;/li>
+&lt;li>&lt;code>user&lt;/code> - use &lt;code>medic&lt;/code> user&lt;/li>
+&lt;li>&lt;code>uuid&lt;/code> - this should match the version you cloned from&lt;/li>
+&lt;li>&lt;code>couchdb_node_storage_size&lt;/code> - use the same size as the volume you just cloned&lt;/li>
+&lt;li>&lt;code>account-id&lt;/code> - this should always be &lt;code>720541322708&lt;/code>&lt;/li>
+&lt;li>&lt;code>host&lt;/code> - this should be your username followed by &lt;code>dev.medicmobile.org&lt;/code>. For example &lt;code>mrjones.dev.medicmobile.org&lt;/code>&lt;/li>
+&lt;li>&lt;code>hosted_zone_id&lt;/code> - this should always be &lt;code>Z3304WUAJTCM7P&lt;/code>&lt;/li>
+&lt;li>&lt;code>preExistingDataAvailable&lt;/code> - set this to be &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>dataPathOnDiskForCouchDB&lt;/code> - use the subPath you got in the step above. For example &lt;code>storage/medic-core/couchdb/data&lt;/code>&lt;/li>
+&lt;li>&lt;code>preExistingEBSVolumeID-1&lt;/code> - set this to be the ID from step 2. For example &lt;code>vol-f9dsa0f9sad09f0dsa&lt;/code>&lt;/li>
+&lt;li>&lt;code>preExistingEBSVolumeSize&lt;/code> - use the same size as the volume you just cloned&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Deploy this to development per the &lt;a href="#starting-and-stopping-aka-deleting" >steps above&lt;/a>. NB - &lt;strong>Be sure to call &lt;code>kubectl config use-context arn:aws:eks:eu-west-2:720541322708:cluster/dev-cht-eks&lt;/code> before you call&lt;/strong> &lt;code>./cht-deploy&lt;/code>! Always create test instances on the dev cluster.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Login using the &lt;code>user&lt;/code> and &lt;code>password&lt;/code> set above, which should match the production instance.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>When you&amp;rsquo;re done with this deployment, you can delete it with helm:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">helm delete USERNAME-dev --namespace USERNAME-dev&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/li>
+&lt;li>
+&lt;p>Now that no resources are using the volume, you should delete it. If you created a snapshot, you should delete that as well. Be sure to replace &lt;code>vol-f9dsa0f9sad09f0dsa&lt;/code> and &lt;code>snap-432490821280432092&lt;/code> with your actual IDs. You only need to delete the snapshot if you created it above, &lt;strong>do no delete snapshots you did not create&lt;/strong>:&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">aws ec2 delete-volume --region eu-west-2 --volume-id vol-f9dsa0f9sad09f0dsa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">aws ec2 delete-snapshot --snapshot-id snap-432490821280432092&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>References and Debugging&lt;span class="hx-absolute -hx-mt-20" id="references-and-debugging">&lt;/span>
+&lt;a href="#references-and-debugging" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>More information on &lt;code>cht-deploy&lt;/code> script is available in the &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/README.md" target="_blank" rel="noopener">CHT Core GitHub repository&lt;/a> which includes specifics of the &lt;code>values.yaml&lt;/code> file and more details about the debugging utilities listed below.&lt;/p>
+&lt;h3>Debugging&lt;span class="hx-absolute -hx-mt-20" id="debugging">&lt;/span>
+&lt;a href="#debugging" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A summary of the utilities in &lt;code>cht-core/scripts/deploy&lt;/code> directory, assuming &lt;code>mrjones-dev&lt;/code> namespace:&lt;/p>
+&lt;ul>
+&lt;li>list all resources: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;li>view logs, assuming &lt;code>cht-couchdb-1&lt;/code> returned from prior command: &lt;code>./troubleshooting/view-logs mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>describe deployment, assuming &lt;code>cht-couchdb-1&lt;/code> returned from 1st command: &lt;code>./troubleshooting/describe-deployment mrjones-dev cht-couchdb-1&lt;/code>&lt;/li>
+&lt;li>list all deployments: &lt;code>./troubleshooting/list-all-resources mrjones-dev&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3>Getting shell&lt;span class="hx-absolute -hx-mt-20" id="getting-shell">&lt;/span>
+&lt;a href="#getting-shell" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Sometimes you need to look at files and other key pieces of data that are not available with &lt;a href="https://github.com/medic/cht-core/blob/master/scripts/deploy/troubleshooting/view-logs" target="_blank" rel="noopener">the current&lt;/a> &lt;code>troubleshooting/view-logs&lt;/code> script. In this case, getting an interactive shell on the pod can be helpful.&lt;/p>
+&lt;ol>
+&lt;li>First, get a list pods for your namespace: &lt;code>kubectl -n NAMESPACE get pods&lt;/code>&lt;/li>
+&lt;li>After finding the pod you&amp;rsquo;re interested, connect to the pod to get a shell: &lt;code>kubectl -n NAMESPACE exec -it PODNAME/CONTAINERNAME -- /bin/bash&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3>&lt;code>invalid apiVersion&lt;/code> Error&lt;span class="hx-absolute -hx-mt-20" id="invalid-apiversion-error">&lt;/span>
+&lt;a href="#invalid-apiversion-error" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If you get the error:&lt;/p>
+&lt;blockquote>
+&lt;p>exec plugin: invalid apiVersion &amp;ldquo;client.authentication.k8s.io/v1alpha1&amp;rdquo; when running &lt;code>kubectl version&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;p>You might be using an version of kubernetes api &lt;code>client.authentication.k8s.io&lt;/code> which is not supported by your &lt;code>kubectl&lt;/code> client. This can sometimes happen in EKS clusters if aws cli is an older version, in most cases you need at least version &lt;code>2&lt;/code> of aws cli. Check version by running: &lt;code>aws --version&lt;/code> and note that version &lt;code>2&lt;/code> &lt;em>cannot&lt;/em> be installed through &lt;code>pip&lt;/code> (See &lt;a href="#command-line" >Command Line&lt;/a> section above for installation instructions)&lt;/p>
+&lt;h2>SRE Steps for granting users access to a namespace&lt;span class="hx-absolute -hx-mt-20" id="sre-steps-for-granting-users-access-to-a-namespace">&lt;/span>
+&lt;a href="#sre-steps-for-granting-users-access-to-a-namespace" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>If you&amp;rsquo;re on the SRE/Infra team and want to grant a Medic teammate access to EKS:&lt;/p>
+&lt;ol>
+&lt;li>Tools required: aws, eksctl, kubectl&lt;/li>
+&lt;li>Create AWS User.
+&lt;ul>
+&lt;li>Attach IAM policy: Force_MFA and share auto-generated password safely&lt;/li>
+&lt;li>Have user log in and finish MFA, access key setup&lt;/li>
+&lt;li>SRE adds you to mfa-required-users group&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Add the namespaces and users to &lt;code>tf/eks/dev/access/main.tf&lt;/code>&lt;/li>
+&lt;li>Run tofu apply in the folder &lt;code>tf/eks/dev/access&lt;/code>&lt;/li>
+&lt;li>Create &lt;code>identitymapping&lt;/code> if needed:&lt;/li>
+&lt;/ol>
+&lt;p>Reading the &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html" target="_blank" rel="noopener">AWS guide for principal access&lt;/a> may help here!&lt;/p></description></item></channel></rss>
