@@ -138,11 +138,11 @@ title="Copy code"
 &lt;/ul>
 &lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
 &lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
-&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data-flows-for-analytics/" >Data Flows for Analytics&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/data-flows-for-analytics/" >Data Flows for Analytics&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;h2>Querying task data&lt;span class="hx-absolute -hx-mt-20" id="querying-task-data">&lt;/span>
-&lt;a href="#querying-task-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The task system running on each user&amp;rsquo;s device is powered by &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task documents&lt;/a> and those task documents sync to the server and to PostgreSQL just like a contact or a report. Having task documents in PostgreSQL allows system administrators to analyse how users are interacting with tasks.&lt;/p>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data-flows-for-analytics/">Data flows for analytics&lt;/a>&lt;/p>
+&lt;a href="#querying-task-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The task system running on each user&amp;rsquo;s device is powered by &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/#tasks" >task documents&lt;/a> and those task documents sync to the server and to PostgreSQL just like a contact or a report. Having task documents in PostgreSQL allows system administrators to analyse how users are interacting with tasks.&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/data-flows-for-analytics/">Data flows for analytics&lt;/a>&lt;/p>
 &lt;h3>First Assessment Completion Rate&lt;span class="hx-absolute -hx-mt-20" id="first-assessment-completion-rate">&lt;/span>
 &lt;a href="#first-assessment-completion-rate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Working with the &lt;em>First Assessment&lt;/em> task from the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/simple-tasks/" >Configuring Tasks Tutorial&lt;/a>, let&amp;rsquo;s try to answer the question &lt;strong>What percentage of the scheduled &lt;em>first assessment&lt;/em> events have been completed?&lt;/strong>.&lt;/p>
 &lt;p>Let&amp;rsquo;s query data from the last three months to see how the &lt;em>first assessment&lt;/em> task is behaving in production:&lt;/p>
@@ -195,8 +195,8 @@ title="Copy code"
 &lt;/div>
 &lt;p>&lt;strong>What is this code doing?&lt;/strong>&lt;/p>
 &lt;ul>
-&lt;li>&lt;code>useview_task&lt;/code> - This is a materialized view of the data from the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
-&lt;li>&lt;code>task_state&lt;/code> - The meaning of each task state is explained in the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
+&lt;li>&lt;code>useview_task&lt;/code> - This is a materialized view of the data from the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
+&lt;li>&lt;code>task_state&lt;/code> - The meaning of each task state is explained in the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/#tasks" >task document schema&lt;/a>.&lt;/li>
 &lt;li>&lt;code>WHERE title&lt;/code> - The &lt;em>name&lt;/em> attribute in the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >task.js schema&lt;/a> is used exclusively in the task&amp;rsquo;s backend data. Here we limit the query to task documents resulting from our named task. The &lt;code>title&lt;/code> in postgres maps to the &lt;code>name&lt;/code> in JavaScript not the &lt;code>title&lt;/code> in JavaScript - which is confusing.&lt;/li>
 &lt;li>&lt;code>WHERE duedate&lt;/code> - One task document is created per event and this task has one event per contact which is due 7 days after the contact&amp;rsquo;s creation date. Here we limit the query to task documents which are &lt;em>due in the last 3 calendar months&lt;/em>.&lt;/li>
 &lt;/ul>
@@ -319,10 +319,10 @@ title="Copy code"
 &lt;p>Let&amp;rsquo;s synthesize some knowledge about CHT applications to help clarify what is happening within the task system:&lt;/p>
 &lt;ol>
 &lt;li>
-&lt;p>All contacts in CHT applications are organised into hierarchies. For more information, read the &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-management/contact-and-users-1/" >Contact and User Management Tutorial&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#contacts-persons-and-places" >schema for contact documents&lt;/a>.&lt;/p>
+&lt;p>All contacts in CHT applications are organised into hierarchies. For more information, read the &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-management/contact-and-users-1/" >Contact and User Management Tutorial&lt;/a> or &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/#contacts-persons-and-places" >schema for contact documents&lt;/a>.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>All reports in the system are linked to one (and only one) contact. For more information, read &lt;a href="https://docs.communityhealthtoolkit.org/building/tutorials/app-forms/" >App Forms Tutorial&lt;/a> or the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/db-schema/#reports" >schema for report documents&lt;/a>.&lt;/p>
+&lt;p>All reports in the system are linked to one (and only one) contact. For more information, read &lt;a href="https://docs.communityhealthtoolkit.org/building/tutorials/app-forms/" >App Forms Tutorial&lt;/a> or the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/#reports" >schema for report documents&lt;/a>.&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>Documents are stored &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/hydration/" >minified&lt;/a> (not hydrated). All data that is passed into the tasks system is minified.&lt;/p>
