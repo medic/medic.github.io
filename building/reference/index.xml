@@ -2806,7 +2806,7 @@ will be undefined.&lt;/p>
 &lt;/tr>
 &lt;tr>
 &lt;td>password&lt;/td>
-&lt;td>yes, if &lt;code>token_login&lt;/code> is not enabled for the user&lt;/td>
+&lt;td>yes, if &lt;code>token_login&lt;/code> or &lt;code>oidc_username&lt;/code> is not set for the user&lt;/td>
 &lt;td>String&lt;/td>
 &lt;td>Password string used for authentication. Only allowed to be set, not retrieved.&lt;/td>
 &lt;td>&lt;/td>
@@ -2845,6 +2845,20 @@ will be undefined.&lt;/p>
 &lt;td>Boolean&lt;/td>
 &lt;td>Boolean to define if the user has logged in before.&lt;/td>
 &lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>password_change_required&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>Set &lt;code>false&lt;/code> to avoid the user being prompted to &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/#password-reset-on-first-login" >reset their password&lt;/a> the next time they log in.&lt;/td>
+&lt;td>4.17.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>oidc_username&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>A unique username for &lt;a href="#login-by-oidc" >authenticating via OIDC&lt;/a>. This value must match the &lt;code>email&lt;/code> claim returned for the user by the OIDC provider.&lt;/td>
+&lt;td>4.20.0&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -2917,6 +2931,14 @@ To regenerate the token, update the user sending &lt;code>token_login&lt;/code> 
 &lt;p>This feature uses &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" >&lt;code>app_settings.app_url&lt;/code>&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/token_login/" >&lt;code>app_settings.token_login&lt;/code>&lt;/a> to be defined and enabled.
 If &lt;code>app_settings.app_url&lt;/code> is not defined, the generated token-login URL will use the &lt;code>Host&lt;/code> request header, which may not always be correct.&lt;/p>
 &lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/concepts/access/#remote-login">Accessing CHT Apps&lt;/a>&lt;/p>
+&lt;h4>Login by OIDC&lt;span class="hx-absolute -hx-mt-20" id="login-by-oidc">&lt;/span>
+&lt;a href="#login-by-oidc" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>When &lt;a href="https://docs.communityhealthtoolkit.org/hosting/sso/" >SSO Login&lt;/a> is enabled (by configuring the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/oidc_provider/" >&lt;code>oidc_provider&lt;/code> settings&lt;/a>), a CHT user must be provisioned for each SSO user prior to them logging in. The CHT user&amp;rsquo;s &lt;code>oidc_username&lt;/code> property must be set to the value of the user&amp;rsquo;s &lt;code>email&lt;/code> claim from the OIDC Provider.&lt;/p>
+&lt;p>Two CHT users cannot share the same &lt;code>oidc_username&lt;/code> value. Setting the &lt;code>oidc_username&lt;/code> property for a user will cause the user&amp;rsquo;s password (in the CHT) to be set to a random value, preventing them from logging in with other authentication methods. Instead, the user must log in using the &amp;ldquo;Login with SSO&amp;rdquo; button.&lt;/p>
+&lt;p>When creating/editing users via the &lt;a href="https://docs.communityhealthtoolkit.org/building/admin/admin-overview/" >App Management interface&lt;/a>, the &amp;ldquo;SSO Email Address&amp;rdquo; field is used to set the &lt;code>oidc_username&lt;/code> property.&lt;/p>
+&lt;p>(Note: it is possible to have a mixed environment where some users log in with SSO and others log in with other authentication methods. In this case, the &lt;code>oidc_username&lt;/code> property is only set for those users who log in with SSO.)&lt;/p>
+&lt;h5>Locale for SSO users&lt;span class="hx-absolute -hx-mt-20" id="locale-for-sso-users">&lt;/span>
+&lt;a href="#locale-for-sso-users" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h5>&lt;p>When a user logs in via SSO, the CHT app will attempt to localize the interface based on the &lt;code>locale&lt;/code> claim returned by the OIDC Provider (otherwise it will fall back to the default locale configured as the first &lt;code>languages&lt;/code> entry in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" >&lt;code>app_settings.json&lt;/code>&lt;/a>).&lt;/p>
+&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/hosting/sso/#remote-login">Single Sign-On&lt;/a>&lt;/p>
 &lt;h3>GET /api/v1/users&lt;span class="hx-absolute -hx-mt-20" id="get-apiv1users">&lt;/span>
 &lt;a href="#get-apiv1users" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>DEPRECATED: use &lt;a href="#get-apiv2users" >/api/v2/users&lt;/a>&lt;/em>&lt;/p>
 &lt;p>Returns a list of users and their profile data in JSON format.&lt;/p>
@@ -3032,6 +3054,7 @@ Content-Type: application/json; charset=utf-8
 &amp;#34;roles&amp;#34;: [ &amp;#34;district_admin&amp;#34;, &amp;#34;data_user&amp;#34; ],
 &amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
 &amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;oidc_username&amp;#34;: &amp;#34;demo@email.com&amp;#34;,
 &amp;#34;place&amp;#34;: {
 &amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
 &amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
@@ -3082,6 +3105,7 @@ Content-Type: application/json; charset=utf-8
 &amp;#34;roles&amp;#34;: [ &amp;#34;district_admin&amp;#34;, &amp;#34;data_user&amp;#34; ],
 &amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
 &amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;oidc_username&amp;#34;: &amp;#34;demo@email.com&amp;#34;,
 &amp;#34;place&amp;#34;: {
 &amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
 &amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
@@ -3132,6 +3156,7 @@ Content-Type: application/json; charset=utf-8
 &amp;#34;roles&amp;#34;: [ &amp;#34;district_admin&amp;#34;, &amp;#34;data_user&amp;#34; ],
 &amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
 &amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;oidc_username&amp;#34;: &amp;#34;demo@email.com&amp;#34;,
 &amp;#34;place&amp;#34;: {
 &amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
 &amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
@@ -3187,6 +3212,7 @@ Content-Type: application/json; charset=utf-8
 &amp;#34;type&amp;#34;: &amp;#34;district-manager&amp;#34;,
 &amp;#34;fullname&amp;#34;: &amp;#34;Example User&amp;#34;,
 &amp;#34;username&amp;#34;: &amp;#34;demo&amp;#34;,
+&amp;#34;oidc_username&amp;#34;: &amp;#34;demo@email.com&amp;#34;,
 &amp;#34;place&amp;#34;: {
 &amp;#34;_id&amp;#34;: &amp;#34;eeb17d6d-5dde-c2c0-62c4a1a0ca17d38b&amp;#34;,
 &amp;#34;type&amp;#34;: &amp;#34;district_hospital&amp;#34;,
@@ -5274,6 +5300,9 @@ title="Copy code"
 &lt;/li>
 &lt;li>
 &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/header_tabs/">.header_tabs&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/oidc_provider/">.oidc_provider&lt;/a>
 &lt;/li>
 &lt;li>
 &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/outbound/">.outbound&lt;/a>

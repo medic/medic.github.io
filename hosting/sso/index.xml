@@ -1,0 +1,490 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Single Sign-On</title><link>https://docs.communityhealthtoolkit.org/hosting/sso/</link><description>Recent content in Single Sign-On on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/sso/index.xml" rel="self" type="application/rss+xml"/><item><title>Using CHT with Keycloak</title><link>https://docs.communityhealthtoolkit.org/hosting/sso/keycloak/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/sso/keycloak/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Introduced in 4.20.0&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Introduction&lt;span class="hx-absolute -hx-mt-20" id="introduction">&lt;/span>
+&lt;a href="#introduction" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>These steps document how to configure Keycloak as the Single Sign On (SSO) identity provider for the CHT. As well, it walks through provisioning a single user for SSO.&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Production&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Development&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;ul>
+&lt;li>Keycloak server - ensure you are running a &lt;a href="https://github.com/keycloak/keycloak/security/policy#supported-versions" target="_blank" rel="noopener">supported version&lt;/a>&lt;/li>
+&lt;li>CHT server - ensure you are running version &lt;code>4.20.0&lt;/code> or later&lt;/li>
+&lt;li>DNS Entries for CHT and Keycloak&lt;/li>
+&lt;li>TLS enabled on CHT and Keycloak&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;p>Start with creating a Keycloak compose file and two cert files in a new &lt;code>~/cht-keycloak&lt;/code> directory by running this code:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">mkdir -p $HOME/cht-keycloak/data&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">curl -so $HOME/cht-keycloak/server.crt https://local-ip.medicmobile.org/fullchain&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">curl -so $HOME/cht-keycloak/server.key https://local-ip.medicmobile.org/key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">cat &amp;gt; $HOME/cht-keycloak/compose.yaml &amp;lt;&amp;lt; EOF&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">keycloak&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">quay.io/keycloak/keycloak&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">KEYCLOAK_ADMIN&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">medic&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">KEYCLOAK_ADMIN_PASSWORD&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">password&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">KC_HTTPS_CERTIFICATE_FILE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/opt/keycloak/conf/server.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">KC_HTTPS_CERTIFICATE_KEY_FILE&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/opt/keycloak/conf/server.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;8443:8443&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">command&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">start-dev&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">$HOME/cht-keycloak/server.crt:/opt/keycloak/conf/server.crt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">$HOME/cht-keycloak/server.key:/opt/keycloak/conf/server.key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">$HOME/cht-keycloak/data:/opt/keycloak/data&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">EOF&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">cd $HOME/cht-keycloak&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">docker compose up -d&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The Keycloak instance is accessible on your Docker Helper URL, but on port &lt;code>8443&lt;/code>. For example &lt;code>https://192-168-68-26.local-ip.medicmobile.org:8443&lt;/code>. The username is &lt;code>medic&lt;/code> and the password is &lt;code>password&lt;/code>.&lt;/p>
+&lt;p>Now create an instance of &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/app-developer/#cht-docker-helper-for-4x" >Docker Helper&lt;/a>.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;h2>Keycloak Setup&lt;span class="hx-absolute -hx-mt-20" id="keycloak-setup">&lt;/span>
+&lt;a href="#keycloak-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>Open Keycloak&lt;span class="hx-absolute -hx-mt-20" id="open-keycloak">&lt;/span>
+&lt;a href="#open-keycloak" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Be sure you&amp;rsquo;re logged in&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/welcome.png" alt="welcome.png" loading="lazy" />&lt;/p>
+&lt;h3>Add new Client&lt;span class="hx-absolute -hx-mt-20" id="add-new-client">&lt;/span>
+&lt;a href="#add-new-client" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Add new Client in Keycloak by going to &amp;ldquo;Clients&amp;rdquo; &amp;gt; &amp;ldquo;Create Client&amp;rdquo;. Be sure to replace &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance. If you&amp;rsquo;re on a development instance be sure to include the port:&lt;/p>
+&lt;ul>
+&lt;li>Client Type: &lt;code>OpenID Connect&lt;/code>&lt;/li>
+&lt;li>Client ID: &lt;code>CHT&lt;/code>&lt;/li>
+&lt;li>Client authentication: &lt;code>On&lt;/code>&lt;/li>
+&lt;li>Authentication Flow: &lt;code>Standard flow&lt;/code>&lt;/li>
+&lt;li>Valid redirect URIs: &lt;code>https://&amp;lt;CHT_URL&amp;gt;/medic/login/oidc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;img src="../keycloak/newclient-new.png" alt="Create new Client" loading="lazy" />&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/newclient-new2.png" alt="Client ID" loading="lazy" />&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/newclient-new3.png" alt="Client authentication" loading="lazy" />&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/newclient-new4.png" alt="Valid redirect URIs" loading="lazy" />&lt;/p>
+&lt;h3>Copy Secret&lt;span class="hx-absolute -hx-mt-20" id="copy-secret">&lt;/span>
+&lt;a href="#copy-secret" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>On the new &lt;code>CHT&lt;/code> client go to &amp;ldquo;Credentials&amp;rdquo; and copy the &amp;ldquo;Client Secret&amp;rdquo; value. You&amp;rsquo;ll need this later when configuring the CHT.&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/copy.secret.png" alt="copy.secret.png" loading="lazy" />&lt;/p>
+&lt;/div>
+&lt;h2>CHT Setup&lt;span class="hx-absolute -hx-mt-20" id="cht-setup">&lt;/span>
+&lt;a href="#cht-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>CHT App Settings&lt;span class="hx-absolute -hx-mt-20" id="cht-app-settings">&lt;/span>
+&lt;a href="#cht-app-settings" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In the config directory for your app, update your &lt;code>app_settings.json&lt;/code> file to contain this additional JSON at the end, before the very last &lt;code>}&lt;/code>&lt;/p>
+&lt;p>Be sure to replace &lt;code>KEYCLOAK_URL&lt;/code> with the production URL of your Keycloak instance and &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance. If you&amp;rsquo;re using a development instance, be sure the &lt;code>CHT_URL&lt;/code> includes your port.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;oidc_provider&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;client_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;CHT&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;discovery_url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://&amp;lt;KEYCLOAK_URL&amp;gt;/realms/master/.well-known/openid-configuration&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;app_url&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="s2">&amp;#34;https://&amp;lt;CHT_URL&amp;gt;/&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Upload CHT config&lt;span class="hx-absolute -hx-mt-20" id="upload-cht-config">&lt;/span>
+&lt;a href="#upload-cht-config" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Production&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Development&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;p>Upload the config using CHT Conf. Replace &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance, &lt;code>USER&lt;/code> with your admin user and &lt;code>PASSWORD&lt;/code> with your password:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht --url=https://&amp;lt;USER&amp;gt;:&amp;lt;PASSWORD&amp;gt;@&amp;lt;CHT_URL&amp;gt; compile-app-settings upload-app-settings&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;p>Upload the config using CHT Conf. Replace &lt;code>CHT_URL&lt;/code> with the docker helper URL, including port:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht --url=https://medic:password@&amp;lt;CHT_URL&amp;gt; compile-app-settings upload-app-settings&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;/div>
+&lt;h3>Client Secret in CHT&lt;span class="hx-absolute -hx-mt-20" id="client-secret-in-cht">&lt;/span>
+&lt;a href="#client-secret-in-cht" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Use the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#put-apiv1credentials" target="_blank" rel="noopener">&lt;code>/api/v1/credentials&lt;/code> REST api&lt;/a> to set the client secret as the &lt;code>oidc:client-secret&lt;/code> credential.&lt;/p>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Production&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Development&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;p>Be sure to replace &lt;code>SECRET&lt;/code> with the value from &lt;a href="#copy-secret" >step 5 above&lt;/a>. As well, replace &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance, &lt;code>USER&lt;/code> with your admin user and &lt;code>PASSWORD&lt;/code> with your password:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -X PUT https://&amp;lt;USER&amp;gt;:&amp;lt;PASSWORD&amp;gt;@&amp;lt;CHT_URL&amp;gt;/api/v1/credentials/oidc:client-secret &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -H &lt;span class="s2">&amp;#34;Content-Type: text/plain&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --data &lt;span class="s2">&amp;#34;&amp;lt;SECRET&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;p>Be sure to replace &lt;code>SECRET&lt;/code> with the value from &lt;a href="#copy-secret" >step 5 above&lt;/a>. As well, replace &lt;code>CHT_URL&lt;/code> with the docker helper URL, including port:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -X PUT https://medic:password@&amp;lt;CHT_URL&amp;gt;/api/v1/credentials/oidc:client-secret &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -H &lt;span class="s2">&amp;#34;Content-Type: text/plain&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --data &lt;span class="s2">&amp;#34;&amp;lt;SECRET&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;/div>
+&lt;p>Upon success, &lt;code>curl&lt;/code> should show the JSON &lt;code>{&amp;quot;ok&amp;quot;:true}&lt;/code> .&lt;/p>
+&lt;p>Further, going to the CHT login screen should now show an extra login button &amp;ldquo;Login with SSO&amp;rdquo;. You may need to hold down the &amp;ldquo;shift&amp;rdquo; key and click reload to clear the browser cache:&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/login-with-sso-button.png" alt="login-with-sso-button.png" loading="lazy" />&lt;/p>
+&lt;/div>
+&lt;h2>Add a test user (optional)&lt;span class="hx-absolute -hx-mt-20" id="add-a-test-user-optional">&lt;/span>
+&lt;a href="#add-a-test-user-optional" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>Add Keycloak user&lt;span class="hx-absolute -hx-mt-20" id="add-keycloak-user">&lt;/span>
+&lt;a href="#add-keycloak-user" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In Keycloak, create a new user by going to &amp;ldquo;Users&amp;rdquo; &amp;gt; &amp;ldquo;Add user&amp;rdquo;. Specify username of &lt;code>test&lt;/code> and and email of &lt;code>test@test.com&lt;/code>&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/new.user.png" alt="new.user.png" loading="lazy" />&lt;/p>
+&lt;h3>Set Keycloak users&amp;rsquo;s password&lt;span class="hx-absolute -hx-mt-20" id="set-keycloak-userss-password">&lt;/span>
+&lt;a href="#set-keycloak-userss-password" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Go to the user&amp;rsquo;s &amp;ldquo;Credentials&amp;rdquo; tab and select &amp;ldquo;Set password&amp;rdquo;&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/set.password.png" alt="set.password.png" loading="lazy" />&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/password.png" alt="password.png" loading="lazy" />&lt;/p>
+&lt;h3>Add CHT user&lt;span class="hx-absolute -hx-mt-20" id="add-cht-user">&lt;/span>
+&lt;a href="#add-cht-user" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>From the &amp;ldquo;App Management&amp;rdquo; console in the CHT, go to &amp;ldquo;Users&amp;rdquo; &amp;gt; &amp;ldquo;Add user&amp;rdquo;&lt;/p>
+&lt;ul>
+&lt;li>User name: &lt;code>test&lt;/code>&lt;/li>
+&lt;li>SSO Email Address: &lt;code>test@test.com&lt;/code> (must match email &lt;a href="#add-keycloak-user" >from step #1&lt;/a>)&lt;/li>
+&lt;li>&lt;strong>Note&lt;/strong> - the &lt;code>E-mail address&lt;/code> field is not used for SSO.&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;img src="../keycloak/cht.new.user.png" alt="cht.new.user.png" loading="lazy" />&lt;/p>
+&lt;h3>Test login&lt;span class="hx-absolute -hx-mt-20" id="test-login">&lt;/span>
+&lt;a href="#test-login" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Logout as the Admin user and then on the CHT login screen, select &amp;ldquo;Login with SSO&amp;rdquo;&lt;/p>
+&lt;ul>
+&lt;li>Your browser will be redirected to the Keycloak login screen&lt;/li>
+&lt;li>Enter the username/password for your Keycloak user&lt;/li>
+&lt;li>You will be redirected back to the CHT app and logged in as your CHT user&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;h3>References&lt;span class="hx-absolute -hx-mt-20" id="references">&lt;/span>
+&lt;a href="#references" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>&lt;a href="https://www.keycloak.org/getting-started/getting-started-docker" target="_blank" rel="noopener">Keycloak Docker Quickstart&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Using CHT with Entra</title><link>https://docs.communityhealthtoolkit.org/hosting/sso/entra/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/sso/entra/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Introduced in 4.20.0&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Introduction&lt;span class="hx-absolute -hx-mt-20" id="introduction">&lt;/span>
+&lt;a href="#introduction" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>These steps document how to configure Microsoft Entra as the Single Sign On (SSO) identity provider for the CHT. As well, it walks through provisioning a single user for SSO.&lt;/p>
+&lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
+&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>&lt;a href="https://entra.microsoft.com" target="_blank" rel="noopener">Microsoft Entra&lt;/a> business account with credit card added. Free trial accounts work, but require a credit card.&lt;/li>
+&lt;li>CHT server - ensure you are running version &lt;code>4.20.0&lt;/code> or later. This can be an instance of &lt;a href="https://docs.communityhealthtoolkit.org/hosting/4.x/app-developer/#cht-docker-helper-for-4x" >Docker Helper&lt;/a>.&lt;/li>
+&lt;li>DNS Entries and TLS enabled on CHT&lt;/li>
+&lt;/ul>
+&lt;h2>Entra Setup&lt;span class="hx-absolute -hx-mt-20" id="entra-setup">&lt;/span>
+&lt;a href="#entra-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>Login&lt;span class="hx-absolute -hx-mt-20" id="login">&lt;/span>
+&lt;a href="#login" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Login to &lt;a href="https://entra.microsoft.com" target="_blank" rel="noopener">Entra&lt;/a>&lt;/p>
+&lt;h3>Add new Client&lt;span class="hx-absolute -hx-mt-20" id="add-new-client">&lt;/span>
+&lt;a href="#add-new-client" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>Navigate to &amp;ldquo;Applications&amp;rdquo; &amp;gt; &amp;ldquo;App registrations&amp;rdquo; &amp;gt; &amp;ldquo;New registration&amp;rdquo;&lt;/li>
+&lt;li>Add a &amp;ldquo;user-facing display name&amp;rdquo; of &lt;code>CHT&lt;/code>&lt;/li>
+&lt;li>Under &amp;ldquo;Redirect URI (optional)&amp;rdquo; select &lt;code>Web&lt;/code>&lt;/li>
+&lt;li>Enter &lt;code>https://&amp;lt;CHT_URL&amp;gt;/medic/login/oidc&lt;/code> as the redirect URI, being sure to replace &lt;code>CHT_URL&lt;/code> with your production CHT URL&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;img src="../entra/new-registration.png" alt="new-registration.png" loading="lazy" />
+&lt;img src="../entra/new-registration2.png" alt="new-registration2.png" loading="lazy" />&lt;/p>
+&lt;h3>Copy Secret&lt;span class="hx-absolute -hx-mt-20" id="copy-secret">&lt;/span>
+&lt;a href="#copy-secret" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Navigate to &amp;ldquo;Certificates &amp;amp; secrets&amp;rdquo; &amp;gt; &amp;ldquo;Client secrets&amp;rdquo; &amp;gt; &amp;ldquo;New client secret&amp;rdquo;. Add a new secret and copy the &lt;code>Value&lt;/code> string&lt;/p>
+&lt;p>
+&lt;img src="../entra/new-secret.png" alt="new-secret.png" loading="lazy" />
+&lt;img src="../entra/copy-secret.png" alt="copy-secret.png" loading="lazy" />&lt;/p>
+&lt;h3>Copy Discovery URL&lt;span class="hx-absolute -hx-mt-20" id="copy-discovery-url">&lt;/span>
+&lt;a href="#copy-discovery-url" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>From the &amp;ldquo;Overview&amp;rdquo; page copy the &amp;ldquo;Application (client) ID&amp;rdquo; and the &amp;ldquo;Directory (tenant) ID&amp;rdquo; which are needed for the &lt;code>client_id&lt;/code> and &lt;code>discovery_url&lt;/code> respectively in step 1 below.&lt;/p>
+&lt;p>
+&lt;img src="../entra/client-overview.png" alt="client-overview.png" loading="lazy" />&lt;/p>
+&lt;/div>
+&lt;h2>CHT Setup&lt;span class="hx-absolute -hx-mt-20" id="cht-setup">&lt;/span>
+&lt;a href="#cht-setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>CHT App Settings&lt;span class="hx-absolute -hx-mt-20" id="cht-app-settings">&lt;/span>
+&lt;a href="#cht-app-settings" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In the config directory for your app, update your &lt;code>app_settings.json&lt;/code> file to contain this additional JSON at the end, before the very last &lt;code>}&lt;/code>&lt;/p>
+&lt;p>Be sure to replace &lt;code>APP_ID&lt;/code> with the Application (client) ID and &lt;code>DIRECTORY_ID&lt;/code> with Directory (tenant) ID both from step 4 above. Replace the &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance. If you&amp;rsquo;re using a development instance, be sure the &lt;code>CHT_URL&lt;/code> includes your port.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;oidc_provider&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;client_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;APP_ID&amp;gt;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;discovery_url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://login.microsoftonline.com/&amp;lt;DIRECTORY_ID&amp;gt;/v2.0/.well-known/openid-configuration&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;app_url&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="s2">&amp;#34;https://&amp;lt;CHT_URL&amp;gt;/&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Upload CHT config&lt;span class="hx-absolute -hx-mt-20" id="upload-cht-config">&lt;/span>
+&lt;a href="#upload-cht-config" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Production&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Development&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;p>Upload the config using CHT Conf. Replace &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance, &lt;code>USER&lt;/code> with your admin user and &lt;code>PASSWORD&lt;/code> with your password:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht --url=https://&amp;lt;USER&amp;gt;:&amp;lt;PASSWORD&amp;gt;@&amp;lt;CHT_URL&amp;gt; compile-app-settings upload-app-settings&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;p>Upload the config using CHT Conf. Replace &lt;code>CHT_URL&lt;/code> with the docker helper URL, including port:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>cht --url=https://medic:password@&amp;lt;CHT_URL&amp;gt; compile-app-settings upload-app-settings&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;/div>
+&lt;h3>Client Secret in CHT&lt;span class="hx-absolute -hx-mt-20" id="client-secret-in-cht">&lt;/span>
+&lt;a href="#client-secret-in-cht" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Use the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#put-apiv1credentials" target="_blank" rel="noopener">&lt;code>/api/v1/credentials&lt;/code> REST api&lt;/a> to set the client secret as the &lt;code>oidc:client-secret&lt;/code> credential.&lt;/p>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Production&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Development&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;p>Be sure to replace &lt;code>SECRET&lt;/code> with the value from &lt;a href="#copy-secret" >step 3 above&lt;/a>. As well, replace &lt;code>CHT_URL&lt;/code> with the production URL of your CHT instance, &lt;code>USER&lt;/code> with your admin user and &lt;code>PASSWORD&lt;/code> with your password:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -X PUT https://&amp;lt;USER&amp;gt;:&amp;lt;PASSWORD&amp;gt;@&amp;lt;CHT_URL&amp;gt;/api/v1/credentials/oidc:client-secret &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -H &lt;span class="s2">&amp;#34;Content-Type: text/plain&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --data &lt;span class="s2">&amp;#34;&amp;lt;SECRET&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;p>Be sure to replace &lt;code>SECRET&lt;/code> with the value from &lt;a href="#copy-secret" >step 3 above&lt;/a>. As well, replace &lt;code>CHT_URL&lt;/code> with the docker helper URL, including port:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -X PUT https://medic:password@&amp;lt;CHT_URL&amp;gt;/api/v1/credentials/oidc:client-secret &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -H &lt;span class="s2">&amp;#34;Content-Type: text/plain&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --data &lt;span class="s2">&amp;#34;&amp;lt;SECRET&amp;gt;&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>&lt;/div>
+&lt;/div>
+&lt;p>Upon success, &lt;code>curl&lt;/code> should show the JSON &lt;code>{&amp;quot;ok&amp;quot;:true}&lt;/code> .&lt;/p>
+&lt;p>Further, going to the CHT login screen should now show an extra login button &amp;ldquo;Login with SSO&amp;rdquo;. You may need to hold down the &amp;ldquo;shift&amp;rdquo; key and click reload to clear the browser cache:&lt;/p>
+&lt;p>
+&lt;img src="../keycloak/login-with-sso-button.png" alt="login-with-sso-button.png" loading="lazy" />&lt;/p>
+&lt;/div>
+&lt;h2>Add a test user (optional)&lt;span class="hx-absolute -hx-mt-20" id="add-a-test-user-optional">&lt;/span>
+&lt;a href="#add-a-test-user-optional" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]">
+&lt;h3>Add Entra user: Screen 1&lt;span class="hx-absolute -hx-mt-20" id="add-entra-user-screen-1">&lt;/span>
+&lt;a href="#add-entra-user-screen-1" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>Navigate to &amp;ldquo;Users&amp;rdquo; &amp;gt; &amp;ldquo;All users&amp;rdquo; &amp;gt; &amp;ldquo;New user&amp;rdquo; &amp;gt; &amp;ldquo;Create new user&amp;rdquo;&lt;/li>
+&lt;li>Enter details for your test user. Specifically note the &amp;ldquo;Mail nickname&amp;rdquo; value as this will need to match the &lt;code>email&lt;/code> value for your CHT user.&lt;/li>
+&lt;li>Specify &amp;ldquo;User principal name&amp;rdquo; of &lt;code>test&lt;/code> which will translate to &lt;code>test@&amp;lt;DOMAIN&amp;gt;.com&lt;/code> where &lt;code>DOMAIN&lt;/code> is the domain you have configured for Entra.&lt;/li>
+&lt;li>Be sure to copy the principal name and the generated password&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;img src="../entra/create-new-user.png" alt="create-new-user.png" loading="lazy" />
+&lt;img src="../entra/create-new-user2.png" alt="create-new-user2.png" loading="lazy" />&lt;/p>
+&lt;h3>Add Entra user: Screen 2&lt;span class="hx-absolute -hx-mt-20" id="add-entra-user-screen-2">&lt;/span>
+&lt;a href="#add-entra-user-screen-2" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>On the 2nd &amp;ldquo;Properties&amp;rdquo; screen, you must paste the exact &amp;ldquo;User principal name&amp;rdquo; into &amp;ldquo;Contact Information&amp;rdquo; -&amp;gt; &amp;ldquo;Email&amp;rdquo; from the prior screen. This is what will get passed to the CHT:&lt;/p>
+&lt;p>
+&lt;img src="../entra/create-new-user3.png" alt="create-new-user3.png" loading="lazy" />&lt;/p>
+&lt;h3>Add CHT user&lt;span class="hx-absolute -hx-mt-20" id="add-cht-user">&lt;/span>
+&lt;a href="#add-cht-user" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>From the &amp;ldquo;App Management&amp;rdquo; console in the CHT, go to &amp;ldquo;Users&amp;rdquo; &amp;gt; &amp;ldquo;Add user&amp;rdquo;&lt;/p>
+&lt;ul>
+&lt;li>User name: &lt;code>test&lt;/code>&lt;/li>
+&lt;li>SSO Email Address: &lt;code>test@test.com&lt;/code> (must match email from prior step)&lt;/li>
+&lt;li>&lt;strong>Note&lt;/strong> - the &lt;code>E-mail address&lt;/code> field is not used for SSO.&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;img src="../entra/cht-new-user.png" alt="cht.new.user.png" loading="lazy" />&lt;/p>
+&lt;h3>Test login&lt;span class="hx-absolute -hx-mt-20" id="test-login">&lt;/span>
+&lt;a href="#test-login" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Logout as the Admin user and then on the CHT login screen, select &amp;ldquo;Login with SSO&amp;rdquo;&lt;/p>
+&lt;ul>
+&lt;li>Your browser will be redirected to the Entra login screen&lt;/li>
+&lt;li>Enter the username/password for your Entra user&lt;/li>
+&lt;li>You will be redirected back to the CHT app and logged in as your CHT user&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;h3>References&lt;span class="hx-absolute -hx-mt-20" id="references">&lt;/span>
+&lt;a href="#references" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>tk&lt;/li>
+&lt;/ul></description></item><item><title>SSO technical reference</title><link>https://docs.communityhealthtoolkit.org/hosting/sso/technical/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/sso/technical/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Introduced in 4.20.0&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>CHT &lt;code>4.20.0&lt;/code> introduced the single sign on (SSO) feature allowing deployments to use the industry standard &lt;a href="https://openid.net/" target="_blank" rel="noopener">OpenID Connect&lt;/a> (OIDC) protocol to authenticate users. Below are some key points on the SSO functionality in the CHT. See the &lt;a href="https://docs.google.com/document/d/1LUn1ZRetAmYE04CtdcTmp-bEBvl37AZ0CvFXZChXqfU/edit?tab=t.0" target="_blank" rel="noopener">technical design document&lt;/a> for all the details.&lt;/p>
+&lt;h2>Setup&lt;span class="hx-absolute -hx-mt-20" id="setup">&lt;/span>
+&lt;a href="#setup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Follow the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/sso/" >setup steps&lt;/a> to &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/oidc_provider/" >configure your CHT instance&lt;/a> for SSO Login. Once the server has been properly configured, the &amp;ldquo;Login with SSO&amp;rdquo; button will be visible on the CHT Login page. CHT users with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#login-by-oidc" >&lt;code>oidc_username&lt;/code> property&lt;/a> will be able to log in with their SSO credentials. The &amp;ldquo;SSO Email Address&amp;rdquo; field will be also be visible in the create/update users modal in the &lt;a href="https://docs.communityhealthtoolkit.org/building/admin/admin-overview/" >App Management interface&lt;/a>.&lt;/p>
+&lt;h2>User Mapping&lt;span class="hx-absolute -hx-mt-20" id="user-mapping">&lt;/span>
+&lt;a href="#user-mapping" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Note that the &amp;ldquo;SSO Email Address&amp;rdquo; field is used to populate the user&amp;rsquo;s &lt;code>oidc_username&lt;/code> property. The &lt;code>oidc_username&lt;/code> is stored separately from the user&amp;rsquo;s normal &lt;code>email&lt;/code> property (populated from the &amp;ldquo;Email Address&amp;rdquo; field in the App Management interface) and different values can be provided for each. Only the &lt;code>oidc_username&lt;/code> will be considered when logging in an SSO user. Users with the &lt;code>can_edit_profile&lt;/code> permission are able to edit their &lt;code>email&lt;/code> value, but only administrators can edit a user&amp;rsquo;s &lt;code>oidc_username&lt;/code>.&lt;/p>
+&lt;p>If someone selects the &amp;ldquo;Login with SSO&amp;rdquo; button and successfully authenticates with the OIDC provider, but their OIDC user account does not have a corresponding CHT user (the &lt;code>email&lt;/code> claim from the OIDC user does not match any CHT user &lt;code>oidc_username&lt;/code>), they will not be logged into the CHT. Instead they will be redirected back to the login page with an error message indicating that they are not allowed to log in with SSO.&lt;/p>
+&lt;p>Users with a currently active OIDC session may not be required to re-authenticate. Instead, when logging into the CHT for the first time they will be prompted by their OIDC Provider to allow the CHT to access their user information.&lt;/p>
+&lt;p>A user with the &lt;code>oidc_username&lt;/code> property is only allowed to log in with SSO. Any other authentication method (e.g. username/password or token login) will fail.&lt;/p>
+&lt;p>To convert an SSO user in the CHT back to a normal CHT user (with username/password authentication), simply remove the user&amp;rsquo;s &lt;code>oidc_username&lt;/code> (by deleting the value from the &amp;ldquo;SSO Email Address&amp;rdquo; field). A new password must then be set for the user. All the user&amp;rsquo;s existing sessions will be invalidated and the user must log in again (this time by using their CHT username/password).&lt;/p>
+&lt;h2>CHT User session&lt;span class="hx-absolute -hx-mt-20" id="cht-user-session">&lt;/span>
+&lt;a href="#cht-user-session" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Once an SSO user has successfully authenticated with the CHT (by completing the OIDC flow), their browser receives a valid Couch session cookie (equivalent to the session cookies provided to normal CHT users). For all subsequent operations, the CHT does not distinguish between SSO and non-SSO users since both types of users are authenticating with the same type of session cookie.&lt;/p>
+&lt;p>It is very important to note that once an SSO user has successfully authenticated with the CHT, the CHT does not contact the OIDC Provider for subsequent requests from that user. If the user is removed from the OIDC Provider (or their OIDC session is otherwise invalidated), they will still be able to access the CHT. This is because their CHT session cookie is still valid. You can prevent the user from accessing the CHT by disabling their CHT user account, updating their &amp;ldquo;SSO Email Address&amp;rdquo; or removing it and setting a new password for the user.&lt;/p>
+&lt;h2>OIDC Login Sequence&lt;span class="hx-absolute -hx-mt-20" id="oidc-login-sequence">&lt;/span>
+&lt;a href="#oidc-login-sequence" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The following diagram demonstrates the sequence of events when a user logs in to the CHT using SSO:&lt;/p>
+&lt;pre class="mermaid hx-mt-6">
+sequenceDiagram
+autonumber
+participant cht as CHT &amp;lt;br/&amp;gt;(api server)
+participant user_agent as User &amp;lt;br/&amp;gt;(web browser)
+participant auth_server as OIDC Provider &amp;lt;br/&amp;gt;(authorization server)
+user_agent-&amp;gt;&amp;gt;cht: Request SSO login authorization
+cht-&amp;gt;&amp;gt;user_agent: Redirect to authorize endpoint on OIDC provider
+user_agent-&amp;gt;&amp;gt;auth_server: Request OIDC authorization &amp;lt;br/&amp;gt;(happens automatically)
+auth_server-&amp;gt;&amp;gt;user_agent: Respond with authentication challenge &amp;lt;br/&amp;gt;(e.g. login page)
+user_agent-&amp;gt;&amp;gt;auth_server: User authenticates &amp;lt;br/&amp;gt;(e.g. submits SSO username/password)
+auth_server--&amp;gt;&amp;gt;auth_server: Authenticate user
+auth_server-&amp;gt;&amp;gt;user_agent: Redirect back to CHT &amp;lt;br/&amp;gt;(with authorization_code)
+user_agent-&amp;gt;&amp;gt;cht: Submit authorization_code &amp;lt;br/&amp;gt;(happens automatically)
+cht--&amp;gt;&amp;gt;auth_server: Request id_token with email scope
+auth_server--&amp;gt;&amp;gt;auth_server: Validates authorization_code &amp;lt;br/&amp;gt;and client credentials
+auth_server--&amp;gt;&amp;gt;cht: Reply with id_token (including email claim)
+cht-&amp;gt;&amp;gt;user_agent: Reply with session cookie
+Note over cht,user_agent: Subsequent requests are made with the &amp;lt;br/&amp;gt;session cookie and do not require contacting&amp;lt;br/&amp;gt;the OIDC provider
+&lt;/pre>&lt;h2>Limitations&lt;span class="hx-absolute -hx-mt-20" id="limitations">&lt;/span>
+&lt;a href="#limitations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>While completely compliant with the OIDC specification, the SSO functionality in the CHT currently has several notable limitations (any of which may be addressed in future releases):&lt;/p>
+&lt;ul>
+&lt;li>User auto-provisioning is not supported. Users must be created in the CHT before they can log in with SSO. The CHT does not automatically create users when they log in with SSO for the first time.&lt;/li>
+&lt;li>Back-channel logout is not supported. As noted above, when a user&amp;rsquo;s OIDC session is ended, it does not automatically end their CHT session.&lt;/li>
+&lt;li>User mapping between OIDC and CHT users only supports matching on the &lt;code>email&lt;/code> claim from the OIDC user. The CHT does not support mapping on other claims (e.g. &lt;code>sub&lt;/code> or &lt;code>preferred_username&lt;/code>).&lt;/li>
+&lt;/ul></description></item></channel></rss>

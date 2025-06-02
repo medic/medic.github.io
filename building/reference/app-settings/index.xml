@@ -564,6 +564,57 @@ If the selected Resource icon is not an &lt;code>svg&lt;/code> that supports css
 The Admin console Resource icon dropdowns only supports selecting &lt;code>svg&lt;/code> icons. If mismatched Resource Icons are selected, they will be deselected upon saving. &lt;br>
 Resource icons images will be sized to &lt;code>24 x 24px&lt;/code> when displayed.&lt;/p>&lt;/div>
 &lt;/div>
+&lt;/div></description></item><item><title>.oidc_provider</title><link>https://docs.communityhealthtoolkit.org/building/reference/app-settings/oidc_provider/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/reference/app-settings/oidc_provider/</guid><description>
+&lt;p>To support &lt;a href="https://docs.communityhealthtoolkit.org/hosting/sso/" >authenticating users with Single Sign-On&lt;/a> (SSO) credentials (instead of CHT-specific usernames/passwords), the CHT can integrate with an external authorization server that supports the &lt;a href="https://openid.net/" target="_blank" rel="noopener">OpenID Connect&lt;/a> (OIDC) protocol. Configure the OIDC Provider connection settings under the &lt;code>oidc_provider&lt;/code> key:&lt;/p>
+&lt;h2>&lt;code>app_settings.json .oidc_provider&lt;/code>&lt;span class="hx-absolute -hx-mt-20" id="app_settingsjson-oidc_provider">&lt;/span>
+&lt;a href="#app_settingsjson-oidc_provider" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>property&lt;/th>
+&lt;th>type&lt;/th>
+&lt;th>required&lt;/th>
+&lt;th>description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>client_id&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>The unique key identifying your CHT application in your OIDC Provider.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>discovery_url&lt;/td>
+&lt;td>String&lt;/td>
+&lt;td>yes&lt;/td>
+&lt;td>The URL to the &lt;code>.well-known&lt;/code> OIDC configuration discovery endpoint for your OIDC Provider. Must be HTTPS unless &lt;code>allow_insecure_requests&lt;/code> is &lt;code>true&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>allow_insecure_requests&lt;/td>
+&lt;td>Boolean&lt;/td>
+&lt;td>no&lt;/td>
+&lt;td>Optional configuration (NOT for production use). If &lt;code>true&lt;/code>, the &lt;code>discovery_url&lt;/code> can use the HTTP protocol (instead of HTTPS). Default is &lt;code>false&lt;/code>.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>When using SSO Login, the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" >&lt;code>app_url&lt;/code> setting&lt;/a> must also be defined. Also, your CHT application&amp;rsquo;s &lt;em>client secret&lt;/em> from the OIDC Provider must be securely configured in your CHT instance with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#credentials" >Credentials API&lt;/a> using the key &lt;code>oidc:client-secret&lt;/code>.&lt;/p>
+&lt;p>Only users with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#login-by-oidc" >&lt;code>oidc_username&lt;/code> property&lt;/a> can log in with SSO.&lt;/p>
+&lt;h2>Code sample&lt;span class="hx-absolute -hx-mt-20" id="code-sample">&lt;/span>
+&lt;a href="#code-sample" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The definition takes the typical form below:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;oidc_provider&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;client_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;60f18991-1eae-4825-a579-44190cbbe51d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;discovery_url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://my.oidc-provider.org/realms/master/.well-known/openid-configuration&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="err">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;app_url&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="s2">&amp;#34;https://my.cht.org&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
 &lt;/div></description></item><item><title>.outbound</title><link>https://docs.communityhealthtoolkit.org/building/reference/app-settings/outbound/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/reference/app-settings/outbound/</guid><description>
 &lt;p>&lt;em>Outbound is only available in CHT Core 3.5.0 and above&lt;/em>&lt;/p>
 &lt;p>Outbound push allows configurers to have the creation or editing of CouchDB documents trigger outbound REST requests using the data in that document. For example, upon receiving a referral report you could send that referral to an external facility system that will manage and process that event.&lt;/p>
