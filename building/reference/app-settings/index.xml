@@ -1839,47 +1839,34 @@ title="Copy code"
 &lt;p>Transitions obey the following rules:&lt;/p>
 &lt;ul>
 &lt;li>
-&lt;p>has a &lt;code>filter(doc)&lt;/code> function that accepts the changed document as an argument and returns &lt;code>true&lt;/code> if it needs to run/be applied.&lt;/p>
+&lt;p>has a &lt;code>filter({ id, doc, info })&lt;/code> function that accepts the changed document as an argument and returns &lt;code>true&lt;/code> if it needs to run/be applied.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>a &lt;code>onMatch(change, db, auditDb, callback)&lt;/code> function that will run on changes that pass the filter.&lt;/p>
+&lt;p>a &lt;code>onMatch({ id, doc, info })&lt;/code> function that will run on changes that pass the filter. Should return true when the transition has run successfully.&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>can have an &lt;code>init()&lt;/code> function to do any required setup and throw Errors on invalid configuration.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>has an &lt;code>onChange(change, db, audit, callback)&lt;/code> function that makes changes to the &lt;code>change.doc&lt;/code> reference (copying is discouraged). &lt;code>db&lt;/code> and &lt;code>audit&lt;/code> are handled to let you query those DBs. You can learn more about &lt;code>callback&lt;/code> in subsequent sections.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>It is not necessary for an individual transition to save the changes made to &lt;code>change.doc&lt;/code> to the DB, the doc will be saved once all the transitions have been edited.
-If an individual transition saves the document provided at &lt;code>change.doc&lt;/code>, it takes responsibility for re-attaching the newly saved document (with new seq etc) at &lt;code>change.doc&lt;/code>&lt;/p>
+&lt;p>It is not necessary for an individual transition to save the changes made to &lt;code>doc&lt;/code> to the DB, the doc will be saved once all the transitions have been edited.
+If an individual transition saves the document provided at &lt;code>doc&lt;/code>, it takes responsibility for re-attaching the newly saved document (with new seq etc) at &lt;code>doc&lt;/code>&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>guarantees the consistency of a document.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>runs serially and in any order. A transition is free to make async calls but the next transition will only run after the previous transition&amp;rsquo;s callback is called. If your transition is dependent on another transition then it will run on the next change. Code your transition to support two changes rather than require a specific order. You can optimize your ordering but don&amp;rsquo;t require it. This keeps configuration simpler.&lt;/p>
+&lt;p>runs serially and in specific order. A transition is free to make async calls but the next transition will only run after the previous transition&amp;rsquo;s match function executed. If your transition is dependent on another transition, it should be sorted so it runs after the dependee transition.&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>is repeatable, it can run multiple times on the same document without negative effect. You can use the &lt;code>transitions&lt;/code> property on a document to determine if a transition has run.&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;p>Callback arguments:&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>callback(err, needsSaving)&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>needsSaving&lt;/code> is true if the &lt;code>change.doc&lt;/code> needs to be saved to the DB by the transition runner. For instance, if the transition has edited the &lt;code>change.doc&lt;/code> in memory.
-&lt;code>err&lt;/code> if truthy, the error will be added to the &lt;code>changes.doc&lt;/code> in memory. (Note that if &lt;code>needsSaving&lt;/code> is falsy, the doc will not be saved, so that error will not be persisted).&lt;/li>
-&lt;/ul>
+&lt;p>is repeatable, it can run multiple times on the same document without negative effect. You can use the &lt;code>transitions&lt;/code> property on a document&amp;rsquo;s infodoc to determine if a transition has run.&lt;/p>
 &lt;/li>
 &lt;/ul>
 &lt;p>Regardless of whether the doc is saved or not, the transitions will all be run (unless one crashes).&lt;/p>
 &lt;p>When your transition encounters an error, there are different ways to deal with it. You can :&lt;/p>
 &lt;ul>
-&lt;li>finish your transition with &lt;code>callback(someError, true)&lt;/code>. This will save the error to &lt;code>change.doc&lt;/code>.&lt;/li>
-&lt;li>finish your transition with &lt;code>callback(someError, false)&lt;/code>. The error will be logged to the sentinel log. This will not save the error on the &lt;code>change.doc&lt;/code>, so there will be no record that this transition ran. That particular &lt;code>change&lt;/code> will not go through transitions again, but if the same doc has another change in the future since there is no record of the erroring transition having run, it will be rerun.&lt;/li>
-&lt;li>crash sentinel. When sentinel restarts, since that &lt;code>change&lt;/code> did not record successful processing, it will be reprocessed. Transitions that did not save anything to the &lt;code>change.doc&lt;/code> will be rerun.&lt;/li>
+&lt;li>finish your transition by throwing an error that has a truthy &lt;code>changed&lt;/code> property. This will save the error to &lt;code>doc&lt;/code>.&lt;/li>
+&lt;li>finish your transition by throwing an error. The error will be logged to the sentinel log. This will not save the error on the &lt;code>doc&lt;/code>, so there will be no record that this transition ran. That particular &lt;code>change&lt;/code> will not go through transitions again, but if the same doc has another change in the future since there is no record of the erroring transition having run, it will be rerun.&lt;/li>
+&lt;li>crash sentinel. When sentinel restarts, since that &lt;code>change&lt;/code> did not record successful processing, it will be reprocessed. Transitions that did not save anything to the &lt;code>doc&lt;/code> will be rerun.&lt;/li>
 &lt;/ul>
 &lt;h2>Configuration&lt;span class="hx-absolute -hx-mt-20" id="configuration">&lt;/span>
 &lt;a href="#configuration" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>By default all transitions are disabled. They can be enabled by configuring the &lt;code>transitions&lt;/code> property to have a key with the transitions name and a &lt;code>truthy&lt;/code> value.
