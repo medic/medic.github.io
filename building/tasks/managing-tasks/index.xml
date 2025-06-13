@@ -1,4 +1,101 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing tasks</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/</link><description>Recent content in Managing tasks on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/index.xml" rel="self" type="application/rss+xml"/><item><title>Passing data from a task into the app form</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Managing tasks</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/</link><description>Recent content in Managing tasks on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/index.xml" rel="self" type="application/rss+xml"/><item><title>Launching a contact form from a task</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/launch-contact-form/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/launch-contact-form/</guid><description>
+&lt;p>Task actions with &lt;code>type: 'contact'&lt;/code> can be configured to redirect the user to the contact form to create/edit a contact.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Note that submitting the contact form does not automatically resolve the task.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Create contact&lt;span class="hx-absolute -hx-mt-20" id="create-contact">&lt;/span>
+&lt;a href="#create-contact" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To configure a task action to redirect the user to a create contact form, use the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >&lt;code>modifyContent&lt;/code> function&lt;/a> to set the &lt;code>type&lt;/code> and &lt;code>parent_id&lt;/code> values for the new contact in the action &lt;code>content&lt;/code>. When the user selects the action, they will automatically be redirected to the create contact form (located at &lt;code>contacts/{{parent_id}}/add/{{type}}&lt;/code>).&lt;/p>
+&lt;p>The following example task config will create a task for all new households (&lt;code>clinic&lt;/code> contacts), prompting the user to add new members to the household. When the user selects the task, they will be presented with two actions. The &amp;ldquo;Add person to household&amp;rdquo; action will redirect the user to the create contact form for a new &lt;code>person&lt;/code> contact, with the &lt;code>parent_id&lt;/code> set to the household contact. This action can be performed as many times as needed to add multiple members to the household. The second action, &amp;ldquo;No more household members to add&amp;rdquo;, will open an &lt;code>app&lt;/code> form to confirm all members have been added to the household. Submitting that form will resolve the task.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;add_household_members_task&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Add Household Members&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesTo&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contacts&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesToType&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;clinic&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">events&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;add_household_members_task_event_id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">days&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">start&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">end&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">actions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contact&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">label&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Add person to household&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">modifyContent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">content&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">contact&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">content&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">content&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">parent_id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_id&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;report&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">form&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;mark_household_complete&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">label&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;No more household members to add&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>A task action can also be configured to redirect the user to the create contact form of a &lt;em>top-level contact&lt;/em> by setting only the &lt;code>type&lt;/code> field in the &lt;code>modifyContent&lt;/code> function (and not the &lt;code>parent_id&lt;/code>).&lt;/p>
+&lt;h2>Edit contact&lt;span class="hx-absolute -hx-mt-20" id="edit-contact">&lt;/span>
+&lt;a href="#edit-contact" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Added in CHT &lt;code>4.21.0&lt;/code>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>To configure a task action to redirect the user to an edit contact form, use the &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >&lt;code>modifyContent&lt;/code> function&lt;/a> to set the &lt;code>edit_id&lt;/code> field in the action &lt;code>content&lt;/code> to the identifier of the contact to edit. When the user selects the action, they will automatically be redirected to the edit contact form for the identified contact (located at &lt;code>contacts/{{edit_id}}/edit&lt;/code>).&lt;/p>
+&lt;p>The following example task config will create a task for new person contacts that do not have a &lt;code>role&lt;/code> value. When the user selects the task, they will be redirected to the edit contact form for the person (where they can set the &lt;code>role&lt;/code> value). Populating the &lt;code>role&lt;/code> value for the person will cause the task to be cancelled and no longer displayed.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;add_role_task&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">title&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;Add Role&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesTo&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contacts&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesToType&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">events&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;add_role_event_id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">days&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">start&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">end&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">appliesIf&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">({&lt;/span> &lt;span class="nx">contact&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">role&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">resolvedIf&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="kc">false&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">actions&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;contact&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">modifyContent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">content&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">contact&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">content&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">edit_id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">contact&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_id&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Navigate to contact profile&lt;span class="hx-absolute -hx-mt-20" id="navigate-to-contact-profile">&lt;/span>
+&lt;a href="#navigate-to-contact-profile" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Added in CHT &lt;code>4.21.0&lt;/code>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>If a task action with &lt;code>type: 'contact'&lt;/code> does not set a value in the action &lt;code>content&lt;/code> for &lt;code>parent_id&lt;/code>, &lt;code>type&lt;/code>, or &lt;code>edit_id&lt;/code>, then selecting the action will simply redirect the user to the contact profile page for the contact associated with the task.&lt;/p></description></item><item><title>Passing data from a task into the app form</title><link>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tasks/managing-tasks/pass-data-to-form/</guid><description>
 &lt;p>This guide explains how to pass data from a task into the action &lt;em>application form&lt;/em>.&lt;/p>
 &lt;h2>Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites">&lt;/span>
 &lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
