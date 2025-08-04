@@ -1,0 +1,1222 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – CHT Core</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/</link><description>Recent content in CHT Core on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/hosting/cht/index.xml" rel="self" type="application/rss+xml"/><item><title>Considerations when hosting</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/considerations/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/considerations/</guid><description>
+&lt;p>Some important questions to consider when setting up hosting for the CHT:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Alerting&lt;/strong> - How will alerts be sent in the case of downtime or degraded service? While &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/introduction/" >Watchdog&lt;/a> can be set up to monitor CHT Core instances - which monitoring system will be used to alert on OS level warnings?&lt;/li>
+&lt;li>&lt;strong>Power failures and unplanned restarts&lt;/strong> - Will the server cleanly restart such that the CHT resumes service correctly?&lt;/li>
+&lt;li>&lt;strong>Backups&lt;/strong> - What happens to the CHT data if there&amp;rsquo;s a hard drive failure? Are there provisions for a &lt;a href="https://en.wikipedia.org/wiki/Backup#Storage" target="_blank" rel="noopener">3-2-1 backup strategy&lt;/a>? See the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/backups/" >backup docs&lt;/a> for more information.&lt;/li>
+&lt;li>&lt;strong>Disaster Recovery&lt;/strong> - What happens if there is a flood at the facility and on-site active and backup data are destroyed?&lt;/li>
+&lt;li>&lt;strong>Scale&lt;/strong> - What happens when the hardware deployed needs to be upgraded to increase capacity?&lt;/li>
+&lt;li>&lt;strong>Updates&lt;/strong> - CHT Core updates happen many times throughout the year - do you have a maintenance schedule for these and staff who are trained to do the upgrade?&lt;/li>
+&lt;li>&lt;strong>Renewals&lt;/strong> - Services such as TLS certificates and domains name registration expire periodically and will make the server inaccessible - do you have a schedule for monitoring and renewing these in a timely manner?&lt;/li>
+&lt;li>&lt;strong>Security&lt;/strong> - While the TLS certificate will protect data on the Internet, is the server hard drive encrypted in the event of property theft? Is there a sufficient policy in place when generating and handling passwords for CHWs? Have you considered &lt;a href="https://docs.communityhealthtoolkit.org/building/login/#magic-links-for-logging-in-token-login" >Token Login&lt;/a> to further reduce risk?&lt;/li>
+&lt;li>&lt;strong>Privacy&lt;/strong> - The CHT inherently carries sensitive patient medical information in the database. Are there sufficient measures in place to protect this sensitive data?&lt;/li>
+&lt;/ul></description></item><item><title>CHT hosting requirements</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/requirements/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/requirements/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">For production CHT deployments, Linux is recommended, with &lt;a href="https://ubuntu.com/server" target="_blank" rel="noopener">Ubuntu&lt;/a> the most commonly used. For App Developer Hosting, Linux or macOS may be used. Windows can be used for either, but without recommendation.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Per the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes-vs-docker/" >Kubernetes vs Docker&lt;/a> page, CHT Core can be deployed with either Docker or Kubernetes.&lt;/p>
+&lt;h2>App Developer Hosting&lt;span class="hx-absolute -hx-mt-20" id="app-developer-hosting">&lt;/span>
+&lt;a href="#app-developer-hosting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>This leverages Docker and requires:&lt;/p>
+&lt;ul>
+&lt;li>4 GB RAM / 2 CPU / 8 GB SSD&lt;/li>
+&lt;li>Root Access&lt;/li>
+&lt;li>TLS certificates - if using &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/app-developer/#cht-docker-helper-for-4x" >Docker Helper&lt;/a> these are provided for you.&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener">Current version&lt;/a> of &lt;code>docker&lt;/code> or current version of &lt;a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">Docker Desktop&lt;/a> both of which include &lt;code>docker compose&lt;/code>. Note that the older &lt;code>docker-compose&lt;/code> is &lt;a href="https://www.docker.com/blog/announcing-compose-v2-general-availability/" target="_blank" rel="noopener">no longer supported&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;h2>Production Hosting&lt;span class="hx-absolute -hx-mt-20" id="production-hosting">&lt;/span>
+&lt;a href="#production-hosting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Docker&lt;span class="hx-absolute -hx-mt-20" id="docker">&lt;/span>
+&lt;a href="#docker" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>8 GB RAM / 4 CPU / 100 GB SSD&lt;/li>
+&lt;li>Root Access&lt;/li>
+&lt;li>Static IP with DNS entry - will be used to provision a valid TLS certificate&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener">Current version&lt;/a> of &lt;code>docker&lt;/code> and &lt;code>docker compose&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3>Kubernetes&lt;span class="hx-absolute -hx-mt-20" id="kubernetes">&lt;/span>
+&lt;a href="#kubernetes" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This guide refers to &amp;ldquo;Kubernetes&amp;rdquo;, and a lightweight orchestrator called &lt;a href="https://docs.k3s.io/" target="_blank" rel="noopener">K3s&lt;/a> can be used for bare-metal hosts. The requirements below refer to K3s deployments but can be translated to other Kubernetes hosting. For example, for cloud hosting, CHT is widely deployed with Amazon &lt;a href="https://aws.amazon.com/eks/" target="_blank" rel="noopener">Elastic Kubernetes Service&lt;/a> (EKS). Additionally, the CHT is succesfully deployed in a &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/self-hosting-k3s-multinode/" >large K3s deployment based on VMWare&lt;/a>.&lt;/p>
+&lt;p>Be sure to see the &lt;code>cht-deploy&lt;/code> &lt;a href="https://github.com/medic/cht-core/tree/master/scripts/deploy" target="_blank" rel="noopener">script&lt;/a> that leverage the &lt;code>helm&lt;/code> &lt;a href="https://helm.sh/docs/intro/install/" target="_blank" rel="noopener">application&lt;/a>.&lt;/p>
+&lt;ul>
+&lt;li>1 x HA control-plane nodes: 2 GB RAM / 2 CPU / 20 GB SSD&lt;/li>
+&lt;li>3 x worker servers: 16 GB RAM / 8 CPU / 50 GB SSD&lt;/li>
+&lt;li>500GB storage area network (SAN)* - Will host &lt;a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank" rel="noopener">Persistent Volume Claims&lt;/a>&lt;/li>
+&lt;li>Root Access&lt;/li>
+&lt;li>Static IP with DNS entry - Kubernetes will use this to provision a valid TLS certificate&lt;/li>
+&lt;li>&lt;code>helm&lt;/code> &lt;a href="https://helm.sh/docs/intro/install/" target="_blank" rel="noopener">application&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.k3s.io/" target="_blank" rel="noopener">K3s&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener">Current version&lt;/a> of &lt;code>docker&lt;/code> (used to bootstrap K3s)&lt;/li>
+&lt;/ul>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">During some upgrades, up to 5x current space used by CouchDB can be needed.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Required skills&lt;span class="hx-absolute -hx-mt-20" id="required-skills">&lt;/span>
+&lt;a href="#required-skills" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In addition to the hosting requirements, system administrators should have a basic understanding of command line interface, Kubernetes, Docker, container orchestration, deployment, databases (CouchDB, Postgres), networking components (TLS, IP addresses, DNS).&lt;/p></description></item><item><title>Hosting Costs</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/costs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/costs/</guid><description>
+&lt;h2>Cost per CHT per Month&lt;span class="hx-absolute -hx-mt-20" id="cost-per-cht-per-month">&lt;/span>
+&lt;a href="#cost-per-cht-per-month" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In a production environment, the CHT costs are estimated at USD$0.10 per active user per month to run. What exactly does this mean? Let&amp;rsquo;s dive into some specifics which importantly cover what is include and excluded and how these costs can vary with each deployment.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">⚠️&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Be sure to read the &lt;a href="#accuracy" >Accuracy section&lt;/a> so you understand what the costs on these page mean for your deployment.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>How the number was calculated&lt;span class="hx-absolute -hx-mt-20" id="how-the-number-was-calculated">&lt;/span>
+&lt;a href="#how-the-number-was-calculated" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Medic hosts a number of production CHT instances in Amazon &lt;a href="https://aws.amazon.com/eks/" target="_blank" rel="noopener">Elastic Kubernetes Service&lt;/a> (EKS). By using &lt;a href="https://www.opencost.io/" target="_blank" rel="noopener">OpenCost&lt;/a>, Medic can closely monitor real world costs with actual end users. OpenCost was used to separate one deployment&amp;rsquo;s CPU, RAM and disk use from another&amp;rsquo;s despite them all running in a multi-tenant EKS cluster.&lt;/p>
+&lt;p>Here&amp;rsquo;s costs for two week period for an actual production instance which informs our USD$0.10 per active user per month cost, including a bit of over-provisioning to give a deployment some headroom:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Total Monthly Cost&lt;/th>
+&lt;th>$68&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Active Users (30 days)&lt;/td>
+&lt;td>661&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>$/User&lt;/td>
+&lt;td>$0.10&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>$22&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>$8&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Storage&lt;/td>
+&lt;td>$24&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Over provision&lt;/td>
+&lt;td>$14&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>We derive the $/User/Month cost by taking $68/mo and dividing it by 661 active users to arrive at $0.10. The bottom 4 lines are the sub-items that make the total $68/mo amount. Note that if a deployment has a lot of active users, but a slower database growth than shown above, it can cause changes in costs mentioned in &lt;a href="#accuracy" >the next section&lt;/a>.&lt;/p>
+&lt;p>By using OpenCost, we not only know costs as shown above, but we also know actual resources used with in the cluster. This allows us to be able to know CPU, storage and RAM usage. At a higher level, we can also know how many documents were stored and document growth. Documents are created, for example, when a CHW follows a health workflow on their device and synchronizes to the CHT:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Monthly Resources&lt;/th>
+&lt;th>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>8&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>RAM (Gigs)&lt;/td>
+&lt;td>15&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Storage (TBs)&lt;/td>
+&lt;td>0.42&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Documents&lt;/td>
+&lt;td>10.7M&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Documents Growth&lt;/td>
+&lt;td>248.0K&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>Accuracy&lt;span class="hx-absolute -hx-mt-20" id="accuracy">&lt;/span>
+&lt;a href="#accuracy" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This research was based on live instances so the costs are realistic. However, since not all programs use the CHT in the exact same way, and not all deployments have the same number of users and workflows, these numbers are still subject to some fluctuation.&lt;/p>
+&lt;p>Further, the costs in the table above only cover the variable costs. That is, the costs incurred of actual usage with in an EKS cluster. In a multi-tenant deployment with multiple instances (for example: Staging, User Acceptance Testing and Production), this can be critical to know what the three different deployments incurred costs are within the EKS cluster.&lt;/p>
+&lt;p>Importantly, all production CHT 4.x deployments have a fixed cost to run the EKS cluster or generic Kubernetes if not on AWS. This is because all clusters contain servers that are always on and fully available. This cost is not yet included in this document.&lt;/p>
+&lt;h3>Production vs Development&lt;span class="hx-absolute -hx-mt-20" id="production-vs-development">&lt;/span>
+&lt;a href="#production-vs-development" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A production deployment means the CHT is hosted either at a cloud provider or in a datacenter. Both provide high quality connectivity, power and cooling so the cost is higher than a development instance. This ensures users do not have service interruptions and can continue to have trust the CHT will be up when they need to deliver care.&lt;/p>
+&lt;p>When analyzing the hosting total cost of ownership (TCO), only production instances were looked at.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>A &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/app-developer" >development environment&lt;/a> can be no cost (or very low cost). Assuming a developer already has a laptop, this is all that is needed to host a development instance.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Small deployment example costs&lt;span class="hx-absolute -hx-mt-20" id="small-deployment-example-costs">&lt;/span>
+&lt;a href="#small-deployment-example-costs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In order to get a better idea of fixed monthly costs, let&amp;rsquo;s look at the smallest Kubernetes deployment per the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/requirements" >requirements docs&lt;/a>. These estimates use Amazon&amp;rsquo;s &lt;a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">EC2 pricing&lt;/a> and &lt;a href="https://aws.amazon.com/ebs/pricing/" target="_blank" rel="noopener">EBS pricing&lt;/a> in Paris (&lt;code>eu-west2&lt;/code>) availability zone. Note that different &lt;a href="https://aws.amazon.com/compare/the-difference-between-on-demand-instances-and-reserved-instances/" target="_blank" rel="noopener">types of EC2 pricing&lt;/a> may have different costs along with other cloud providers which will have different costs as well.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">For more examples of deployments, but without costs, see &lt;a href="https://docs.communityhealthtoolkit.org/hosting/kubernetes-vs-docker/#example-deployments" >Kubernetes vs Docker&lt;/a>.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h3>Monthly costs&lt;span class="hx-absolute -hx-mt-20" id="monthly-costs">&lt;/span>
+&lt;a href="#monthly-costs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Item&lt;/th>
+&lt;th>Cost&lt;/th>
+&lt;th>Count&lt;/th>
+&lt;th>Total/mo&lt;/th>
+&lt;th>Note&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>EC2 t4g.small&lt;/td>
+&lt;td>$0.01/hr&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>$8&lt;/td>
+&lt;td>Control-plane node&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>EC2 c6g.2xlarge&lt;/td>
+&lt;td>$0.32/hr&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>$692&lt;/td>
+&lt;td>Worker nodes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>EBS SSD (gp3)&lt;/td>
+&lt;td>$0.09/mo&lt;/td>
+&lt;td>500&lt;/td>
+&lt;td>$45&lt;/td>
+&lt;td>500GB of shared storage&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;strong>TOTAL&lt;/strong>&lt;/td>
+&lt;td>&lt;strong>$745/mo&lt;/strong>*&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;em>* These estimates are as of 2024.&lt;/em>&lt;/p>
+&lt;h3>On-going costs and growth&lt;span class="hx-absolute -hx-mt-20" id="on-going-costs-and-growth">&lt;/span>
+&lt;a href="#on-going-costs-and-growth" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When running a small instance, be sure to plan for future costs. Do not assume that costs will stay flat or go down. Assume they will go up. Areas where costs can increase are:&lt;/p>
+&lt;ul>
+&lt;li>Backups - As your CouchDB instance takes more and more room, backups will cost more and more to store.&lt;/li>
+&lt;li>Storage - As with backups, if the 500GB of storage approaches being full, or upgrades require a burst of disk use, plan on adding more active storage.&lt;/li>
+&lt;li>More users - offline and online CHT Core users increase the load on the system. Be prepared to either add more worker nodes or increase the size of existing worker nodes to add more CPU and RAM. As well, consider stronger CPUs which might have higher clock speeds, more cache and be more efficient.&lt;/li>
+&lt;/ul>
+&lt;h2>What&amp;rsquo;s included in the per user cost&lt;span class="hx-absolute -hx-mt-20" id="whats-included-in-the-per-user-cost">&lt;/span>
+&lt;a href="#whats-included-in-the-per-user-cost" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>This document covers hosting cost and does not cover Total Cost of Ownership (TCO). Below is a list of what&amp;rsquo;s included in the hosting casts above and what is excluded.&lt;/p>
+&lt;h3>Included&lt;span class="hx-absolute -hx-mt-20" id="included">&lt;/span>
+&lt;a href="#included" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Items that are included in the basic costs of hosting the CHT:&lt;/p>
+&lt;ul>
+&lt;li>Servers - Given the large number of hosted CHT instances this is the area with the most data to use to build the calculator. This includes:
+&lt;ul>
+&lt;li>Average monthly cost to host the CHT&lt;/li>
+&lt;li>Ability to adjust based on expected user count, number of workflows and a few other program specific numbers like how many workflows there are.&lt;/li>
+&lt;li>Amount of CPU/RAM/Storage needed - while it is assumed this will be for AWS, it will come in the form of something like &amp;ldquo;20 vCPUs&amp;rdquo; which can be translated to any hosting environment.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Built in overprovisioning to allow for bursts and a bit of growth&lt;/li>
+&lt;li>Monitoring and Alerting - Since all software fails eventually, you need to be prepared to defend against this with aggressive monitoring and alerting. The goal will be to fix the problem before any users notice.&lt;/li>
+&lt;li>Ingress/Egress - This is the ability to send and receive data to the CHT. Pricing from Datacenters and Cloud is readily available and &amp;ldquo;Servers&amp;rdquo; above can not exist without it.&lt;/li>
+&lt;li>CHT Core updates and system maintenance - Both the CHT and underlying operating system will be upgraded on a regular basis. This not only ensures there are no security vulnerabilities, but also ensures the deployments gains the benefit of new features and performance gains in the CHT.&lt;/li>
+&lt;li>Active users - this is the total amount of users that engage with the CHT every day. If there are credentials that are created, but no users logging in with those credentials, these do not increase costs.&lt;/li>
+&lt;/ul>
+&lt;h3>Excluded&lt;span class="hx-absolute -hx-mt-20" id="excluded">&lt;/span>
+&lt;a href="#excluded" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>There are many assumptions about what else is needed to run the CHT. While important, they are excluded:&lt;/p>
+&lt;ul>
+&lt;li>Kubernetes cluster - Large, multi-tenant deployments in a Kubernetes cluster will have a fixed monthly cost to operate, including the worker nodes which may be large in size (RAM &amp;amp; CPU).&lt;/li>
+&lt;li>Backups - Regular snapshots of the production data will need to be taken to ensure there is no data loss in case of catastrophic failure of server hardware. This takes up a disk space which should be accounted for when budgeting to host the CHT.&lt;/li>
+&lt;li>Building a Datacenter (DC) - While some well funded MoH&amp;rsquo;s may have the budget and time to build a complete data center, this is out of the scope for this calculation. Therefore it is assumed an existing DC will be used or cloud hosting will be used. In the case where a MoH wants to build a DC, a competent 3rd party should be selected&lt;/li>
+&lt;li>Training of Systems Administrators/IT - System administrator IT systems that have not used Kubernetes or have not hosted the CHT, will need to be trained on how to do both.&lt;/li>
+&lt;li>Training of Trainers (ToT) and user Training&lt;/li>
+&lt;li>Data Warehousing &amp;amp; Dashboards - While close to &amp;ldquo;Servers&amp;rdquo; above, not all deployments have a data warehouse (CHT Sync + Postgres) and dashboards (Superset/Klipfolio) at launch. These are easy to add on at a later date and cost can be estimated at that time.&lt;/li>
+&lt;li>Upfront Purchase of Hardware - It is assumed that a deployment will either be using cloud based solutions or using managed bare metal, so these costs don&amp;rsquo;t apply.&lt;/li>
+&lt;li>App Development - Each deployment needs to have the default CHT app customized for each of the required workflows.&lt;/li>
+&lt;li>Smartphones - Device purchase, setup, and distribution for users to use the CHT.&lt;/li>
+&lt;li>Analog -&amp;gt; Digital Workflow conversion - The process of documenting paper processes in places that the CHT will replace.&lt;/li>
+&lt;li>SMS - Some projects need the ability to send SMS to users from the CHT.&lt;/li>
+&lt;li>Interoperability - While the CHT supports this out of the box - development work is needed to ensure it works with the specific 3rd party systems.&lt;/li>
+&lt;li>Mobile Device Management - optional.&lt;/li>
+&lt;li>Cellphone telecom services - Users actually uploading/downloading data&lt;/li>
+&lt;li>Setup and/or transfer of hosting provider&lt;/li>
+&lt;/ul></description></item><item><title>Kubernetes vs Docker</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes-vs-docker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes-vs-docker/</guid><description>
+&lt;p>To deploy the CHT, you should use the technology you are most familiar and comfortable with. It is possible to deploy 20 CHT instances without using Kubernetes. Conversely, if a hosting organisation uses Kubernetes and intends to deploy a single instance of the CHT, that&amp;rsquo;s also fine.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>&lt;/svg>Tip&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/app-developer/" >Application development&lt;/a> is more straightforward to setup with Docker.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Which one to choose?&lt;span class="hx-absolute -hx-mt-20" id="which-one-to-choose">&lt;/span>
+&lt;a href="#which-one-to-choose" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>There is no one-size-fits-all solution for all deployments, and every solution comes with its advantages and disadvantages.&lt;/p>
+&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/" >Docker&lt;/a> is suitable for most CHT deployments use cases. Use &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/" >Kubernetes&lt;/a> for multi-tenant or specific hardware constrained deployments, such as bare-metal servers with a low core-count.&lt;/p>
+&lt;p>For more details on the research behind why Docker and single-node CouchDB are preferable for CHT deployments, see &lt;a href="https://forum.communityhealthtoolkit.org/t/investigate-adding-more-shards-as-a-potential-avenue-for-improved-performance/4831?u=mrjones" target="_blank" rel="noopener">this forum post&lt;/a>. Results from this experiment show no clear advantage for CouchDB clustering, as the performance for view indexing and replication is the same when using a CouchDB cluster vs using a single machine with the same number of cores.&lt;/p>
+&lt;h2>Docker&lt;span class="hx-absolute -hx-mt-20" id="docker">&lt;/span>
+&lt;a href="#docker" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Docker has stood the test of time and has many benefits:&lt;/p>
+&lt;ul>
+&lt;li>Easy to deploy by just downloading a compose file.&lt;/li>
+&lt;li>Trivially scales down to a 4-core laptop and &lt;a href="https://forum.communityhealthtoolkit.org/t/investigate-adding-more-shards-as-a-potential-avenue-for-improved-performance/4831" target="_blank" rel="noopener">way up to a 48-core server&lt;/a>.&lt;/li>
+&lt;li>Easily integrates with existing Docker based solutions like &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/" >Watchdog&lt;/a> or other services running in Docker.&lt;/li>
+&lt;li>Backup and restore can be achieved via simple file management via &lt;a href="https://docs.docker.com/engine/storage/bind-mounts/" target="_blank" rel="noopener">bind mounted volumes&lt;/a>.&lt;/li>
+&lt;li>Just enough complexity to securely and soundly run the CHT without extra complexities of Kubernetes&lt;/li>
+&lt;li>Natively supports one-click CHT upgrades in the admin GUI&lt;/li>
+&lt;/ul>
+&lt;p>Docker Compose deployment has the following services when running the CHT:&lt;/p>
+&lt;ul>
+&lt;li>A service for each CouchDB instance.&lt;/li>
+&lt;li>A CHT API service.&lt;/li>
+&lt;li>HAProxy Healthcheck service.&lt;/li>
+&lt;li>HAProxy service.&lt;/li>
+&lt;li>Upgrade Service service.&lt;/li>
+&lt;li>A CHT Sentinel service.&lt;/li>
+&lt;li>An nginx service to act as a reverse proxy and terminate TLS connections&lt;/li>
+&lt;/ul>
+&lt;h2>Kubernetes (k8s)&lt;span class="hx-absolute -hx-mt-20" id="kubernetes-k8s">&lt;/span>
+&lt;a href="#kubernetes-k8s" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Running CHT on k8s requires familiarity with the k8s platform and can be more complex to deploy.&lt;/p>
+&lt;p>k8s offers:&lt;/p>
+&lt;ul>
+&lt;li>Resilient network across either physical or VM nodes in the cluster. This allows strong distribution of the heavy CPU and RAM loads that CouchDB can incur under heavy use.&lt;/li>
+&lt;li>Orchestration of multiple deployments ensuring easy hosting of multi-tenants. For example you may opt to have a user acceptance testing (UAT), staging, and production instances all in one cluster.&lt;/li>
+&lt;li>Service discovery which enables routing of public requests to deployments within the cluster&lt;/li>
+&lt;li>Integration with hypervisors such as VMware and ESX. This is possible due to CRD support in Kubernetes that allows third parties to create integrations&lt;/li>
+&lt;li>Helm support and integration that makes it easy to deploy applications onto the cluster&lt;/li>
+&lt;li>Highly efficient snapshot backups when used with a storage area network (&lt;a href="https://en.wikipedia.org/wiki/Storage_area_network" target="_blank" rel="noopener">SAN&lt;/a>) or Amazon&amp;rsquo;s &lt;a href="https://aws.amazon.com/ebs/" target="_blank" rel="noopener">Elastic Block Storage&lt;/a> (EBS).&lt;/li>
+&lt;/ul>
+&lt;p>The main components of a Kubernetes CHT deployment include one less service than a Compose-based deployment as ingress via &lt;code>nginx&lt;/code> isn&amp;rsquo;t needed as it&amp;rsquo;s handled externally:&lt;/p>
+&lt;ul>
+&lt;li>A pod for each CouchDB instance.&lt;/li>
+&lt;li>A CHT API pod.&lt;/li>
+&lt;li>A CHT HAProxy Healthcheck pod.&lt;/li>
+&lt;li>A CHT HAProxy pod.&lt;/li>
+&lt;li>Upgrade Service pod.&lt;/li>
+&lt;li>CHT-Sentinel pod.&lt;/li>
+&lt;/ul>
+&lt;h2>Example deployments&lt;span class="hx-absolute -hx-mt-20" id="example-deployments">&lt;/span>
+&lt;a href="#example-deployments" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Below are examples from real world large-scale CHT deployments which have been anonymized. User counts represent the number of active users within a 30 days interval.&lt;/p>
+&lt;h3>CHT Deployment Example 1&lt;span class="hx-absolute -hx-mt-20" id="cht-deployment-example-1">&lt;/span>
+&lt;a href="#cht-deployment-example-1" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This deployment hosts 47 production instances in a data center running &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/" >Docker&lt;/a>. It trades ease and simplicity of Docker Compose deployment for a bit of fragility: if a VM fails, there is no automatic failover, and a restore from backup is needed.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: left">&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">CHT Instances:&lt;/td>
+&lt;td style="text-align: left">47&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Hosting:&lt;/td>
+&lt;td style="text-align: left">Docker&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Cores:&lt;/td>
+&lt;td style="text-align: left">376 (47 VMs x 8 Cores/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">RAM:&lt;/td>
+&lt;td style="text-align: left">752 GB (47 VMs x 16 GB/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Disk:&lt;/td>
+&lt;td style="text-align: left">4,700 GB (Max 700, Min 21)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Multi-Node Couch:&lt;/td>
+&lt;td style="text-align: left">No&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Users:&lt;/td>
+&lt;td style="text-align: left">50.6k&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>CHT Deployment Example 2&lt;span class="hx-absolute -hx-mt-20" id="cht-deployment-example-2">&lt;/span>
+&lt;a href="#cht-deployment-example-2" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This deployment hosts 1 CHT production instance in a data center running &lt;a href="https://k3s.io/" target="_blank" rel="noopener">K3s&lt;/a>.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: left">&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">CHT Instances:&lt;/td>
+&lt;td style="text-align: left">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Hosting:&lt;/td>
+&lt;td style="text-align: left">k3s (on VMware)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Cores:&lt;/td>
+&lt;td style="text-align: left">32 (4 VMs x 8 cores/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">RAM:&lt;/td>
+&lt;td style="text-align: left">64 GB (4 VMs x 16 GB/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Disk:&lt;/td>
+&lt;td style="text-align: left">2,400 GB (4 VMs x 600 GB/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Multi-Node Couch:&lt;/td>
+&lt;td style="text-align: left">Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Users:&lt;/td>
+&lt;td style="text-align: left">9.5k&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>CHT Deployment Example 3&lt;span class="hx-absolute -hx-mt-20" id="cht-deployment-example-3">&lt;/span>
+&lt;a href="#cht-deployment-example-3" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>This deployment hosts 46 production instances on Amazon &lt;a href="https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html" target="_blank" rel="noopener">Elastic Kubernetes Service&lt;/a> (EKS).&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: left">&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">CHT Instances:&lt;/td>
+&lt;td style="text-align: left">46&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Hosting:&lt;/td>
+&lt;td style="text-align: left">k8s on EKS&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Cores:&lt;/td>
+&lt;td style="text-align: left">64 (8 VMs x 8 Cores/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">RAM:&lt;/td>
+&lt;td style="text-align: left">256 GB (8 VMs x 32 GB/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Disk:&lt;/td>
+&lt;td style="text-align: left">8.6 TB (8 VMs x 500 GB/ea + 46 CHTs x ~100 GB/ea)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Multi-Node Couch:&lt;/td>
+&lt;td style="text-align: left">44 No, 2 Yes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">Users:&lt;/td>
+&lt;td style="text-align: left">25.7k&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>To give more specific examples of what&amp;rsquo;s running in the 46 instances, here&amp;rsquo;s details on two including their &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/dashboards/#replication" >Apdex&lt;/a>:&lt;/p>
+&lt;ul>
+&lt;li>One large instance has 2.4k active users, 8.9M documents in the Medic database in CouchDB and a mean replication Apdex of 100.0.&lt;/li>
+&lt;li>Another medium instance has 232 active users, 279k documents in the Medic database in CouchDB and a mean replication Apdex of 100.&lt;/li>
+&lt;/ul></description></item><item><title>App Developer</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/app-developer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/app-developer/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>This guide assumes you are a CHT app developer wanting to either run concurrent instances of the CHT, or easily be able to switch between different instances without losing any data while doing so. To do development on the CHT Core Framework itself, see the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" >development guide&lt;/a>.&lt;/p>
+&lt;p>To deploy the CHT in production, see see the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/" >production&lt;/a> documentation.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Getting started&lt;span class="hx-absolute -hx-mt-20" id="getting-started">&lt;/span>
+&lt;a href="#getting-started" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First, decide which way to run the CHT: Docker Helper or manually it via &lt;code>docker compose&lt;/code>. Since they both achieve the same result, &lt;strong>it is recommended to use Docker Helper&lt;/strong> as shown in the next section as it&amp;rsquo;s very easy to run. Alternately, the manual process is covered at the &lt;a href="#manual-docker-compose-method" >bottom of the page&lt;/a>.&lt;/p>
+&lt;h2>CHT Docker Helper&lt;span class="hx-absolute -hx-mt-20" id="cht-docker-helper">&lt;/span>
+&lt;a href="#cht-docker-helper" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The &lt;code>cht-docker-compose.sh&lt;/code> scripts downloads 3 compose files and builds an &lt;code>.env&lt;/code> file. This greatly eases starting your first CHT instance with a simple text based GUI which works on Windows (WSL2), macOS (both x86 and Apple Silicon) and Linux.&lt;/p>
+&lt;figure>&lt;a href="cht-docker-helper.png">&lt;img src="https://docs.communityhealthtoolkit.org/hosting/cht/app-developer/cht-docker-helper.png">&lt;/a>
+&lt;/figure>
+&lt;p>The cht-docker-compose.sh script showing the URL and version of the CHT instance as well as number of containers launched, global container count, medic images downloaded count and OS load average. Finally a &amp;ldquo;Successfully started my_first_project&amp;rdquo; message is shown and denotes the login is &amp;ldquo;medic&amp;rdquo; and the password is &amp;ldquo;password&amp;rdquo;.&lt;/p>
+&lt;p>This script brings a lot of benefits with it:&lt;/p>
+&lt;ul>
+&lt;li>You only have to download one bash script&lt;/li>
+&lt;li>All compose files and images will be downloaded automatically for you&lt;/li>
+&lt;li>All networks, storage volumes and containers will be created&lt;/li>
+&lt;li>A valid TLS certificate will be installed, allowing you to easily test on with CHT Android natively on a mobile device&lt;/li>
+&lt;li>An unused port is automatically chosen for you when creating a new project. No more manually looking at your existing &lt;code>.env&lt;/code> files!&lt;/li>
+&lt;/ul>
+&lt;h3>Installing&lt;span class="hx-absolute -hx-mt-20" id="installing">&lt;/span>
+&lt;a href="#installing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To get started using it:&lt;/p>
+&lt;ol>
+&lt;li>Meet all &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/requirements/" >CHT hosting requirements&lt;/a>&lt;/li>
+&lt;li>Clone the &lt;a href="https://github.com/medic/cht-core/" target="_blank" rel="noopener">CHT Core&lt;/a> repo&lt;/li>
+&lt;li>When you want to check for updates, just run &lt;code>git pull origin&lt;/code> in the &lt;code>cht-core&lt;/code> directory.&lt;/li>
+&lt;/ol>
+&lt;p>An alternate to steps 2 and 3 above, if a more stand-alone version is desired, the bash script can be &lt;code>curl&lt;/code>ed directly, but you can&amp;rsquo;t use &lt;code>git&lt;/code> to easily update it then:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -s -o cht-docker-compose.sh https://raw.githubusercontent.com/medic/cht-core/master/scripts/docker-helper-4.x/cht-docker-compose.sh&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Usage&lt;span class="hx-absolute -hx-mt-20" id="usage">&lt;/span>
+&lt;a href="#usage" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Always run the script from the directory where it lives. If you launch it from a different directory, relative paths will fail:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Do&lt;/th>
+&lt;th>Don&amp;rsquo;t&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>./cht-docker-compose.sh&lt;/code>&lt;/td>
+&lt;td>&lt;code>./docker-helper-4.x/cht-docker-compose.sh&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4>Launching&lt;span class="hx-absolute -hx-mt-20" id="launching">&lt;/span>
+&lt;a href="#launching" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>Run the script with:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-docker-compose.sh&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The first time you run, you will be prompted to create a new project. Here&amp;rsquo;s what that looks like:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-docker-compose.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Would you like to initialize a new project &lt;span class="o">[&lt;/span>y/N&lt;span class="o">]&lt;/span>? y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">How &lt;span class="k">do&lt;/span> you want to name the project? &lt;span class="m">4&lt;/span> OH The First
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Downloading compose files ... &lt;span class="k">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Creating network &lt;span class="s2">&amp;#34;4_oh_the_first-cht-net&amp;#34;&lt;/span> with the default driver
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Creating my_first_cht_project-dir_cht-upgrade-service_1 ... &lt;span class="k">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Starting project &lt;span class="s2">&amp;#34;4_oh_the_first&amp;#34;&lt;/span>. First run takes a &lt;span class="k">while&lt;/span>. Will try &lt;span class="k">for&lt;/span> up to five minutes........
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Success! &lt;span class="s2">&amp;#34;4_oh_the_first&amp;#34;&lt;/span> is &lt;span class="nb">set&lt;/span> up:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> https://127-0-0-1.local-ip.medicmobile.org:10444/ &lt;span class="o">(&lt;/span>CHT&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> https://127-0-0-1.local-ip.medicmobile.org:10444/_utils/ &lt;span class="o">(&lt;/span>Fauxton&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Login: medic
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Password: password
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Start existing project
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ./cht-docker-compose.sh ENV-FILE.env
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Stop and keep project:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ./cht-docker-compose.sh ENV-FILE.env stop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Stop and destroy all project data:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ./cht-docker-compose.sh ENV-FILE.env destroy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https://docs.communityhealthtoolkit.org/apps/guides/hosting/cht/app-developer/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Have a great day! &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>If you have many existing projects, you can specify them to launch them directly. If you had a project called &lt;code>4_oh_the_first&lt;/code> you would run:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-docker-compose.sh 4_oh_the_first.env&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h4>Stopping&lt;span class="hx-absolute -hx-mt-20" id="stopping">&lt;/span>
+&lt;a href="#stopping" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>When you&amp;rsquo;re done with a project, it&amp;rsquo;s good to stop all the containers to reduce load on your computer. Do this by specifying the project and the &lt;code>stop&lt;/code> command. This command will simply stop the active Docker containers, and not delete any data. Using our existing example &lt;code>4_oh_the_first&lt;/code> project, you would call:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-docker-compose.sh 4_oh_the_first.env stop&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h4>Destroying&lt;span class="hx-absolute -hx-mt-20" id="destroying">&lt;/span>
+&lt;a href="#destroying" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>When you want to &lt;strong>permanently delete all files and all data&lt;/strong> for a project, specify the project and the &lt;code>destroy&lt;/code> command. Using our existing example &lt;code>4_oh_the_first&lt;/code> project, you would call:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">./cht-docker-compose.sh 4_oh_the_first.env destroy&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Be sure you want to do this, there is no &amp;ldquo;are you sure?&amp;rdquo; prompt and it will delete all your data.&lt;/p>
+&lt;p>Also note that this command will use the &lt;code>sudo&lt;/code> command when deleting the CouchDB data, so it may prompt for your password.&lt;/p>
+&lt;h4>Debugging&lt;span class="hx-absolute -hx-mt-20" id="debugging">&lt;/span>
+&lt;a href="#debugging" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>To get debug output while running the docker helper, you can prepend the &lt;code>DEBUG=true&lt;/code> flag like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">DEBUG&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> ./cht-docker-compose.sh&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This shows load average, CHT container count, global container count, and a table of services with their status like this:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">---DEBUG INFO---
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Load: 3.75 2.92 2.93
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">CHT Containers: &lt;span class="m">7&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Global Containers &lt;span class="m">15&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Service Status Container Image
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cht-upgrade-service running 400_deleteme-dir-cht-upgrade-service-1 public.ecr.aws/s5s3h4s7/cht-upgrade-service:latest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">haproxy NA NA public.ecr.aws/medic/cht-haproxy:4.4.0-8229-outbound-push
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">healthcheck running 400_deleteme_healthcheck_1 public.ecr.aws/medic/cht-haproxy-healthcheck:4.4.0-8229-outbound-push
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">api running 400_deleteme_api_1 public.ecr.aws/medic/cht-api:4.4.0-8229-outbound-push
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sentinel running 400_deleteme_sentinel_1 public.ecr.aws/medic/cht-sentinel:4.4.0-8229-outbound-push
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nginx running 400_deleteme_nginx_1 public.ecr.aws/medic/cht-nginx:4.4.0-8229-outbound-push
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">couchdb running 400_deleteme_couchdb_1 public.ecr.aws/medic/cht-couchdb:4.4.0-8229-outbound-push&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h4>Troubleshooting&lt;span class="hx-absolute -hx-mt-20" id="troubleshooting">&lt;/span>
+&lt;a href="#troubleshooting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>When you are starting a CHT Core instance using Docker Helper 4.x and don&amp;rsquo;t have any containers created, images downloaded, or storage volumes created - the &lt;code>*.local-ip.medicmobile.org&lt;/code> TLS certificate fails to install, which leads to a browser &lt;code>Your connection is not private&lt;/code> message.&lt;/p>
+&lt;p>To solve this issue, follow the steps below:&lt;/p>
+&lt;ol>
+&lt;li>First, find the name of the &lt;code>nginx&lt;/code> container with: &lt;code>docker ps --filter &amp;quot;name=nginx&amp;quot; --format '{{ .Names }}'&lt;/code>.&lt;/li>
+&lt;li>After cloning the &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener">CHT Core repo&lt;/a>, &lt;code>cd&lt;/code> into the &lt;code>scripts&lt;/code> directory: &lt;code>cd ./cht-core/scripts&lt;/code>.&lt;/li>
+&lt;li>Using the container name from the first command, call the script to update the certificate: &lt;code>./add-local-ip-certs-to-docker-4.x.sh CONTAINER_NAME&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;p>These three steps look like as following assuming that &lt;code>CONTAINER_NAME&lt;/code> is equal to &lt;code>4_3_0_nginx_1&lt;/code>. Note that &lt;code>CONTAINER_NAME&lt;/code> will be different for each instance of CHT you run with Docker Helper:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ docker ps --filter &lt;span class="s2">&amp;#34;name=nginx&amp;#34;&lt;/span> --format &lt;span class="s1">&amp;#39;{{ .Names }}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4_3_0_nginx_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">cd&lt;/span> Documents/MedicMobile/cht-core/scripts/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">scripts $ ./add-local-ip-certs-to-docker-4.x.sh 4_3_0_nginx_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">4_3_0_nginx_1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">If just container name is shown above, a fresh local-ip.medicmobile.org certificate was downloaded fresh local-ip.medicmobile.org.&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>File locations&lt;span class="hx-absolute -hx-mt-20" id="file-locations">&lt;/span>
+&lt;a href="#file-locations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The bash script keeps files in two places:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>*.env&lt;/code> files&lt;/strong> - the same directory as the bash script.&lt;/li>
+&lt;li>&lt;strong>&lt;code>~/medic/cht-docker/&lt;/code> files&lt;/strong> - in your home directory, a sub-directory is created for each project. Within each project directory, a &lt;code>compose&lt;/code> directory has the two compose files and the &lt;code>couch&lt;/code> directory has the CouchDB datafiles.&lt;/li>
+&lt;/ul>
+&lt;p>While you can manually remove any of these, it&amp;rsquo;s best to use the &lt;code>destroy&lt;/code> command above to ensure all related data files are deleted too.&lt;/p>
+&lt;h3>Video&lt;span class="hx-absolute -hx-mt-20" id="video">&lt;/span>
+&lt;a href="#video" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Here is a video of the helper being run on 1 Dec 2022. The video references &lt;code>lazydocker&lt;/code> which is &lt;a href="https://github.com/jesseduffield/lazydocker" target="_blank" rel="noopener">a great way&lt;/a> to monitor and control your local docker environment:&lt;/p>
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+&lt;iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/hrcy8JlJP9M?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video">&lt;/iframe>
+&lt;/div>
+&lt;h2>Manual &lt;code>docker compose&lt;/code> method&lt;span class="hx-absolute -hx-mt-20" id="manual-docker-compose-method">&lt;/span>
+&lt;a href="#manual-docker-compose-method" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>This process achieves the same result as Docker Helper, but is a more manual process. Be sure the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/requirements/" >CHT hosting requirements&lt;/a> are all met first.&lt;/p>
+&lt;p>To avoid conflicts, ensure that all other CHT 4.x instances are stopped. To stop ALL containers, you can use&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker &lt;span class="nb">kill&lt;/span> &lt;span class="k">$(&lt;/span>docker ps -q&lt;span class="k">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>After meeting these requirements, create a directory and download the developer YAML files in the directory you want to store them. This example uses &lt;code>~/cht-4-app-developer&lt;/code> as the directory. If you don&amp;rsquo;t know which to use, use Single Node CouchDB:&lt;/p>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Single Node CouchDB&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Multi-Node CouchDB&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p ~/cht_4_app_developer-dir/&lt;span class="o">{&lt;/span>compose,couchdb&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/cht_4_app_developer-dir
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-couchdb.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p ~/cht_4_app_developer-dir/&lt;span class="o">{&lt;/span>compose,couchdb&lt;span class="o">}&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> mkdir -p ~/cht_4_app_developer-dir/couchdb/&lt;span class="o">{&lt;/span>srv1,srv2,srv3&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/cht_4_app_developer-dir
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-couchdb-clustered.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>You should now have 3 compose files and 2 directories which we can check with &lt;code>ls -R&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">compose compose.yml couch
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./compose:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cht-core.yml cht-couchdb.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./couch:&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>To prepare for the first developer CHT instance, write all environment variables to the &lt;code>.env&lt;/code> file with this code. Be sure to use the same single or multi-node as above. If you don’t know which to use, use Single Node CouchDB:&lt;/p>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Single Node CouchDB&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Multi-Node CouchDB&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat &amp;gt; ~/cht_4_app_developer-dir/.env &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTP_PORT=8080
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTPS_PORT=8443
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_USER=medic
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_PASSWORD=password
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PROJECT_NAME=cht_4_app_developer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DOCKER_CONFIG_PATH=${HOME}/cht_4_app_developer-dir
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_SECRET=19f3b9fb1d7aba1ef4d1c5ed709512ee
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_UUID=e7122b1e463de4449fb05b0c494b0224
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_DATA=${HOME}/cht_4_app_developer-dir/couchdb
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PATH=${HOME}/cht_4_app_developer-dir/compose
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_NETWORK=cht_4_app_developer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat &amp;gt; ~/cht_4_app_developer-dir/.env &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTP_PORT=8080
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTPS_PORT=8443
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_USER=medic
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_PASSWORD=password
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PROJECT_NAME=cht_4_app_developer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DOCKER_CONFIG_PATH=${HOME}/cht_4_app_developer-dir
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_SECRET=19f3b9fb1d7aba1ef4d1c5ed709512ee
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_UUID=e7122b1e463de4449fb05b0c494b0224
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PATH=${HOME}/cht_4_app_developer-dir/compose
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_NETWORK=cht_4_app_developer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DB1_DATA=${HOME}/cht_4_app_developer-dir/couchdb/srv1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DB2_DATA=${HOME}/cht_4_app_developer-dir/couchdb/srv2
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DB3_DATA=${HOME}/cht_4_app_developer-dir/couchdb/srv3
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_SERVERS=couchdb-1.local,couchdb-2.local,couchdb-3.local
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Start the first CHT instance by calling &lt;code>docker&lt;/code>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/cht_4_app_developer-dir &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> docker compose up -d&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This may take some minutes to fully start depending on the speed of the internet connection and speed of the host. Docker needs to download all the container images and first setup needs to run on the CHT. You can check the status with:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker ps --filter &lt;span class="s2">&amp;#34;name=cht_4_app_developer&amp;#34;&lt;/span> --format &lt;span class="s2">&amp;#34;{{.Status}} {{.Names}}&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Which should look like this:&lt;/p>
+&lt;div class="hextra-scrollbar hx-overflow-x-auto hx-overflow-y-hidden hx-overscroll-x-contain">
+&lt;div class="hx-mt-4 hx-flex hx-w-max hx-min-w-full hx-border-b hx-border-gray-200 hx-pb-px dark:hx-border-neutral-800">&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-0" aria-selected="true" tabindex="0" data-state="selected">Single Node CouchDB&lt;/button>&lt;button
+class="hextra-tabs-toggle data-[state=selected]:hx-border-primary-500 data-[state=selected]:hx-text-primary-600 data-[state=selected]:dark:hx-border-primary-500 data-[state=selected]:dark:hx-text-primary-600 hx-mr-2 hx-rounded-t hx-p-2 hx-font-medium hx-leading-5 hx-transition-colors -hx-mb-0.5 hx-select-none hx-border-b-2 hx-border-transparent hx-text-gray-600 hover:hx-border-gray-200 hover:hx-text-black dark:hx-text-gray-200 dark:hover:hx-border-neutral-800 dark:hover:hx-text-white"
+role="tab"
+type="button"
+aria-controls="tabs-panel-1">Multi-Node CouchDB&lt;/button>&lt;/div>
+&lt;/div>
+&lt;div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-0"
+role="tabpanel" tabindex="0" data-state="selected" >&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">47&lt;/span> seconds cht_4_app_developer-nginx-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">48&lt;/span> seconds cht_4_app_developer-sentinel-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">48&lt;/span> seconds cht_4_app_developer-api-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">48&lt;/span> seconds cht_4_app_developer-haproxy-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">48&lt;/span> seconds cht_4_app_developer-healthcheck-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">48&lt;/span> seconds cht_4_app_developer-couchdb-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">49&lt;/span> seconds cht_4_app_developer-dir-cht-upgrade-service-1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div
+class="hextra-tabs-panel hx-rounded hx-pt-6 hx-hidden data-[state=selected]:hx-block"
+id="tabs-panel-1"
+role="tabpanel">&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">2&lt;/span> seconds cht_4_app_developer-nginx-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">3&lt;/span> seconds cht_4_app_developer-api-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">3&lt;/span> seconds cht_4_app_developer-sentinel-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-couchdb-1.local-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-couchdb-2.local-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-haproxy-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-couchdb-3.local-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-healthcheck-1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Up &lt;span class="m">4&lt;/span> seconds cht_4_app_developer-dir-cht-upgrade-service-1&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>After running the above &lt;code>docker ps&lt;/code> command and you see your containers running, the CHT is accessible on &lt;a href="https://localhost:8443" target="_blank" rel="noopener">https://localhost:8443&lt;/a>. The username is &lt;code>medic&lt;/code> and password is &lt;code>password&lt;/code>.&lt;/p>
+&lt;p>The first time you connect in a browser, an error will be shown, &amp;ldquo;Your connection is not private&amp;rdquo; with &lt;code>NET::ERR_CERT_AUTHORITY_INVALID&lt;/code> (see &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/privacy.error.png" >screenshot&lt;/a>). To get past this, click &amp;ldquo;Advanced&amp;rdquo; and then click &amp;ldquo;Proceed to localhost&amp;rdquo;.&lt;/p>
+&lt;p>To stop this instance run:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker stop &lt;span class="k">$(&lt;/span>docker ps -q --filter &lt;span class="s2">&amp;#34;name=cht_4_app_developer&amp;#34;&lt;/span>&lt;span class="k">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h2>Running the Nth CHT instance&lt;span class="hx-absolute -hx-mt-20" id="running-the-nth-cht-instance">&lt;/span>
+&lt;a href="#running-the-nth-cht-instance" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>After running the first instance of the CHT, it&amp;rsquo;s easy to run as many more as are needed. This is achieved by specifying different:&lt;/p>
+&lt;ul>
+&lt;li>port for &lt;code>HTTP&lt;/code> redirects (&lt;code>CHT_HTTP&lt;/code>)&lt;/li>
+&lt;li>port for &lt;code>HTTPS&lt;/code> traffic (&lt;code>NGINX_HTTP_PORT&lt;/code>)&lt;/li>
+&lt;li>directory for storing the compose files and CouchDB files&lt;/li>
+&lt;/ul>
+&lt;p>Assuming you want to start a new project called &lt;code>the_second&lt;/code> and start the instance on &lt;code>HTTP&lt;/code> port &lt;code>8081&lt;/code> and &lt;code>HTTPS&lt;/code> port &lt;code>8443&lt;/code>, we would first create a new directory and download the same files:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p ~/cht_4_app_developer-2nd-dir/&lt;span class="o">{&lt;/span>compose,couchdb&lt;span class="o">}&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">cd&lt;/span> ~/cht_4_app_developer-2nd-dir
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose.yml https://raw.githubusercontent.com/medic/cht-upgrade-service/main/docker-compose.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-core.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-core.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -o ./compose/cht-couchdb.yml https://staging.dev.medicmobile.org/_couch/builds_4/medic%3Amedic%3Amaster/docker-compose/cht-couchdb.yml&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Then, we would create an &lt;code>.env&lt;/code> file like before&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">cat &amp;gt; ~/cht_4_app_developer-2nd-dir/.env &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTP_PORT=8081
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">NGINX_HTTPS_PORT=8444
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_USER=medic
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_PASSWORD=password
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PROJECT_NAME=cht_4_app_developer-2nd
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">DOCKER_CONFIG_PATH=${HOME}/cht_4_app_developer-2nd-dir
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_SECRET=19f3b9fb1d7aba1ef4d1c5ed709512ee
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_UUID=e7122b1e463de4449fb05b0c494b0224
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">COUCHDB_DATA=${HOME}/cht_4_app_developer-2nd-dir/couch
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_COMPOSE_PATH=${HOME}/cht_4_app_developer-2nd-dir/compose
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">CHT_NETWORK=cht_4_app_developer-2nd
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>And finally use the same &lt;code>docker compose&lt;/code> command as above:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/cht_4_app_developer-2nd-dir &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> docker compose up&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The second instance is now accessible at &lt;a href="https://localhost:8444" target="_blank" rel="noopener">https://localhost:8444&lt;/a> and again using username &lt;code>medic&lt;/code> and password &lt;code>password&lt;/code> to login.&lt;/p>
+&lt;h2>Switching &amp;amp; concurrent projects&lt;span class="hx-absolute -hx-mt-20" id="switching--concurrent-projects">&lt;/span>
+&lt;a href="#switching--concurrent-projects" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The easiest way to switch between projects is to stop the first set of containers and start the second set. Cancel the first project running in the foreground with &lt;code>ctrl + c&lt;/code> and &lt;code>stop&lt;/code> all the project&amp;rsquo;s services. Here any container named &lt;code>cht_4_app_developer-2nd*&lt;/code> is stopped:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker stop &lt;span class="k">$(&lt;/span>docker ps -q --filter &lt;span class="s2">&amp;#34;name=cht_4_app_developer-2nd*&amp;#34;&lt;/span>&lt;span class="k">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Alternately, you can stop ALL containers (even non-CHT ones!) with &lt;code>docker kill $(docker ps -q)&lt;/code>. Then start the other CHT project using either the &lt;code>.env&lt;/code> file or use the explicit command with ports and other environment variables as shown above.&lt;/p>
+&lt;p>To run projects concurrently open a second terminal and start the second project so you don&amp;rsquo;t have to cancel and &lt;code>stop&lt;/code> the first project. Remember to avoid port conflicts!&lt;/p></description></item><item><title>Docker Production Hosting CHT</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/docker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/docker/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Read the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes-vs-docker/" >Docker vs Kubernetes&lt;/a> documentation to select a style of hosting that best fits your CHT deployment.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="hextra-cards hx-mt-4 hx-gap-4 hx-grid not-prose" style="--hextra-cards-grid-cols: 3;">
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/installation"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">&lt;path fill="currentColor" d="M20.17 9.82a4.76 4.76 0 0 0-.84.07a3.12 3.12 0 0 0-1.43-2.14l-.28-.16l-.19.27a3.7 3.7 0 0 0-.51 1.19a2.84 2.84 0 0 0 .33 2.22a4.11 4.11 0 0 1-1.45.35H2.63a.63.63 0 0 0-.63.62a9.6 9.6 0 0 0 .58 3.39a5 5 0 0 0 2 2.6a8.86 8.86 0 0 0 4.42.95a13.27 13.27 0 0 0 2.42-.18a10.09 10.09 0 0 0 3.19-1.15A8.9 8.9 0 0 0 16.78 16a11.94 11.94 0 0 0 2.13-3.67h.19a3.08 3.08 0 0 0 2.23-.84a2.36 2.36 0 0 0 .59-.87l.08-.22l-.2-.16a2.69 2.69 0 0 0-1.63-.42z"/>&lt;path fill="currentColor" d="M5.61 9.35H3.85a.16.16 0 0 0-.16.15v1.58a.16.16 0 0 0 .16.15h1.76a.16.16 0 0 0 .16-.15V9.5a.16.16 0 0 0-.16-.15zm2.44 0H6.28a.16.16 0 0 0-.16.15v1.58a.16.16 0 0 0 .16.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zm2.47 0H8.75a.15.15 0 0 0-.15.15v1.58a.15.15 0 0 0 .15.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zm.67 0a.15.15 0 0 0-.19.15v1.58a.15.15 0 0 0 .15.15H13a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zM6.28 7.09H8a.16.16 0 0 1 .16.16v1.56A.16.16 0 0 1 8 9H6.28a.15.15 0 0 1-.15-.15V7.24a.15.15 0 0 1 .15-.15zm2.47 0h1.77a.15.15 0 0 1 .15.15v1.57a.16.16 0 0 1-.16.16H8.75a.15.15 0 0 1-.15-.15V7.24a.15.15 0 0 1 .15-.15zm2.44 0H13a.15.15 0 0 1 .15.15v1.57A.15.15 0 0 1 13 9h-1.81a.16.16 0 0 1-.19-.19V7.24a.15.15 0 0 1 .19-.15z"/>&lt;rect width="2.07" height="1.88" x="11.04" y="4.82" fill="currentColor" rx=".15"/>&lt;path fill="currentColor" d="M13.65 9.35a.15.15 0 0 0-.15.15v1.58a.15.15 0 0 0 .15.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15z"/>&lt;/svg>Installation&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Installing the CHT on Docker&lt;/div>&lt;/a>
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/adding-tls-certificates"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>&lt;/svg>Adding TLS Certificates&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Ensuring all traffic is encrypted&lt;/div>&lt;/a>
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/logs"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>&lt;/svg>Logs&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">How to view logs&lt;/div>&lt;/a>
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/backups"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>&lt;/svg>Backups&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Backing up your production data&lt;/div>&lt;/a>
+&lt;/div></description></item><item><title>Kubernetes Production Hosting in CHT</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">Read the &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes-vs-docker/" >Docker vs Kubernetes&lt;/a> documentation to select a style of hosting that best fits your CHT deployment.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;div class="section-pages-list">
+&lt;h3>Content in this section &lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/gcp-multinode/">Production Hosting CHT - Google Cloud Platform&lt;/a>
+&lt;/li>
+&lt;li>
+&lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/self-hosting-k3s-multinode/">Production Hosting in CHT - Multiple CouchDB Nodes on k3s on VMWare&lt;/a>
+&lt;/li>
+&lt;/ul>
+&lt;/div></description></item><item><title>Migration Guides</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/migration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/migration/</guid><description>
+&lt;div class="hextra-cards hx-mt-4 hx-gap-4 hx-grid not-prose" style="--hextra-cards-grid-cols: 3;">
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="data-migration-3x-docker-to-4x-k3s-multi"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -10.44 722.846 722.846">&lt;path fill="currentColor" d="M358.986 10.06a46.725 46.342 0 0 0-17.905 4.531L96.735 131.341a46.725 46.342 0 0 0-25.28 31.437l-60.28 262.25a46.725 46.342 0 0 0 6.344 35.533 46.725 46.342 0 0 0 2.656 3.688l169.124 210.278a46.725 46.342 0 0 0 36.53 17.44l271.22-.062a46.725 46.342 0 0 0 36.532-17.408l169.062-210.312a46.725 46.342 0 0 0 9.03-39.22l-60.372-262.248a46.725 46.342 0 0 0-25.282-31.438L381.644 14.59a46.725 46.342 0 0 0-22.658-4.53zm2.42 52.492c9.256 0 16.76 8.34 16.761 18.624.005 1.458.086 3.415.035 4.763-.22 5.933-1.514 10.472-2.292 15.937-1.41 11.697-2.627 21.393-1.897 30.405.661 4.511 3.296 6.294 5.478 8.381.05 1.216.246 5.253.395 7.486 53.292 4.735 102.783 29.105 139.135 67.222l6.375-4.55c2.16.129 6.922.783 10.172-1.108 7.5-5.05 14.331-12.054 22.598-20.45 3.787-4.017 6.567-7.84 11.066-11.71 1.028-.884 2.58-2.068 3.724-2.974 8.04-6.415 19.227-5.731 25 1.505 5.771 7.236 3.92 18.297-4.12 24.71-1.133.912-2.61 2.176-3.69 2.974-4.774 3.526-9.172 5.33-13.93 8.13-10.025 6.19-18.335 11.323-24.926 17.512-3.114 3.33-2.88 6.483-3.152 9.49-.93.855-4.209 3.758-5.945 5.337 14.448 21.503 25.279 45.91 31.409 72.594 6.073 26.439 7.017 52.864 3.508 78.254l6.77 1.968c1.217 1.723 3.718 5.907 7.234 7.27 8.624 2.717 18.33 3.715 30.048 4.944 5.501.456 10.247.185 16.08 1.29 1.397.264 3.434.818 4.871 1.145 9.88 2.384 16.222 11.466 14.182 20.413-2.041 8.949-11.692 14.388-21.63 12.25-.073-.018-.177-.02-.253-.038-.112-.025-.21-.079-.321-.105-1.386-.305-3.121-.608-4.333-.932-5.734-1.535-9.888-3.826-15.042-5.801-11.09-3.977-20.277-7.302-29.225-8.596-4.545-.359-6.862 1.811-9.383 3.473-1.224-.245-4.994-.912-7.163-1.253-16.06 50.473-50.26 94.175-96.624 121.553.8 1.932 2.158 6.04 2.793 6.768-1.06 2.827-2.65 5.532-1.29 9.883 3.254 8.437 8.517 16.685 14.863 26.612 3.072 4.586 6.216 8.109 8.99 13.358.663 1.256 1.544 3.185 2.184 4.512 4.31 9.217 1.148 19.832-7.126 23.817-8.34 4.017-18.709-.226-23.173-9.492-.637-1.312-1.536-3.057-2.077-4.297-2.374-5.44-3.2-10.103-4.87-15.364-3.807-11.15-6.93-20.38-11.496-28.185-2.555-3.777-5.687-4.26-8.56-5.194-.531-.916-2.516-4.555-3.582-6.447a217.484 217.484 0 0 1-28.758 8.669c-43.49 9.874-87.027 5.867-125.921-9.062l-3.796 6.875c-2.826.757-5.551 1.525-7.224 3.52-6.104 7.282-8.539 18.97-12.974 30.11-1.67 5.26-2.46 9.923-4.835 15.363-.538 1.232-1.442 2.954-2.08 4.264-.004.01.006.025 0 .035-.005.014-.028.022-.035.036-4.473 9.235-14.807 13.463-23.134 9.455-8.275-3.984-11.436-14.6-7.128-23.817.64-1.326 1.486-3.256 2.15-4.512 2.772-5.25 5.917-8.808 8.99-13.395 6.345-9.927 11.917-18.83 15.17-27.265.818-2.804-.392-6.643-1.49-9.479l3.044-7.306c-44.615-26.437-79.849-68.569-96.661-120.694l-7.306 1.255c-1.959-1.097-5.898-3.695-9.634-3.403-8.95 1.295-18.136 4.618-29.225 8.595-5.156 1.976-9.307 4.231-15.04 5.767-1.213.324-2.948.663-4.335.967-.111.028-.209.083-.321.108-.075.016-.18.02-.252.035-9.939 2.142-19.588-3.3-21.631-12.247-2.042-8.947 4.303-18.028 14.182-20.415.073-.016.173-.053.25-.07l.145-.038c1.405-.329 3.192-.796 4.475-1.04 5.832-1.104 10.582-.83 16.083-1.287 11.717-1.229 21.422-2.226 30.046-4.942 2.735-1.122 5.348-4.881 7.199-7.27l7.02-2.042c-7.866-54.47 5.444-107.928 34.201-151.207l-5.372-4.798c-.343-2.092-.793-6.926-3.367-9.67-6.59-6.19-14.901-11.322-24.926-17.513-4.758-2.799-9.12-4.604-13.895-8.13-1.016-.75-2.37-1.897-3.475-2.792-.083-.064-.17-.115-.25-.18-8.042-6.411-9.89-17.475-4.118-24.712 3.246-4.07 8.205-6.085 13.358-5.908 4.007.136 8.157 1.6 11.675 4.404 1.144.906 2.703 2.093 3.724 2.972 4.5 3.872 7.244 7.696 11.031 11.711 8.267 8.396 15.097 15.365 22.598 20.413 3.94 2.296 6.964 1.374 9.957.97a280.97 280.971 0 0 0 6.053 4.296c28.527-30.267 65.998-52.685 109.518-62.568a218.134 218.134 0 0 1 30.299-4.655l.393-7.09c2.232-2.161 4.734-5.27 5.445-8.668.727-9.012-.453-18.708-1.862-30.405-.78-5.465-2.073-10.005-2.293-15.937-.045-1.216.021-2.9.034-4.3-.002-.155-.034-.305-.034-.463 0-10.285 7.504-18.623 16.76-18.624zm-20.987 130.005a176.633 176.633 0 0 0-17.872 3.08c-32.66 7.414-61.003 23.516-83.159 45.303l72.092 51.107.145-.07a14.69 14.69 0 0 0 8.702 2.827c7.948 0 14.42-6.28 14.755-14.145l.358-.18 4.979-87.922zm42.008 0 4.979 87.78.072.034a14.677 14.677 0 0 0 3.222 8.561c4.956 6.213 13.914 7.364 20.272 2.722l.249.105 71.628-50.782c-27.023-26.464-62.289-43.73-100.422-48.42zm-169.184 81.225c-19.535 31.825-28.79 69.998-24.497 109.267l84.379-24.354.07-.286a14.775 14.775 0 0 0 7.665-5.049c4.957-6.214 4.08-15.177-1.862-20.342l.072-.359-65.827-58.877zm295.859.035-65.468 58.592.036.178a14.653 14.653 0 0 0-4.693 7.845c-1.768 7.748 2.9 15.474 10.493 17.548l.073.359 84.807 24.424c1.796-18.296.703-37.227-3.653-56.192-4.409-19.195-11.815-36.9-21.595-52.754zm-161.199 63.39-16.797 20.916 6.018 26.145 24.281 11.674 24.211-11.639 6.016-26.143-16.76-20.953h-26.969zm86.456 71.7c-1.91.097-3.826.587-5.66 1.469-7.16 3.448-10.274 11.929-7.163 19.16l-.106.143 33.878 81.834c32.658-20.805 57.1-51.892 69.874-87.78l-87.278-14.755-.143.18a14.748 14.748 0 0 0-3.402-.25zm-146.587.357a15.06 15.06 0 0 0-2.9.253l-.144-.18-86.526 14.682c13.354 36.948 38.317 67.06 69.659 87.173l33.521-81.012-.252-.321a14.634 14.634 0 0 0 .826-9.097c-1.548-6.78-7.524-11.404-14.184-11.498zm73.095 35.493a14.795 14.795 0 0 0-12.498 7.807h-.072l-42.545 76.928c29.444 10.033 61.961 12.278 94.582 4.87a176.783 176.784 0 0 0 17.048-4.762l-42.653-77.073h-.324c-1.426-2.665-3.691-4.889-6.625-6.302a14.628 14.628 0 0 0-6.911-1.468h-.002z"/>&lt;/svg>To K3s Multi-node&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Guide to migrate existing data from CHT 3.x Docker Compose deployment to CHT 4.x clustered K3s deployment with 3 CouchDB nodes&lt;/div>&lt;/a>
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="data-migration-3x-docker-to-4x-k3s-single"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -10.44 722.846 722.846">&lt;path fill="currentColor" d="M358.986 10.06a46.725 46.342 0 0 0-17.905 4.531L96.735 131.341a46.725 46.342 0 0 0-25.28 31.437l-60.28 262.25a46.725 46.342 0 0 0 6.344 35.533 46.725 46.342 0 0 0 2.656 3.688l169.124 210.278a46.725 46.342 0 0 0 36.53 17.44l271.22-.062a46.725 46.342 0 0 0 36.532-17.408l169.062-210.312a46.725 46.342 0 0 0 9.03-39.22l-60.372-262.248a46.725 46.342 0 0 0-25.282-31.438L381.644 14.59a46.725 46.342 0 0 0-22.658-4.53zm2.42 52.492c9.256 0 16.76 8.34 16.761 18.624.005 1.458.086 3.415.035 4.763-.22 5.933-1.514 10.472-2.292 15.937-1.41 11.697-2.627 21.393-1.897 30.405.661 4.511 3.296 6.294 5.478 8.381.05 1.216.246 5.253.395 7.486 53.292 4.735 102.783 29.105 139.135 67.222l6.375-4.55c2.16.129 6.922.783 10.172-1.108 7.5-5.05 14.331-12.054 22.598-20.45 3.787-4.017 6.567-7.84 11.066-11.71 1.028-.884 2.58-2.068 3.724-2.974 8.04-6.415 19.227-5.731 25 1.505 5.771 7.236 3.92 18.297-4.12 24.71-1.133.912-2.61 2.176-3.69 2.974-4.774 3.526-9.172 5.33-13.93 8.13-10.025 6.19-18.335 11.323-24.926 17.512-3.114 3.33-2.88 6.483-3.152 9.49-.93.855-4.209 3.758-5.945 5.337 14.448 21.503 25.279 45.91 31.409 72.594 6.073 26.439 7.017 52.864 3.508 78.254l6.77 1.968c1.217 1.723 3.718 5.907 7.234 7.27 8.624 2.717 18.33 3.715 30.048 4.944 5.501.456 10.247.185 16.08 1.29 1.397.264 3.434.818 4.871 1.145 9.88 2.384 16.222 11.466 14.182 20.413-2.041 8.949-11.692 14.388-21.63 12.25-.073-.018-.177-.02-.253-.038-.112-.025-.21-.079-.321-.105-1.386-.305-3.121-.608-4.333-.932-5.734-1.535-9.888-3.826-15.042-5.801-11.09-3.977-20.277-7.302-29.225-8.596-4.545-.359-6.862 1.811-9.383 3.473-1.224-.245-4.994-.912-7.163-1.253-16.06 50.473-50.26 94.175-96.624 121.553.8 1.932 2.158 6.04 2.793 6.768-1.06 2.827-2.65 5.532-1.29 9.883 3.254 8.437 8.517 16.685 14.863 26.612 3.072 4.586 6.216 8.109 8.99 13.358.663 1.256 1.544 3.185 2.184 4.512 4.31 9.217 1.148 19.832-7.126 23.817-8.34 4.017-18.709-.226-23.173-9.492-.637-1.312-1.536-3.057-2.077-4.297-2.374-5.44-3.2-10.103-4.87-15.364-3.807-11.15-6.93-20.38-11.496-28.185-2.555-3.777-5.687-4.26-8.56-5.194-.531-.916-2.516-4.555-3.582-6.447a217.484 217.484 0 0 1-28.758 8.669c-43.49 9.874-87.027 5.867-125.921-9.062l-3.796 6.875c-2.826.757-5.551 1.525-7.224 3.52-6.104 7.282-8.539 18.97-12.974 30.11-1.67 5.26-2.46 9.923-4.835 15.363-.538 1.232-1.442 2.954-2.08 4.264-.004.01.006.025 0 .035-.005.014-.028.022-.035.036-4.473 9.235-14.807 13.463-23.134 9.455-8.275-3.984-11.436-14.6-7.128-23.817.64-1.326 1.486-3.256 2.15-4.512 2.772-5.25 5.917-8.808 8.99-13.395 6.345-9.927 11.917-18.83 15.17-27.265.818-2.804-.392-6.643-1.49-9.479l3.044-7.306c-44.615-26.437-79.849-68.569-96.661-120.694l-7.306 1.255c-1.959-1.097-5.898-3.695-9.634-3.403-8.95 1.295-18.136 4.618-29.225 8.595-5.156 1.976-9.307 4.231-15.04 5.767-1.213.324-2.948.663-4.335.967-.111.028-.209.083-.321.108-.075.016-.18.02-.252.035-9.939 2.142-19.588-3.3-21.631-12.247-2.042-8.947 4.303-18.028 14.182-20.415.073-.016.173-.053.25-.07l.145-.038c1.405-.329 3.192-.796 4.475-1.04 5.832-1.104 10.582-.83 16.083-1.287 11.717-1.229 21.422-2.226 30.046-4.942 2.735-1.122 5.348-4.881 7.199-7.27l7.02-2.042c-7.866-54.47 5.444-107.928 34.201-151.207l-5.372-4.798c-.343-2.092-.793-6.926-3.367-9.67-6.59-6.19-14.901-11.322-24.926-17.513-4.758-2.799-9.12-4.604-13.895-8.13-1.016-.75-2.37-1.897-3.475-2.792-.083-.064-.17-.115-.25-.18-8.042-6.411-9.89-17.475-4.118-24.712 3.246-4.07 8.205-6.085 13.358-5.908 4.007.136 8.157 1.6 11.675 4.404 1.144.906 2.703 2.093 3.724 2.972 4.5 3.872 7.244 7.696 11.031 11.711 8.267 8.396 15.097 15.365 22.598 20.413 3.94 2.296 6.964 1.374 9.957.97a280.97 280.971 0 0 0 6.053 4.296c28.527-30.267 65.998-52.685 109.518-62.568a218.134 218.134 0 0 1 30.299-4.655l.393-7.09c2.232-2.161 4.734-5.27 5.445-8.668.727-9.012-.453-18.708-1.862-30.405-.78-5.465-2.073-10.005-2.293-15.937-.045-1.216.021-2.9.034-4.3-.002-.155-.034-.305-.034-.463 0-10.285 7.504-18.623 16.76-18.624zm-20.987 130.005a176.633 176.633 0 0 0-17.872 3.08c-32.66 7.414-61.003 23.516-83.159 45.303l72.092 51.107.145-.07a14.69 14.69 0 0 0 8.702 2.827c7.948 0 14.42-6.28 14.755-14.145l.358-.18 4.979-87.922zm42.008 0 4.979 87.78.072.034a14.677 14.677 0 0 0 3.222 8.561c4.956 6.213 13.914 7.364 20.272 2.722l.249.105 71.628-50.782c-27.023-26.464-62.289-43.73-100.422-48.42zm-169.184 81.225c-19.535 31.825-28.79 69.998-24.497 109.267l84.379-24.354.07-.286a14.775 14.775 0 0 0 7.665-5.049c4.957-6.214 4.08-15.177-1.862-20.342l.072-.359-65.827-58.877zm295.859.035-65.468 58.592.036.178a14.653 14.653 0 0 0-4.693 7.845c-1.768 7.748 2.9 15.474 10.493 17.548l.073.359 84.807 24.424c1.796-18.296.703-37.227-3.653-56.192-4.409-19.195-11.815-36.9-21.595-52.754zm-161.199 63.39-16.797 20.916 6.018 26.145 24.281 11.674 24.211-11.639 6.016-26.143-16.76-20.953h-26.969zm86.456 71.7c-1.91.097-3.826.587-5.66 1.469-7.16 3.448-10.274 11.929-7.163 19.16l-.106.143 33.878 81.834c32.658-20.805 57.1-51.892 69.874-87.78l-87.278-14.755-.143.18a14.748 14.748 0 0 0-3.402-.25zm-146.587.357a15.06 15.06 0 0 0-2.9.253l-.144-.18-86.526 14.682c13.354 36.948 38.317 67.06 69.659 87.173l33.521-81.012-.252-.321a14.634 14.634 0 0 0 .826-9.097c-1.548-6.78-7.524-11.404-14.184-11.498zm73.095 35.493a14.795 14.795 0 0 0-12.498 7.807h-.072l-42.545 76.928c29.444 10.033 61.961 12.278 94.582 4.87a176.783 176.784 0 0 0 17.048-4.762l-42.653-77.073h-.324c-1.426-2.665-3.691-4.889-6.625-6.302a14.628 14.628 0 0 0-6.911-1.468h-.002z"/>&lt;/svg>To K3s Single-node&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Guide on how to migrate existing data from CHT 3.x Docker Compose deployment to CHT 4.x single-node K3s deployment&lt;/div>&lt;/a>
+&lt;a
+class="hextra-card hx-group hx-flex hx-flex-col hx-justify-start hx-overflow-hidden hx-rounded-lg hx-border hx-border-gray-200 hx-text-current hx-no-underline dark:hx-shadow-none hover:hx-shadow-gray-100 dark:hover:hx-shadow-none hx-shadow-gray-100 active:hx-shadow-sm active:hx-shadow-gray-200 hx-transition-all hx-duration-200 hover:hx-border-gray-300 hx-bg-transparent hx-shadow-sm dark:hx-border-neutral-800 hover:hx-bg-slate-50 hover:hx-shadow-md dark:hover:hx-border-neutral-700 dark:hover:hx-bg-neutral-900"href="migration-to-4x-docker"
+>&lt;span class="hextra-card-icon hx-flex hx-font-semibold hx-items-start hx-gap-2 hx-pt-4 hx-px-4 hx-text-gray-700 hover:hx-text-gray-900 dark:hx-text-neutral-200 dark:hover:hx-text-neutral-50">&lt;svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">&lt;path fill="currentColor" d="M20.17 9.82a4.76 4.76 0 0 0-.84.07a3.12 3.12 0 0 0-1.43-2.14l-.28-.16l-.19.27a3.7 3.7 0 0 0-.51 1.19a2.84 2.84 0 0 0 .33 2.22a4.11 4.11 0 0 1-1.45.35H2.63a.63.63 0 0 0-.63.62a9.6 9.6 0 0 0 .58 3.39a5 5 0 0 0 2 2.6a8.86 8.86 0 0 0 4.42.95a13.27 13.27 0 0 0 2.42-.18a10.09 10.09 0 0 0 3.19-1.15A8.9 8.9 0 0 0 16.78 16a11.94 11.94 0 0 0 2.13-3.67h.19a3.08 3.08 0 0 0 2.23-.84a2.36 2.36 0 0 0 .59-.87l.08-.22l-.2-.16a2.69 2.69 0 0 0-1.63-.42z"/>&lt;path fill="currentColor" d="M5.61 9.35H3.85a.16.16 0 0 0-.16.15v1.58a.16.16 0 0 0 .16.15h1.76a.16.16 0 0 0 .16-.15V9.5a.16.16 0 0 0-.16-.15zm2.44 0H6.28a.16.16 0 0 0-.16.15v1.58a.16.16 0 0 0 .16.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zm2.47 0H8.75a.15.15 0 0 0-.15.15v1.58a.15.15 0 0 0 .15.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zm.67 0a.15.15 0 0 0-.19.15v1.58a.15.15 0 0 0 .15.15H13a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15zM6.28 7.09H8a.16.16 0 0 1 .16.16v1.56A.16.16 0 0 1 8 9H6.28a.15.15 0 0 1-.15-.15V7.24a.15.15 0 0 1 .15-.15zm2.47 0h1.77a.15.15 0 0 1 .15.15v1.57a.16.16 0 0 1-.16.16H8.75a.15.15 0 0 1-.15-.15V7.24a.15.15 0 0 1 .15-.15zm2.44 0H13a.15.15 0 0 1 .15.15v1.57A.15.15 0 0 1 13 9h-1.81a.16.16 0 0 1-.19-.19V7.24a.15.15 0 0 1 .19-.15z"/>&lt;rect width="2.07" height="1.88" x="11.04" y="4.82" fill="currentColor" rx=".15"/>&lt;path fill="currentColor" d="M13.65 9.35a.15.15 0 0 0-.15.15v1.58a.15.15 0 0 0 .15.15h1.77a.15.15 0 0 0 .15-.15V9.5a.15.15 0 0 0-.15-.15z"/>&lt;/svg>To Docker Single-Node&lt;/span>&lt;div class="hextra-card-subtitle hx-line-clamp-3 hx-text-sm hx-font-normal hx-text-gray-500 dark:hx-text-gray-400 hx-px-4 hx-mb-4 hx-mt-2">Guide to migrate existent data from CHT 3.x to CHT 4.x&lt;/div>&lt;/a>
+&lt;/div>
+&lt;h3>Related forum posts&lt;span class="hx-absolute -hx-mt-20" id="related-forum-posts">&lt;/span>
+&lt;a href="#related-forum-posts" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;ul>
+&lt;li>&lt;a href="https://forum.communityhealthtoolkit.org/t/restoring-corrupted-couchdb-database/4551/1" target="_blank" rel="noopener">&amp;ldquo;Restoring corrupted couchdb database&amp;rdquo;&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Troubleshooting upgrades</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">4.0.0 was released in November of 2022 so 4.x is mature and users have learned a number of important lessons on how to fix failed upgrades. Below are some specific tips as well as general practices on upgrading.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>There&amp;rsquo;s a concept of upgrades &amp;ldquo;getting stuck&amp;rdquo; which mainly means that after many many hours an upgrade is not making any progress. Most likely, this will manifest as the progress bars in the upgrade admin web UI not increasing and &amp;ldquo;sticking&amp;rdquo; at a certain percentage. An alternate possibility is that the progress bars disappear altogether.&lt;/p>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-amber-200 hx-bg-amber-100 hx-text-amber-900 dark:hx-border-amber-200/30 dark:hx-bg-amber-900/30 dark:hx-text-amber-200">
+&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>&lt;/svg>Warning&lt;/p>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>All tips apply to both &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/" >Docker&lt;/a> and &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/kubernetes/" >Kubernetes&lt;/a> based deployments unless otherwise specified.
+All upgrades are expected to succeed without issue. Do not attempt any fixes unless you actively have a problem upgrading.&lt;/p>&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;h2>Considerations&lt;span class="hx-absolute -hx-mt-20" id="considerations">&lt;/span>
+&lt;a href="#considerations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>When troubleshooting, consider making sure there are:&lt;/p>
+&lt;ul>
+&lt;li>Backups exist and restores have been tested&lt;/li>
+&lt;li>Extra disk space is availabe (up to 5x!)&lt;/li>
+&lt;li>The upgrade has been tested on a development instance with production data&lt;/li>
+&lt;/ul>
+&lt;h2>A go-to fix: restart&lt;span class="hx-absolute -hx-mt-20" id="a-go-to-fix-restart">&lt;/span>
+&lt;a href="#a-go-to-fix-restart" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A safe fix for any upgrade getting stuck is to restart all services. Any views that were being re-indexed will be picked up where they left off without losing any work. This should be your first step when trouble shooting a stuck upgrade.&lt;/p>
+&lt;p>If you&amp;rsquo;re able to, after a restart go back into the admin web GUI and try to upgrade again. Consider trying this at least twice.&lt;/p>
+&lt;h2>CHT 4.0.x - 4.3.x: CouchDB Crashes&lt;span class="hx-absolute -hx-mt-20" id="cht-40x---43x-couchdb-crashes">&lt;/span>
+&lt;a href="#cht-40x---43x-couchdb-crashes" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;strong>&lt;a href="https://github.com/medic/cht-core/issues/9286" target="_blank" rel="noopener">Issue #9286&lt;/a>&lt;/strong>: Starting an upgrade that involves view indexing can cause CouchDB to crash on large databases (&amp;gt;30m docs). The upgrade will fail and you will see the logs below when you have this issue.&lt;/p>
+&lt;p>HAProxy:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&amp;lt;150&amp;gt;Jul &lt;span class="m">26&lt;/span> 20:57:39 haproxy&lt;span class="o">[&lt;/span>12&lt;span class="o">]&lt;/span>: 172.22.0.4,&amp;lt;NOSRV&amp;gt;,503,0,0,0,GET,/,-,medic,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>,217,-1,-,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;150&amp;gt;Jul &lt;span class="m">26&lt;/span> 20:57:40 haproxy&lt;span class="o">[&lt;/span>12&lt;span class="o">]&lt;/span>: 172.22.0.4,&amp;lt;NOSRV&amp;gt;,503,0,0,0,GET,/,-,medic,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>,217,-1,-,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;150&amp;gt;Jul &lt;span class="m">26&lt;/span> 20:57:41 haproxy&lt;span class="o">[&lt;/span>12&lt;span class="o">]&lt;/span>: 172.22.0.4,&amp;lt;NOSRV&amp;gt;,503,0,0,0,GET,/,-,medic,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>,217,-1,-,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>CouchDB&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>notice&lt;span class="o">]&lt;/span> 2024-07-26T20:52:45.229027Z couchdb@127.0.0.1 &amp;lt;0.10998.4&amp;gt; dca1387a05 haproxy:5984 172.22.0.4 medic GET /_active_tasks &lt;span class="m">200&lt;/span> ok &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>notice&lt;span class="o">]&lt;/span> 2024-07-26T20:52:45.234397Z couchdb@127.0.0.1 &amp;lt;0.10986.4&amp;gt; 2715cd1e47 haproxy:5984 172.22.0.4 medic GET /medic-logs/_all_docs?descending&lt;span class="o">=&lt;/span>true&lt;span class="p">&amp;amp;&lt;/span>&lt;span class="nv">include_docs&lt;/span>&lt;span class="o">=&lt;/span>true&lt;span class="p">&amp;amp;&lt;/span>&lt;span class="nv">startkey&lt;/span>&lt;span class="o">=&lt;/span>%22upgrade_log%3A1722027165223%3A%22&lt;span class="p">&amp;amp;&lt;/span>&lt;span class="nv">limit&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> &lt;span class="m">200&lt;/span> ok &lt;span class="m">6&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>notice&lt;span class="o">]&lt;/span> 2024-07-26T20:52:45.468469Z couchdb@127.0.0.1 &amp;lt;0.11029.4&amp;gt; 3bf85c6071 haproxy:5984 172.22.0.4 medic GET /_active_tasks &lt;span class="m">200&lt;/span> ok &lt;span class="m">1&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>Fix:&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>Check that all the indexes are warmed by loading them one by one in fauxton.&lt;/li>
+&lt;li>Restart all services, &lt;strong>retry&lt;/strong> upgrade from Admin GUI, do not cancel and upgrade. Here&amp;rsquo;s a screenshot showing the retry button:&lt;/li>
+&lt;/ol>
+&lt;figure>&lt;a href="retry.upgrade.png">&lt;img src="https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/retry.upgrade.png"
+alt="Admin web GUI showing Retry upgrade button in the lower right">&lt;/a>&lt;figcaption>
+&lt;p>Admin web GUI showing Retry upgrade button in the lower right&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;h2>CHT 4.0.0 - 4.2.2: view indexing can become stuck after indexing is finished&lt;span class="hx-absolute -hx-mt-20" id="cht-400---422-view-indexing-can-become-stuck-after-indexing-is-finished">&lt;/span>
+&lt;a href="#cht-400---422-view-indexing-can-become-stuck-after-indexing-is-finished" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;strong>&lt;a href="https://github.com/medic/cht-core/issues/9617" target="_blank" rel="noopener">Issue #9617&lt;/a>:&lt;/strong> Starting an upgrade that involves view indexing can become stuck after indexing is finished&lt;/p>
+&lt;p>Upgrade process stalls while trying to index staged views:&lt;/p>
+&lt;figure>&lt;a href="stalled-upgrade.png">&lt;img src="https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/stalled-upgrade.png"
+alt="CHT Core admin UI showing upgrade progress bar stalled at 4%">&lt;/a>&lt;figcaption>
+&lt;p>CHT Core admin UI showing upgrade progress bar stalled at 4%&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>&lt;strong>Fix:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>When API goes stuck after view indexing, simply restart API.&lt;/li>
+&lt;li>The admin upgrade page will say that the upgrade was interrupted, click retry upgrade.&lt;/li>
+&lt;li>Depending on the state of the database, you might see view indexing again. Depending on how many docs need to be indexed, indexing might get stuck again. Go back to 1 if that happens.&lt;/li>
+&lt;li>Eventually, when indexing jobs are short enough not to trigger a request hang, you will get the button to complete the upgrade.&lt;/li>
+&lt;/ul>
+&lt;h2>CHT 4.0.1 - 4.9.0: CouchDB restart causes all services to go down&lt;span class="hx-absolute -hx-mt-20" id="cht-401---490-couchdb-restart-causes-all-services-to-go-down">&lt;/span>
+&lt;a href="#cht-401---490-couchdb-restart-causes-all-services-to-go-down" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;strong>Note&lt;/strong> - This is a Docker only issue.&lt;/p>
+&lt;p>&lt;strong>&lt;a href="https://github.com/medic/cht-core/issues/9284" target="_blank" rel="noopener">Issue #9284&lt;/a>&lt;/strong>: A couchdb restart in single node docker takes down the whole instance. The upgrade will fail and you will see the logs below when you have this issue.&lt;/p>
+&lt;p>Haproxy reports &lt;code>NOSRV&lt;/code> errors:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&amp;lt;150&amp;gt;Jul &lt;span class="m">25&lt;/span> 18:11:03 haproxy&lt;span class="o">[&lt;/span>12&lt;span class="o">]&lt;/span>: 172.18.0.9,&amp;lt;NOSRV&amp;gt;,503,0,1001,0,GET,/,-,admin,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>,241,-1,-,&lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>API logs:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">StatusCodeError: &lt;span class="m">503&lt;/span> - &lt;span class="o">{&lt;/span>&lt;span class="s2">&amp;#34;error&amp;#34;&lt;/span>:&lt;span class="s2">&amp;#34;503 Service Unavailable&amp;#34;&lt;/span>,&lt;span class="s2">&amp;#34;reason&amp;#34;&lt;/span>:&lt;span class="s2">&amp;#34;No server is available to handle this request&amp;#34;&lt;/span>,&lt;span class="s2">&amp;#34;server&amp;#34;&lt;/span>:&lt;span class="s2">&amp;#34;haproxy&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>nginx reports:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">2024/07/25 18:40:28 &lt;span class="o">[&lt;/span>error&lt;span class="o">]&lt;/span> 43#43: *5757 connect&lt;span class="o">()&lt;/span> failed &lt;span class="o">(&lt;/span>111: Connection refused&lt;span class="o">)&lt;/span> &lt;span class="k">while&lt;/span> connecting to upstream, client: 172.18.0.1, &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>Fix:&lt;/strong> Restart all services&lt;/p>
+&lt;h2>CHT 4.x.x upgrade to 4.x.x - no more free disk space&lt;span class="hx-absolute -hx-mt-20" id="cht-4xx-upgrade-to-4xx---no-more-free-disk-space">&lt;/span>
+&lt;a href="#cht-4xx-upgrade-to-4xx---no-more-free-disk-space" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;strong>Issue*:&lt;/strong> Couch is crashing during upgrade. The upgrade will fail and you will see the logs below when you have this issue. While there&amp;rsquo;s two log scenarios, both have the same fix.&lt;/p>
+&lt;p>CouchDB logs scenario 1:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>error&lt;span class="o">]&lt;/span> 2024-11-04T20:42:37.275307Z couchdb@127.0.0.1 &amp;lt;0.29099.2438&amp;gt; -------- rexi_server: from: couchdb@127.0.0.1&lt;span class="o">(&lt;/span>&amp;lt;0.3643.2436&amp;gt;&lt;span class="o">)&lt;/span> mfa: fabric_rpc:all_docs/3 exit:timeout &lt;span class="o">[{&lt;/span>rexi,init_stream,1,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,265&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>rexi,stream2,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,205&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>fabric_rpc,view_cb,2,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/fabric_rpc.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,462&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_mrview,finish_fold,2,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_mrview.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,682&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>rexi_server,init_p,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi_server.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,140&lt;span class="o">}]}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>error&lt;span class="o">]&lt;/span> 2024-11-04T20:42:37.275303Z couchdb@127.0.0.1 &amp;lt;0.10933.2445&amp;gt; -------- rexi_server: from: couchdb@127.0.0.1&lt;span class="o">(&lt;/span>&amp;lt;0.3643.2436&amp;gt;&lt;span class="o">)&lt;/span> mfa: fabric_rpc:all_docs/3 exit:timeout &lt;span class="o">[{&lt;/span>rexi,init_stream,1,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,265&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>rexi,stream2,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,205&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>fabric_rpc,view_cb,2,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/fabric_rpc.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,462&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_mrview,map_fold,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_mrview.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,526&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_bt_engine,include_reductions,4,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_bt_engine.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,1074&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_bt_engine,skip_deleted,4,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_bt_engine.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,1069&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_btree,stream_kv_node2,8,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_btree.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,848&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_btree,stream_kp_node,8,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_btree.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,819&lt;span class="o">}]}]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>error&lt;span class="o">]&lt;/span> 2024-11-04T20:42:37.275377Z couchdb@127.0.0.1 &amp;lt;0.7374.2434&amp;gt; -------- rexi_server: from: couchdb@127.0.0.1&lt;span class="o">(&lt;/span>&amp;lt;0.3643.2436&amp;gt;&lt;span class="o">)&lt;/span> mfa: fabric_rpc:all_docs/3 exit:timeout &lt;span class="o">[{&lt;/span>rexi,init_stream,1,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,265&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>rexi,stream2,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/rexi.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,205&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>fabric_rpc,view_cb,2,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/fabric_rpc.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,462&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_mrview,map_fold,3,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_mrview.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,526&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_bt_engine,include_reductions,4,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_bt_engine.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,1074&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_bt_engine,skip_deleted,4,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_bt_engine.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,1069&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_btree,stream_kv_node2,8,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_btree.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,848&lt;span class="o">}]}&lt;/span>,&lt;span class="o">{&lt;/span>couch_btree,stream_kp_node,8,&lt;span class="o">[{&lt;/span>file,&lt;span class="s2">&amp;#34;src/couch_btree.erl&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>,&lt;span class="o">{&lt;/span>line,819&lt;span class="o">}]}]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>CouchDB logs scenario 2:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>info&lt;span class="o">]&lt;/span> 2024-11-04T20:18:46.692239Z couchdb@127.0.0.1 &amp;lt;0.6832.4663&amp;gt; -------- Starting compaction &lt;span class="k">for&lt;/span> db &lt;span class="s2">&amp;#34;shards/7ffffffe-95555552/medic-user-mikehaya-meta.1690191139&amp;#34;&lt;/span> at &lt;span class="m">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>info&lt;span class="o">]&lt;/span> 2024-11-04T20:19:47.821999Z couchdb@127.0.0.1 &amp;lt;0.7017.4653&amp;gt; -------- Starting compaction &lt;span class="k">for&lt;/span> db &lt;span class="s2">&amp;#34;shards/7ffffffe-95555552/medic-user-marnyakoa-meta.1690202463&amp;#34;&lt;/span> at &lt;span class="m">21&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>info&lt;span class="o">]&lt;/span> 2024-11-04T20:21:24.529822Z couchdb@127.0.0.1 &amp;lt;0.24125.4661&amp;gt; -------- Starting compaction &lt;span class="k">for&lt;/span> db &lt;span class="s2">&amp;#34;shards/7ffffffe-95555552/medic-user-lilian_lubanga-meta.1690115504&amp;#34;&lt;/span> at &lt;span class="m">15&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>Fix:&lt;/strong> Give CouchDB more disk and Restart all services&lt;/p>
+&lt;p>&lt;em>* See eCHIS Kenya &lt;a href="https://github.com/moh-kenya/config-echis-2.0/issues/2578#issuecomment-2455702112" target="_blank" rel="noopener">Issue #2578&lt;/a> - a private repo and not available to the public&lt;/em>&lt;/p>
+&lt;h2>CHT 4.2.x upgrade to 4.11 - Kubernetes has pods stuck in indeterminate state&lt;span class="hx-absolute -hx-mt-20" id="cht-42x-upgrade-to-411----kubernetes-has-pods-stuck-in-indeterminate-state">&lt;/span>
+&lt;a href="#cht-42x-upgrade-to-411----kubernetes-has-pods-stuck-in-indeterminate-state" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;strong>Note&lt;/strong> - This is a Kubernetes only issue.&lt;/p>
+&lt;p>&lt;strong>Issue*:&lt;/strong> A number of pods were stuck in indeterminate state, presumably because of failed garbage collection&lt;/p>
+&lt;p>API Logs:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">2024-11-04 19:33:56 ERROR: Server error: StatusCodeError: &lt;span class="m">500&lt;/span> - &lt;span class="o">{&lt;/span>&lt;span class="s2">&amp;#34;message&amp;#34;&lt;/span>:&lt;span class="s2">&amp;#34;Error: Can&amp;#39;t upgrade right now.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> The following pods are not ready....&amp;#34;&lt;/span>&lt;span class="o">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Running &lt;code>kubectl get po&lt;/code> shows 3 pods with status of &lt;code>ContainerStatusUnknown&lt;/code>:&lt;/p>
+&lt;figure>&lt;a href="container-status-unknown.png">&lt;img src="https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/container-status-unknown.png"
+alt="CLI screenshot showing 3 pods with STATUS of ContainerStatusUnknown">&lt;/a>&lt;figcaption>
+&lt;p>CLI screenshot showing 3 pods with STATUS of ContainerStatusUnknown&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>&lt;strong>Fix:&lt;/strong> delete pods so they get recreated and start cleanly&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">kubectl delete po &lt;span class="s1">&amp;#39;cht.service in (api, sentinel, haproxy, couchdb)&amp;#39;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;em>* See eCHIS Kenya &lt;a href="https://github.com/moh-kenya/config-echis-2.0/issues/2579#issuecomment-2455637516" target="_blank" rel="noopener">Issue #2579&lt;/a> - a private repo and not available to the public&lt;/em>&lt;/p></description></item></channel></rss>
