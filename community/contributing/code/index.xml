@@ -1967,6 +1967,113 @@ title="Copy code"
 &lt;/li>
 &lt;/ul>
 &lt;/li>
+&lt;/ul></description></item><item><title>Test Data Generator for CHT Test Instances</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/test-data-generator/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/test-data-generator/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">🚫&lt;/div>&lt;/div>
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">It is not recommended to use this tool to push data into production instances.&lt;/div>
+&lt;/div>
+&lt;/div>
+&lt;p>Design the test data that fits your project hierarchy and reports. The tool will generate CouchDB docs and push them into your CHT test instance.&lt;/p>
+&lt;h2>Technologies and Packages Used&lt;span class="hx-absolute -hx-mt-20" id="technologies-and-packages-used">&lt;/span>
+&lt;a href="#technologies-and-packages-used" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>TypeScript&lt;/li>
+&lt;li>Axios&lt;/li>
+&lt;li>UUID&lt;/li>
+&lt;li>Faker&lt;/li>
+&lt;/ul>
+&lt;h2>Minimum System Requirements&lt;span class="hx-absolute -hx-mt-20" id="minimum-system-requirements">&lt;/span>
+&lt;a href="#minimum-system-requirements" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
+&lt;li>npm &amp;gt;= 10.2.4&lt;/li>
+&lt;li>node &amp;gt;= 20.11.0&lt;/li>
+&lt;/ul>
+&lt;h2>Setup and Getting Started&lt;span class="hx-absolute -hx-mt-20" id="setup-and-getting-started">&lt;/span>
+&lt;a href="#setup-and-getting-started" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Instructions on setting up the project and getting it running on a local machine:&lt;/p>
+&lt;ol>
+&lt;li>Set the &lt;code>COUCH_URL&lt;/code> environment variable to point to your test instance, for example: &lt;code>http://[user]:[pass]@[host]:[port]/medic&lt;/code>&lt;/li>
+&lt;li>Double-check your CHT test instance is running&lt;/li>
+&lt;li>Clone or fork the &lt;a href="https://github.com/medic/test-data-generator" target="_blank" rel="noopener">test data generator repository&lt;/a>&lt;/li>
+&lt;li>Install and build the project by running &lt;code>npm ci&lt;/code> in the project root folder&lt;/li>
+&lt;li>Design the test data in a custom JavaScript file. See section on &lt;a href="#designing-test-data" >designing test data&lt;/a>.&lt;/li>
+&lt;li>Build, generate data and upload by running &lt;code>npm run generate *path_to_your_custom_design_file*&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3>Install test data generator globally&lt;span class="hx-absolute -hx-mt-20" id="install-test-data-generator-globally">&lt;/span>
+&lt;a href="#install-test-data-generator-globally" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Another option is to install the tool globally:&lt;/p>
+&lt;ol>
+&lt;li>Install package dependencies and build the project &lt;code>npm ci&lt;/code>&lt;/li>
+&lt;li>Run &lt;code>npm install -g&lt;/code> in the project root folder&lt;/li>
+&lt;li>Build, generate and upload data by running &lt;code>tdg &amp;lt;path_to_your_custom_design_file&amp;gt;&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h3>Use it with Docker&lt;span class="hx-absolute -hx-mt-20" id="use-it-with-docker">&lt;/span>
+&lt;a href="#use-it-with-docker" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The tool is also available in Docker:&lt;/p>
+&lt;ol>
+&lt;li>Create the image &lt;code>docker build -t test-data-generator .&lt;/code>&lt;/li>
+&lt;li>Run the container &lt;code>docker run --rm -it -v &amp;lt;folder_path_of_your_design_file&amp;gt;:/app/test-data -e COUCH_URL=&amp;lt;test_instance_CouchDB_URL&amp;gt; -e FILE=&amp;lt;your_design_file&amp;gt; test-data-generator&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h2>Designing Test Data&lt;span class="hx-absolute -hx-mt-20" id="designing-test-data">&lt;/span>
+&lt;a href="#designing-test-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Steps to design the test data:&lt;/p>
+&lt;ol>
+&lt;li>Create a custom JavaScript file that exports a &lt;code>default&lt;/code> function. This function should match the &lt;a href="https://github.com/medic/test-data-generator/blob/main/src/doc-design.ts" target="_blank" rel="noopener">&lt;code>DocDesign&lt;/code> type&lt;/a>.&lt;/li>
+&lt;li>Your custom function should return an array of &lt;a href="https://github.com/medic/test-data-generator/blob/main/src/doc-design.ts" target="_blank" rel="noopener">&lt;code>DesignSpec&lt;/code>&lt;/a> objects that define the structure of the data to be created.&lt;/li>
+&lt;li>Generate and upload data &lt;code>npm run generate *path_to_your_custom_design_file*&lt;/code>. That&amp;rsquo;s all! You can check the data in the CHT&amp;rsquo;s CouchDB.&lt;/li>
+&lt;/ol>
+&lt;p>Note that &lt;code>getDoc&lt;/code> function should return an object with at least a &lt;code>type: string&lt;/code>. Remember that &lt;code>type&lt;/code> is a &lt;code>data_record&lt;/code> for reports, but when it comes to contacts, use the &lt;code>contact_types&lt;/code> defined in your CHT project&amp;rsquo;s &lt;code>app-settings.json&lt;/code> file.&lt;/p>
+&lt;h3>Example&lt;span class="hx-absolute -hx-mt-20" id="example">&lt;/span>
+&lt;a href="#example" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kr">import&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">faker&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="nx">from&lt;/span> &lt;span class="s1">&amp;#39;@faker-js/faker&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// API Reference: https://fakerjs.dev/api
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">export&lt;/span> &lt;span class="k">default&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">amount&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">14&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// This creates 14 reports
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">getDoc&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;data_record&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">form&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;pregnancy_facility_visit_reminder&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fields&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">patient_name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">faker&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">person&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">firstName&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">amount&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// This creates 10 hospitals
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">getDoc&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;district_hospital&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="sb">`&lt;/span>&lt;span class="si">${&lt;/span> &lt;span class="nx">faker&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">location&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">city&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="si">}&lt;/span>&lt;span class="sb">&amp;#39;s hospital`&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">children&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">amount&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="c1">// This creates 5 people per each hospital
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">getDoc&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">({&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">faker&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">person&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">firstName&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Based on the example above, the tool will create and push 14 report docs at once (the &lt;code>amount&lt;/code> is also the batch size pushed into the CHT instance), it then creates 10 hospitals docs, and lastly creates 5 people docs for each hospital (it&amp;rsquo;s sent in groups of 5 docs to the CHT instance).&lt;/p>
+&lt;p>See the &lt;a href="https://github.com/medic/test-data-generator/tree/main/sample-designs" target="_blank" rel="noopener">sample-designs&lt;/a> folder for more examples.&lt;/p>
+&lt;h2>Performance considerations&lt;span class="hx-absolute -hx-mt-20" id="performance-considerations">&lt;/span>
+&lt;a href="#performance-considerations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Many factors can affect the performance of the generator including the number of documents to generate, the size of the documents, the network speed, and the server&amp;rsquo;s performance. When adding large datasets (100,000+ documents) to a database with existing views (e.g. the &lt;code>medic&lt;/code> database), Couch&amp;rsquo;s view indexing jobs can significantly impact the performance of the generator.&lt;/p>
+&lt;p>Under optimal conditions, running against a local CouchDB instance and inserting data into a new database with no views, the document creation rate has been measured at &lt;code>~360,000 docs/min&lt;/code>.&lt;/p>
+&lt;p>However, when running against a local CouchDB instance and inserting data into an existing &lt;code>medic&lt;/code> database, the measured document creation rate was &lt;code>~8000 docs/min&lt;/code>.&lt;/p>
+&lt;h3>Generate then replicate&lt;span class="hx-absolute -hx-mt-20" id="generate-then-replicate">&lt;/span>
+&lt;a href="#generate-then-replicate" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>When generating a massive dataset (100,000+ documents) for an existing database with views (e.g. the &lt;code>medic&lt;/code> database), it is advisable to generate the data into a temporary database (on the same CouchDB instance) and then replicate the data into the target database (for example, using the Fauxton form at &lt;code>_utils/#/replication/_create&lt;/code>). The document creation rate for this process (including generating into the temp DB, replicating to &lt;code>medic&lt;/code> DB, and indexing views) has been measured at &lt;code>~11,000 docs/min&lt;/code>.&lt;/p>
+&lt;p>While the speed gains of this approach are somewhat modest, it has a couple additional benefits:&lt;/p>
+&lt;ul>
+&lt;li>The time spent running the actual generation script is minimal (since docs are added to the temp db at &lt;code>~360,000 docs/min&lt;/code>). Therefore, there is less risk of the script being interrupted or becoming disconnected from the CouchDB instance.
+Once all the docs are saved in the temp DB, the replication/indexing happens internally within the Couch instance. This is where the vast majority of the time is spent.&lt;/li>
+&lt;li>You can keep your generated dataset in the temp DB for future use, without having to regenerate it each time you want to test with it.&lt;/li>
 &lt;/ul></description></item><item><title>Design Documents Guide</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/design-docs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/design-docs/</guid><description>
 &lt;h2>What are design docs?&lt;span class="hx-absolute -hx-mt-20" id="what-are-design-docs">&lt;/span>
 &lt;a href="#what-are-design-docs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Software development is not just about writing code, but rather about solving problems and building the right solutions. Before diving into an initiative or feature and starting coding, it’s essential that the developers (and other team members) have a high-level understanding of what a solution might look like.&lt;/p>
@@ -2080,4 +2187,673 @@ That’s something to improve, not outsource to someone else. Even still, the QA
 &lt;div class="hx-p-2 hx-overflow-hidden">
 Automating more. That can be in more end-to-end tests for better regression testing, automating mobile device testing, adding better structures to enable the whole team to automate better, improving CI pipeline, etc.
 &lt;/div>
-&lt;/details></description></item></channel></rss>
+&lt;/details></description></item><item><title>Revalidate invalid reports</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/</guid><description>
+&lt;p>You may encounter a dreaded case when reports coming in to a Medic Webapp instance have a red indicator instead of the green indicator.&lt;/p>
+&lt;figure>&lt;a href="invalid_report.png">&lt;img src="https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/invalid_report.png"
+alt="Invalid reports">&lt;/a>&lt;figcaption>
+&lt;p>Invalid reports&lt;/p>
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>This may be caused by:&lt;/p>
+&lt;ul>
+&lt;li>Missing forms in the &lt;code>app_settings&lt;/code> config.&lt;/li>
+&lt;li>Missing or incorrect fields in the input form. e.g Missing patient ID, or Patient ID with letters&lt;/li>
+&lt;li>Extra fields in the input form. This happens when you don&amp;rsquo;t configure for some fields in the app_settings.json of the webapp&lt;/li>
+&lt;li>Configuring some forms in the wrong section of the app_settings i.e &lt;code>registrations&lt;/code> and &lt;code>patient_reports&lt;/code>. Forms that don&amp;rsquo;t have a patient_id field because it is generated afterwards, e.g ANCR, IMMR, go to the &lt;code>registrations&lt;/code> section, while form that have a patient_id field e.g ANCP, ANCV, IMMV; go to the &lt;code>patient_reports&lt;/code> section&lt;/li>
+&lt;/ul>
+&lt;h2>How to solve&lt;span class="hx-absolute -hx-mt-20" id="how-to-solve">&lt;/span>
+&lt;a href="#how-to-solve" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To revalidate an invalid report, we need to clear the errors field on the doc (set it to []). Updating this field from Futon will not work and will result in an endless update process. The recommended way to do it is to download the doc, update it and then upload it. This will also ensure propagation and replication in couchdb.&lt;/p>
+&lt;p>To download a doc, use:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>curl &amp;#39;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt;&amp;#39; &amp;gt; filename.json&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;code>filename.json&lt;/code> is the local file in your computer you have stored the doc json&lt;/p>
+&lt;p>Update &lt;code>filename.json&lt;/code>: Set &amp;ldquo;errors&amp;rdquo; to [] and remove &amp;ldquo;accept_patient_reports&amp;rdquo; transition so that sentinel can revalidate the report.&lt;/p>
+&lt;p>Upload &lt;code>filename.json&lt;/code> with:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;pre>&lt;code>curl -X PUT hhttps://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt; -d @filename.json --header &amp;#34;Content-Type: application/json&amp;#34;&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div></description></item><item><title>CSV to Docs</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/csv-to-docs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/csv-to-docs/</guid><description>
+&lt;h2>Seeding data with cht-conf&lt;span class="hx-absolute -hx-mt-20" id="seeding-data-with-cht-conf">&lt;/span>
+&lt;a href="#seeding-data-with-cht-conf" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Users, contacts, and report data can be specified in comma-separated value (CSV) files, then converted to JavaScript Object Notation (JSON) files and uploaded into your instance using &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">cht-conf&lt;/a>. This documentation will cover the CSV notation used, fetching CSV files from Google Sheets, converting the CSV files into JSON docs, and then uploading the data from the JSON files to your instance.&lt;/p>
+&lt;h3>Converting CSVs&lt;span class="hx-absolute -hx-mt-20" id="converting-csvs">&lt;/span>
+&lt;a href="#converting-csvs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Running &lt;code>cht-conf&lt;/code> with the &lt;code>csv-to-docs&lt;/code> action converts CSV files from the &lt;code>csv&lt;/code> folder into JSON docs to be uploaded to your instance. The JSON files are stored in the &lt;code>json_docs&lt;/code> folder. Instructions for creating the CSV files are in sections below.&lt;/p>
+&lt;h3>Uploading CSVs&lt;span class="hx-absolute -hx-mt-20" id="uploading-csvs">&lt;/span>
+&lt;a href="#uploading-csvs" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Running &lt;code>cht-conf&lt;/code> with the &lt;code>upload-docs&lt;/code> action will upload the JSON docs that were generated from the CSV files to your instance. For example, running &lt;code>cht --local upload-docs&lt;/code> will upload the converted docs into your local instance. The target location &lt;code>--local&lt;/code> can be replaced with an instance or URL. See &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">cht-conf&lt;/a> for detailed instructions.&lt;/p>
+&lt;h3>Creating CSV files for Contacts, Reports&lt;span class="hx-absolute -hx-mt-20" id="creating-csv-files-for-contacts-reports">&lt;/span>
+&lt;a href="#creating-csv-files-for-contacts-reports" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>A separate CSV file is needed for each type of place, person, or report in your project&amp;rsquo;s local &lt;code>csv&lt;/code> folder. The name of the file determines the type of doc created for rows contained in the file. The possible types are: &lt;code>report&lt;/code>, &lt;code>person&lt;/code>, and &lt;code>place&lt;/code>. Each of these has a further specifier provided in the filename:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>place.{place_type}.csv&lt;/code>: where &lt;code>{place_type}&lt;/code> is the type of place specified in the file. By default, the place types are one of &lt;code>clinic&lt;/code>, &lt;code>health_center&lt;/code>, or &lt;code>district_hospital&lt;/code>. As of 3.7 of the &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener">Core Framework&lt;/a>, the number of place types and their names can be configured — the &lt;code>{place_type}&lt;/code> should match with the hierarchy names used.&lt;/li>
+&lt;li>&lt;code>person.{parent_place_type}.csv&lt;/code>: where &lt;code>{parent_place_type}&lt;/code> is the type of place to which the people in the file will belong.&lt;/li>
+&lt;li>&lt;code>report.{form_id}.csv&lt;/code>: where &lt;code>{form_id}&lt;/code> is the form ID for all the reports in the file. You will need one file per form ID&lt;/li>
+&lt;/ul>
+&lt;p>Here are some examples:&lt;/p>
+&lt;ul>
+&lt;li>File named &lt;code>place.district_hospital.csv&lt;/code> adds the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;district_hospital&amp;quot;&lt;/code>&lt;/li>
+&lt;li>File named &lt;code>person.clinic.csv&lt;/code> add the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;person&amp;quot;&lt;/code>&lt;/li>
+&lt;li>File named &lt;code>report.immunization_visit.csv&lt;/code> add the property &lt;code>&amp;quot;type&amp;quot;:&amp;quot;report&amp;quot;, &amp;quot;form&amp;quot;:&amp;quot;immunization_visit&amp;quot;&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>In each of these files a header row is used to specify the JSON field names, and each subsequent row specifies the corresponding values for a doc. A &lt;code>_id&lt;/code> field is automatically generated with a universally unique identifier.&lt;/p>
+&lt;p>Here is an example of a &lt;code>csv/person.clinic.csv&lt;/code> file for people belonging to clinics:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">sex&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">date_of_birth&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">Adriana Akiyama&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">female&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">1985-12-31&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">Becky Backlund&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">female&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">1987-10-17&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">Carson Crane&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">male&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">2015-01-23&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Here is the table representation of the CSV:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>name&lt;/th>
+&lt;th>sex&lt;/th>
+&lt;th>date_of_birth&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Adriana Akiyama&lt;/td>
+&lt;td>female&lt;/td>
+&lt;td>1985-12-31&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Becky Backlund&lt;/td>
+&lt;td>female&lt;/td>
+&lt;td>1987-10-17&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Carson Crane&lt;/td>
+&lt;td>male&lt;/td>
+&lt;td>2015-01-23&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Converting that CSV file to JSON docs with the &lt;code>csv-to-docs&lt;/code> action would generate three files, one for each person. Here is one of the corresponding JSON files, &lt;code>json_docs/dbfbc0f0-117a-59ec-9542-3313fb10ef25.doc.json&lt;/code>, which was created from the CSV data above:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Adriana Akiyama&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sex&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;female&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;date_of_birth&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1985-12-31&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;dbfbc0f0-117a-59ec-9542-3313fb10ef25&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Special notations&lt;span class="hx-absolute -hx-mt-20" id="special-notations">&lt;/span>
+&lt;a href="#special-notations" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;h4>Specifying property type&lt;span class="hx-absolute -hx-mt-20" id="specifying-property-type">&lt;/span>
+&lt;a href="#specifying-property-type" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>By default, values are parsed as strings. To parse a CSV column as a different JSON type, append the JSON type name to the column definition, e.g.&lt;/p>
+&lt;pre>&lt;code>column_one,column_two:bool,column_three:int,column_four:float,column_five:date,column_six:timestamp
+some string,true,1,2.3,2017-12-31,1513255007072
+&lt;/code>&lt;/pre>
+&lt;p>This would create a structure such as:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;09efb53f-9cd8-524c-9dfd-f62c242f1817&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_one&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;some string&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_two&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_three&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_four&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">2.3&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_five&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2017-12-31T00:00:00.000Z&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;column_six&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1513255007072&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h5>Excluding column&lt;span class="hx-absolute -hx-mt-20" id="excluding-column">&lt;/span>
+&lt;a href="#excluding-column" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h5>&lt;p>A special column type, &lt;code>excluded&lt;/code>, is used for excluding a column from the final JSON data:&lt;/p>
+&lt;pre>&lt;code>my_column_that_will_not_be_a_property:excluded
+&lt;/code>&lt;/pre>
+&lt;p>This can be useful if using a column for doc references.&lt;/p>
+&lt;h4>Available types&lt;span class="hx-absolute -hx-mt-20" id="available-types">&lt;/span>
+&lt;a href="#available-types" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>type&lt;/th>
+&lt;th>outcome&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>date&lt;/td>
+&lt;td>Creates a date using Date() in javascript&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-date&lt;/td>
+&lt;td>Creates a date with the addition of number days to the current date. A negative number results in a past date.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>timestamp&lt;/td>
+&lt;td>Sets the string passed in as a timestamp number. If the timestamp in the csv is in milliseconds that will be used. If a date is passed it will be parsed and the milliseconds returned. EX: 04 Dec 1995 00:12:00 GMT becomes 818035920000&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rel-timestamp&lt;/td>
+&lt;td>Creates a timestamp that is offset by milliseconds against the current(NOW) timestamp. A negative number results in a past timestamp&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>int&lt;/td>
+&lt;td>Parses the value as an int using Number.parseInt()&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>bool&lt;/td>
+&lt;td>Sets boolean value based on string passed, either &lt;code>&amp;quot;true&amp;quot;&lt;/code> or &lt;code>&amp;quot;false&amp;quot;&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>Sets the value as the string being interpreted. Can be omitted if values are only strings.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>float&lt;/td>
+&lt;td>Sets value using Number.parseFloat()&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3>Including another doc&lt;span class="hx-absolute -hx-mt-20" id="including-another-doc">&lt;/span>
+&lt;a href="#including-another-doc" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Often times database documents need to include or refer to other documents in the database. This can be achieved with queries across CSV files, which is done by specifying a query in the column header. The query specifies the doc type (&lt;code>person&lt;/code> or &lt;code>place&lt;/code>) and matching condition.&lt;/p>
+&lt;p>For instance, to include the parent district&amp;rsquo;s doc in a health center&amp;rsquo;s doc, the &lt;code>parent:place WHERE reference_id=COL_VAL&lt;/code> column header is used. The &lt;code>COL_VAL&lt;/code> is a special notation for that column&amp;rsquo;s value for the row, and it will be used to match against the &lt;code>reference_id&lt;/code> field in all other places. Given these example CSVs, you can see the corresponding JSON structure:&lt;/p>
+&lt;p>&lt;strong>&lt;code>place.district.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>D3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>&lt;code>place.health_center.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent:place WHERE reference_id=COL_VAL&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_2&lt;/td>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_3&lt;/td>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>&lt;code>480d0cd0-c021-5d55-8c63-d86576d592fc.doc.json&lt;/code>&lt;/strong>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;D2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;notes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;f223f240-5d6a-5a7a-91d4-46d3c59de73e&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HC7&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;notes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;480d0cd0-c021-5d55-8c63-d86576d592fc&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h5>Including value from another doc&lt;span class="hx-absolute -hx-mt-20" id="including-value-from-another-doc">&lt;/span>
+&lt;a href="#including-value-from-another-doc" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h5>&lt;p>Similar to including another doc, it is also possible to get the value of a specific field in another doc. For instance, if &lt;code>parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/code> were used in the example above, the &lt;code>parent&lt;/code> field&amp;rsquo;s value would have been set to the &lt;code>_id&lt;/code> of the referred to doc instead of including the whole doc. Note that &lt;code>_id&lt;/code> is a generated value included in all generated docs.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent:GET _id OF place WHERE reference_id=COL_VAL&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>district_1&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_2&lt;/td>
+&lt;td>district_2&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC2&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>health_center_3&lt;/td>
+&lt;td>district_3&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC3&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The resulting doc would be as follows, with the &lt;code>_id&lt;/code> from &lt;code>district_1&lt;/code> as the &lt;code>parent&lt;/code> value:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HC3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;notes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h5>Link to a parent document already existing in the database&lt;span class="hx-absolute -hx-mt-20" id="link-to-a-parent-document-already-existing-in-the-database">&lt;/span>
+&lt;a href="#link-to-a-parent-document-already-existing-in-the-database" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h5>&lt;p>You may wish to link the new record to a parent document that already exists in the database that was created in the past.
+Get the UUID of the existing parent document and place it in the column named &lt;code>parent._id&lt;/code>. Get the rest of the the parent UUIDs in the hierarchy lineage and track them in separate columns. It is important to track all levels of the hierarchy as certain app features (e.g Tasks) in the configuration could be directly referencing a UUID deeper in the hierrarchy.&lt;/p>
+&lt;p>For example, a parent document below can be linked as shown in the table&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;66142fef-c4b4-4578-94e2-3d7f1a304ef7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>reference_id:excluded&lt;/th>
+&lt;th>parent._id&lt;/th>
+&lt;th>parent.parent._id&lt;/th>
+&lt;th>is_name_generated&lt;/th>
+&lt;th>name&lt;/th>
+&lt;th>reported_date:timestamp&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>health_center_1&lt;/td>
+&lt;td>0c31056a-3a80-54dd-b136-46145d451a66&lt;/td>
+&lt;td>66142fef-c4b4-4578-94e2-3d7f1a304ef7&lt;/td>
+&lt;td>false&lt;/td>
+&lt;td>HC1&lt;/td>
+&lt;td>1544031155715&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The resulting doc would be as follows:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;0c31056a-3a80-54dd-b136-46145d451a66&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;66142fef-c4b4-4578-94e2-3d7f1a304ef7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;45293356-353c-5eb1-9a41-baa3427b4f69&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Creating CSV files for users&lt;span class="hx-absolute -hx-mt-20" id="creating-csv-files-for-users">&lt;/span>
+&lt;a href="#creating-csv-files-for-users" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To create user accounts from CSV files, a &lt;code>users.csv&lt;/code> file will be needed in the &lt;code>csv&lt;/code> folder. The &lt;code>users.csv&lt;/code> file requires columns for &lt;code>username&lt;/code> and &lt;code>password&lt;/code>. Additional columns can be used for any additional fields needed on the user&amp;rsquo;s doc, for example &lt;code>roles&lt;/code>, &lt;code>phone&lt;/code>. Running the &lt;code>csv-to-docs&lt;/code> &lt;code>upload-docs&lt;/code> &lt;code>create-users&lt;/code> actions in that order will generate the necessary JSON docs with a &lt;code>users.csv&lt;/code> file in your working directory, and then create the people, places, and users.&lt;/p>
+&lt;p>The following sections describe the different ways to associate the new users to contacts.&lt;/p>
+&lt;h4>Creating new users with existing contacts&lt;span class="hx-absolute -hx-mt-20" id="creating-new-users-with-existing-contacts">&lt;/span>
+&lt;a href="#creating-new-users-with-existing-contacts" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>When creating users that are associated to existing contacts, &lt;code>contact&lt;/code> and &lt;code>place&lt;/code> columns should be created. Each row should have the UUID of an existing person for &lt;code>contact&lt;/code>, and an existing place for &lt;code>place&lt;/code>.&lt;/p>
+&lt;h3>Creating new users with new contacts&lt;span class="hx-absolute -hx-mt-20" id="creating-new-users-with-new-contacts">&lt;/span>
+&lt;a href="#creating-new-users-with-new-contacts" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To create new contacts for each new user provide values for &lt;code>contact.name&lt;/code>, &lt;code>place.name&lt;/code>, and &lt;code>place.parent&lt;/code> (can be existing place), as seen in this example CSV:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">username&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">password&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">roles&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">phone&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">contact.name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">place.c_prop&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">place.type&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">place.name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">place.parent&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">alice&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district-admin&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Alice Example&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Alice&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_val_a&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">alice area&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_uuid&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">bob&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district-admin&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">bob Example&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">bob&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_val_a&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">bob area&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">disctrict_uuid&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>The &lt;code>username&lt;/code>, &lt;code>password&lt;/code>, &lt;code>contact.name&lt;/code>, &lt;code>place.type&lt;/code>, &lt;code>place.name&lt;/code> columns are required to have functional users with new places.&lt;/p>
+&lt;h3>Creating new users linked to contacts in CSV files&lt;span class="hx-absolute -hx-mt-20" id="creating-new-users-linked-to-contacts-in-csv-files">&lt;/span>
+&lt;a href="#creating-new-users-linked-to-contacts-in-csv-files" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To associate the new users to contacts that will also be created with the &lt;code>csv-to-docs&lt;/code> action, use reference queries to the contacts.
+For instance, the column header for the person would be &lt;code>contact:person WHERE reference_id=COL_VAL&lt;/code>, and for the place would be &lt;code>place:GET _id OF place WHERE reference_id=COL_VAL&lt;/code>.&lt;/p>
+&lt;p>Here is a example of how the three CSV files need to be configured to setup a user linked to existing place and contact.&lt;/p>
+&lt;p>&lt;strong>&lt;code>csv/place.health_center.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">reference_id:excluded&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">parent:place WHERE reference_id=COL_VAL&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">is_name_generated&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">reported_date:timestamp&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">FALSE&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">HC1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">1544031155715&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Generated JSON doc for the health center:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;District1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;notes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;FALSE&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>&lt;code>csv/person.csv&lt;/code>:&lt;/strong>&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">reference_id:excluded&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">parent:place WHERE reference_id=COL_VAL&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">phone&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">sex&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">role&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">reported_date&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">patient_id&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">p_hc1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Bob Johnson 1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+16143291527&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">male&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">manager&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">1552494835669&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">60951&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">p_hc2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Bob Johnson 2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+16143291528&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">male&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">manager&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">1552494835669&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">60951&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>Generated JSON doc for the person:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;health_center&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;district_hospital&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parent&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;District1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;external_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;notes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;geolocation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;e8f9739a-5d37-5b1e-be3c-a571b2c2409b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;is_name_generated&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;FALSE&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HC1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1544031155715&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Bob Johnson 1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;phone&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;+16143291527&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sex&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;male&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;role&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;manager&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reported_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1552494835669&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;patient_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;60951&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>&lt;strong>&lt;code>csv/users.csv&lt;/code>&lt;/strong>:&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">username&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">password&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">roles&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">phone&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">contact:person WHERE reference_id=COL_VAL&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">place:GET _id OF place WHERE reference_id=COL_VAL&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">ac1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_admin:red1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_hc1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">ac2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_admin:supervisor&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_hc2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">ac3&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_admin&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_hc3&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s">ac4&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">Secret_1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">district_admin&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">+123456789&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">p_hc4&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">health_center_1&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>This will generate the &lt;code>users.csv&lt;/code> file in the working directory which is used by the &lt;code>create-users&lt;/code> action. The contact and place fields should be resolved to the actual UUIDs.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-csv" data-lang="csv">&lt;span class="line">&lt;span class="cl">&lt;span class="s">p_hc1&amp;#34;username&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;password&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;roles&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;contact&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;phone&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;place&amp;#34;&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s2">&amp;#34;ac1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;Secret_1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;district_admin:red1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;65c52076-84c5-53a2-baca-88e6ec6e0875&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;+123456789&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>&lt;span class="p">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&lt;/span>&lt;span class="s2">&amp;#34;ac2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;Secret_1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;district_admin:supervisor&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;b7d0dbd5-beeb-52a8-8e4c-513d0baece8e&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;+123456789&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;8606a91a-f454-56e3-a089-0b686af3c6b7&amp;#34;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Using CSV files on Google Drive&lt;span class="hx-absolute -hx-mt-20" id="using-csv-files-on-google-drive">&lt;/span>
+&lt;a href="#using-csv-files-on-google-drive" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Individual Google Sheets can be used for each CSV file, which can be exported manually to CSV file format, or linked to your project to be downloaded by cht-conf.&lt;/p>
+&lt;p>To fetch the files from Google Drive run the &lt;code>fetch-csvs-from-google-drive&lt;/code> action in cht-conf. This will download the CSV files specified in the &lt;code>csvs-on-google-drive.json&lt;/code> file, and place them into the &lt;code>csv&lt;/code> folder.&lt;/p>
+&lt;h4>Linking to Google Drive&lt;span class="hx-absolute -hx-mt-20" id="linking-to-google-drive">&lt;/span>
+&lt;a href="#linking-to-google-drive" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>The file &lt;code>csvs-on-google-drive.json&lt;/code> in your project&amp;rsquo;s home directory will consist of a key value pair for each CSV file. The keys must be the filename where the CSV will be stored locally — see the CSV &lt;a href="#creating-csv-files-for-contacts-reports" >file documentation above&lt;/a> for the notation. The value of each key must be the ID of the corresponding file in Google Drive — the ID can be obtained from the URL eg &lt;code>https://docs.google.com/spreadsheets/d/{FILE_ID}/edit&lt;/code>.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;person.clinic.csv&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="s2">&amp;#34;google_drive_ID&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;h3>Google Drive authentication&lt;span class="hx-absolute -hx-mt-20" id="google-drive-authentication">&lt;/span>
+&lt;a href="#google-drive-authentication" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Cht-conf leverages Google authentication to access Google Drive. You will need to create a client_secrets file named &lt;code>.gdrive.secrets.json&lt;/code> and place it in your working directory, and &lt;a href="https://developers.google.com/identity/protocols/OAuth2InstalledApp" target="_blank" rel="noopener">create a token&lt;/a>.&lt;/p>
+&lt;p>Create the &lt;code>.gdrive.secrets.json&lt;/code> file by downloading the &lt;code>client_secrets.json&lt;/code> from Google. You will need a &lt;code>CLIENT_ID&lt;/code>, &lt;code>CLIENT_SECRET&lt;/code> and &lt;code>REDIRECT_URL&lt;/code>. You can find these pieces of information by going to the Developer Console, clicking your project &amp;ndash;&amp;gt; APIs &amp;amp; auth &amp;ndash;&amp;gt; credentials &amp;ndash;&amp;gt; Download JSON. This will download the credentials but will need modified to be in this structure.&lt;/p>
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
+&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;client_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;client_id&amp;gt;.apps.googleusercontent.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;project_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;proj_id&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;auth_uri&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://accounts.google.com/o/oauth2/auth&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;token_uri&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://accounts.google.com/o/oauth2/token&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;auth_provider_x509_cert_url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://www.googleapis.com/oauth2/v1/certs&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;client_secret&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;client_secret&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;redirect_uris&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;urn:ietf:wg:oauth:2.0:oob&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;http://localhost&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+>
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
+&lt;/button>
+&lt;/div>
+&lt;/div>
+&lt;p>See Google&amp;rsquo;s docs &lt;a href="https://github.com/googleapis/google-api-nodejs-client#user-content-oauth2-client" target="_blank" rel="noopener">here&lt;/a> on Oauth2&lt;/p></description></item><item><title>Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/replicating-production-data-locally/</guid><description>
+&lt;p>Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p>
+&lt;ul>
+&lt;li>Copy the data from an instance to a local CouchDB database&lt;/li>
+&lt;li>Run a local webapp instance with that data&lt;/li>
+&lt;/ul>
+&lt;h2>First, a note about data safety&lt;span class="hx-absolute -hx-mt-20" id="first-a-note-about-data-safety">&lt;/span>
+&lt;a href="#first-a-note-about-data-safety" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an encrypted drive and delete it once you&amp;rsquo;re done with it.&lt;/p>
+&lt;h2>Step 1: Get the data&lt;span class="hx-absolute -hx-mt-20" id="step-1-get-the-data">&lt;/span>
+&lt;a href="#step-1-get-the-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p>
+&lt;h3>Small production instances&lt;span class="hx-absolute -hx-mt-20" id="small-production-instances">&lt;/span>
+&lt;a href="#small-production-instances" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p>
+&lt;p>For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
+For command line, see: &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#replicate" target="_blank" rel="noopener">https://docs.couchdb.org/en/stable/api/server/common.html#replicate&lt;/a>&lt;/p>
+&lt;p>Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code>login&lt;/code> (ie &lt;code>https://url/login&lt;/code>) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p>
+&lt;h3>Large production instances&lt;span class="hx-absolute -hx-mt-20" id="large-production-instances">&lt;/span>
+&lt;a href="#large-production-instances" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p>
+&lt;ol>
+&lt;li>Open Firefox and navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>false&lt;/code> to disable Content Security Policies.&lt;/li>
+&lt;li>Navigate to the instance and login as the user with the data you want. &lt;em>(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em>&lt;/li>
+&lt;li>Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em>(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em>&lt;/li>
+&lt;li>Make sure your local CouchDB has CORS enabled: &lt;a href="https://docs.couchdb.org/en/stable/config/http.html#cors" target="_blank" rel="noopener">https://docs.couchdb.org/en/stable/config/http.html#cors&lt;/a>. Consider using &lt;a href="https://github.com/pouchdb/add-cors-to-couchdb#user-content-what-it-does" target="_blank" rel="noopener">add-cors-to-couchdb&lt;/a> or its recommended settings.&lt;/li>
+&lt;li>Allow your CouchDB to be accessible via &lt;code>https&lt;/code>. One way is to run &lt;code>ngrok http PORT&lt;/code>. The &lt;code>PORT&lt;/code> &lt;em>(&lt;code>5984&lt;/code> by default)&lt;/em> can be found in database configuration using fauxton under the &lt;code>chttpd&lt;/code> section. This will make your CouchDB accessible via a url like &lt;code>https://abcd1234.ngrok.io&lt;/code>.&lt;/li>
+&lt;li>Open the console in Firefox and run &lt;code>await PouchDB.replicate('medic-user-XXX', 'https://your:admin@abcd1234.ngrok.io/YYY');&lt;/code>. Here &lt;code>XXX&lt;/code> is the name you logged in as, and &lt;code>YYY&lt;/code> is the name of a database in which to store the data.
+&lt;ul>
+&lt;li>&lt;strong>Note&lt;/strong>: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth); and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code>5984&lt;/code> and &lt;code>5986&lt;/code> to localhost.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li>
+&lt;li>Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li>
+&lt;li>Navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>true&lt;/code> to re-enable Content Security Policies.&lt;/li>
+&lt;/ol>
+&lt;h3>Regardless, do this too&lt;span class="hx-absolute -hx-mt-20" id="regardless-do-this-too">&lt;/span>
+&lt;a href="#regardless-do-this-too" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To log in as a specific prod user you need to also copy them from the prod &lt;code>_users&lt;/code> database into your own local &lt;code>_users&lt;/code> database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code>_users&lt;/code> DB and paste it in, deleting the &lt;code>_rev&lt;/code> property.&lt;/p>
+&lt;p>You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code>password&lt;/code> property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p>
+&lt;h2>Step 2, run it locally&lt;span class="hx-absolute -hx-mt-20" id="step-2-run-it-locally">&lt;/span>
+&lt;a href="#step-2-run-it-locally" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener">Horticulturalist&lt;/a>.&lt;/p>
+&lt;p>A local development environment will be useful to you if:&lt;/p>
+&lt;ul>
+&lt;li>You want to change code locally&lt;/li>
+&lt;li>You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li>
+&lt;li>You want to deploy a version of the code older than &lt;code>2.14.0&lt;/code>, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li>
+&lt;/ul>
+&lt;h3>Option 1, local development environment&lt;span class="hx-absolute -hx-mt-20" id="option-1-local-development-environment">&lt;/span>
+&lt;a href="#option-1-local-development-environment" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" >development setup instructions&lt;/a>.&lt;/p>
+&lt;p>Then you need to:&lt;/p>
+&lt;ol>
+&lt;li>Push the code you want to run via &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY npm run build-dev&lt;/code>.&lt;/li>
+&lt;li>Start API and Sentinel by running &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;p>Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p>
+&lt;h3>Option 2, horticulturalist&lt;span class="hx-absolute -hx-mt-20" id="option-2-horticulturalist">&lt;/span>
+&lt;a href="#option-2-horticulturalist" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Follow the instructions on the &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener">horticulturalist repo&lt;/a> to get it installed. Then:&lt;/p>
+&lt;ol>
+&lt;li>Make sure that the &lt;code>medic&lt;/code> DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li>
+&lt;li>Replicate your local PROD DB into a new &lt;code>medic&lt;/code> database using the Fauxton console.&lt;/li>
+&lt;li>Run &lt;code>horti --local --bootstrap=XXX&lt;/code>, where &lt;code>XXX&lt;/code> is the version you want to use (maybe the same one as production?)&lt;/li>
+&lt;/ol>
+&lt;p>You should now be able to log in as that user locally!&lt;/p></description></item></channel></rss>

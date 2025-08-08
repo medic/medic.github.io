@@ -23,7 +23,7 @@
 &lt;li>&lt;strong>Patient data&lt;/strong> such as personal details, information about visits, reports, tasks, and messages.&lt;/li>
 &lt;/ul>
 &lt;p>Both of these types of data are cached on the device because they are required for the user to do their job. The CHT Core Framework uses &lt;a href="https://pouchdb.com/" target="_blank" rel="noopener">PouchDB&lt;/a> to store the data on the device&amp;rsquo;s disk. Once cached, when the application starts up the code is executed, which reads the data, allowing the user to do their job regardless of the quality of their internet connection.&lt;/p>
-&lt;p>If the user creates new patient data by registering a family or completing a task the application stores this in the phone&amp;rsquo;s cache and attempts to submit this to the server. Periodically the application checks to see if there is new data on the server that is relevant to the user and if so, it updates the cache. This process of sending and receiving data updates is called &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/performance/replication/" >replication&lt;/a>, and is performed without interrupting the user from their work.&lt;/p>
+&lt;p>If the user creates new patient data by registering a family or completing a task the application stores this in the phone&amp;rsquo;s cache and attempts to submit this to the server. Periodically the application checks to see if there is new data on the server that is relevant to the user and if so, it updates the cache. This process of sending and receiving data updates is called &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/replication/" >replication&lt;/a>, and is performed without interrupting the user from their work.&lt;/p>
 &lt;h2>FAQs from CHT contributors&lt;span class="hx-absolute -hx-mt-20" id="faqs-from-cht-contributors">&lt;/span>
 &lt;a href="#faqs-from-cht-contributors" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
 &lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
@@ -95,465 +95,73 @@ A: Maybe. There are some things that cannot be done offline first because they e
 &lt;li>In Chrome or Firefox go to the application URL, log in, and wait for the webapp to finish loading completely.&lt;/li>
 &lt;li>Follow these &lt;a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Add_to_home_screen" target="_blank" rel="noopener">instructions for PWA installation&lt;/a>.&lt;/li>
 &lt;/ol>
-&lt;p>Now the application can be used offline just like a regular Android application.&lt;/p></description></item><item><title>Database schema conventions</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/db-schema/</guid><description>
-&lt;p>CouchDB (and PouchDB in the browser) is a JSON-based NoSQL datastore that we use to store our data. While unlike SQL databases there is no enforced schema, code still follows conventions, and this document aims to describe the schema as defined by how our code operates.&lt;/p>
-&lt;p>In this document &amp;ldquo;record&amp;rdquo; means a JSON object that resides in CouchDB or PouchDB.&lt;/p>
-&lt;h2>General record data structure&lt;span class="hx-absolute -hx-mt-20" id="general-record-data-structure">&lt;/span>
-&lt;a href="#general-record-data-structure" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Property&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;th>Required by&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>&lt;code>_id&lt;/code>&lt;/td>
-&lt;td>CouchDB&amp;rsquo;s unique identifier of the record&lt;/td>
-&lt;td>all records&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;code>_rev&lt;/code>&lt;/td>
-&lt;td>CouchDB&amp;rsquo;s revision marker&lt;/td>
-&lt;td>all records&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;code>type&lt;/code>&lt;/td>
-&lt;td>The general type of the document, see below&lt;/td>
-&lt;td>all user-created* documents&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;code>reported_date&lt;/code>&lt;/td>
-&lt;td>Numerical timestamp of when the document is first created&lt;/td>
-&lt;td>all user-created documents&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
-&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">ℹ️&lt;/div>&lt;/div>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">*User-created documents here generally means contacts and reports, but may extend further.&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;h2>Contacts (Persons and Places)&lt;span class="hx-absolute -hx-mt-20" id="contacts-persons-and-places">&lt;/span>
-&lt;a href="#contacts-persons-and-places" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Contacts are either places (e.g. clinic), groupings (e.g. family) or people (e.g. a patient or CHW).&lt;/p>
-&lt;p>The &lt;code>type&lt;/code> property of contact records depends on the version of Medic you are running:&lt;/p>
-&lt;ul>
-&lt;li>If you are running 3.7 or later you get to &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/#app_settingsjson-contact_types" >configure your contact hierarchy&lt;/a>, and the &lt;code>type&lt;/code> of contacts is &lt;code>contact&lt;/code>, and the configured type is in the &lt;code>contact_type&lt;/code> property.&lt;/li>
-&lt;li>In earlier versions the type depended on hierarchical location of the contact. There are 3 hard coded place types: &lt;code>district_hospital&lt;/code>, &lt;code>health_centre&lt;/code> and &lt;code>clinic&lt;/code> and one people type &lt;code>person&lt;/code>. These place names are often meaningless (hence the configurable contact hierarchy in later versions) to the configured project, and are textually (ie in the UI not in data structures) renamed to mean other things. For example, as &lt;code>clinic&lt;/code> is the lowest level it is often used to represent a family.&lt;/li>
-&lt;/ul>
-&lt;h3>Places&lt;span class="hx-absolute -hx-mt-20" id="places">&lt;/span>
-&lt;a href="#places" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Represent either an actual physical location such as a clinic, or a grouping such as a family or region.&lt;/p>
-&lt;p>Unless a place is at the top of the hierarchy it has a &lt;code>parent&lt;/code> place.&lt;/p>
-&lt;p>Each location has a primary contact, which is a &lt;code>person&lt;/code> contact stored in the &lt;code>contact&lt;/code> property.&lt;/p>
-&lt;h3>People&lt;span class="hx-absolute -hx-mt-20" id="people">&lt;/span>
-&lt;a href="#people" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>People are both patients in the system and users of the system, such as CHWs or Nurses. Users have additional records marking them as users of the system (see &lt;a href="#users" >User&lt;/a> below).&lt;/p>
-&lt;p>People always have a &lt;code>parent&lt;/code> place.&lt;/p>
-&lt;h3>Parent hierarchy representation&lt;span class="hx-absolute -hx-mt-20" id="parent-hierarchy-representation">&lt;/span>
-&lt;a href="#parent-hierarchy-representation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Contacts &lt;strong>store&lt;/strong> their parent hierarchy as a minified hierarchical structure, which records the &lt;code>_id&lt;/code> of each parent up until the top of the hierarchy:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;health_centre-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;district_hospital-id&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>Generally when contacts are &lt;strong>used&lt;/strong> in the app they are first &amp;ldquo;hydrated&amp;rdquo;, with the rest of the information filled in from their parent&amp;rsquo;s place documents:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A clinic&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1234&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;health_centre-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A Health Centre&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1134&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;district_hospital-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;THE District Hospital&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1034&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>&lt;em>See Also&lt;/em>: &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/data/hydration/">Document hydration&lt;/a>&lt;/p>
-&lt;p>As of version &lt;strong>3.10&lt;/strong>, you can connect contacts with other documents via the &lt;code>linked_docs&lt;/code> property. This allows the app to have access to these linked documents when the contact is used.&lt;/p>
-&lt;p>Like the parent hierarchy, linked docs are stored as a minified object, where every linked doc is identified by a string tag and the UUID of the document it represents.&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">linked_docs&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;some-contact-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;other-contact-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag3&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;report-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>Linked docs are shallowly &amp;ldquo;hydrated&amp;rdquo; along with the parent hierarchy:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A patient&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;clinic-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A clinic&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1234&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;health_centre-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;A Health Centre&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1134&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;district_hospital-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;THE District Hospital&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">1034&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">linked_docs&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;some-contact-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;some contact&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;person&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;other-clinic&amp;#39;&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">reported_date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">4569&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;other-contact-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;other contact&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;clinic&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">parent&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;health_center&amp;#39;&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">custom_tag3&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;report-id&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">form&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;FORM&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">contact&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">_id&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;submitter-id&amp;#39;&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span> &lt;span class="c1">// etc
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;h2>Reports&lt;span class="hx-absolute -hx-mt-20" id="reports">&lt;/span>
-&lt;a href="#reports" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Reports are created by users filling out and submitting forms, as well as sending in SMS.&lt;/p>
-&lt;p>All reports:&lt;/p>
-&lt;ul>
-&lt;li>Use the &lt;code>data_record&lt;/code> type&lt;/li>
-&lt;li>Have their fields stored in the &lt;code>fields&lt;/code> property&lt;/li>
-&lt;li>Have the report author&amp;rsquo;s phone number (if it exists) stored in the &lt;code>from&lt;/code> field&lt;/li>
-&lt;li>Store the form&amp;rsquo;s identifier in the &lt;code>form&lt;/code> field&lt;/li>
-&lt;li>May have a &lt;code>contact&lt;/code> property, which is a minified version of the report author&amp;rsquo;s contact and its hierarchy (see above)&lt;/li>
-&lt;/ul>
-&lt;p>Reports can and should be linked to a contact when possible. The report&amp;rsquo;s associated contact (sometimes called the report&amp;rsquo;s subject) can be either a person or place. The link between report and contact is established by defining one of the following properties within the report:&lt;/p>
+&lt;p>Now the application can be used offline just like a regular Android application.&lt;/p></description></item><item><title>CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</guid><description>
+&lt;p>Impact monitoring is an essential part of both the Community Health Toolkit and Medic&amp;rsquo;s processes and ethos. We are committed to harnessing data to:&lt;/p>
 &lt;ol>
-&lt;li>A person shortcode or uuid at &lt;code>doc.fields.patient_id&lt;/code>, &lt;code>doc.fields.patient_uuid&lt;/code>, or &lt;code>doc.patient_id&lt;/code>&lt;/li>
-&lt;li>A place shortcode or uuid at &lt;code>doc.fields.place_id&lt;/code> or &lt;code>doc.place_id&lt;/code>.&lt;/li>
+&lt;li>Support our partners in data-driven operational and strategic decision making&lt;/li>
+&lt;li>Inform our product roadmap and organizational strategy, and&lt;/li>
+&lt;li>Participate in overarching policy discussions around community health.&lt;/li>
 &lt;/ol>
-&lt;p>Additionally, SMS reports:&lt;/p>
+&lt;p>As a member of the CHT community and potential CHT implementer, we encourage you to learn more about the recommended impact metrics for monitoring and evaluation across priority use cases by reviewing the metrics listed below.&lt;/p>
+&lt;h2>Impact Metrics&lt;span class="hx-absolute -hx-mt-20" id="impact-metrics">&lt;/span>
+&lt;a href="#impact-metrics" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The following list of Impact Metrics is comprehensive; it includes all of the Impact Metric that Medic and one or more additional CHT implementers have decided to share with the general public across workflows:&lt;/p>
+&lt;p>&lt;em>Caring Activities&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>Have an &lt;code>sms_message&lt;/code> property which contains, among other things, the raw SMS&lt;/li>
-&lt;li>May not have a &lt;code>contact&lt;/code> property if the SMS comes from a phone number that does not have an associated contact&lt;/li>
+&lt;li>Total number of caring activities logged on the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;p>Additionally, XML reports:&lt;/p>
+&lt;p>&lt;em>Engagement&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>Have the XML file that Enketo (the XForm renderer used) generates as an attachment&lt;/li>
-&lt;li>Have a &lt;code>content_type&lt;/code> property of &lt;code>xml&lt;/code>&lt;/li>
+&lt;li>Total number of frontline health workers supported by the CHT (total, per month)&lt;/li>
+&lt;li>Total number of frontline health workers trained to use the CHT for a specific use case (ie. antenatal care) (total, per month)&lt;/li>
 &lt;/ul>
-&lt;h2>Forms&lt;span class="hx-absolute -hx-mt-20" id="forms">&lt;/span>
-&lt;a href="#forms" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>SMS forms are defined in &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/patient_reports/#app_settingsjson-patient_reports" >application config&lt;/a>.&lt;/p>
-&lt;p>XML forms are stored in the database and have:&lt;/p>
+&lt;p>&lt;em>Households&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>An &lt;code>_id&lt;/code> of &lt;code>form:&amp;lt;formname&amp;gt;&lt;/code>&lt;/li>
-&lt;li>The &lt;code>type&lt;/code> of &lt;code>form&lt;/code>&lt;/li>
-&lt;li>The actual XML Xforms definition attached&lt;/li>
+&lt;li>Total number of households registered in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of new households registered in the CHT per month&lt;/li>
+&lt;li>Total number of registered households with one or more visits by a health worker logged in the CHT per month&lt;/li>
 &lt;/ul>
-&lt;p>XML forms are defined as XForm XML files&lt;/p>
-&lt;h2>Users&lt;span class="hx-absolute -hx-mt-20" id="users">&lt;/span>
-&lt;a href="#users" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Users represent credentials and roles / permissions for accessing the application. This can either be:&lt;/p>
+&lt;p>&lt;em>Antenatal Care&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>people who can log into the application, such as CHWs or Nurses&lt;/li>
-&lt;li>or credentials granting external software restricted permissions to perform certain tasks, such as allowing an external service permission to write reports via the api.&lt;/li>
+&lt;li>Total number of pregnancy registrations logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of pregnancy registrations logged in the first trimester in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of confirmed deliveries logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of confirmed deliveries occurring in a health facility logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;p>User records have at least:&lt;/p>
+&lt;p>&lt;em>Postnatal Care&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>An &lt;code>_id&lt;/code> of &lt;code>org.couchdb.user:&amp;lt;username&amp;gt;&lt;/code>&lt;/li>
-&lt;li>A &lt;code>name&lt;/code> which is the same as &lt;code>&amp;lt;username&amp;gt;&lt;/code> above&lt;/li>
-&lt;li>A &lt;code>roles&lt;/code> array&lt;/li>
+&lt;li>Total number of postnatal visits logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of women receiving the first postnatal care visit within 48h of delivery logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;p>There are two slightly different copies of this record stored.&lt;/p>
-&lt;p>The record in the &lt;code>_users&lt;/code> database includes:&lt;/p>
+&lt;p>&lt;em>iCCM&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>The &lt;code>type&lt;/code> of &lt;code>user&lt;/code>&lt;/li>
-&lt;li>The password hash and associated data&lt;/li>
+&lt;li>Total number of assessments conducted on children under five (U5) in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of resulting diagnoses from U5 child assessments in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of resulting referrals from U5 child assessments in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of assessments conducted where the U5 child was presenting symptoms in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child assessments conducted within 72h of symptom onset logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child assessments conducted within 24h of symptom onset logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of patients receiving correct treatment at home from a healthcare worker, when treatment is recommended, logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of patient referral follow-up visits with a health facility visit confirmed logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;p>The &lt;code>_users&lt;/code> database is what CouchDB uses for authentication and is only editable by administrative users, so is authoritative when it comes to roles and the like.&lt;/p>
-&lt;p>The &lt;code>medic&lt;/code> database stores a copy of roles and permissions along with:&lt;/p>
+&lt;p>&lt;em>Family Planning&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>The &lt;code>type&lt;/code> of &lt;code>user-settings&lt;/code>&lt;/li>
-&lt;li>They may have a &lt;code>contact_id&lt;/code> field that is the &lt;code>_id&lt;/code> of the &lt;em>person&lt;/em> that the user is attached to&lt;/li>
-&lt;li>They may also have a &lt;code>facility_id&lt;/code> field that is the &lt;code>_id&lt;/code> of the &lt;em>place&lt;/em> that the user is attached to&lt;/li>
-&lt;li>They may also have a &lt;code>known&lt;/code> field. If this field is &lt;code>true&lt;/code>, it means the user has logged in once. Otherwise, it will be &lt;code>undefined&lt;/code>.&lt;/li>
+&lt;li>Total number of women counseled by healthcare workers on family planning logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of women newly using family planning following a counseling session with a healthcare worker logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;p>Note that SMS users do not have a users record: their phone number will be attached to a &lt;code>person&lt;/code> record, but they do not have a user because they do not access the application.&lt;/p>
-&lt;p>Users then, can be represented by up to 3 docs:&lt;/p>
+&lt;p>&lt;em>Malnutrition&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>a &lt;code>person&lt;/code> document that represents a physical human being in our hierarchy of places and people&lt;/li>
-&lt;li>a &lt;code>users&lt;/code> document that represents authorisation and authentication information for physical people or authenticated external services&lt;/li>
-&lt;li>a &lt;code>user-settings&lt;/code> document that ties the &lt;code>user&lt;/code> and &lt;code>person&lt;/code> documents together&lt;/li>
+&lt;li>Total number of malnutrition screenings completed for U5 children logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 child malnutrition cases identified via malnutrition screening logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 children with malnutrition receiving treatment and assessed to have recovered via a follow-up malnutrition screening logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;h2>Tasks&lt;span class="hx-absolute -hx-mt-20" id="tasks">&lt;/span>
-&lt;a href="#tasks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/#tasksjs" >Partner configuration code&lt;/a> running inside the Core Framework can cause tasks to appear within the Tasks tab. Each task in the tab is powered by a task document. Task documents are:&lt;/p>
+&lt;p>&lt;em>Immunization&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>updated only after the data for their emitting contact changes or every 7 days&lt;/li>
-&lt;li>created in the database for any task due within the last 60 days&lt;/li>
-&lt;li>immutable once their state is &amp;ldquo;terminal&amp;rdquo; (Cancelled, Completed, Failed)&lt;/li>
+&lt;li>Total number of immunization screenings for U5 children logged in the CHT (total, per month)&lt;/li>
+&lt;li>Total number of U5 children receiving vaccinations logged in the CHT (total, per month)&lt;/li>
 &lt;/ul>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>State&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>Draft&lt;/td>
-&lt;td>Task has been calculated but it is scheduled in the future&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Ready&lt;/td>
-&lt;td>Task is currently showing to the user&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Cancelled&lt;/td>
-&lt;td>Task was not emitted when refreshing the requester&amp;rsquo;s data. Task has invalid partner emission.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Completed&lt;/td>
-&lt;td>Task was emitted with { resolved: true }&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Failed&lt;/td>
-&lt;td>Task was never terminated and the endDate has past&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Attribute&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>user&lt;/td>
-&lt;td>The user settings id of the user who calculated and created the document. Used for controlling replication. (eg. &lt;code>org.couchdb.user:agatha&lt;/code>)&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>requester&lt;/td>
-&lt;td>The guid of the contact whose data brought about the creation of the document. Used for controlling cancellation.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>owner&lt;/td>
-&lt;td>The guid of the contact whose profile this task will appear on in the contact&amp;rsquo;s tab.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>forId&lt;/td>
-&lt;td>If completing a task&amp;rsquo;s action opens a form. Completing the form creates a report. &lt;code>forId&lt;/code> is the guid of the contact information that will be passed into the form. For most forms, the resulting report will be associated with this contact.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>emission&lt;/td>
-&lt;td>Minified task data emitted from the partner code.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>stateHistory&lt;/td>
-&lt;td>Each time the state attribute changes, the time of the change is recorded in the state history.&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;p>To understand the difference between a task requester and a task owner, kindly see the example below:&lt;/p>
+&lt;p>&lt;em>COVID-19&lt;/em>&lt;/p>
 &lt;ul>
-&lt;li>A CHW submits a delivery form. The patient is woman1, and she delivered one child child1.&lt;/li>
-&lt;li>The delivery form generates a task, delivery_child_followup, but the task&amp;rsquo;s patient is child1 not woman1&lt;/li>
-&lt;li>In the case of this task, the requester is woman1, because it was their delivery report that triggered task generation, but the owner is child1.&lt;/li>
-&lt;/ul>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;task~org.couchdb.user:agatha~pregReport~pregnancy-facility-visit-reminder~2~523435132468&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;task&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;authoredOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">523435132468&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;requester&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;requester-contact-guid&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;owner&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;owner-contact-guid&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;state&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Ready&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;emission&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;pregReport~pregnancy-facility-visit-reminder~2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;forId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;for-contact-guid&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;dueDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2000-01-01&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;startDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1999-12-29&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;endDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2000-01-08&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;priority&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;high&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;priorityLabel&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;task.priority&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;stateHistory&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;state&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Ready&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;timestamp&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">523435132468&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}],&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;h2>Targets&lt;span class="hx-absolute -hx-mt-20" id="targets">&lt;/span>
-&lt;a href="#targets" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/building/targets/targets-js/#targetsjs" >Partner configuration code&lt;/a> can configure targets to appear within the Targets/Analytics tab. Target documents are:&lt;/p>
-&lt;ul>
-&lt;li>one per analytics reporting period&lt;/li>
-&lt;li>updated when the user loads the application or when they view the targets tab&lt;/li>
-&lt;li>updated a maximum of once per day&lt;/li>
-&lt;/ul>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;target~2000-01~user-contact-guid~org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;target&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;org.couchdb.user:agatha&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;owner&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;user-contact-guid&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;updated_date&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">523435132468&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;targets&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;deaths-this-month&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;pass&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;total&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">15&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div></description></item><item><title>Data Flows for Analytics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/data-flows-for-analytics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/data-flows-for-analytics/</guid><description>
-&lt;p>In this section, we focus on how data flows through the various components of the Community Health Toolkit. The CHT is built to support the delivery of quality community health care at the last mile. The CHT is designed to work in areas with low connectivity, which means it is an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/offline-first/" >Offline-First&lt;/a> toolkit for care provision. The architectural and technology choices in the stack are mostly guided by this principle, which will be evident in the discussion of the data management pipeline.&lt;/p>
-&lt;h2>Overview&lt;span class="hx-absolute -hx-mt-20" id="overview">&lt;/span>
-&lt;a href="#overview" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;figure>&lt;a href="data-flows.png">&lt;img src="https://docs.communityhealthtoolkit.org/technical-overview/concepts/data-flows-for-analytics/data-flows.png"
-alt="Data Flows">&lt;/a>&lt;figcaption>
-&lt;p>Data Flows&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>At a high level:&lt;/p>
-&lt;ul>
-&lt;li>Data are collected from the device of a health worker;&lt;/li>
-&lt;li>Data are pushed to an online instance from where data are available to other health workers, supervisors, and decision makers;&lt;/li>
-&lt;li>Data are transferred to a relational database (PostgreSQL) using &lt;a href="https://github.com/medic/cht-sync" target="_blank" rel="noopener">CHT Sync&lt;/a> and made available for impact monitoring, data science projects, and visualizations;&lt;/li>
-&lt;li>Access to PostreSQL is given to relevant parties at this level, for example members of the Research &amp;amp; Learning team for impact monitoring and data science;&lt;/li>
-&lt;li>Visualization platforms, such as &lt;a href="https://www.klipfolio.com/" target="_blank" rel="noopener">Klipfolio&lt;/a> or &lt;a href="https://superset.apache.org/" target="_blank" rel="noopener">Superset&lt;/a>, are then connected to PostgreSQL from where program managers and other partner representatives can access visualizations of their data for decision-making.&lt;/li>
-&lt;/ul>
-&lt;h2>Details of the data flow&lt;span class="hx-absolute -hx-mt-20" id="details-of-the-data-flow">&lt;/span>
-&lt;a href="#details-of-the-data-flow" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The layout detailed here is specific to how Medic supports its CHT partners at the moment. It is replicable and can be deployed as is or tweaked independent of Medic either by modifying or replacing pieces of it with other options.&lt;/p>
-&lt;h3>Current infrastructure&lt;span class="hx-absolute -hx-mt-20" id="current-infrastructure">&lt;/span>
-&lt;a href="#current-infrastructure" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>We look at this in three general phases.&lt;/p>
-&lt;h4>1. Data Collection&lt;span class="hx-absolute -hx-mt-20" id="1-data-collection">&lt;/span>
-&lt;a href="#1-data-collection" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>Data is collected in the community at the point of care, i.e. the community health worker interacting with the toolkit. These tools and their corresponding data stores are::-&lt;/p>
-&lt;ul>
-&lt;li>Mobile app -&amp;gt; PouchDB&lt;/li>
-&lt;li>Webapp -&amp;gt; PouchDB / CouchDB&lt;/li>
-&lt;li>Text forms / sms -&amp;gt; SMS gateway / SMS aggregator -&amp;gt; CouchDB&lt;/li>
-&lt;/ul>
-&lt;p>The mobile app and webapp, when deployed for offline first use, use a local database namely PouchDB. Similar to CouchDB, it is a document-oriented database. The data collected in PouchDB is synced to an online CouchDB upon the user connecting to the internet. Local storage is not applicable to SMS; instead, an &lt;a href="https://github.com/medic/cht-gateway" target="_blank" rel="noopener">SMS gateway&lt;/a> or an SMS aggregator (for example &lt;a href="https://africastalking.com" target="_blank" rel="noopener">Africa&amp;rsquo;s Talking&lt;/a>) is used to help get the data to an online CouchDB instance.&lt;/p>
-&lt;p>Ultimately all the data ends up in a CouchDB instance deployed in the cloud whether through data synchronization with PouchDB local to the health workers devices, use of SMS aggregators or gateway. It should be mentioned that you can have a deployment supported by all of webapp, mobile app and SMS and have all the data end up in the same CouchDB instance.&lt;/p>
-&lt;h4>2. Data Transformation&lt;span class="hx-absolute -hx-mt-20" id="2-data-transformation">&lt;/span>
-&lt;a href="#2-data-transformation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-sync/" >CHT Sync&lt;/a> is used to move data from CouchDB to a relational database, PostgreSQL in this case. The choice of PostgreSQL for analytics dashboard data sources is to allow use of the more familiar SQL querying. It is an open source tool that can be &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" >easily deployed&lt;/a>. When deployed the service uses &lt;a href="https://docs.couchdb.org/en/stable/api/database/changes.html" target="_blank" rel="noopener">CouchDB&amp;rsquo;s changes feed&lt;/a> which allows capturing of everything happening in CouchDB in incremental updates. It is run and monitored by the operating system where it is configured to fetch data at a configurable interval.&lt;/p>
-&lt;p>Data copied over to PostgreSQL is first stored as raw json (document) making use of PostgreSQL&amp;rsquo;s jsonb data type to create an exact replica of a CouchDB database. From this, default views are created at deployment of the service and refreshed during every subsequent run. Additional custom materialized views created later are also refreshed at this time.&lt;/p>
-&lt;p>Custom materialized views and functions are added specific to a deployment&amp;rsquo;s needs. Generally the following naming convention is recommended:&lt;/p>
-&lt;ul>
-&lt;li>&lt;em>formview&lt;/em> as a view of raw forms&lt;/li>
-&lt;li>&lt;em>useview&lt;/em> as a view of form data supporting a use case as defined by design&lt;/li>
-&lt;li>&lt;em>contactview&lt;/em> as a view of people and places&lt;/li>
-&lt;li>Database functions are used as a way to join as much relevant data as possible for easier querying in analytics or dashboard visualizations.&lt;/li>
-&lt;/ul>
-&lt;p>Data in the views and functions mentioned in this section is as accurate as the accuracy of the SQL queries. Best practice is to begin the process of defining these objects at design in order to align analytics and dashboards requirements with workflows being deployed.&lt;/p>
-&lt;h4>3. Data Use&lt;span class="hx-absolute -hx-mt-20" id="3-data-use">&lt;/span>
-&lt;a href="#3-data-use" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>The data in PostgreSQL is mostly either used by direct querying or via dashboard visualizations for impact monitoring and data driven-decision making. Database visualizations are built scoped to the requirements of supporting a successful deployment. The work of our Research &amp;amp; Learning team, specifically data science, is supported at the PostgreSQL level through updated contactviews, formviews, useviews and functions with access to these provided to relevant parties as and when needed. Our use of data follows our Privacy &amp;amp; Data Protection policy and is in accordance to agreements with our CHT partners.&lt;/p>
-&lt;p>As mentioned previously, formviews are built to present data in a structure similar to the data collection tool (form) used. Useviews are tailored to align with a use case, mostly using the formviews as the data sources. These are fundamentally guided by design of the workflows and should be interpreted in the context of the design materials including a document explaining the definitions of variables used.&lt;/p>
-&lt;p>The objects present here are not limited to views and functions. Additional tables can be added, for example providing mappings or supporting operations external to the functions available in the toolkit. In short, there is no limitation to the utility that can be added this level to support analytics and dashboards. That said, measures are taken to ensure controlled access, reliability and timely access of the data by the various parties. Some of these measures are:&lt;/p>
-&lt;ul>
-&lt;li>Roles and users allocation and deallocation done by specific roles within partner technical teams with support from Medic as needed;&lt;/li>
-&lt;li>Access control management is left to the partner technical teams where possible;&lt;/li>
-&lt;li>Dashboard data source refresh intervals set to align with project needs;&lt;/li>
-&lt;li>Update of the data sources monitored to ensure updating works as expected;&lt;/li>
-&lt;li>Review of the dashboards as part of the design process;&lt;/li>
-&lt;li>Qualitative design activities to interrogate trends observed in the dashboards and iterate on them if need be;&lt;/li>
-&lt;/ul>
-&lt;h3>Beyond Our Current Pipeline&lt;span class="hx-absolute -hx-mt-20" id="beyond-our-current-pipeline">&lt;/span>
-&lt;a href="#beyond-our-current-pipeline" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener">cht-core&lt;/a> is mostly data collection tools and is the first component of the data management pipeline. It is the core part of a deployment but the rest of the tools can be easily replaced with other preferred options. It also helps that CHT Sync is an open source tool which provides the opportunity for collaboration to extend its functionality to support other implementations. Klipfolio, the tool that we currently use for visualizations, is a proprietary tool but there are many open source options, such as &lt;a href="https://superset.incubator.apache.org/" target="_blank" rel="noopener">Apache Superset&lt;/a> that are worth exploring and building into future iterations of our impact monitoring and analytics support for the CHT.&lt;/p>
-&lt;h2>Backup&lt;span class="hx-absolute -hx-mt-20" id="backup">&lt;/span>
-&lt;a href="#backup" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The machines running each of CouchDB and PostgreSQL instances are backed up daily.&lt;/p></description></item></channel></rss>
+&lt;li>Total number of community event-based surveillance signals for COVID-19 reported by health workers via the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;li>Total number of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;li>Total number of contacts of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
+&lt;/ul></description></item></channel></rss>

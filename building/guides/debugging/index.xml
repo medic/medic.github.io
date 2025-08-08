@@ -61,65 +61,7 @@ title="Copy code"
 &lt;/div>
 &lt;/div>
 &lt;h2>On the server&lt;span class="hx-absolute -hx-mt-20" id="on-the-server">&lt;/span>
-&lt;a href="#on-the-server" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Some unexpected errors are caught and stored in &lt;code>feedback&lt;/code> docs and stored on the phone and later synced to CouchDB on the server. To access these, look for docs in the &lt;code>medic-user-{username}-meta&lt;/code> or &lt;code>medic-users-meta&lt;/code> databases. This is particularly useful to debug issues where you do not have physical access to the device. More information is available under &lt;a href="https://docs.communityhealthtoolkit.org/building/guides/database/" >Managing Databases&lt;/a>.&lt;/p></description></item><item><title>Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/replicating-production-data-locally/</guid><description>
-&lt;p>Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p>
-&lt;ul>
-&lt;li>Copy the data from an instance to a local CouchDB database&lt;/li>
-&lt;li>Run a local webapp instance with that data&lt;/li>
-&lt;/ul>
-&lt;h2>First, a note about data safety&lt;span class="hx-absolute -hx-mt-20" id="first-a-note-about-data-safety">&lt;/span>
-&lt;a href="#first-a-note-about-data-safety" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an encrypted drive and delete it once you&amp;rsquo;re done with it.&lt;/p>
-&lt;h2>Step 1: Get the data&lt;span class="hx-absolute -hx-mt-20" id="step-1-get-the-data">&lt;/span>
-&lt;a href="#step-1-get-the-data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p>
-&lt;h3>Small production instances&lt;span class="hx-absolute -hx-mt-20" id="small-production-instances">&lt;/span>
-&lt;a href="#small-production-instances" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p>
-&lt;p>For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
-For command line, see: &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#replicate" target="_blank" rel="noopener">https://docs.couchdb.org/en/stable/api/server/common.html#replicate&lt;/a>&lt;/p>
-&lt;p>Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code>login&lt;/code> (ie &lt;code>https://url/login&lt;/code>) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p>
-&lt;h3>Large production instances&lt;span class="hx-absolute -hx-mt-20" id="large-production-instances">&lt;/span>
-&lt;a href="#large-production-instances" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p>
-&lt;ol>
-&lt;li>Open Firefox and navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>false&lt;/code> to disable Content Security Policies.&lt;/li>
-&lt;li>Navigate to the instance and login as the user with the data you want. &lt;em>(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em>&lt;/li>
-&lt;li>Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em>(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em>&lt;/li>
-&lt;li>Make sure your local CouchDB has CORS enabled: &lt;a href="https://docs.couchdb.org/en/stable/config/http.html#cors" target="_blank" rel="noopener">https://docs.couchdb.org/en/stable/config/http.html#cors&lt;/a>. Consider using &lt;a href="https://github.com/pouchdb/add-cors-to-couchdb#user-content-what-it-does" target="_blank" rel="noopener">add-cors-to-couchdb&lt;/a> or its recommended settings.&lt;/li>
-&lt;li>Allow your CouchDB to be accessible via &lt;code>https&lt;/code>. One way is to run &lt;code>ngrok http PORT&lt;/code>. The &lt;code>PORT&lt;/code> &lt;em>(&lt;code>5984&lt;/code> by default)&lt;/em> can be found in database configuration using fauxton under the &lt;code>chttpd&lt;/code> section. This will make your CouchDB accessible via a url like &lt;code>https://abcd1234.ngrok.io&lt;/code>.&lt;/li>
-&lt;li>Open the console in Firefox and run &lt;code>await PouchDB.replicate('medic-user-XXX', 'https://your:admin@abcd1234.ngrok.io/YYY');&lt;/code>. Here &lt;code>XXX&lt;/code> is the name you logged in as, and &lt;code>YYY&lt;/code> is the name of a database in which to store the data.
-&lt;ul>
-&lt;li>&lt;strong>Note&lt;/strong>: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth); and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code>5984&lt;/code> and &lt;code>5986&lt;/code> to localhost.&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li>
-&lt;li>Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li>
-&lt;li>Navigate to &lt;code>about:config&lt;/code>. Set &lt;code>security.csp.enable&lt;/code> to &lt;code>true&lt;/code> to re-enable Content Security Policies.&lt;/li>
-&lt;/ol>
-&lt;h3>Regardless, do this too&lt;span class="hx-absolute -hx-mt-20" id="regardless-do-this-too">&lt;/span>
-&lt;a href="#regardless-do-this-too" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>To log in as a specific prod user you need to also copy them from the prod &lt;code>_users&lt;/code> database into your own local &lt;code>_users&lt;/code> database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code>_users&lt;/code> DB and paste it in, deleting the &lt;code>_rev&lt;/code> property.&lt;/p>
-&lt;p>You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code>password&lt;/code> property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p>
-&lt;h2>Step 2, run it locally&lt;span class="hx-absolute -hx-mt-20" id="step-2-run-it-locally">&lt;/span>
-&lt;a href="#step-2-run-it-locally" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener">Horticulturalist&lt;/a>.&lt;/p>
-&lt;p>A local development environment will be useful to you if:&lt;/p>
-&lt;ul>
-&lt;li>You want to change code locally&lt;/li>
-&lt;li>You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li>
-&lt;li>You want to deploy a version of the code older than &lt;code>2.14.0&lt;/code>, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li>
-&lt;/ul>
-&lt;h3>Option 1, local development environment&lt;span class="hx-absolute -hx-mt-20" id="option-1-local-development-environment">&lt;/span>
-&lt;a href="#option-1-local-development-environment" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" >development setup instructions&lt;/a>.&lt;/p>
-&lt;p>Then you need to:&lt;/p>
-&lt;ol>
-&lt;li>Push the code you want to run via &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY npm run build-dev&lt;/code>.&lt;/li>
-&lt;li>Start API and Sentinel by running &lt;code>COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code>.&lt;/li>
-&lt;/ol>
-&lt;p>Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p>
-&lt;h3>Option 2, horticulturalist&lt;span class="hx-absolute -hx-mt-20" id="option-2-horticulturalist">&lt;/span>
-&lt;a href="#option-2-horticulturalist" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Follow the instructions on the &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener">horticulturalist repo&lt;/a> to get it installed. Then:&lt;/p>
-&lt;ol>
-&lt;li>Make sure that the &lt;code>medic&lt;/code> DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li>
-&lt;li>Replicate your local PROD DB into a new &lt;code>medic&lt;/code> database using the Fauxton console.&lt;/li>
-&lt;li>Run &lt;code>horti --local --bootstrap=XXX&lt;/code>, where &lt;code>XXX&lt;/code> is the version you want to use (maybe the same one as production?)&lt;/li>
-&lt;/ol>
-&lt;p>You should now be able to log in as that user locally!&lt;/p></description></item><item><title>Securely Sharing Your Development Environment</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</guid><description>
+&lt;a href="#on-the-server" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Some unexpected errors are caught and stored in &lt;code>feedback&lt;/code> docs and stored on the phone and later synced to CouchDB on the server. To access these, look for docs in the &lt;code>medic-user-{username}-meta&lt;/code> or &lt;code>medic-users-meta&lt;/code> databases. This is particularly useful to debug issues where you do not have physical access to the device. More information is available under &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/" >Managing Databases&lt;/a>.&lt;/p></description></item><item><title>Securely Sharing Your Development Environment</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</guid><description>
 &lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200">
 &lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Caution&lt;/p>
 &lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
