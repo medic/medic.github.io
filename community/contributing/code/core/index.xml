@@ -387,34 +387,6 @@ title="Copy code"
 &lt;/div>
 &lt;/div>
 &lt;p>The workaround, unfortunately, is to just start your CouchDB Docker container with sudo: &lt;code>sudo docker run...&lt;/code>.&lt;/p>
-&lt;h3>CouchDB on Docker Details&lt;span class="hx-absolute -hx-mt-20" id="couchdb-on-docker-details">&lt;/span>
-&lt;a href="#couchdb-on-docker-details" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Breaking down the command from &lt;a href="#couchdb" >the above section&lt;/a>, here&amp;rsquo;s a generic version that doesn&amp;rsquo;t include hard coded paths:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -d -p 5984:5984 -p 5986:5986 --name medic-couchdb -e &lt;span class="nv">COUCHDB_USER&lt;/span>&lt;span class="o">=&lt;/span>medic -e &lt;span class="nv">COUCHDB_PASSWORD&lt;/span>&lt;span class="o">=&lt;/span>password -v &amp;lt;data path&amp;gt;:/opt/couchdb/data -v &amp;lt;config path&amp;gt;:/opt/couchdb/etc/local.d apache/couchdb:2&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>Parts of the command:&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>--name&lt;/code> creates a container called &lt;code>medic-couchdb&lt;/code>. You can name it whatever you want, but this is how you refer to it later&lt;/li>
-&lt;li>&lt;code>-e&lt;/code> sets an environment variable inside the container. Two are set here, for a user and password for the initial admin user.&lt;/li>
-&lt;li>&lt;code>-v&lt;/code> maps where couchdb stores data to your local file system to ensure persistence without depending on the container, using the path &lt;em>before&lt;/em> the &lt;code>:&lt;/code> (the path after the colon is the internal path inside the docker image). This should be somewhere you have write access to, and want this data to be stored. The second mounted volume is for the couch configuration, which will retain settings if your container is removed. This is especially important after running the command to secure the instance (done in steps below).&lt;/li>
-&lt;li>&lt;code>apache/couchdb:2&lt;/code> will install the latest package for CouchDB 2.x&lt;/li>
-&lt;/ul>
-&lt;p>Once this downloads and starts, you will need to &lt;a href="http://localhost:5984/_utils/#/setup" target="_blank" rel="noopener">initialise CouchDB&lt;/a> as noted in &lt;a href="https://docs.couchdb.org/en/stable/setup/index.html#setup" target="_blank" rel="noopener">their install instructions&lt;/a>.&lt;/p>
-&lt;p>You can use &lt;code>docker stop medic-couchdb&lt;/code> to stop it and &lt;code>docker start medic-couchdb&lt;/code> to start it again. Remember that you&amp;rsquo;ll need to start it whenever you restart your OS, which might not be the case if you use a normal OS package. &lt;code>docker rm medic-couchdb&lt;/code> will totally remove the container.&lt;/p>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>&lt;/svg>Tip&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Familiarise yourself with other Docker commands to make docker image and container management clearer.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div>
 &lt;h3>Required environment variables&lt;span class="hx-absolute -hx-mt-20" id="required-environment-variables">&lt;/span>
 &lt;a href="#required-environment-variables" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Medic needs the following environment variables to be declared:&lt;/p>
 &lt;ul>
