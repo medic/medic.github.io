@@ -1,167 +1,167 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Concepts and paradigms of the CHT</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/</link><description>Recent content in Concepts and paradigms of the CHT on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/index.xml" rel="self" type="application/rss+xml"/><item><title>Offline-First in the CHT</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/offline-first/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/offline-first/</guid><description>
-&lt;p>CHT applications are designed to be used equally well in areas with no internet connectivity, slow or unreliable internet connectivity, and good internet connectivity. Achieving reliable performance and powerful features requires diligence and strict adherence to the principles of Offline-First development.&lt;/p>
-&lt;p>In this page we&amp;rsquo;ll cover why and how we achieve this in the CHT.&lt;/p>
-&lt;h2>Why this is important&lt;span class="hx-absolute -hx-mt-20" id="why-this-is-important">&lt;/span>
-&lt;a href="#why-this-is-important" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The CHT is designed to improve healthcare in the hardest to reach communities. While some users have a strong internet connection, to be as inclusive as possible we optimise for Care Teams with connections that are intermittent, unreliable, expensive, and low bandwidth. To achieve this the CHT is designed to be offline first, which, as the name suggests, means the application never relies on an internet connection for day to day tasks.&lt;/p>
-&lt;p>Caveat: a small set of use cases require a decent internet connection, but these are limited to:&lt;/p>
-&lt;ul>
-&lt;li>Logging in&lt;/li>
-&lt;li>Initial download of the application and data&lt;/li>
-&lt;li>Changing your own password&lt;/li>
-&lt;li>Most administrative tasks such as creating new users&lt;/li>
-&lt;li>Data analytics over large data sets&lt;/li>
-&lt;/ul>
-&lt;h2>Requirements&lt;span class="hx-absolute -hx-mt-20" id="requirements">&lt;/span>
-&lt;a href="#requirements" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Code&lt;span class="hx-absolute -hx-mt-20" id="code">&lt;/span>
-&lt;a href="#code" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The CHT uses a &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank" rel="noopener">Service Worker&lt;/a> to store the code needed to start up and run which is best practice for caching web applications. The CHT Core Framework code is downloaded when the user visits the login page for the first time and completes silently in the background while the user logs in.&lt;/p>
-&lt;p>The code includes JavaScript, CSS, HTML, fonts, and images. It doesn&amp;rsquo;t contain any private information so it&amp;rsquo;s safe to download and cache it without authentication. It also doesn&amp;rsquo;t contain deployment specific configuration (covered in detail &lt;a href="#data" >below&lt;/a>).&lt;/p>
-&lt;p>The CHT Core Framework checks for updates to the code by attempting to connect to the server in the background. The user isn&amp;rsquo;t notified if this check fails or times out, so they can continue to complete workflows without interruption. When an update is found the new code is downloaded and the service worker cache is updated. The user is prompted to reload to start using the new version of the application, but this can be dismissed if they are busy with a patient or don&amp;rsquo;t want to lose their progress if they are midway through an action like creating a contact or completing a form. Either way, the update will be automatically applied the next time the application starts up.&lt;/p>
-&lt;h3>Data&lt;span class="hx-absolute -hx-mt-20" id="data">&lt;/span>
-&lt;a href="#data" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Once the application has started up it needs data to be useful. This data falls into two categories:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Configuration&lt;/strong> specific to a single deployment such as forms, task definitions, places, and hierarchies.&lt;/li>
-&lt;li>&lt;strong>Patient data&lt;/strong> such as personal details, information about visits, reports, tasks, and messages.&lt;/li>
-&lt;/ul>
-&lt;p>Both of these types of data are cached on the device because they are required for the user to do their job. The CHT Core Framework uses &lt;a href="https://pouchdb.com/" target="_blank" rel="noopener">PouchDB&lt;/a> to store the data on the device&amp;rsquo;s disk. Once cached, when the application starts up the code is executed, which reads the data, allowing the user to do their job regardless of the quality of their internet connection.&lt;/p>
-&lt;p>If the user creates new patient data by registering a family or completing a task the application stores this in the phone&amp;rsquo;s cache and attempts to submit this to the server. Periodically the application checks to see if there is new data on the server that is relevant to the user and if so, it updates the cache. This process of sending and receiving data updates is called &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/replication/" >replication&lt;/a>, and is performed without interrupting the user from their work.&lt;/p>
-&lt;h2>FAQs from CHT contributors&lt;span class="hx-absolute -hx-mt-20" id="faqs-from-cht-contributors">&lt;/span>
-&lt;a href="#faqs-from-cht-contributors" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: Should I rely on request failure handling?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;p&gt;CHT applications are designed to be used equally well in areas with no internet connectivity, slow or unreliable internet connectivity, and good internet connectivity. Achieving reliable performance and powerful features requires diligence and strict adherence to the principles of Offline-First development.&lt;/p&gt;
+&lt;p&gt;In this page we&amp;rsquo;ll cover why and how we achieve this in the CHT.&lt;/p&gt;
+&lt;h2&gt;Why this is important&lt;span class="hx-absolute -hx-mt-20" id="why-this-is-important"&gt;&lt;/span&gt;
+&lt;a href="#why-this-is-important" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The CHT is designed to improve healthcare in the hardest to reach communities. While some users have a strong internet connection, to be as inclusive as possible we optimise for Care Teams with connections that are intermittent, unreliable, expensive, and low bandwidth. To achieve this the CHT is designed to be offline first, which, as the name suggests, means the application never relies on an internet connection for day to day tasks.&lt;/p&gt;
+&lt;p&gt;Caveat: a small set of use cases require a decent internet connection, but these are limited to:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Logging in&lt;/li&gt;
+&lt;li&gt;Initial download of the application and data&lt;/li&gt;
+&lt;li&gt;Changing your own password&lt;/li&gt;
+&lt;li&gt;Most administrative tasks such as creating new users&lt;/li&gt;
+&lt;li&gt;Data analytics over large data sets&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Requirements&lt;span class="hx-absolute -hx-mt-20" id="requirements"&gt;&lt;/span&gt;
+&lt;a href="#requirements" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Code&lt;span class="hx-absolute -hx-mt-20" id="code"&gt;&lt;/span&gt;
+&lt;a href="#code" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The CHT uses a &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank" rel="noopener"&gt;Service Worker&lt;/a&gt; to store the code needed to start up and run which is best practice for caching web applications. The CHT Core Framework code is downloaded when the user visits the login page for the first time and completes silently in the background while the user logs in.&lt;/p&gt;
+&lt;p&gt;The code includes JavaScript, CSS, HTML, fonts, and images. It doesn&amp;rsquo;t contain any private information so it&amp;rsquo;s safe to download and cache it without authentication. It also doesn&amp;rsquo;t contain deployment specific configuration (covered in detail &lt;a href="#data" &gt;below&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The CHT Core Framework checks for updates to the code by attempting to connect to the server in the background. The user isn&amp;rsquo;t notified if this check fails or times out, so they can continue to complete workflows without interruption. When an update is found the new code is downloaded and the service worker cache is updated. The user is prompted to reload to start using the new version of the application, but this can be dismissed if they are busy with a patient or don&amp;rsquo;t want to lose their progress if they are midway through an action like creating a contact or completing a form. Either way, the update will be automatically applied the next time the application starts up.&lt;/p&gt;
+&lt;h3&gt;Data&lt;span class="hx-absolute -hx-mt-20" id="data"&gt;&lt;/span&gt;
+&lt;a href="#data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Once the application has started up it needs data to be useful. This data falls into two categories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Configuration&lt;/strong&gt; specific to a single deployment such as forms, task definitions, places, and hierarchies.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Patient data&lt;/strong&gt; such as personal details, information about visits, reports, tasks, and messages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Both of these types of data are cached on the device because they are required for the user to do their job. The CHT Core Framework uses &lt;a href="https://pouchdb.com/" target="_blank" rel="noopener"&gt;PouchDB&lt;/a&gt; to store the data on the device&amp;rsquo;s disk. Once cached, when the application starts up the code is executed, which reads the data, allowing the user to do their job regardless of the quality of their internet connection.&lt;/p&gt;
+&lt;p&gt;If the user creates new patient data by registering a family or completing a task the application stores this in the phone&amp;rsquo;s cache and attempts to submit this to the server. Periodically the application checks to see if there is new data on the server that is relevant to the user and if so, it updates the cache. This process of sending and receiving data updates is called &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/replication/" &gt;replication&lt;/a&gt;, and is performed without interrupting the user from their work.&lt;/p&gt;
+&lt;h2&gt;FAQs from CHT contributors&lt;span class="hx-absolute -hx-mt-20" id="faqs-from-cht-contributors"&gt;&lt;/span&gt;
+&lt;a href="#faqs-from-cht-contributors" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: Should I rely on request failure handling?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
 A: No. This only works well when the user has a strong connection, or if the user is completely offline and the request fails immediately. It&amp;rsquo;s impossible to know for sure how long the request will take, so users with poor connectivity may end up waiting forever. If this request is essential to doing their job they will be unable to move on. It is important to handle request failures gracefully, but it doesn&amp;rsquo;t make a request offline first.
-&lt;/div>
-&lt;/details>
-&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: Should I rely on a request timeout?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: Should I rely on a request timeout?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
 A: No. This attempts to mitigate the problem by unblocking the user eventually. The problem is setting the timeout length correctly - if it&amp;rsquo;s too short then the request won&amp;rsquo;t succeed, but if it&amp;rsquo;s too long the user will be required to wait. Experience suggests the timeout for a simple request would have to be around a minute to allow the request to succeed for most users, but a minute is far too long to expect a user to wait. Almost all requests should have a timeout, but that is not sufficient to make a request offline first.
-&lt;/div>
-&lt;/details>
-&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: Should I rely on a spinner or loading bar?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: Should I rely on a spinner or loading bar?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
 A: No. Much like the timeout solution, this is an attempt to mitigate the problem in this case by giving the user more information about the request. Regardless of the UX, blocking user interaction while waiting for a response is not offline first and therefore not appropriate for the CHT. Showing UX elements when loading is still recommended for local requests, user initiated server requests, and other potentially slow operations.
-&lt;/div>
-&lt;/details>
-&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: How can I check if the user is authenticated?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: How can I check if the user is authenticated?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
 A: It is not possible to know for certain if a user has an active session without getting a response from the server. The CHT caches some data to hint at whether the session is still active, for example the session expiry date. However, the only way to be certain is to connect to the server, which is not offline first. This has been implemented in the CHT by checking the status code on background requests such as replication, and instructing the user to login when necessary.
-&lt;/div>
-&lt;/details>
-&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: Should I rely on APIs which report device connection status?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
-A: No. There are &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine" target="_blank" rel="noopener">APIs available&lt;/a> which report whether the device is online with reasonable reliability. Unfortunately these APIs don&amp;rsquo;t reliably report whether the connection is slow, whether the connection will be held until the request completes, or whether the CHT server is available. This means that even if the browser API reports that the device is online the code will still make a request that may fail or wait indefinitely for a response. These APIs can be useful but must be used in conjunction with Offline-First principles, for example, the CHT uses the &amp;ldquo;online&amp;rdquo; event listener as a prompt to attempt replication in the background.
-&lt;/div>
-&lt;/details>
-&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open>
-&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90">
-&lt;strong class="hx-text-lg">Q: Should I add a feature that requires a connection?&lt;/strong>
-&lt;/summary>
-&lt;div class="hx-p-2 hx-overflow-hidden">
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: Should I rely on APIs which report device connection status?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
+A: No. There are &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine" target="_blank" rel="noopener"&gt;APIs available&lt;/a&gt; which report whether the device is online with reasonable reliability. Unfortunately these APIs don&amp;rsquo;t reliably report whether the connection is slow, whether the connection will be held until the request completes, or whether the CHT server is available. This means that even if the browser API reports that the device is online the code will still make a request that may fail or wait indefinitely for a response. These APIs can be useful but must be used in conjunction with Offline-First principles, for example, the CHT uses the &amp;ldquo;online&amp;rdquo; event listener as a prompt to attempt replication in the background.
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;details class="last-of-type:hx-mb-0 hx-rounded-lg hx-bg-neutral-50 dark:hx-bg-neutral-800 hx-p-2 hx-mt-4 hx-group" open&gt;
+&lt;summary class="hx-flex hx-items-center hx-cursor-pointer hx-select-none hx-list-none hx-p-1 hx-rounded hx-transition-colors hover:hx-bg-gray-100 dark:hover:hx-bg-neutral-800 before:hx-mr-1 before:hx-inline-block before:hx-transition-transform before:hx-content-[''] dark:before:hx-invert rtl:before:hx-rotate-180 group-open:before:hx-rotate-90"&gt;
+&lt;strong class="hx-text-lg"&gt;Q: Should I add a feature that requires a connection?&lt;/strong&gt;
+&lt;/summary&gt;
+&lt;div class="hx-p-2 hx-overflow-hidden"&gt;
 A: Maybe. There are some things that cannot be done offline first because they either require server interaction (eg: authentication during login) or they need to access data that cannot be cached locally (eg: deployment-wide analytics). Every effort should be made to find a way to implement the feature using Offline-First principles, and trade-offs discussed with senior CHT contributors. If the feature truly needs to be online first then the UX needs to be designed so that the user understands the feature requires an internet connection.
-&lt;/div>
-&lt;/details>
-&lt;h2>Further reading&lt;span class="hx-absolute -hx-mt-20" id="further-reading">&lt;/span>
-&lt;a href="#further-reading" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ul>
-&lt;li>&lt;a href="https://alistapart.com/article/offline-first/" target="_blank" rel="noopener">Designing Offline-First Web Apps&lt;/a> by A List Apart&lt;/li>
-&lt;li>&lt;a href="https://hasura.io/blog/design-guide-to-offline-first-apps/" target="_blank" rel="noopener">A Design Guide for Building Offline First Apps&lt;/a> by Hasura&lt;/li>
-&lt;li>&lt;a href="https://blog.couchdb.org/2017/09/19/couchdb-takes-medic-mobile-to-the-front-lines-of-healthcare-work/" target="_blank" rel="noopener">CouchDB takes CHT to the front lines of healthcare work&lt;/a> by CouchDB&lt;/li>
-&lt;/ul></description></item><item><title>Installation as a Progressive Web App</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/pwa/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/pwa/</guid><description>
-&lt;h2>What is a Progressive Web App (PWA)?&lt;span class="hx-absolute -hx-mt-20" id="what-is-a-progressive-web-app-pwa">&lt;/span>
-&lt;a href="#what-is-a-progressive-web-app-pwa" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A PWA is a web application that can be used like a website in the browser, but the user can choose to &amp;ldquo;install&amp;rdquo; it. This means a shortcut is added to the home screen of the device, and when the application is run it doesn&amp;rsquo;t have the usual browser address bar and tabs so it looks like a regular application.&lt;/p>
-&lt;p>The CHT Core webapp has been developed to be a PWA to give users more choice about how applications are installed.&lt;/p>
-&lt;h2>Benefits of PWA installation&lt;span class="hx-absolute -hx-mt-20" id="benefits-of-pwa-installation">&lt;/span>
-&lt;a href="#benefits-of-pwa-installation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Using a PWA avoids the need to build an Android application and publish it to the Play Store which can be cumbersome and slow. This also means there&amp;rsquo;s no need for the user to install or update the Android application as any updates will be downloaded automatically from the CHT server.&lt;/p>
-&lt;p>In addition you can install PWAs on a wider range of devices, for example, desktop computers.&lt;/p>
-&lt;p>Deployments can use a mixture of PWA and Android applications.&lt;/p>
-&lt;h2>Benefits of Android applications&lt;span class="hx-absolute -hx-mt-20" id="benefits-of-android-applications">&lt;/span>
-&lt;a href="#benefits-of-android-applications" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Installation of the PWA may be more difficult for users, for example they will need to visit the website and then follow the instructions to install it. This process is less well known than a usual Play Store installation.&lt;/p>
-&lt;p>Certain features are only available with an Android application, including integration with other android apps, and sending SMS from within the app.&lt;/p>
-&lt;h2>How to distribute a CHT app as a PWA&lt;span class="hx-absolute -hx-mt-20" id="how-to-distribute-a-cht-app-as-a-pwa">&lt;/span>
-&lt;a href="#how-to-distribute-a-cht-app-as-a-pwa" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
-&lt;li>Ensure branding configuration is complete. Without this the browser won&amp;rsquo;t recognize the CHT as a PWA and installation will not be possible. Specifically the app will need a &lt;code>title&lt;/code> and &lt;code>icon&lt;/code> as these are used for the icon on the home screen. To set this up, follow the instructions on the &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/application-graphics/#1-site-branding" >branding page&lt;/a>.&lt;/li>
-&lt;li>In Chrome or Firefox go to the application URL, log in, and wait for the webapp to finish loading completely.&lt;/li>
-&lt;li>Follow these &lt;a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Add_to_home_screen" target="_blank" rel="noopener">instructions for PWA installation&lt;/a>.&lt;/li>
-&lt;/ol>
-&lt;p>Now the application can be used offline just like a regular Android application.&lt;/p></description></item><item><title>CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</guid><description>
-&lt;p>Impact monitoring is an essential part of both the Community Health Toolkit and Medic&amp;rsquo;s processes and ethos. We are committed to harnessing data to:&lt;/p>
-&lt;ol>
-&lt;li>Support our partners in data-driven operational and strategic decision making&lt;/li>
-&lt;li>Inform our product roadmap and organizational strategy, and&lt;/li>
-&lt;li>Participate in overarching policy discussions around community health.&lt;/li>
-&lt;/ol>
-&lt;p>As a member of the CHT community and potential CHT implementer, we encourage you to learn more about the recommended impact metrics for monitoring and evaluation across priority use cases by reviewing the metrics listed below.&lt;/p>
-&lt;h2>Impact Metrics&lt;span class="hx-absolute -hx-mt-20" id="impact-metrics">&lt;/span>
-&lt;a href="#impact-metrics" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The following list of Impact Metrics is comprehensive; it includes all of the Impact Metric that Medic and one or more additional CHT implementers have decided to share with the general public across workflows:&lt;/p>
-&lt;p>&lt;em>Caring Activities&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of caring activities logged on the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Engagement&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of frontline health workers supported by the CHT (total, per month)&lt;/li>
-&lt;li>Total number of frontline health workers trained to use the CHT for a specific use case (ie. antenatal care) (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Households&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of households registered in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of new households registered in the CHT per month&lt;/li>
-&lt;li>Total number of registered households with one or more visits by a health worker logged in the CHT per month&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Antenatal Care&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of pregnancy registrations logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of pregnancy registrations logged in the first trimester in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of confirmed deliveries logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of confirmed deliveries occurring in a health facility logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Postnatal Care&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of postnatal visits logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of women receiving the first postnatal care visit within 48h of delivery logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>iCCM&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of assessments conducted on children under five (U5) in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of resulting diagnoses from U5 child assessments in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of resulting referrals from U5 child assessments in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of assessments conducted where the U5 child was presenting symptoms in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of U5 child assessments conducted within 72h of symptom onset logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of U5 child assessments conducted within 24h of symptom onset logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of patients receiving correct treatment at home from a healthcare worker, when treatment is recommended, logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of patient referral follow-up visits with a health facility visit confirmed logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Family Planning&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of women counseled by healthcare workers on family planning logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of women newly using family planning following a counseling session with a healthcare worker logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Malnutrition&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of malnutrition screenings completed for U5 children logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of U5 child malnutrition cases identified via malnutrition screening logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of U5 children with malnutrition receiving treatment and assessed to have recovered via a follow-up malnutrition screening logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>Immunization&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of immunization screenings for U5 children logged in the CHT (total, per month)&lt;/li>
-&lt;li>Total number of U5 children receiving vaccinations logged in the CHT (total, per month)&lt;/li>
-&lt;/ul>
-&lt;p>&lt;em>COVID-19&lt;/em>&lt;/p>
-&lt;ul>
-&lt;li>Total number of community event-based surveillance signals for COVID-19 reported by health workers via the Software (daily, weekly, monthly, total)&lt;/li>
-&lt;li>Total number of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
-&lt;li>Total number of contacts of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li>
-&lt;/ul></description></item></channel></rss>
+&lt;/div&gt;
+&lt;/details&gt;
+&lt;h2&gt;Further reading&lt;span class="hx-absolute -hx-mt-20" id="further-reading"&gt;&lt;/span&gt;
+&lt;a href="#further-reading" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://alistapart.com/article/offline-first/" target="_blank" rel="noopener"&gt;Designing Offline-First Web Apps&lt;/a&gt; by A List Apart&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://hasura.io/blog/design-guide-to-offline-first-apps/" target="_blank" rel="noopener"&gt;A Design Guide for Building Offline First Apps&lt;/a&gt; by Hasura&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://blog.couchdb.org/2017/09/19/couchdb-takes-medic-mobile-to-the-front-lines-of-healthcare-work/" target="_blank" rel="noopener"&gt;CouchDB takes CHT to the front lines of healthcare work&lt;/a&gt; by CouchDB&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Installation as a Progressive Web App</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/pwa/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/pwa/</guid><description>
+&lt;h2&gt;What is a Progressive Web App (PWA)?&lt;span class="hx-absolute -hx-mt-20" id="what-is-a-progressive-web-app-pwa"&gt;&lt;/span&gt;
+&lt;a href="#what-is-a-progressive-web-app-pwa" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;A PWA is a web application that can be used like a website in the browser, but the user can choose to &amp;ldquo;install&amp;rdquo; it. This means a shortcut is added to the home screen of the device, and when the application is run it doesn&amp;rsquo;t have the usual browser address bar and tabs so it looks like a regular application.&lt;/p&gt;
+&lt;p&gt;The CHT Core webapp has been developed to be a PWA to give users more choice about how applications are installed.&lt;/p&gt;
+&lt;h2&gt;Benefits of PWA installation&lt;span class="hx-absolute -hx-mt-20" id="benefits-of-pwa-installation"&gt;&lt;/span&gt;
+&lt;a href="#benefits-of-pwa-installation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Using a PWA avoids the need to build an Android application and publish it to the Play Store which can be cumbersome and slow. This also means there&amp;rsquo;s no need for the user to install or update the Android application as any updates will be downloaded automatically from the CHT server.&lt;/p&gt;
+&lt;p&gt;In addition you can install PWAs on a wider range of devices, for example, desktop computers.&lt;/p&gt;
+&lt;p&gt;Deployments can use a mixture of PWA and Android applications.&lt;/p&gt;
+&lt;h2&gt;Benefits of Android applications&lt;span class="hx-absolute -hx-mt-20" id="benefits-of-android-applications"&gt;&lt;/span&gt;
+&lt;a href="#benefits-of-android-applications" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Installation of the PWA may be more difficult for users, for example they will need to visit the website and then follow the instructions to install it. This process is less well known than a usual Play Store installation.&lt;/p&gt;
+&lt;p&gt;Certain features are only available with an Android application, including integration with other android apps, and sending SMS from within the app.&lt;/p&gt;
+&lt;h2&gt;How to distribute a CHT app as a PWA&lt;span class="hx-absolute -hx-mt-20" id="how-to-distribute-a-cht-app-as-a-pwa"&gt;&lt;/span&gt;
+&lt;a href="#how-to-distribute-a-cht-app-as-a-pwa" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Ensure branding configuration is complete. Without this the browser won&amp;rsquo;t recognize the CHT as a PWA and installation will not be possible. Specifically the app will need a &lt;code&gt;title&lt;/code&gt; and &lt;code&gt;icon&lt;/code&gt; as these are used for the icon on the home screen. To set this up, follow the instructions on the &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/application-graphics/#1-site-branding" &gt;branding page&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;In Chrome or Firefox go to the application URL, log in, and wait for the webapp to finish loading completely.&lt;/li&gt;
+&lt;li&gt;Follow these &lt;a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Add_to_home_screen" target="_blank" rel="noopener"&gt;instructions for PWA installation&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Now the application can be used offline just like a regular Android application.&lt;/p&gt;</description></item><item><title>CHT Impact Metrics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/concepts/impact-metrics/</guid><description>
+&lt;p&gt;Impact monitoring is an essential part of both the Community Health Toolkit and Medic&amp;rsquo;s processes and ethos. We are committed to harnessing data to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Support our partners in data-driven operational and strategic decision making&lt;/li&gt;
+&lt;li&gt;Inform our product roadmap and organizational strategy, and&lt;/li&gt;
+&lt;li&gt;Participate in overarching policy discussions around community health.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As a member of the CHT community and potential CHT implementer, we encourage you to learn more about the recommended impact metrics for monitoring and evaluation across priority use cases by reviewing the metrics listed below.&lt;/p&gt;
+&lt;h2&gt;Impact Metrics&lt;span class="hx-absolute -hx-mt-20" id="impact-metrics"&gt;&lt;/span&gt;
+&lt;a href="#impact-metrics" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The following list of Impact Metrics is comprehensive; it includes all of the Impact Metric that Medic and one or more additional CHT implementers have decided to share with the general public across workflows:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Caring Activities&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of caring activities logged on the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Engagement&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of frontline health workers supported by the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of frontline health workers trained to use the CHT for a specific use case (ie. antenatal care) (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Households&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of households registered in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of new households registered in the CHT per month&lt;/li&gt;
+&lt;li&gt;Total number of registered households with one or more visits by a health worker logged in the CHT per month&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Antenatal Care&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of pregnancy registrations logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of pregnancy registrations logged in the first trimester in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of confirmed deliveries logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of confirmed deliveries occurring in a health facility logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Postnatal Care&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of postnatal visits logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of women receiving the first postnatal care visit within 48h of delivery logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;iCCM&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of assessments conducted on children under five (U5) in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of resulting diagnoses from U5 child assessments in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of resulting referrals from U5 child assessments in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of assessments conducted where the U5 child was presenting symptoms in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of U5 child assessments conducted within 72h of symptom onset logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of U5 child assessments conducted within 24h of symptom onset logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of patients receiving correct treatment at home from a healthcare worker, when treatment is recommended, logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of patient referral follow-up visits with a health facility visit confirmed logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Family Planning&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of women counseled by healthcare workers on family planning logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of women newly using family planning following a counseling session with a healthcare worker logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Malnutrition&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of malnutrition screenings completed for U5 children logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of U5 child malnutrition cases identified via malnutrition screening logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of U5 children with malnutrition receiving treatment and assessed to have recovered via a follow-up malnutrition screening logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Immunization&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of immunization screenings for U5 children logged in the CHT (total, per month)&lt;/li&gt;
+&lt;li&gt;Total number of U5 children receiving vaccinations logged in the CHT (total, per month)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;COVID-19&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Total number of community event-based surveillance signals for COVID-19 reported by health workers via the Software (daily, weekly, monthly, total)&lt;/li&gt;
+&lt;li&gt;Total number of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li&gt;
+&lt;li&gt;Total number of contacts of COVID-19 cases registered for contact tracing in the Software (daily, weekly, monthly, total)&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,711 +1,711 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Training</title><link>https://docs.communityhealthtoolkit.org/building/training/</link><description>Recent content in Training on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/training/index.xml" rel="self" type="application/rss+xml"/><item><title>Onboarding Using a Training App</title><link>https://docs.communityhealthtoolkit.org/building/training/onboarding/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/onboarding/</guid><description>
-&lt;p>When onboarding new users, having a dedicated CHT app and instance for training can be helpful; it allows new users to do training exercises with mock data to get familiar with the app, while not having the data from their training interfering with the future use of their CHT app. Different approaches are possible, such as only entering real patient data during training, or manually deleting all the training data, but these methods are less practical for large deployments.&lt;/p>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The suggestions in this guide should be assessed and adapted as needed to benefit a deployment. It is important that users don&amp;rsquo;t accidentally use the wrong app. The &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-instance/" >troubleshooting guide&lt;/a> can help to monitor and remediate training data being in the production instance, or the opposite.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;h2>Setting up a training app&lt;span class="hx-absolute -hx-mt-20" id="setting-up-a-training-app">&lt;/span>
-&lt;a href="#setting-up-a-training-app" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>A separate Android App can be created for training, which would point to a CHT instance dedicated to training. The training instance should have the same configuration as the production instance, and have users created for training. To differentiate the Android app used for training from the production one, create a duplicate of &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/android/" >your flavor&lt;/a> and modify the following aspects&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Border &amp;amp; Message&lt;/strong>: Consider adding a distinctive border and message when using the training app. This can be done by setting the build config field &lt;code>IS_TRAINING_APP&lt;/code> to &lt;code>true&lt;/code>, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L212-L216" target="_blank" rel="noopener">&lt;code>build.gradle&lt;/code>&lt;/a> for the training version of the Gamma app.&lt;/li>
-&lt;li>&lt;strong>CHT Instance&lt;/strong>: In your flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file set the &lt;code>app_host&lt;/code> string to be the URL of your training instance, as seen in the &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L3" target="_blank" rel="noopener">Gamma Training app&lt;/a>. If left the same as the production app both training and production data will end up in your production instance.&lt;/li>
-&lt;li>&lt;strong>Launcher icons&lt;/strong>: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/li>
-&lt;li>&lt;strong>App name&lt;/strong>: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code>CHW App [TRAINING VERSION]&lt;/code> may display as &lt;code>CHW App...&lt;/code> so it would be better to use &lt;code>[TRAINING] CHW App&lt;/code>. The app name is set in the flavor&amp;rsquo;s &lt;code>res/values/strings.xml&lt;/code> file, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L4" target="_blank" rel="noopener">the Gamma training app&lt;/a>.&lt;/li>
-&lt;li>&lt;strong>App ID&lt;/strong>: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code>applicationId&lt;/code>, as seen &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L214" target="_blank" rel="noopener">in &lt;code>build.gradle&lt;/code> for the Gamma training app&lt;/a>.&lt;/li>
-&lt;/ul>
-&lt;div class="hextra-cards hx-mt-4 hx-gap-4 hx-grid not-prose" style="--hextra-cards-grid-cols: 3;">
-&lt;figure class="right col-6 col-lg-4">&lt;a href="training-app.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/onboarding/training-app.png"
-alt="CHT training app with border and message">&lt;/a>
-&lt;/figure>
-&lt;/div>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Keeping the &lt;code>applicationId&lt;/code> values the same will make it impossible to have both the training and production apps installed at the same time on a device. If you have a way to install the production app after the training is complete then you may choose to do this to prevent users from using the wrong app.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;h2>Switching from training to production app&lt;span class="hx-absolute -hx-mt-20" id="switching-from-training-to-production-app">&lt;/span>
-&lt;a href="#switching-from-training-to-production-app" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To avoid having production data in the training app, it is encouraged to &lt;strong>remove&lt;/strong> the training app from the device once training is complete.&lt;/p>
-&lt;p>If the production app can always be installed after the use of the training is complete, then using the same &lt;code>applicationId&lt;/code> guarantees that only one of the apps is installed at any given time.&lt;/p>
-&lt;p>Changing passwords for the training users in an attempt to lock them out is not recommended. In some circumstances a user would be able to continue to use the training app for production use and not have the data sync back to the server.&lt;/p>
-&lt;p>It is preferable to remove the training app from devices, and &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-instance/" >monitor the training instance for unexpected activity&lt;/a> that can be brought over to the production instance if needed.&lt;/p></description></item><item><title>Training Cards</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards/</guid><description>
-&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
-&lt;p>&lt;em>Training Cards&lt;/em> help health workers learn about changes to CHT apps remotely, directly in their app. Training content might include information about a newly deployed feature, changes to a &lt;a href="https://docs.communityhealthtoolkit.org/building/care-guides/" >care guide&lt;/a>, or simply a reminder about an underused feature or workflow. They are perfect for training on a very specific topic and are not meant to replace a comprehensive onboarding program.&lt;/p>
-&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/" >Template training content&lt;/a> for new CHT features is made available from time to time. These templates can be customized to the local context.&lt;/p>
-&lt;figure class="col-12 col-lg-10">&lt;a href="training-deck.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-deck.png">&lt;/a>
-&lt;/figure>
-&lt;h2>Accessing&lt;span class="hx-absolute -hx-mt-20" id="accessing">&lt;/span>
-&lt;a href="#accessing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>When health workers open or reload their app, configured training cards will automatically show on top of all other content in the app. If it is not a convenient time to complete the training, they can cancel out at any time and will be prompted again the next day they open their app (training will start from the beginning).&lt;/p>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>If there are multiple training sets configured to start on the same day, the CHT will determine the order alphabetically based on the form ID. Subsequent training sets will only be displayed once the previous ones are either completed or no longer valid the next day the app is opened.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;p>Training materials can also be accessed in the training page found in the auxiliary menu for users to revisit as needed. Completed training is displayed with a green checkmark. &lt;em>Added in 4.15.0&lt;/em>.&lt;/p>
-&lt;figure class="col-10 col-lg-10">&lt;a href="training-materials-page.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-materials-page.png">&lt;/a>
-&lt;/figure>
-&lt;h2>Completing&lt;span class="hx-absolute -hx-mt-20" id="completing">&lt;/span>
-&lt;a href="#completing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Health workers read through each card one by one in a predefined sequence, tapping “Next” on each card. When they are finished reading all cards, they tap “Submit” on the last card. The training set is now considered complete and they can continue using their app. Completed training sets show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/reports/#main-list" >main list&lt;/a> of the Reports tab and they won’t be asked to complete this set again. If there are additional training sets to complete, they will be shown the next day the app is opened.&lt;/p>
-&lt;h2>Monitoring&lt;span class="hx-absolute -hx-mt-20" id="monitoring">&lt;/span>
-&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>As mentioned above, completed training sets will show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/reports/#main-list" >main list&lt;/a> of the Reports tab. These reports are available in &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-dashboards" >analytics&lt;/a>, &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#chw-aggregate-targets" >aggregate targets&lt;/a> , and can trigger supervision workflows and &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-tasks" >tasks&lt;/a>.&lt;/p>
-&lt;h2>Configurability&lt;span class="hx-absolute -hx-mt-20" id="configurability">&lt;/span>
-&lt;a href="#configurability" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Training cards can be shown to any user associated to a contact. A “set” of training cards represents a collection of individual training cards, generally covering a single training topic. The list below highlights some of the key areas of customization:&lt;/p>
-&lt;ul>
-&lt;li>Number of sets&lt;/li>
-&lt;li>Number of cards in a set&lt;/li>
-&lt;li>Content of each individual card (text, images, etc…)&lt;/li>
-&lt;li>When health workers will start seeing a set (specific start date)&lt;/li>
-&lt;li>How long the set will be available (# of days, relative to the start date)&lt;/li>
-&lt;li>Which users will see the set (based on user roles)&lt;/li>
-&lt;/ul></description></item><item><title>Training Cards Resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</guid><description>
-&lt;h2>Best practices&lt;span class="hx-absolute -hx-mt-20" id="best-practices">&lt;/span>
-&lt;a href="#best-practices" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>If you are deploying new &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >trainings cards&lt;/a>, here are some best practices to follow:&lt;/p>
-&lt;ul>
-&lt;li>When deploying training cards for the first time, provide guidance in advance as to what users should expect from the cards and how to use them&lt;/li>
-&lt;li>Test training card content with a small set of users to ensure learnability and understanding before deploying to your live instance&lt;/li>
-&lt;li>Test on a physical device to see what content will look like on different screen sizes&lt;/li>
-&lt;li>Keep content to a minimum and try to have as few cards as possible&lt;/li>
-&lt;li>Ensure images aren&amp;rsquo;t confused with UI elements: Add outlines or shadows indicating they&amp;rsquo;re for demonstrative purposes only. Never include navigation buttons in your screenshots (e.g., &amp;ldquo;Next&amp;rdquo; or &amp;ldquo;Cancel&amp;rdquo;).&lt;/li>
-&lt;li>Make sure users know who to contact if they run into issues&lt;/li>
-&lt;li>Establish success criteria for the training cards&lt;/li>
-&lt;/ul>
-&lt;p>Some examples of data to monitor include:&lt;/p>
-&lt;ul>
-&lt;li>Users who have completed the training within X days&lt;/li>
-&lt;li>Outliers, ex. users who have seen the cards multiple times and not completed the training&lt;/li>
-&lt;li>The intended users have received the training&lt;/li>
-&lt;/ul>
-&lt;h2>Examples&lt;span class="hx-absolute -hx-mt-20" id="examples">&lt;/span>
-&lt;a href="#examples" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Below is a list of training cards that you can use in your project to train users about new updates in CHT. Read the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >step by step guide&lt;/a> to deploy the training cards.&lt;/p>
-&lt;h3>Floating Action Button&lt;span class="hx-absolute -hx-mt-20" id="floating-action-button">&lt;/span>
-&lt;a href="#floating-action-button" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
-&lt;p>The additive actions (creating reports, places, people, etc&amp;hellip;) have moved from the bottom action bar to a Floating Action Button. Use this training to introduce the change to your users.&lt;/p>
-&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/floating-action-button" target="_blank" rel="noopener">here&lt;/a>.&lt;/p>
-&lt;figure class="left col-10">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/floating-action-button.png">
-&lt;/figure>
-&lt;br clear="all">
-&lt;h3>More Options Menu&lt;span class="hx-absolute -hx-mt-20" id="more-options-menu">&lt;/span>
-&lt;a href="#more-options-menu" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;em>Introduced in 4.2.0&lt;/em>&lt;/p>
-&lt;p>The Edit, Delete and Export actions have been moved to the More Options menu. Use this training to introduce the change to your users.&lt;/p>
-&lt;p>Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/more-options" target="_blank" rel="noopener">here&lt;/a>.&lt;/p>
-&lt;figure class="left col-10">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/more-options.png">
-&lt;/figure>
-&lt;br clear="all">
-&lt;p>Once you have downloaded the training card files, follow the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >step by step guide&lt;/a> to learn how to edit the &lt;code>properties file&lt;/code> to configure:&lt;/p>
-&lt;ul>
-&lt;li>The &lt;code>roles&lt;/code> of users who can view the training cards&lt;/li>
-&lt;li>The &lt;code>start_date&lt;/code> to define the training start day (when the training cards should show)&lt;/li>
-&lt;/ul></description></item><item><title>CHT training resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training/</guid><description>
-&lt;h2>CHT training process&lt;span class="hx-absolute -hx-mt-20" id="cht-training-process">&lt;/span>
-&lt;a href="#cht-training-process" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In the implementation of CHT supported community health programs, health care workers such as CHWs, CHW supervisors and facility based health care providers need training to help equip them with the required knowledge and skills to effectively carry out their roles and responsibilities. For most deployments, program leads and ministry of health officials may also need training for them to perform their roles, oversee and supervise the community health programs. End user training needs to be well planned and implemented using standardized training methods and approaches which take into account the capacity of end users.&lt;/p>
-&lt;p>For most community health programs, CHW training is divided into two major sections consisting of basic modules and technical modules. For basic module training, CHWs are trained on basic skills such as leadership, communication and counselling, basic health promotion practices and basic lifesaving skills. For technical training, end users are trained in the following common areas to help improve their skills and delivery:&lt;/p>
-&lt;ul>
-&lt;li>Thematic training - this training focuses on the health program areas of interest, this will vary from one program to another depending on the specific health areas users are expected to support. For example, for an MNCH program, users will be trained in ANC, PNC and immunization.&lt;/li>
-&lt;li>Hardware and software training - users are trained on how they can operate an android phone, reboot the hardware, install and reinstall applications and how they can log into the CHT app. This training is critical for end users who have never interacted with a smart phone before.&lt;/li>
-&lt;li>CHT tool training - this involves training users on how they can use different CHT tools (SMS, mobile and web applications) to guide them to deliver health care services.&lt;/li>
-&lt;li>Skill development - users are trained on interpersonal communication, listening skills, capacity building skills and how they can promote healthy behaviour change.&lt;/li>
-&lt;li>Behavioural - the users are taught how to build relations in the community and how to work within diverse communities.&lt;/li>
-&lt;/ul>
-&lt;p>Proper training of health care workers leads to increased job satisfaction ensuring health care workers are able to provide high quality care.&lt;/p>
-&lt;p>This guide highlights some of the considerations and steps for planning and conducting end user training. It is based on the learnings from many collaborative trainings that have been conducted over the years. Some of the training resources have been co-created with various implementing partners and ministries of health. This guide can help partners learn how they can plan and conduct training.&lt;/p>
-&lt;p>The CHT training process comprises a series of steps highlighted below that need to be followed systematically to ensure an efficient training programme.&lt;/p>
-&lt;ul>
-&lt;li>Training needs assessment - this is the first step prior to conducting the training to help understand the users needs, behaviour, roles and how they perform their responsibilities. At this stage, information on the literacy and numerical skills of end users, demographics (age, gender, language of instruction), potential program champions is collected, this information helps inform the training approach, duration and methods of training. To collect the needs assessment information, various methods can be used including observation, interviews,focused group discussions and surveys.&lt;/li>
-&lt;li>Define the training objectives - In this step, the training outcomes are defined, these are things end users should be able to do as a result of the training.&lt;/li>
-&lt;li>Develop a training plan or checklist - The checklist lists the tasks, activities and resources needed to train the end users&lt;/li>
-&lt;li>Create the training materials and resources&lt;/li>
-&lt;li>Conduct the training - Different training approaches can be adopted. Training can be done in person or virtually. It includes direct training of end users, training of trainers (ToT) model which involves training program champions to cascade the training, use of &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" >CHT training cards&lt;/a> in which users are able to access training resources in-app, remote online training and self learning through a learning management system.&lt;/li>
-&lt;li>Evaluate the training - In this stage, the training outcomes are assessed to determine if the training has achieved the expected outcomes. The learning objectives will help to determine the evaluation process that would be most appropriate.&lt;/li>
-&lt;/ul>
-&lt;h2>Pre training preparation&lt;span class="hx-absolute -hx-mt-20" id="pre-training-preparation">&lt;/span>
-&lt;a href="#pre-training-preparation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Before training is done, a training preparation checklist is prepared to ensure all items listed below are catered to.&lt;/p>
-&lt;h4>Tech preparation&lt;span class="hx-absolute -hx-mt-20" id="tech-preparation">&lt;/span>
-&lt;a href="#tech-preparation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
-&lt;li>Set up application instance (training &amp;amp; production instances)&lt;/li>
-&lt;li>Create user accounts for all personas depending on the specific project&lt;/li>
-&lt;li>Set up users&amp;rsquo; phones to ensure applications like Playstore and other related tools are available&lt;/li>
-&lt;/ul>
-&lt;h4>Logistics&lt;span class="hx-absolute -hx-mt-20" id="logistics">&lt;/span>
-&lt;a href="#logistics" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
-&lt;li>Identify the total number of participants. It is recommended that the ratio of facilitators to participants should be 1:10 and each training class should have a maximum of 30 participants.&lt;/li>
-&lt;li>Confirm and organize training venue. The venue should be well ventilated, have adequate lighting, good sanitation and security and be at a central location for easy access. It is recommended that the training of the CHWs takes place in a community setting such as schools, churches or mosques while training of CHAs and program teams can happen in a facility or hotel.&lt;/li>
-&lt;li>Phone preparation
-&lt;ul>
-&lt;li>Procure phones for the training with &lt;a href="https://docs.communityhealthtoolkit.org/building/login/" >minimum specs requirements&lt;/a>&lt;/li>
-&lt;li>Ensure phones are fully charged prior to training&lt;/li>
-&lt;li>Guide users on how to obtain and register SIM cards&lt;/li>
-&lt;li>Load airtime into phones&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>Pack phones, chargers and any other applicable hardware to take to the training venue&lt;/li>
-&lt;li>Prepare the inventory with end-users names, SIM numbers and phone IMEI numbers&lt;/li>
-&lt;li>Prepare the mobile and SIM handover form with a documented mobile and SIM Management guideline handout&lt;/li>
-&lt;li>Confirm availability of electricity, mobile network and internet at the training venue&lt;/li>
-&lt;li>Invite the partner or ministry of health to lead the training&lt;/li>
-&lt;li>Organize a facilitators pre-planning meeting to assign each facilitator sessions they will be covering.&lt;/li>
-&lt;li>Facilitators should visit the training site prior to the training to make sure the site is ready for the planned training.&lt;/li>
-&lt;li>Organize and process payment forms, if applicable, for:
-&lt;ul>
-&lt;li>Trainer and co-trainer allowance&lt;/li>
-&lt;li>Participation allowance&lt;/li>
-&lt;li>Travel allowance for participants&lt;/li>
-&lt;li>Venue costs and other expenses&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h4>Training materials&lt;span class="hx-absolute -hx-mt-20" id="training-materials">&lt;/span>
-&lt;a href="#training-materials" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;ul>
-&lt;li>Prepare training materials&lt;/li>
-&lt;li>Prepare training agenda with daily training schedule. This should contain the trainer responsibilities and activities - &lt;a href="https://docs.google.com/spreadsheets/d/1_oqbWhXoQy51WdUgyGTbnMpkPyugVmwT/edit?usp=drive_link&amp;amp;ouid=101053816538187800670&amp;amp;rtpof=true&amp;amp;sd=true" target="_blank" rel="noopener">here is an example of a training schedule&lt;/a>&lt;/li>
-&lt;li>Prepare screenshots or posters of training materials as backup&lt;/li>
-&lt;li>Finalize user guides - &lt;a href="https://drive.google.com/file/d/1T4OPfSnCzJPSpXEEVe7a6_8gq2MkS6sB/view?usp=drive_link" target="_blank" rel="noopener">here is an example of a user guide&lt;/a>&lt;/li>
-&lt;li>Finalize on the trainer and co-trainer resources&lt;/li>
-&lt;li>Translate training materials and arrange for a translator, if required&lt;/li>
-&lt;li>Organize supplies and stationery (markers, pens, notebooks, meta cards, tape, newsprint, index cards, handouts, take-home guides, projector and other required training equipment)&lt;/li>
-&lt;li>Print training materials such as the ones listed below:
-&lt;ul>
-&lt;li>Posters as a backup in case there is no electricity&lt;/li>
-&lt;li>User guides&lt;/li>
-&lt;li>Evaluations which include pre-tests and post-tests - &lt;a href="https://docs.google.com/document/d/1t5tqrk0m3c-5YJJBrteqU8sNsoDc3UT1WrXfy8NLNtw" target="_blank" rel="noopener">here is an example of a pre/post test&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;h2>Training&lt;span class="hx-absolute -hx-mt-20" id="training">&lt;/span>
-&lt;a href="#training" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Conducting a training&lt;span class="hx-absolute -hx-mt-20" id="conducting-a-training">&lt;/span>
-&lt;a href="#conducting-a-training" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Training should be approached in a cohesive and integrated manner, starting with the initial training of the end users, followed by regular refresher training, with continuous support, supervision and mentorship. Training is usually carried out collaboratively by the implementing partners, ministry of health officials and project implementers.&lt;/p>
-&lt;p>Different training approaches can be used to train end users. Several factors determine the training approach that is to be used, this includes the number of trainees and facilitators, user demographics, learning objectives, training environment and the available resources. The training approaches include: the training of trainers (ToT) model, direct end-user training and remote training. The ToT model is used to train a large pool of end users. For this model, a cadre of end users are trained as ToTs and after the training they are expected to cascade, reinforce and support the training of other end users. Direct training involves a trainer conducting an in-person training of end users while for the remote training, end users are trained online or they can access the training resources on their devices.&lt;/p>
-&lt;h3>Training delivery methods&lt;span class="hx-absolute -hx-mt-20" id="training-delivery-methods">&lt;/span>
-&lt;a href="#training-delivery-methods" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>There are a number of training methods that can be used to train end users. Blended training, participatory and interactive techniques can be used to make the training effective. The table below has a list of some of the delivery methods.&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Method&lt;/th>
-&lt;th>Description&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>Role play&lt;/td>
-&lt;td>Learners act out the different roles they are assigned. Following the skit, there are discussions and conclusions related to the topic.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Presentations&lt;/td>
-&lt;td>A facilitator delivers content through oral, video and visual aids.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Demonstrations&lt;/td>
-&lt;td>A skill is demonstrated with a goal of facilitating understanding, eliciting comments and explanations.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Pair work&lt;/td>
-&lt;td>Participants are able to work in pairs so that participants with low confidence are able to learn from other participants.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Case studies&lt;/td>
-&lt;td>A facilitator presents facts about a theoretical case or scenario and learners are asked to intervene and make suggestions, followed by a conclusion about the case.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Interactive simulations&lt;/td>
-&lt;td>This method provides an opportunity for learners to practise a certain task for example how to register a new households on CHT.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Teachbacks&lt;/td>
-&lt;td>Trainees pick a topic or a skill they have learned in one of the sessions and teach it to their peers.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Question and answer&lt;/td>
-&lt;td>The learners are provided with a set of questions which they are expected to answer so as to establish their prior level of understanding of a certain topic.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Hands-on practice&lt;/td>
-&lt;td>Learners get to experience and practise what they have learned, for example a learner will get the experience of navigating a digital app.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Individual work and assessments&lt;/td>
-&lt;td>Participants work individually to answer written or oral questions about a topic that has already been covered in the training.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Flip charts&lt;/td>
-&lt;td>These are wall and board hangings that can serve as visual aids to reinforce learning.&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Group assessments&lt;/td>
-&lt;td>Learners work together to answer questions or complete assigned tasks aimed at assessing knowledge of topics already covered in the training.&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h2>Post training activities&lt;span class="hx-absolute -hx-mt-20" id="post-training-activities">&lt;/span>
-&lt;a href="#post-training-activities" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>After every day of training, facilitators should conduct training evaluation to discuss what went well and the areas to improve on the subsequent training days. After the completion of the training, ministries of health, implementing partners and CHT users agree on a date when the project can go live. Below are the critical activities that take place before go-live.&lt;/p>
-&lt;ul>
-&lt;li>Participants are informed when the project will go live. In most cases, the project goes live a few weeks after the training&lt;/li>
-&lt;li>Participants are trained on how to install the production application&lt;/li>
-&lt;li>Paricipants are reminded to uninstall the training application&lt;/li>
-&lt;li>User accounts are created on the production instance and credentials shared&lt;/li>
-&lt;li>Users are informed on technical support structure to support with post-training issues&lt;/li>
-&lt;li>Users are sensitized on privacy and security best practices&lt;/li>
-&lt;/ul>
-&lt;h2>Evaluation&lt;span class="hx-absolute -hx-mt-20" id="evaluation">&lt;/span>
-&lt;a href="#evaluation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Evaluation assesses whether the training objectives have been achieved. Evaluation of the training involves assessing the effect of the training observed against a set standard considered as an indication of learning. A common model used to evaluate the training consists of the following four levels:&lt;/p>
-&lt;ul>
-&lt;li>Level 1 - this is the participants reaction towards the learning usually performed through a feedback survey, participants can evaluate the training content, facilitators, training approaches and the training venue. Trainers use this feedback to improve the training content and approach&lt;/li>
-&lt;li>Level 2 - This measures what learners have learnt and what they are able to perform as a result of the training. This can be done during the training through pre and post tests, simulations, practical tests and tasks&lt;/li>
-&lt;li>Level 3 - After the training event, the learners are evaluated if they are able to apply what they have learned when working. This can be done through observations, learning and interviews&lt;/li>
-&lt;li>Level 4 - This is concerned with the extent to which changes in behaviour after the training contribute to improved results and increased impact. This can be done after a series of training and refresher trainings and it requires before and after the training comparison&lt;/li>
-&lt;/ul></description></item><item><title>Detecting and fixing production data on training instances</title><link>https://docs.communityhealthtoolkit.org/building/training/training-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-instance/</guid><description>
-&lt;p>After &lt;a href="https://docs.communityhealthtoolkit.org/building/training/onboarding/" >onboarding CHWs&lt;/a>, sometimes data ends up on the wrong CHT instance. There are some passive and active actions you can take to help deal with this situation.&lt;/p>
-&lt;h2>Monitoring``&lt;span class="hx-absolute -hx-mt-20" id="monitoring">&lt;/span>
-&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Monitoring is a good way to see if CHWs are sending forms to the wrong CHT server. By catching such a problem early, it may be easy to fix manually which avoids more laborious fixes on the command line for admins.
-``&lt;/p>
-&lt;h3>Manual device checks&lt;span class="hx-absolute -hx-mt-20" id="manual-device-checks">&lt;/span>
-&lt;a href="#manual-device-checks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Supervisors can actively monitor CHWs as they register their first household. If each CHW is given a deadline to do this, the Supervisor can follow up promptly with CHWs who have not met the deadline.&lt;/p>
-&lt;h3>Centralized database checks&lt;span class="hx-absolute -hx-mt-20" id="centralized-database-checks">&lt;/span>
-&lt;a href="#centralized-database-checks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>From an administrative perspective, passive monitoring can be done by querying the Postgres instance that &lt;a href="https://github.com/medic/cht-sync/" target="_blank" rel="noopener">CHT Sync&lt;/a> is populating. If &lt;code>2020-09-14&lt;/code> was the date to stop use the training instance, this SQL query would show CHWs using the wrong instance after &lt;code>2020-09-14&lt;/code>:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">with forms as &lt;span class="o">(&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">select&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> doc &lt;span class="c1">#&amp;gt;&amp;gt; &amp;#39;{fields,inputs,user,contact_id}&amp;#39; as chw_id,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> count&lt;span class="o">(&lt;/span>*&lt;span class="o">)&lt;/span> as n_forms
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> from
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> couchdb
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> where to_timestamp&lt;span class="o">((&lt;/span>doc -&amp;gt;&amp;gt; &lt;span class="s1">&amp;#39;reported_date&amp;#39;&lt;/span> &lt;span class="o">)&lt;/span>::bigint / 1000&lt;span class="o">)&lt;/span> &amp;gt; &lt;span class="s1">&amp;#39;2020-09-14 00:00:00&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> group by &lt;span class="m">1&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">)&lt;/span>, chw_names as &lt;span class="o">(&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">select&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> doc -&amp;gt;&amp;gt; &lt;span class="s1">&amp;#39;_id&amp;#39;&lt;/span> as chw_id,
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> doc -&amp;gt;&amp;gt; &lt;span class="s1">&amp;#39;name&amp;#39;&lt;/span> as chw_name
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> from couchdb
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> where doc -&amp;gt;&amp;gt; &lt;span class="s1">&amp;#39;role&amp;#39;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;chw&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> and doc -&amp;gt;&amp;gt; &lt;span class="s1">&amp;#39;name&amp;#39;&lt;/span> not like &lt;span class="s1">&amp;#39;ASC%&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">select&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> n.chw_name,
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> f.n_forms
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">from
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">forms f
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">left join
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chw_names n
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">using&lt;span class="o">(&lt;/span>chw_id&lt;span class="o">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">order by n_forms desc&lt;span class="p">;&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;p&gt;When onboarding new users, having a dedicated CHT app and instance for training can be helpful; it allows new users to do training exercises with mock data to get familiar with the app, while not having the data from their training interfering with the future use of their CHT app. Different approaches are possible, such as only entering real patient data during training, or manually deleting all the training data, but these methods are less practical for large deployments.&lt;/p&gt;
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
+&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;The suggestions in this guide should be assessed and adapted as needed to benefit a deployment. It is important that users don&amp;rsquo;t accidentally use the wrong app. The &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-instance/" &gt;troubleshooting guide&lt;/a&gt; can help to monitor and remediate training data being in the production instance, or the opposite.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Setting up a training app&lt;span class="hx-absolute -hx-mt-20" id="setting-up-a-training-app"&gt;&lt;/span&gt;
+&lt;a href="#setting-up-a-training-app" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;A separate Android App can be created for training, which would point to a CHT instance dedicated to training. The training instance should have the same configuration as the production instance, and have users created for training. To differentiate the Android app used for training from the production one, create a duplicate of &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/android/" &gt;your flavor&lt;/a&gt; and modify the following aspects&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Border &amp;amp; Message&lt;/strong&gt;: Consider adding a distinctive border and message when using the training app. This can be done by setting the build config field &lt;code&gt;IS_TRAINING_APP&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt;, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L212-L216" target="_blank" rel="noopener"&gt;&lt;code&gt;build.gradle&lt;/code&gt;&lt;/a&gt; for the training version of the Gamma app.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;CHT Instance&lt;/strong&gt;: In your flavor&amp;rsquo;s &lt;code&gt;res/values/strings.xml&lt;/code&gt; file set the &lt;code&gt;app_host&lt;/code&gt; string to be the URL of your training instance, as seen in the &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L3" target="_blank" rel="noopener"&gt;Gamma Training app&lt;/a&gt;. If left the same as the production app both training and production data will end up in your production instance.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Launcher icons&lt;/strong&gt;: Consider using completely different icons, or at least change the color of the launcher icons.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;App name&lt;/strong&gt;: Provide a noticeably different name to the training app. Since app names are often cut short on Android devices, make the change at beginning of the text. For example, &lt;code&gt;CHW App [TRAINING VERSION]&lt;/code&gt; may display as &lt;code&gt;CHW App...&lt;/code&gt; so it would be better to use &lt;code&gt;[TRAINING] CHW App&lt;/code&gt;. The app name is set in the flavor&amp;rsquo;s &lt;code&gt;res/values/strings.xml&lt;/code&gt; file, as seen in &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/src/medicmobilegamma_training/res/values/strings.xml#L4" target="_blank" rel="noopener"&gt;the Gamma training app&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;App ID&lt;/strong&gt;: If you want to allow both apps to be on a device at once you will need to make sure your training app has a different &lt;code&gt;applicationId&lt;/code&gt;, as seen &lt;a href="https://github.com/medic/cht-android/blob/8d077ed08dc3889ef1f4e3bad7231931bca55d87/build.gradle#L214" target="_blank" rel="noopener"&gt;in &lt;code&gt;build.gradle&lt;/code&gt; for the Gamma training app&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="hextra-cards hx-mt-4 hx-gap-4 hx-grid not-prose" style="--hextra-cards-grid-cols: 3;"&gt;
+&lt;figure class="right col-6 col-lg-4"&gt;&lt;a href="training-app.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/onboarding/training-app.png"
+alt="CHT training app with border and message"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;/div&gt;
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
+&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Keeping the &lt;code&gt;applicationId&lt;/code&gt; values the same will make it impossible to have both the training and production apps installed at the same time on a device. If you have a way to install the production app after the training is complete then you may choose to do this to prevent users from using the wrong app.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Switching from training to production app&lt;span class="hx-absolute -hx-mt-20" id="switching-from-training-to-production-app"&gt;&lt;/span&gt;
+&lt;a href="#switching-from-training-to-production-app" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To avoid having production data in the training app, it is encouraged to &lt;strong&gt;remove&lt;/strong&gt; the training app from the device once training is complete.&lt;/p&gt;
+&lt;p&gt;If the production app can always be installed after the use of the training is complete, then using the same &lt;code&gt;applicationId&lt;/code&gt; guarantees that only one of the apps is installed at any given time.&lt;/p&gt;
+&lt;p&gt;Changing passwords for the training users in an attempt to lock them out is not recommended. In some circumstances a user would be able to continue to use the training app for production use and not have the data sync back to the server.&lt;/p&gt;
+&lt;p&gt;It is preferable to remove the training app from devices, and &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-instance/" &gt;monitor the training instance for unexpected activity&lt;/a&gt; that can be brought over to the production instance if needed.&lt;/p&gt;</description></item><item><title>Training Cards</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards/</guid><description>
+&lt;p&gt;&lt;em&gt;Introduced in 4.2.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Training Cards&lt;/em&gt; help health workers learn about changes to CHT apps remotely, directly in their app. Training content might include information about a newly deployed feature, changes to a &lt;a href="https://docs.communityhealthtoolkit.org/building/care-guides/" &gt;care guide&lt;/a&gt;, or simply a reminder about an underused feature or workflow. They are perfect for training on a very specific topic and are not meant to replace a comprehensive onboarding program.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/" &gt;Template training content&lt;/a&gt; for new CHT features is made available from time to time. These templates can be customized to the local context.&lt;/p&gt;
+&lt;figure class="col-12 col-lg-10"&gt;&lt;a href="training-deck.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-deck.png"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;h2&gt;Accessing&lt;span class="hx-absolute -hx-mt-20" id="accessing"&gt;&lt;/span&gt;
+&lt;a href="#accessing" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;When health workers open or reload their app, configured training cards will automatically show on top of all other content in the app. If it is not a convenient time to complete the training, they can cancel out at any time and will be prompted again the next day they open their app (training will start from the beginning).&lt;/p&gt;
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
+&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;If there are multiple training sets configured to start on the same day, the CHT will determine the order alphabetically based on the form ID. Subsequent training sets will only be displayed once the previous ones are either completed or no longer valid the next day the app is opened.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Training materials can also be accessed in the training page found in the auxiliary menu for users to revisit as needed. Completed training is displayed with a green checkmark. &lt;em&gt;Added in 4.15.0&lt;/em&gt;.&lt;/p&gt;
+&lt;figure class="col-10 col-lg-10"&gt;&lt;a href="training-materials-page.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards/training-materials-page.png"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;h2&gt;Completing&lt;span class="hx-absolute -hx-mt-20" id="completing"&gt;&lt;/span&gt;
+&lt;a href="#completing" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Health workers read through each card one by one in a predefined sequence, tapping “Next” on each card. When they are finished reading all cards, they tap “Submit” on the last card. The training set is now considered complete and they can continue using their app. Completed training sets show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/reports/#main-list" &gt;main list&lt;/a&gt; of the Reports tab and they won’t be asked to complete this set again. If there are additional training sets to complete, they will be shown the next day the app is opened.&lt;/p&gt;
+&lt;h2&gt;Monitoring&lt;span class="hx-absolute -hx-mt-20" id="monitoring"&gt;&lt;/span&gt;
+&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;As mentioned above, completed training sets will show up on the &lt;a href="https://docs.communityhealthtoolkit.org/building/reports/#main-list" &gt;main list&lt;/a&gt; of the Reports tab. These reports are available in &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-dashboards" &gt;analytics&lt;/a&gt;, &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#chw-aggregate-targets" &gt;aggregate targets&lt;/a&gt; , and can trigger supervision workflows and &lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-tasks" &gt;tasks&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Configurability&lt;span class="hx-absolute -hx-mt-20" id="configurability"&gt;&lt;/span&gt;
+&lt;a href="#configurability" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Training cards can be shown to any user associated to a contact. A “set” of training cards represents a collection of individual training cards, generally covering a single training topic. The list below highlights some of the key areas of customization:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Number of sets&lt;/li&gt;
+&lt;li&gt;Number of cards in a set&lt;/li&gt;
+&lt;li&gt;Content of each individual card (text, images, etc…)&lt;/li&gt;
+&lt;li&gt;When health workers will start seeing a set (specific start date)&lt;/li&gt;
+&lt;li&gt;How long the set will be available (# of days, relative to the start date)&lt;/li&gt;
+&lt;li&gt;Which users will see the set (based on user roles)&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Training Cards Resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/</guid><description>
+&lt;h2&gt;Best practices&lt;span class="hx-absolute -hx-mt-20" id="best-practices"&gt;&lt;/span&gt;
+&lt;a href="#best-practices" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;If you are deploying new &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" &gt;trainings cards&lt;/a&gt;, here are some best practices to follow:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;When deploying training cards for the first time, provide guidance in advance as to what users should expect from the cards and how to use them&lt;/li&gt;
+&lt;li&gt;Test training card content with a small set of users to ensure learnability and understanding before deploying to your live instance&lt;/li&gt;
+&lt;li&gt;Test on a physical device to see what content will look like on different screen sizes&lt;/li&gt;
+&lt;li&gt;Keep content to a minimum and try to have as few cards as possible&lt;/li&gt;
+&lt;li&gt;Ensure images aren&amp;rsquo;t confused with UI elements: Add outlines or shadows indicating they&amp;rsquo;re for demonstrative purposes only. Never include navigation buttons in your screenshots (e.g., &amp;ldquo;Next&amp;rdquo; or &amp;ldquo;Cancel&amp;rdquo;).&lt;/li&gt;
+&lt;li&gt;Make sure users know who to contact if they run into issues&lt;/li&gt;
+&lt;li&gt;Establish success criteria for the training cards&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some examples of data to monitor include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Users who have completed the training within X days&lt;/li&gt;
+&lt;li&gt;Outliers, ex. users who have seen the cards multiple times and not completed the training&lt;/li&gt;
+&lt;li&gt;The intended users have received the training&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Examples&lt;span class="hx-absolute -hx-mt-20" id="examples"&gt;&lt;/span&gt;
+&lt;a href="#examples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Below is a list of training cards that you can use in your project to train users about new updates in CHT. Read the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" &gt;step by step guide&lt;/a&gt; to deploy the training cards.&lt;/p&gt;
+&lt;h3&gt;Floating Action Button&lt;span class="hx-absolute -hx-mt-20" id="floating-action-button"&gt;&lt;/span&gt;
+&lt;a href="#floating-action-button" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;em&gt;Introduced in 4.2.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The additive actions (creating reports, places, people, etc&amp;hellip;) have moved from the bottom action bar to a Floating Action Button. Use this training to introduce the change to your users.&lt;/p&gt;
+&lt;p&gt;Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/floating-action-button" target="_blank" rel="noopener"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;figure class="left col-10"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/floating-action-button.png"&gt;
+&lt;/figure&gt;
+&lt;br clear="all"&gt;
+&lt;h3&gt;More Options Menu&lt;span class="hx-absolute -hx-mt-20" id="more-options-menu"&gt;&lt;/span&gt;
+&lt;a href="#more-options-menu" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;em&gt;Introduced in 4.2.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The Edit, Delete and Export actions have been moved to the More Options menu. Use this training to introduce the change to your users.&lt;/p&gt;
+&lt;p&gt;Get the training card files &lt;a href="https://github.com/medic/cht-docs/tree/main/content/en/building/training/training-cards-resources/available-trainings/more-options" target="_blank" rel="noopener"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;figure class="left col-10"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-cards-resources/images/more-options.png"&gt;
+&lt;/figure&gt;
+&lt;br clear="all"&gt;
+&lt;p&gt;Once you have downloaded the training card files, follow the &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" &gt;step by step guide&lt;/a&gt; to learn how to edit the &lt;code&gt;properties file&lt;/code&gt; to configure:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;roles&lt;/code&gt; of users who can view the training cards&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;start_date&lt;/code&gt; to define the training start day (when the training cards should show)&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>CHT training resources</title><link>https://docs.communityhealthtoolkit.org/building/training/training/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training/</guid><description>
+&lt;h2&gt;CHT training process&lt;span class="hx-absolute -hx-mt-20" id="cht-training-process"&gt;&lt;/span&gt;
+&lt;a href="#cht-training-process" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In the implementation of CHT supported community health programs, health care workers such as CHWs, CHW supervisors and facility based health care providers need training to help equip them with the required knowledge and skills to effectively carry out their roles and responsibilities. For most deployments, program leads and ministry of health officials may also need training for them to perform their roles, oversee and supervise the community health programs. End user training needs to be well planned and implemented using standardized training methods and approaches which take into account the capacity of end users.&lt;/p&gt;
+&lt;p&gt;For most community health programs, CHW training is divided into two major sections consisting of basic modules and technical modules. For basic module training, CHWs are trained on basic skills such as leadership, communication and counselling, basic health promotion practices and basic lifesaving skills. For technical training, end users are trained in the following common areas to help improve their skills and delivery:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Thematic training - this training focuses on the health program areas of interest, this will vary from one program to another depending on the specific health areas users are expected to support. For example, for an MNCH program, users will be trained in ANC, PNC and immunization.&lt;/li&gt;
+&lt;li&gt;Hardware and software training - users are trained on how they can operate an android phone, reboot the hardware, install and reinstall applications and how they can log into the CHT app. This training is critical for end users who have never interacted with a smart phone before.&lt;/li&gt;
+&lt;li&gt;CHT tool training - this involves training users on how they can use different CHT tools (SMS, mobile and web applications) to guide them to deliver health care services.&lt;/li&gt;
+&lt;li&gt;Skill development - users are trained on interpersonal communication, listening skills, capacity building skills and how they can promote healthy behaviour change.&lt;/li&gt;
+&lt;li&gt;Behavioural - the users are taught how to build relations in the community and how to work within diverse communities.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Proper training of health care workers leads to increased job satisfaction ensuring health care workers are able to provide high quality care.&lt;/p&gt;
+&lt;p&gt;This guide highlights some of the considerations and steps for planning and conducting end user training. It is based on the learnings from many collaborative trainings that have been conducted over the years. Some of the training resources have been co-created with various implementing partners and ministries of health. This guide can help partners learn how they can plan and conduct training.&lt;/p&gt;
+&lt;p&gt;The CHT training process comprises a series of steps highlighted below that need to be followed systematically to ensure an efficient training programme.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Training needs assessment - this is the first step prior to conducting the training to help understand the users needs, behaviour, roles and how they perform their responsibilities. At this stage, information on the literacy and numerical skills of end users, demographics (age, gender, language of instruction), potential program champions is collected, this information helps inform the training approach, duration and methods of training. To collect the needs assessment information, various methods can be used including observation, interviews,focused group discussions and surveys.&lt;/li&gt;
+&lt;li&gt;Define the training objectives - In this step, the training outcomes are defined, these are things end users should be able to do as a result of the training.&lt;/li&gt;
+&lt;li&gt;Develop a training plan or checklist - The checklist lists the tasks, activities and resources needed to train the end users&lt;/li&gt;
+&lt;li&gt;Create the training materials and resources&lt;/li&gt;
+&lt;li&gt;Conduct the training - Different training approaches can be adopted. Training can be done in person or virtually. It includes direct training of end users, training of trainers (ToT) model which involves training program champions to cascade the training, use of &lt;a href="https://docs.communityhealthtoolkit.org/building/training/training-cards/" &gt;CHT training cards&lt;/a&gt; in which users are able to access training resources in-app, remote online training and self learning through a learning management system.&lt;/li&gt;
+&lt;li&gt;Evaluate the training - In this stage, the training outcomes are assessed to determine if the training has achieved the expected outcomes. The learning objectives will help to determine the evaluation process that would be most appropriate.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Pre training preparation&lt;span class="hx-absolute -hx-mt-20" id="pre-training-preparation"&gt;&lt;/span&gt;
+&lt;a href="#pre-training-preparation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Before training is done, a training preparation checklist is prepared to ensure all items listed below are catered to.&lt;/p&gt;
+&lt;h4&gt;Tech preparation&lt;span class="hx-absolute -hx-mt-20" id="tech-preparation"&gt;&lt;/span&gt;
+&lt;a href="#tech-preparation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Set up application instance (training &amp;amp; production instances)&lt;/li&gt;
+&lt;li&gt;Create user accounts for all personas depending on the specific project&lt;/li&gt;
+&lt;li&gt;Set up users&amp;rsquo; phones to ensure applications like Playstore and other related tools are available&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Logistics&lt;span class="hx-absolute -hx-mt-20" id="logistics"&gt;&lt;/span&gt;
+&lt;a href="#logistics" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Identify the total number of participants. It is recommended that the ratio of facilitators to participants should be 1:10 and each training class should have a maximum of 30 participants.&lt;/li&gt;
+&lt;li&gt;Confirm and organize training venue. The venue should be well ventilated, have adequate lighting, good sanitation and security and be at a central location for easy access. It is recommended that the training of the CHWs takes place in a community setting such as schools, churches or mosques while training of CHAs and program teams can happen in a facility or hotel.&lt;/li&gt;
+&lt;li&gt;Phone preparation
+&lt;ul&gt;
+&lt;li&gt;Procure phones for the training with &lt;a href="https://docs.communityhealthtoolkit.org/building/login/" &gt;minimum specs requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Ensure phones are fully charged prior to training&lt;/li&gt;
+&lt;li&gt;Guide users on how to obtain and register SIM cards&lt;/li&gt;
+&lt;li&gt;Load airtime into phones&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Pack phones, chargers and any other applicable hardware to take to the training venue&lt;/li&gt;
+&lt;li&gt;Prepare the inventory with end-users names, SIM numbers and phone IMEI numbers&lt;/li&gt;
+&lt;li&gt;Prepare the mobile and SIM handover form with a documented mobile and SIM Management guideline handout&lt;/li&gt;
+&lt;li&gt;Confirm availability of electricity, mobile network and internet at the training venue&lt;/li&gt;
+&lt;li&gt;Invite the partner or ministry of health to lead the training&lt;/li&gt;
+&lt;li&gt;Organize a facilitators pre-planning meeting to assign each facilitator sessions they will be covering.&lt;/li&gt;
+&lt;li&gt;Facilitators should visit the training site prior to the training to make sure the site is ready for the planned training.&lt;/li&gt;
+&lt;li&gt;Organize and process payment forms, if applicable, for:
+&lt;ul&gt;
+&lt;li&gt;Trainer and co-trainer allowance&lt;/li&gt;
+&lt;li&gt;Participation allowance&lt;/li&gt;
+&lt;li&gt;Travel allowance for participants&lt;/li&gt;
+&lt;li&gt;Venue costs and other expenses&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Training materials&lt;span class="hx-absolute -hx-mt-20" id="training-materials"&gt;&lt;/span&gt;
+&lt;a href="#training-materials" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Prepare training materials&lt;/li&gt;
+&lt;li&gt;Prepare training agenda with daily training schedule. This should contain the trainer responsibilities and activities - &lt;a href="https://docs.google.com/spreadsheets/d/1_oqbWhXoQy51WdUgyGTbnMpkPyugVmwT/edit?usp=drive_link&amp;amp;ouid=101053816538187800670&amp;amp;rtpof=true&amp;amp;sd=true" target="_blank" rel="noopener"&gt;here is an example of a training schedule&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Prepare screenshots or posters of training materials as backup&lt;/li&gt;
+&lt;li&gt;Finalize user guides - &lt;a href="https://drive.google.com/file/d/1T4OPfSnCzJPSpXEEVe7a6_8gq2MkS6sB/view?usp=drive_link" target="_blank" rel="noopener"&gt;here is an example of a user guide&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Finalize on the trainer and co-trainer resources&lt;/li&gt;
+&lt;li&gt;Translate training materials and arrange for a translator, if required&lt;/li&gt;
+&lt;li&gt;Organize supplies and stationery (markers, pens, notebooks, meta cards, tape, newsprint, index cards, handouts, take-home guides, projector and other required training equipment)&lt;/li&gt;
+&lt;li&gt;Print training materials such as the ones listed below:
+&lt;ul&gt;
+&lt;li&gt;Posters as a backup in case there is no electricity&lt;/li&gt;
+&lt;li&gt;User guides&lt;/li&gt;
+&lt;li&gt;Evaluations which include pre-tests and post-tests - &lt;a href="https://docs.google.com/document/d/1t5tqrk0m3c-5YJJBrteqU8sNsoDc3UT1WrXfy8NLNtw" target="_blank" rel="noopener"&gt;here is an example of a pre/post test&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Training&lt;span class="hx-absolute -hx-mt-20" id="training"&gt;&lt;/span&gt;
+&lt;a href="#training" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Conducting a training&lt;span class="hx-absolute -hx-mt-20" id="conducting-a-training"&gt;&lt;/span&gt;
+&lt;a href="#conducting-a-training" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Training should be approached in a cohesive and integrated manner, starting with the initial training of the end users, followed by regular refresher training, with continuous support, supervision and mentorship. Training is usually carried out collaboratively by the implementing partners, ministry of health officials and project implementers.&lt;/p&gt;
+&lt;p&gt;Different training approaches can be used to train end users. Several factors determine the training approach that is to be used, this includes the number of trainees and facilitators, user demographics, learning objectives, training environment and the available resources. The training approaches include: the training of trainers (ToT) model, direct end-user training and remote training. The ToT model is used to train a large pool of end users. For this model, a cadre of end users are trained as ToTs and after the training they are expected to cascade, reinforce and support the training of other end users. Direct training involves a trainer conducting an in-person training of end users while for the remote training, end users are trained online or they can access the training resources on their devices.&lt;/p&gt;
+&lt;h3&gt;Training delivery methods&lt;span class="hx-absolute -hx-mt-20" id="training-delivery-methods"&gt;&lt;/span&gt;
+&lt;a href="#training-delivery-methods" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;There are a number of training methods that can be used to train end users. Blended training, participatory and interactive techniques can be used to make the training effective. The table below has a list of some of the delivery methods.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Method&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Role play&lt;/td&gt;
+&lt;td&gt;Learners act out the different roles they are assigned. Following the skit, there are discussions and conclusions related to the topic.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Presentations&lt;/td&gt;
+&lt;td&gt;A facilitator delivers content through oral, video and visual aids.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Demonstrations&lt;/td&gt;
+&lt;td&gt;A skill is demonstrated with a goal of facilitating understanding, eliciting comments and explanations.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Pair work&lt;/td&gt;
+&lt;td&gt;Participants are able to work in pairs so that participants with low confidence are able to learn from other participants.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Case studies&lt;/td&gt;
+&lt;td&gt;A facilitator presents facts about a theoretical case or scenario and learners are asked to intervene and make suggestions, followed by a conclusion about the case.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Interactive simulations&lt;/td&gt;
+&lt;td&gt;This method provides an opportunity for learners to practise a certain task for example how to register a new households on CHT.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Teachbacks&lt;/td&gt;
+&lt;td&gt;Trainees pick a topic or a skill they have learned in one of the sessions and teach it to their peers.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Question and answer&lt;/td&gt;
+&lt;td&gt;The learners are provided with a set of questions which they are expected to answer so as to establish their prior level of understanding of a certain topic.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hands-on practice&lt;/td&gt;
+&lt;td&gt;Learners get to experience and practise what they have learned, for example a learner will get the experience of navigating a digital app.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Individual work and assessments&lt;/td&gt;
+&lt;td&gt;Participants work individually to answer written or oral questions about a topic that has already been covered in the training.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Flip charts&lt;/td&gt;
+&lt;td&gt;These are wall and board hangings that can serve as visual aids to reinforce learning.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Group assessments&lt;/td&gt;
+&lt;td&gt;Learners work together to answer questions or complete assigned tasks aimed at assessing knowledge of topics already covered in the training.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Post training activities&lt;span class="hx-absolute -hx-mt-20" id="post-training-activities"&gt;&lt;/span&gt;
+&lt;a href="#post-training-activities" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;After every day of training, facilitators should conduct training evaluation to discuss what went well and the areas to improve on the subsequent training days. After the completion of the training, ministries of health, implementing partners and CHT users agree on a date when the project can go live. Below are the critical activities that take place before go-live.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Participants are informed when the project will go live. In most cases, the project goes live a few weeks after the training&lt;/li&gt;
+&lt;li&gt;Participants are trained on how to install the production application&lt;/li&gt;
+&lt;li&gt;Paricipants are reminded to uninstall the training application&lt;/li&gt;
+&lt;li&gt;User accounts are created on the production instance and credentials shared&lt;/li&gt;
+&lt;li&gt;Users are informed on technical support structure to support with post-training issues&lt;/li&gt;
+&lt;li&gt;Users are sensitized on privacy and security best practices&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Evaluation&lt;span class="hx-absolute -hx-mt-20" id="evaluation"&gt;&lt;/span&gt;
+&lt;a href="#evaluation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Evaluation assesses whether the training objectives have been achieved. Evaluation of the training involves assessing the effect of the training observed against a set standard considered as an indication of learning. A common model used to evaluate the training consists of the following four levels:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Level 1 - this is the participants reaction towards the learning usually performed through a feedback survey, participants can evaluate the training content, facilitators, training approaches and the training venue. Trainers use this feedback to improve the training content and approach&lt;/li&gt;
+&lt;li&gt;Level 2 - This measures what learners have learnt and what they are able to perform as a result of the training. This can be done during the training through pre and post tests, simulations, practical tests and tasks&lt;/li&gt;
+&lt;li&gt;Level 3 - After the training event, the learners are evaluated if they are able to apply what they have learned when working. This can be done through observations, learning and interviews&lt;/li&gt;
+&lt;li&gt;Level 4 - This is concerned with the extent to which changes in behaviour after the training contribute to improved results and increased impact. This can be done after a series of training and refresher trainings and it requires before and after the training comparison&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Detecting and fixing production data on training instances</title><link>https://docs.communityhealthtoolkit.org/building/training/training-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/training-instance/</guid><description>
+&lt;p&gt;After &lt;a href="https://docs.communityhealthtoolkit.org/building/training/onboarding/" &gt;onboarding CHWs&lt;/a&gt;, sometimes data ends up on the wrong CHT instance. There are some passive and active actions you can take to help deal with this situation.&lt;/p&gt;
+&lt;h2&gt;Monitoring``&lt;span class="hx-absolute -hx-mt-20" id="monitoring"&gt;&lt;/span&gt;
+&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Monitoring is a good way to see if CHWs are sending forms to the wrong CHT server. By catching such a problem early, it may be easy to fix manually which avoids more laborious fixes on the command line for admins.
+``&lt;/p&gt;
+&lt;h3&gt;Manual device checks&lt;span class="hx-absolute -hx-mt-20" id="manual-device-checks"&gt;&lt;/span&gt;
+&lt;a href="#manual-device-checks" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Supervisors can actively monitor CHWs as they register their first household. If each CHW is given a deadline to do this, the Supervisor can follow up promptly with CHWs who have not met the deadline.&lt;/p&gt;
+&lt;h3&gt;Centralized database checks&lt;span class="hx-absolute -hx-mt-20" id="centralized-database-checks"&gt;&lt;/span&gt;
+&lt;a href="#centralized-database-checks" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;From an administrative perspective, passive monitoring can be done by querying the Postgres instance that &lt;a href="https://github.com/medic/cht-sync/" target="_blank" rel="noopener"&gt;CHT Sync&lt;/a&gt; is populating. If &lt;code&gt;2020-09-14&lt;/code&gt; was the date to stop use the training instance, this SQL query would show CHWs using the wrong instance after &lt;code&gt;2020-09-14&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;with forms as &lt;span class="o"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;select&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; doc &lt;span class="c1"&gt;#&amp;gt;&amp;gt; &amp;#39;{fields,inputs,user,contact_id}&amp;#39; as chw_id,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; count&lt;span class="o"&gt;(&lt;/span&gt;*&lt;span class="o"&gt;)&lt;/span&gt; as n_forms
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; from
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; couchdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; where to_timestamp&lt;span class="o"&gt;((&lt;/span&gt;doc -&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;reported_date&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;::bigint / 1000&lt;span class="o"&gt;)&lt;/span&gt; &amp;gt; &lt;span class="s1"&gt;&amp;#39;2020-09-14 00:00:00&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; group by &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;)&lt;/span&gt;, chw_names as &lt;span class="o"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;select&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; doc -&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;_id&amp;#39;&lt;/span&gt; as chw_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; doc -&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt; as chw_name
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; from couchdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; where doc -&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;role&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;chw&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; and doc -&amp;gt;&amp;gt; &lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt; not like &lt;span class="s1"&gt;&amp;#39;ASC%&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;select&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; n.chw_name,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; f.n_forms
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;from
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;forms f
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;left join
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chw_names n
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;using&lt;span class="o"&gt;(&lt;/span&gt;chw_id&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;order by n_forms desc&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>A limitation of this technique is that CHWs who have not synchronized their device will not show up. In this case, a supervisor proactively checking per above is a better failsafe.&lt;/p>
-&lt;h3>CHT based supervisor tasks&lt;span class="hx-absolute -hx-mt-20" id="cht-based-supervisor-tasks">&lt;/span>
-&lt;a href="#cht-based-supervisor-tasks" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>&lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-tasks" >Tasks for supervisors&lt;/a> can also be used for the CHWs that report to them. This can be used to trigger a task when a CHW hasn&amp;rsquo;t submitted a task within a given period on production.&lt;/p>
-&lt;h2>Remediation&lt;span class="hx-absolute -hx-mt-20" id="remediation">&lt;/span>
-&lt;a href="#remediation" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>In the case that production data has been entered into a training instance, care must be used to ensure data is not lost or overwritten. These steps assume you&amp;rsquo;re on a Linux command line and have jq, curl and cat installed. The task is to carefully download all docs created after a certain date on a training, clean up extra docs not needed and then upload them to a production instance:&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>Set the aliases and environment variables:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>alias ts=&amp;#39;date -u &amp;#43;&amp;#34;%Y-%m-%dT%H:%M:%SZ&amp;#34;&amp;#39;
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;A limitation of this technique is that CHWs who have not synchronized their device will not show up. In this case, a supervisor proactively checking per above is a better failsafe.&lt;/p&gt;
+&lt;h3&gt;CHT based supervisor tasks&lt;span class="hx-absolute -hx-mt-20" id="cht-based-supervisor-tasks"&gt;&lt;/span&gt;
+&lt;a href="#cht-based-supervisor-tasks" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/supervision/#supervisor-tasks" &gt;Tasks for supervisors&lt;/a&gt; can also be used for the CHWs that report to them. This can be used to trigger a task when a CHW hasn&amp;rsquo;t submitted a task within a given period on production.&lt;/p&gt;
+&lt;h2&gt;Remediation&lt;span class="hx-absolute -hx-mt-20" id="remediation"&gt;&lt;/span&gt;
+&lt;a href="#remediation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In the case that production data has been entered into a training instance, care must be used to ensure data is not lost or overwritten. These steps assume you&amp;rsquo;re on a Linux command line and have jq, curl and cat installed. The task is to carefully download all docs created after a certain date on a training, clean up extra docs not needed and then upload them to a production instance:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Set the aliases and environment variables:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;alias ts=&amp;#39;date -u &amp;#43;&amp;#34;%Y-%m-%dT%H:%M:%SZ&amp;#34;&amp;#39;
 alias curlj=&amp;#34;curl -H &amp;#39;content-type:application/json&amp;#39;&amp;#34;
 alias curljz=&amp;#34;curl --compressed -H &amp;#39;content-type:application/json&amp;#39;&amp;#34;
-export COUCH_URL=https://admin:pass@dev.example.org&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+export COUCH_URL=https://admin:pass@dev.example.org&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;li>
-&lt;p>Ensure affected CHWs have synced their devices to the development instance one last time. If they have been offline for some time and gathered production data, signing out or deleting the app before synchronizing may result in lost data.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Find the date when CHWs should have started using production. Convert this to epoch with milliseconds. For example if the time was &amp;ldquo;Tue, 01 Dec 2020 09:36:50 GMT&amp;rdquo; then the epoch would be &amp;ldquo;1606815410000&amp;rdquo;&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Using Fauxton, create a view to show all documents created after this date:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>function (doc) {
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ensure affected CHWs have synced their devices to the development instance one last time. If they have been offline for some time and gathered production data, signing out or deleting the app before synchronizing may result in lost data.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Find the date when CHWs should have started using production. Convert this to epoch with milliseconds. For example if the time was &amp;ldquo;Tue, 01 Dec 2020 09:36:50 GMT&amp;rdquo; then the epoch would be &amp;ldquo;1606815410000&amp;rdquo;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Using Fauxton, create a view to show all documents created after this date:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;function (doc) {
 if(doc.reported_date &amp;gt; 1606815410000) {
 emit(doc._id, 1);
 }
-}&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;/ol>
-&lt;figure>&lt;a href="create.view.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-instance/create.view.png"
-alt="Creating a view in Fauxton">&lt;/a>&lt;figcaption>
-&lt;p>Creating a view in Fauxton&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;ol start="5">
-&lt;li>
-&lt;p>Download the UUIDs of the documents in the view, and convert it to raw format (uuids-2.txt):&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>curl &amp;#34;$COUCH_URL/medic/_design/temp/_view/temp1&amp;#34; &amp;gt; uuids-1.txt
-cat uuids-1.txt | jq -r &amp;#39;.rows[].id&amp;#39; &amp;gt; uuids-2.txt&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure&gt;&lt;a href="create.view.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/training-instance/create.view.png"
+alt="Creating a view in Fauxton"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Creating a view in Fauxton&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;ol start="5"&gt;
+&lt;li&gt;
+&lt;p&gt;Download the UUIDs of the documents in the view, and convert it to raw format (uuids-2.txt):&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;curl &amp;#34;$COUCH_URL/medic/_design/temp/_view/temp1&amp;#34; &amp;gt; uuids-1.txt
+cat uuids-1.txt | jq -r &amp;#39;.rows[].id&amp;#39; &amp;gt; uuids-2.txt&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;li>
-&lt;p>Download all the matching docs to docs.json:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>cat uuids-2.txt | jq --raw-input --slurp &amp;#39;{keys: split(&amp;#34;\n&amp;#34;) }&amp;#39; | curljz -d@- &amp;#34;$COUCH_URL/medic/_all_docs?include_docs=true&amp;#34; | jq &amp;#39;{docs: [ .rows[] | select(.doc).doc ]}&amp;#39; &amp;gt; docs.json&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download all the matching docs to docs.json:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;cat uuids-2.txt | jq --raw-input --slurp &amp;#39;{keys: split(&amp;#34;\n&amp;#34;) }&amp;#39; | curljz -d@- &amp;#34;$COUCH_URL/medic/_all_docs?include_docs=true&amp;#34; | jq &amp;#39;{docs: [ .rows[] | select(.doc).doc ]}&amp;#39; &amp;gt; docs.json&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;li>
-&lt;p>Change the fields by deleting &amp;ldquo;_rev&amp;rdquo; field and also &amp;ldquo;_attachments&amp;rdquo; if uploading in a different instance. This can be carefully done by manually editing the JSON locally before uploading.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Change the COUCH_URL to be your production instance by setting another export:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>export COUCH_URL=http://admin:pass@app.example.org&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Change the fields by deleting &amp;ldquo;_rev&amp;rdquo; field and also &amp;ldquo;_attachments&amp;rdquo; if uploading in a different instance. This can be carefully done by manually editing the JSON locally before uploading.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Change the COUCH_URL to be your production instance by setting another export:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;export COUCH_URL=http://admin:pass@app.example.org&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;li>
-&lt;p>Upload the docs, for example, the following command adds a field (updated=true) to the docs and uploads them:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;pre>&lt;code>cat docs.json | jq &amp;#39;{&amp;#34;docs&amp;#34;:[ .docs[] | .updated = true ]}&amp;#39; | curljz -d@- $COUCH_URL/medic/_bulk_docs &amp;gt; results.json&lt;/code>&lt;/pre>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Upload the docs, for example, the following command adds a field (updated=true) to the docs and uploads them:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;cat docs.json | jq &amp;#39;{&amp;#34;docs&amp;#34;:[ .docs[] | .updated = true ]}&amp;#39; | curljz -d@- $COUCH_URL/medic/_bulk_docs &amp;gt; results.json&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;/li>
-&lt;/ol></description></item><item><title>How to bulk load users</title><link>https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/</guid><description>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300">
-&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2">&lt;/div>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">The bulk user upload feature is available in 3.16.0 and later versions of the CHT. As of CHT 3.17.0, when creating both a contact and a place, the contact will be set as the default contact of the place. User creation can be scripted using the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#post-apiv2users" >CHT API&lt;/a> directly or using the &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener">&lt;code>cht-conf&lt;/code> tool&lt;/a>, which is detailed in the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/csv-to-docs/" >CSV-to-Docs guide&lt;/a>.
-This feature can be used to load as many users as possible but works optimally with chunks of 1,000 users or less.&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;p>Steps to bulk load users:&lt;/p>
-&lt;ol>
-&lt;li>Using Google Sheets, populate a spreadsheet with the users to be imported.&lt;/li>
-&lt;li>Import the new users using the Admin UI in the CHT.&lt;/li>
-&lt;li>Handle any errors that may occur during importation.&lt;/li>
-&lt;li>When done, you will have created new users, new contacts and new places, all of which are correctly associated in CouchDB with the correct UUIDs.&lt;/li>
-&lt;/ol>
-&lt;h2>Workbook Instructions&lt;span class="hx-absolute -hx-mt-20" id="workbook-instructions">&lt;/span>
-&lt;a href="#workbook-instructions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The workbook contains a varying number of spreadsheets depending on the hierarchy in question. Users with different roles are placed in different spreadsheets as shown in the templates below. For example when creating users with chw and chw_supervisor roles, you will have &amp;ldquo;contact.chw&amp;rdquo;, &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo;, &amp;ldquo;contact.chw_supervisor&amp;rdquo; and &amp;ldquo;contact.chw_supervisor_VLOOKUP&amp;rdquo; spreadsheets. These pair per role spreadsheets contain actual data on users and parent place data respectively.&lt;/p>
-&lt;p>There is another spreadsheet, &amp;ldquo;place.type_VLOOKUP&amp;rdquo;, which is required when creating user accounts, contacts and their places. This spreadsheet defines the name and type of places in your hierarchy and should match those in the app_settings.json file. Note that you will need to create the parent place before importing the users.&lt;/p>
-&lt;p>To get started, there are three different workbook templates available that are compatible with the &lt;code>default&lt;/code> configuration of the CHT, they cater for use cases that you might encounter when creating users in bulk. You will notice some columns have an &lt;code>:excluded&lt;/code> suffix. These are columns that are ignored by the API and allow addition of autocomplete and data validation within the spreadsheet to make it easier to work with.&lt;/p>
-&lt;p>Click on any of the use cases below to make a copy of the spreadsheet for the use case in question:&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1zlvF5cWnV2n1rax1bAO2hSBCIxgD0c-5tZ-yh96kwws/copy" target="_blank" rel="noopener">when you want to create user accounts only&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1y6wYqRIWiC2QZA7NaWfolP_Wf9FnSahjYHlL3iDYeJ4/copy" target="_blank" rel="noopener">when you want to create user accounts and their contacts&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy" target="_blank" rel="noopener">when you want to create user accounts, their contacts and their places&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;p>We will use the second use case to create user accounts and their contacts in the example below.&lt;/p>
-&lt;h2>Contact Spreadsheet Instructions&lt;span class="hx-absolute -hx-mt-20" id="contact-spreadsheet-instructions">&lt;/span>
-&lt;a href="#contact-spreadsheet-instructions" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The spreadsheet interfaces with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#get-apiv1users" >&lt;code>POST /api/v1/users&lt;/code> API&lt;/a> which works as though passing a JSON array of users. Rows in the spreadsheet represent a user while columns represent properties of the user.
-Each column in the spreadsheet maps to an object property understood by the API to insert the users into the database. These properties can be found in &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#post-apiv1users" >the Users API documentation&lt;/a>.&lt;/p>
-&lt;p>Contact spreadsheets are named according to the user role, for example when creating users who are chws and others who are chw_supervisors, the following contact spreadsheets are populated respectively: &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_supervisor&amp;rdquo;.&lt;/p>
-&lt;p>There are three sections to the contact spreadsheet:&lt;/p>
-&lt;figure>&lt;a href="users-spreadsheet.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/users-spreadsheet.png"
-alt="Bulk user import spreadsheet with areas labeled">&lt;/a>&lt;figcaption>
-&lt;p>Bulk user import spreadsheet with areas labeled&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;h4>&lt;strong>Spreadsheet Area 1&lt;/strong>&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-1">&lt;/span>
-&lt;a href="#spreadsheet-area-1" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>These three columns are where you paste the results after running an import. See step 8 in &amp;ldquo;Importing users example&amp;rdquo; &lt;a href="#importing-users-example" >below&lt;/a>.&lt;/p>
-&lt;ol>
-&lt;li>&lt;code>import.status:excluded&lt;/code>: This field can have three values. Over time, they should all be &lt;code>imported&lt;/code> or &lt;code>skipped&lt;/code> as you will have processed all users on the list:
-&lt;ul>
-&lt;li>&lt;code>imported&lt;/code>- This user has already been successfully imported&lt;/li>
-&lt;li>&lt;code>skipped&lt;/code> - This user was skipped&lt;/li>
-&lt;li>&lt;code>error&lt;/code> - Contains errors that were encountered during importation. See &lt;code>import.message:excluded&lt;/code> field for more information&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>import.message:excluded&lt;/code>: The status of the last import. For example, &lt;code>Imported successfully&lt;/code> or &lt;code>Username 'mrjones' already taken&lt;/code>&lt;/li>
-&lt;li>&lt;code>import.username:excluded&lt;/code>: Use this column to ensure you&amp;rsquo;re matching the response with the correct user in the &lt;code>contact.username&lt;/code> to the right&lt;/li>
-&lt;/ol>
-&lt;h4>&lt;strong>Spreadsheet Area 2&lt;/strong>&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-2">&lt;/span>
-&lt;a href="#spreadsheet-area-2" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>This is where you enter your user data and contains the following columns:&lt;/p>
-&lt;ol>
-&lt;li>&lt;code>username&lt;/code>: username used to log into the application&lt;/li>
-&lt;li>&lt;code>Parent-Place:excluded&lt;/code>: existing parent place of the new user place. A drop-down populated from contact vlookup spreadsheet&lt;/li>
-&lt;li>&lt;code>User-Place-Type:excluded&lt;/code>: type of user place to be created. A drop-down populated from place vlookup spreadsheet&lt;/li>
-&lt;li>&lt;code>contact.first_name&lt;/code>: first name of the new user&lt;/li>
-&lt;li>&lt;code>contact.last_name&lt;/code>: last name of the new user&lt;/li>
-&lt;li>&lt;code>contact.sex&lt;/code>: sex of the new user&lt;/li>
-&lt;li>&lt;code>contact.phone&lt;/code>: phone number of the new user&lt;/li>
-&lt;li>&lt;code>email&lt;/code>: email of the new user (optional field)&lt;/li>
-&lt;li>&lt;code>contact.meta.created_by&lt;/code>: this column contains metadata on the person who created the user (optional field)&lt;/li>
-&lt;li>&lt;code>token_login&lt;/code>: whether the user should be sent login credentials via SMS as a link&lt;/li>
-&lt;li>&lt;code>contact.type&lt;/code> or &lt;code>place.type&lt;/code>: when creating a user, is logged as contact. In the case of the &lt;a href="https://github.com/medic/cht-core/tree/master/config/default/" target="_blank" rel="noopener">default config&lt;/a>, possible values are district_hospital, health_center, clinic, and person&lt;/li>
-&lt;li>&lt;code>contact.contact_type&lt;/code> or &lt;code>place.contact_type&lt;/code>: defines the type of contact being created depending on the deployment&amp;rsquo;s configuration. It should match one of the contact types defined in the config&amp;rsquo;s contact_types field&lt;/li>
-&lt;li>&lt;code>type&lt;/code>: role of the contact&lt;/li>
-&lt;/ol>
-&lt;h4>&lt;strong>Spreadsheet Area 3&lt;/strong>&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-3">&lt;/span>
-&lt;a href="#spreadsheet-area-3" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h4>&lt;p>Columns in this area are automatically populated by the spreadsheet logic.
-While this is needed to create a user, it is intentionally not editable and you will see this error when you try to edit data:&lt;/p>
-&lt;figure>&lt;a href="users-spreadsheet-warning.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/users-spreadsheet-warning.png"
-alt="Bulk user import spreadsheet warning">&lt;/a>&lt;figcaption>
-&lt;p>Bulk user import spreadsheet warning&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>However, for the mapping to occur as expected, you may edit the fields &lt;code>contact.role&lt;/code>, &lt;code>contact.contact_type&lt;/code>, &lt;code>place.contact_type&lt;/code> and &lt;code>type&lt;/code> to match your deployment&amp;rsquo;s configuration.&lt;/p>
-&lt;p>Do not edit column headers in row 1. They are needed by the CHT to identify which data is in it. Changing the names will result in errors or missing data in the CHT.&lt;/p>
-&lt;h3>Passwords&lt;span class="hx-absolute -hx-mt-20" id="passwords">&lt;/span>
-&lt;a href="#passwords" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Passwords are automatically generated by the spreadsheet. Use caution when editing rows marked as &lt;code>imported&lt;/code> in the Import.status:excluded column.
-For example, if a user was imported two weeks ago and the token_login is set to &lt;code>TRUE&lt;/code> and then back to &lt;code>FALSE&lt;/code>,
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description></item><item><title>How to bulk load users</title><link>https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/</guid><description>
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-orange-100 hx-bg-orange-50 hx-text-orange-800 dark:hx-border-orange-400/30 dark:hx-bg-orange-400/20 dark:hx-text-orange-300"&gt;
+&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2"&gt;&lt;/div&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;The bulk user upload feature is available in 3.16.0 and later versions of the CHT. As of CHT 3.17.0, when creating both a contact and a place, the contact will be set as the default contact of the place. User creation can be scripted using the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#post-apiv2users" &gt;CHT API&lt;/a&gt; directly or using the &lt;a href="https://github.com/medic/cht-conf" target="_blank" rel="noopener"&gt;&lt;code&gt;cht-conf&lt;/code&gt; tool&lt;/a&gt;, which is detailed in the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/test-data/csv-to-docs/" &gt;CSV-to-Docs guide&lt;/a&gt;.
+This feature can be used to load as many users as possible but works optimally with chunks of 1,000 users or less.&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Steps to bulk load users:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Using Google Sheets, populate a spreadsheet with the users to be imported.&lt;/li&gt;
+&lt;li&gt;Import the new users using the Admin UI in the CHT.&lt;/li&gt;
+&lt;li&gt;Handle any errors that may occur during importation.&lt;/li&gt;
+&lt;li&gt;When done, you will have created new users, new contacts and new places, all of which are correctly associated in CouchDB with the correct UUIDs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Workbook Instructions&lt;span class="hx-absolute -hx-mt-20" id="workbook-instructions"&gt;&lt;/span&gt;
+&lt;a href="#workbook-instructions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The workbook contains a varying number of spreadsheets depending on the hierarchy in question. Users with different roles are placed in different spreadsheets as shown in the templates below. For example when creating users with chw and chw_supervisor roles, you will have &amp;ldquo;contact.chw&amp;rdquo;, &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo;, &amp;ldquo;contact.chw_supervisor&amp;rdquo; and &amp;ldquo;contact.chw_supervisor_VLOOKUP&amp;rdquo; spreadsheets. These pair per role spreadsheets contain actual data on users and parent place data respectively.&lt;/p&gt;
+&lt;p&gt;There is another spreadsheet, &amp;ldquo;place.type_VLOOKUP&amp;rdquo;, which is required when creating user accounts, contacts and their places. This spreadsheet defines the name and type of places in your hierarchy and should match those in the app_settings.json file. Note that you will need to create the parent place before importing the users.&lt;/p&gt;
+&lt;p&gt;To get started, there are three different workbook templates available that are compatible with the &lt;code&gt;default&lt;/code&gt; configuration of the CHT, they cater for use cases that you might encounter when creating users in bulk. You will notice some columns have an &lt;code&gt;:excluded&lt;/code&gt; suffix. These are columns that are ignored by the API and allow addition of autocomplete and data validation within the spreadsheet to make it easier to work with.&lt;/p&gt;
+&lt;p&gt;Click on any of the use cases below to make a copy of the spreadsheet for the use case in question:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://docs.google.com/spreadsheets/d/1zlvF5cWnV2n1rax1bAO2hSBCIxgD0c-5tZ-yh96kwws/copy" target="_blank" rel="noopener"&gt;when you want to create user accounts only&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.google.com/spreadsheets/d/1y6wYqRIWiC2QZA7NaWfolP_Wf9FnSahjYHlL3iDYeJ4/copy" target="_blank" rel="noopener"&gt;when you want to create user accounts and their contacts&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy" target="_blank" rel="noopener"&gt;when you want to create user accounts, their contacts and their places&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We will use the second use case to create user accounts and their contacts in the example below.&lt;/p&gt;
+&lt;h2&gt;Contact Spreadsheet Instructions&lt;span class="hx-absolute -hx-mt-20" id="contact-spreadsheet-instructions"&gt;&lt;/span&gt;
+&lt;a href="#contact-spreadsheet-instructions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The spreadsheet interfaces with the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#get-apiv1users" &gt;&lt;code&gt;POST /api/v1/users&lt;/code&gt; API&lt;/a&gt; which works as though passing a JSON array of users. Rows in the spreadsheet represent a user while columns represent properties of the user.
+Each column in the spreadsheet maps to an object property understood by the API to insert the users into the database. These properties can be found in &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#post-apiv1users" &gt;the Users API documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Contact spreadsheets are named according to the user role, for example when creating users who are chws and others who are chw_supervisors, the following contact spreadsheets are populated respectively: &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_supervisor&amp;rdquo;.&lt;/p&gt;
+&lt;p&gt;There are three sections to the contact spreadsheet:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="users-spreadsheet.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/users-spreadsheet.png"
+alt="Bulk user import spreadsheet with areas labeled"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Bulk user import spreadsheet with areas labeled&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;h4&gt;&lt;strong&gt;Spreadsheet Area 1&lt;/strong&gt;&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-1"&gt;&lt;/span&gt;
+&lt;a href="#spreadsheet-area-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;These three columns are where you paste the results after running an import. See step 8 in &amp;ldquo;Importing users example&amp;rdquo; &lt;a href="#importing-users-example" &gt;below&lt;/a&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;import.status:excluded&lt;/code&gt;: This field can have three values. Over time, they should all be &lt;code&gt;imported&lt;/code&gt; or &lt;code&gt;skipped&lt;/code&gt; as you will have processed all users on the list:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;imported&lt;/code&gt;- This user has already been successfully imported&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;skipped&lt;/code&gt; - This user was skipped&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;error&lt;/code&gt; - Contains errors that were encountered during importation. See &lt;code&gt;import.message:excluded&lt;/code&gt; field for more information&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;import.message:excluded&lt;/code&gt;: The status of the last import. For example, &lt;code&gt;Imported successfully&lt;/code&gt; or &lt;code&gt;Username 'mrjones' already taken&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;import.username:excluded&lt;/code&gt;: Use this column to ensure you&amp;rsquo;re matching the response with the correct user in the &lt;code&gt;contact.username&lt;/code&gt; to the right&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;&lt;strong&gt;Spreadsheet Area 2&lt;/strong&gt;&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-2"&gt;&lt;/span&gt;
+&lt;a href="#spreadsheet-area-2" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;This is where you enter your user data and contains the following columns:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;username&lt;/code&gt;: username used to log into the application&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Parent-Place:excluded&lt;/code&gt;: existing parent place of the new user place. A drop-down populated from contact vlookup spreadsheet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User-Place-Type:excluded&lt;/code&gt;: type of user place to be created. A drop-down populated from place vlookup spreadsheet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.first_name&lt;/code&gt;: first name of the new user&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.last_name&lt;/code&gt;: last name of the new user&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.sex&lt;/code&gt;: sex of the new user&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.phone&lt;/code&gt;: phone number of the new user&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;email&lt;/code&gt;: email of the new user (optional field)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.meta.created_by&lt;/code&gt;: this column contains metadata on the person who created the user (optional field)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;token_login&lt;/code&gt;: whether the user should be sent login credentials via SMS as a link&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.type&lt;/code&gt; or &lt;code&gt;place.type&lt;/code&gt;: when creating a user, is logged as contact. In the case of the &lt;a href="https://github.com/medic/cht-core/tree/master/config/default/" target="_blank" rel="noopener"&gt;default config&lt;/a&gt;, possible values are district_hospital, health_center, clinic, and person&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact.contact_type&lt;/code&gt; or &lt;code&gt;place.contact_type&lt;/code&gt;: defines the type of contact being created depending on the deployment&amp;rsquo;s configuration. It should match one of the contact types defined in the config&amp;rsquo;s contact_types field&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;type&lt;/code&gt;: role of the contact&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;&lt;strong&gt;Spreadsheet Area 3&lt;/strong&gt;&lt;span class="hx-absolute -hx-mt-20" id="spreadsheet-area-3"&gt;&lt;/span&gt;
+&lt;a href="#spreadsheet-area-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Columns in this area are automatically populated by the spreadsheet logic.
+While this is needed to create a user, it is intentionally not editable and you will see this error when you try to edit data:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="users-spreadsheet-warning.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/users-spreadsheet-warning.png"
+alt="Bulk user import spreadsheet warning"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Bulk user import spreadsheet warning&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;However, for the mapping to occur as expected, you may edit the fields &lt;code&gt;contact.role&lt;/code&gt;, &lt;code&gt;contact.contact_type&lt;/code&gt;, &lt;code&gt;place.contact_type&lt;/code&gt; and &lt;code&gt;type&lt;/code&gt; to match your deployment&amp;rsquo;s configuration.&lt;/p&gt;
+&lt;p&gt;Do not edit column headers in row 1. They are needed by the CHT to identify which data is in it. Changing the names will result in errors or missing data in the CHT.&lt;/p&gt;
+&lt;h3&gt;Passwords&lt;span class="hx-absolute -hx-mt-20" id="passwords"&gt;&lt;/span&gt;
+&lt;a href="#passwords" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Passwords are automatically generated by the spreadsheet. Use caution when editing rows marked as &lt;code&gt;imported&lt;/code&gt; in the Import.status:excluded column.
+For example, if a user was imported two weeks ago and the token_login is set to &lt;code&gt;TRUE&lt;/code&gt; and then back to &lt;code&gt;FALSE&lt;/code&gt;,
 the password will be regenerated and thus be different from the one the user is using to login.
-If a change is made, you can use Google Sheets history (&amp;ldquo;File&amp;rdquo; -&amp;gt; &amp;ldquo;Version History&amp;rdquo;) to retrieve the old value.&lt;/p>
-&lt;h2>Importing users example&lt;span class="hx-absolute -hx-mt-20" id="importing-users-example">&lt;/span>
-&lt;a href="#importing-users-example" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;ol>
-&lt;li>
-&lt;p>Create a copy of &lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy" target="_blank" rel="noopener">this spreadsheet&lt;/a>.
-Give it a descriptive name and note its location in Google Drive. You will always come back to your copy of this Sheet whenever you want to add a set of users.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Copy the &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo; spreadsheets so that you have a set of the pair per level of your hierarchy.
-If your hierarchy was &amp;ldquo;Central -&amp;gt; Supervisor -&amp;gt; CHW&amp;rdquo;, you would have 3 pairs (6 spreadsheets total). Be sure each spreadsheet is named accurately.&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Open the spreadsheet and populate your list of parent places that you&amp;rsquo;d like to use for your users.
+If a change is made, you can use Google Sheets history (&amp;ldquo;File&amp;rdquo; -&amp;gt; &amp;ldquo;Version History&amp;rdquo;) to retrieve the old value.&lt;/p&gt;
+&lt;h2&gt;Importing users example&lt;span class="hx-absolute -hx-mt-20" id="importing-users-example"&gt;&lt;/span&gt;
+&lt;a href="#importing-users-example" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create a copy of &lt;a href="https://docs.google.com/spreadsheets/d/1yUenFP-5deQ0I9c-OYDTpbKYrkl3juv9djXoLLPoQ7Y/copy" target="_blank" rel="noopener"&gt;this spreadsheet&lt;/a&gt;.
+Give it a descriptive name and note its location in Google Drive. You will always come back to your copy of this Sheet whenever you want to add a set of users.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Copy the &amp;ldquo;contact.chw&amp;rdquo; and &amp;ldquo;contact.chw_VLOOKUP&amp;rdquo; spreadsheets so that you have a set of the pair per level of your hierarchy.
+If your hierarchy was &amp;ldquo;Central -&amp;gt; Supervisor -&amp;gt; CHW&amp;rdquo;, you would have 3 pairs (6 spreadsheets total). Be sure each spreadsheet is named accurately.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Open the spreadsheet and populate your list of parent places that you&amp;rsquo;d like to use for your users.
 In this example the &amp;ldquo;Penda Ouedraogo&amp;rdquo; place has gotten an updated UUID starting with &amp;ldquo;bcc&amp;rdquo;
-&lt;figure>&lt;a href="importing-users-populate-parents-places.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-populate-parents-places.png"
-alt="populate your list of parent places">&lt;/a>&lt;figcaption>
-&lt;p>populate your list of parent places&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Add the users you would like to create
-&lt;figure>&lt;a href="importing-users-entering-data.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-entering-data.png"
-alt="entering data into the spreadsheet">&lt;/a>&lt;figcaption>
-&lt;p>entering data into the spreadsheet&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Export spreadsheet into CSV
-&lt;figure>&lt;a href="importing-users-export-csv.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-export-csv.png"
-alt="export spreadsheet into CSV">&lt;/a>&lt;figcaption>
-&lt;p>export spreadsheet into CSV&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Access the &lt;a href="https://docs.communityhealthtoolkit.org/building/admin/" >Admin Console&lt;/a> of your instance, go to &amp;ldquo;Users&amp;rdquo;, click &amp;ldquo;Import from file&amp;rdquo; and select your CSV file you just exported
-&lt;figure>&lt;a href="importing-users-import-csv.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-csv.png"
-alt="import CSV into CHT">&lt;/a>&lt;figcaption>
-&lt;p>import CSV into CHT&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Be patient during import (testing showed ~0.4 seconds per record up to 500 records)
-&lt;figure>&lt;a href="importing-users-import-progress.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-progress.png"
-alt="progress feedback during CSV import">&lt;/a>&lt;figcaption>
-&lt;p>progress feedback during CSV import&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Download the status file
-&lt;figure>&lt;a href="importing-users-download-status-file.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-download-status-file.png"
-alt="download the status file">&lt;/a>&lt;figcaption>
-&lt;p>download the status file&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Transfer errors back into spreadsheet. Make sure you copy all three columns A, B and C.
+&lt;figure&gt;&lt;a href="importing-users-populate-parents-places.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-populate-parents-places.png"
+alt="populate your list of parent places"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;populate your list of parent places&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add the users you would like to create
+&lt;figure&gt;&lt;a href="importing-users-entering-data.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-entering-data.png"
+alt="entering data into the spreadsheet"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;entering data into the spreadsheet&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Export spreadsheet into CSV
+&lt;figure&gt;&lt;a href="importing-users-export-csv.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-export-csv.png"
+alt="export spreadsheet into CSV"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;export spreadsheet into CSV&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Access the &lt;a href="https://docs.communityhealthtoolkit.org/building/admin/" &gt;Admin Console&lt;/a&gt; of your instance, go to &amp;ldquo;Users&amp;rdquo;, click &amp;ldquo;Import from file&amp;rdquo; and select your CSV file you just exported
+&lt;figure&gt;&lt;a href="importing-users-import-csv.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-csv.png"
+alt="import CSV into CHT"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;import CSV into CHT&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Be patient during import (testing showed ~0.4 seconds per record up to 500 records)
+&lt;figure&gt;&lt;a href="importing-users-import-progress.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-progress.png"
+alt="progress feedback during CSV import"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;progress feedback during CSV import&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download the status file
+&lt;figure&gt;&lt;a href="importing-users-download-status-file.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-download-status-file.png"
+alt="download the status file"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;download the status file&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Transfer errors back into spreadsheet. Make sure you copy all three columns A, B and C.
 The usernames in column C must match those in column D of the original spreadsheet.
-&lt;figure>&lt;a href="importing-users-transfer-errors.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-transfer-errors.png"
-alt="transfers errors back into spreadsheet">&lt;/a>&lt;figcaption>
-&lt;p>transfers errors back into spreadsheet&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Fix the errors and export to CSV
-&lt;figure>&lt;a href="importing-users-fix-errors.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-fix-errors.png"
-alt="fix errors and export to CSV">&lt;/a>&lt;figcaption>
-&lt;p>fix errors and export to CSV&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;/ol>
-&lt;figure>&lt;a href="importing-users-export-csv.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-export-csv.png"
-alt="export spreadsheet into CSV">&lt;/a>&lt;figcaption>
-&lt;p>export spreadsheet into CSV&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;ol start="11">
-&lt;li>
-&lt;p>Import the fixed CSV, noting already import rows are skipped
-&lt;figure>&lt;a href="importing-users-import-fixed-csv.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-fixed-csv.png"
-alt="import the fixed CSV">&lt;/a>&lt;figcaption>
-&lt;p>import the fixed CSV&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Deliver credentials to phone or to CHW, using care to not overshare the login and password&lt;/p>
-&lt;/li>
-&lt;/ol>
-&lt;h2>Adding new places&lt;span class="hx-absolute -hx-mt-20" id="adding-new-places">&lt;/span>
-&lt;a href="#adding-new-places" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>Over time, new places will be added to different levels of the hierarchy.
-You will need to manually add these new places to the spreadsheet so that you can add users to the new places.&lt;/p>
-&lt;ol>
-&lt;li>Navigate in the CHT to the new site. In this case, it is &amp;ldquo;Site Dieco&amp;rdquo; that has been added (item 1). Copy the 36 character UUID from the URL (item 2).&lt;/li>
-&lt;/ol>
-&lt;figure>&lt;a href="adding-places-cht-new-site.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/adding-places-cht-new-site.png"
-alt="navigate in the CHT to the new site">&lt;/a>&lt;figcaption>
-&lt;p>navigate in the CHT to the new site&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;ol start="2">
-&lt;li>Open your existing Google Spreadsheet with your users. Find the hierarchy level you added your new site.
+&lt;figure&gt;&lt;a href="importing-users-transfer-errors.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-transfer-errors.png"
+alt="transfers errors back into spreadsheet"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;transfers errors back into spreadsheet&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Fix the errors and export to CSV
+&lt;figure&gt;&lt;a href="importing-users-fix-errors.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-fix-errors.png"
+alt="fix errors and export to CSV"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;fix errors and export to CSV&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure&gt;&lt;a href="importing-users-export-csv.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-export-csv.png"
+alt="export spreadsheet into CSV"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;export spreadsheet into CSV&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;ol start="11"&gt;
+&lt;li&gt;
+&lt;p&gt;Import the fixed CSV, noting already import rows are skipped
+&lt;figure&gt;&lt;a href="importing-users-import-fixed-csv.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/importing-users-import-fixed-csv.png"
+alt="import the fixed CSV"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;import the fixed CSV&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Deliver credentials to phone or to CHW, using care to not overshare the login and password&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Adding new places&lt;span class="hx-absolute -hx-mt-20" id="adding-new-places"&gt;&lt;/span&gt;
+&lt;a href="#adding-new-places" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Over time, new places will be added to different levels of the hierarchy.
+You will need to manually add these new places to the spreadsheet so that you can add users to the new places.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Navigate in the CHT to the new site. In this case, it is &amp;ldquo;Site Dieco&amp;rdquo; that has been added (item 1). Copy the 36 character UUID from the URL (item 2).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure&gt;&lt;a href="adding-places-cht-new-site.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/adding-places-cht-new-site.png"
+alt="navigate in the CHT to the new site"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;navigate in the CHT to the new site&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Open your existing Google Spreadsheet with your users. Find the hierarchy level you added your new site.
 In this case &amp;ldquo;Site Dieco&amp;rdquo; is a CHW place, so we&amp;rsquo;ll go to the &amp;ldquo;contact.c62_chw_VLOOKUP&amp;rdquo; spreadsheet.
-Add some new rows at the bottom (item 1), enter the new place name in column A (item 2) and paste the UUID in column B (item 3)&lt;/li>
-&lt;/ol>
-&lt;figure>&lt;a href="adding-places-existing-spreadsheet.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/adding-places-existing-spreadsheet.png"
-alt="open your existing spreadsheet">&lt;/a>&lt;figcaption>
-&lt;p>open your existing spreadsheet&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;h2>Configuring custom places types&lt;span class="hx-absolute -hx-mt-20" id="configuring-custom-places-types">&lt;/span>
-&lt;a href="#configuring-custom-places-types" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>The third use case mentioned in the &lt;a href="#workbook-instructions" >workbook instructions section&lt;/a> links to a Google Sheets to create user places alongside their account and their contact. This works out of the box with the &lt;code>default&lt;/code> CHT configuration but will require adjustments to be made in the &lt;code>place.type_VLOOKUP&lt;/code> spreadsheet when dealing with a CHT configuration with custom places types.&lt;/p>
-&lt;p>The &lt;code>place.type_VLOOKUP&lt;/code> spreadsheet has two columns that contain the name of the places types set in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/" >&lt;code>.contact_types[]&lt;/code>&lt;/a> property of your &lt;code>app_settings.json&lt;/code> and their respective IDs. The place type name is used by the &lt;code>User-Place-Type:excluded&lt;/code> column in the &lt;code>contact.chw&lt;/code> spreadsheet to provide a user-friendly way to pick a place with autocompletion. You will want to keep this spreadsheet in sync with your CHT configuration to create users&amp;rsquo; places.&lt;/p>
-&lt;h2>Trouble shooting&lt;span class="hx-absolute -hx-mt-20" id="trouble-shooting">&lt;/span>
-&lt;a href="#trouble-shooting" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>&amp;ldquo;Wrong type, this is not a person.&amp;rdquo;&lt;span class="hx-absolute -hx-mt-20" id="wrong-type-this-is-not-a-person">&lt;/span>
-&lt;a href="#wrong-type-this-is-not-a-person" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If you have miss-matched contact types, you will get an error upon import:&lt;/p>
-&lt;blockquote>
-&lt;p>&lt;strong>Wrong type, this is not a person.&lt;/strong>&lt;/p>
-&lt;/blockquote>
-&lt;p>As of CHT 3.7.0, you&amp;rsquo;re &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/#app_settingsjson-contact_types" >allowed to declare different contact types&lt;/a> in your &lt;code>app_settings.json&lt;/code>. If you have populated the &lt;code>.contact_types[]&lt;/code> property in your JSON, you will need to update the automatic value of the &lt;code>contact.contact_type&lt;/code> column. The default value is:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">=&lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="o">(&lt;/span>NOT&lt;span class="o">(&lt;/span>ISBLANK&lt;span class="o">(&lt;/span>D2&lt;span class="o">))&lt;/span>,&lt;span class="s2">&amp;#34;person&amp;#34;&lt;/span>,&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+Add some new rows at the bottom (item 1), enter the new place name in column A (item 2) and paste the UUID in column B (item 3)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure&gt;&lt;a href="adding-places-existing-spreadsheet.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/adding-places-existing-spreadsheet.png"
+alt="open your existing spreadsheet"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;open your existing spreadsheet&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;h2&gt;Configuring custom places types&lt;span class="hx-absolute -hx-mt-20" id="configuring-custom-places-types"&gt;&lt;/span&gt;
+&lt;a href="#configuring-custom-places-types" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The third use case mentioned in the &lt;a href="#workbook-instructions" &gt;workbook instructions section&lt;/a&gt; links to a Google Sheets to create user places alongside their account and their contact. This works out of the box with the &lt;code&gt;default&lt;/code&gt; CHT configuration but will require adjustments to be made in the &lt;code&gt;place.type_VLOOKUP&lt;/code&gt; spreadsheet when dealing with a CHT configuration with custom places types.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;place.type_VLOOKUP&lt;/code&gt; spreadsheet has two columns that contain the name of the places types set in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/" &gt;&lt;code&gt;.contact_types[]&lt;/code&gt;&lt;/a&gt; property of your &lt;code&gt;app_settings.json&lt;/code&gt; and their respective IDs. The place type name is used by the &lt;code&gt;User-Place-Type:excluded&lt;/code&gt; column in the &lt;code&gt;contact.chw&lt;/code&gt; spreadsheet to provide a user-friendly way to pick a place with autocompletion. You will want to keep this spreadsheet in sync with your CHT configuration to create users&amp;rsquo; places.&lt;/p&gt;
+&lt;h2&gt;Trouble shooting&lt;span class="hx-absolute -hx-mt-20" id="trouble-shooting"&gt;&lt;/span&gt;
+&lt;a href="#trouble-shooting" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;&amp;ldquo;Wrong type, this is not a person.&amp;rdquo;&lt;span class="hx-absolute -hx-mt-20" id="wrong-type-this-is-not-a-person"&gt;&lt;/span&gt;
+&lt;a href="#wrong-type-this-is-not-a-person" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;If you have miss-matched contact types, you will get an error upon import:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Wrong type, this is not a person.&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As of CHT 3.7.0, you&amp;rsquo;re &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/#app_settingsjson-contact_types" &gt;allowed to declare different contact types&lt;/a&gt; in your &lt;code&gt;app_settings.json&lt;/code&gt;. If you have populated the &lt;code&gt;.contact_types[]&lt;/code&gt; property in your JSON, you will need to update the automatic value of the &lt;code&gt;contact.contact_type&lt;/code&gt; column. The default value is:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;NOT&lt;span class="o"&gt;(&lt;/span&gt;ISBLANK&lt;span class="o"&gt;(&lt;/span&gt;D2&lt;span class="o"&gt;))&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;person&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>Often times numbers are used in &lt;code>app_settings.json&lt;/code> to declare &lt;code>contact_types&lt;/code> matching numerical names from &lt;code>place_hierarchy_types&lt;/code>. It might look like this:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;contact_types&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;c52_supervisor&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c52_supervisor&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c52_supervisor.plural&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c52_supervisor.new&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c52_supervisor.edit&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;icon-manager&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;form:contact:c52_supervisor:create&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;form:contact:c52_supervisor:edit&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;c62_chw&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c62_chw&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;group_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c62_chw.plural&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;create_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c62_chw.new&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;edit_key&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;contact.type.c62_chw.edit&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;parents&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;c60_chw_site&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;icon&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;icon-chw&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;create_form&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;form:contact:c62_chw:create&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;edit_form&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;form:contact:c62_chw:edit&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;person&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Often times numbers are used in &lt;code&gt;app_settings.json&lt;/code&gt; to declare &lt;code&gt;contact_types&lt;/code&gt; matching numerical names from &lt;code&gt;place_hierarchy_types&lt;/code&gt;. It might look like this:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;contact_types&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;c52_supervisor&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c52_supervisor&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;group_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c52_supervisor.plural&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;create_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c52_supervisor.new&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;edit_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c52_supervisor.edit&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;icon&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;icon-manager&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;create_form&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;form:contact:c52_supervisor:create&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;edit_form&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;form:contact:c52_supervisor:edit&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;c62_chw&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c62_chw&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;group_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c62_chw.plural&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;create_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c62_chw.new&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;edit_key&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;contact.type.c62_chw.edit&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;parents&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;c60_chw_site&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;icon&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;icon-chw&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;create_form&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;form:contact:c62_chw:create&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;edit_form&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;form:contact:c62_chw:edit&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>In this case, you would need to change the value of the &lt;code>contact.contact_type&lt;/code> column to match your new types. Based on the &lt;code>contact.types&lt;/code> above, a CHW would be declared like this now:&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">=&lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="o">(&lt;/span>NOT&lt;span class="o">(&lt;/span>ISBLANK&lt;span class="o">(&lt;/span>D2&lt;span class="o">))&lt;/span>,&lt;span class="s2">&amp;#34;c62_chw&amp;#34;&lt;/span>,&lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;In this case, you would need to change the value of the &lt;code&gt;contact.contact_type&lt;/code&gt; column to match your new types. Based on the &lt;code&gt;contact.types&lt;/code&gt; above, a CHW would be declared like this now:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;NOT&lt;span class="o"&gt;(&lt;/span&gt;ISBLANK&lt;span class="o"&gt;(&lt;/span&gt;D2&lt;span class="o"&gt;))&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;c62_chw&amp;#34;&lt;/span&gt;,&lt;span class="s2"&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;p>Be sure you copy this updated formula for all rows in the &lt;code>contact.contact_type&lt;/code> column.&lt;/p>
-&lt;h3>Access denied&lt;span class="hx-absolute -hx-mt-20" id="access-denied">&lt;/span>
-&lt;a href="#access-denied" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>If a user you successfully created can not log in because they see an error:&lt;/p>
-&lt;figure>&lt;a href="access.denied.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/access.denied.png"
-alt="Access denied - You have insufficient privileges to view this page. Talk to an administrator to increase your privileges">&lt;/a>&lt;figcaption>
-&lt;p>Access denied - You have insufficient privileges to view this page. Talk to an administrator to increase your privileges&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>A possible cause of this is you have a bad role defined in your spreadsheet that doesn&amp;rsquo;t match your configuration. For example, the the default role should be &lt;code>chw_supervisor&lt;/code>, but here we see garbage characters were accidentally added. While the user was created without errors, they&amp;rsquo;ll see the above error when they try to log in:&lt;/p>
-&lt;figure>&lt;a href="bad.type.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/bad.type.png"
-alt="Bad type declared in spreadsheet causes the user to have no role">&lt;/a>&lt;figcaption>
-&lt;p>Bad type declared in spreadsheet causes the user to have no role&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>You may manually fix any users you imported to have the correct role. To ensure future users have valid roles to log in with, check the &lt;code>/admin/#/authorization/roles&lt;/code> area on your CHT instance for valid roles:&lt;/p>
-&lt;figure>&lt;a href="valid.roles.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/valid.roles.png"
-alt="CHT admin showing a list of valid roles in the Role column on the left">&lt;/a>&lt;figcaption>
-&lt;p>CHT admin showing a list of valid roles in the Role column on the left&lt;/p>
-&lt;/figcaption>
-&lt;/figure></description></item></channel></rss>
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Be sure you copy this updated formula for all rows in the &lt;code&gt;contact.contact_type&lt;/code&gt; column.&lt;/p&gt;
+&lt;h3&gt;Access denied&lt;span class="hx-absolute -hx-mt-20" id="access-denied"&gt;&lt;/span&gt;
+&lt;a href="#access-denied" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;If a user you successfully created can not log in because they see an error:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="access.denied.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/access.denied.png"
+alt="Access denied - You have insufficient privileges to view this page. Talk to an administrator to increase your privileges"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Access denied - You have insufficient privileges to view this page. Talk to an administrator to increase your privileges&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;A possible cause of this is you have a bad role defined in your spreadsheet that doesn&amp;rsquo;t match your configuration. For example, the the default role should be &lt;code&gt;chw_supervisor&lt;/code&gt;, but here we see garbage characters were accidentally added. While the user was created without errors, they&amp;rsquo;ll see the above error when they try to log in:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="bad.type.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/bad.type.png"
+alt="Bad type declared in spreadsheet causes the user to have no role"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Bad type declared in spreadsheet causes the user to have no role&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;You may manually fix any users you imported to have the correct role. To ensure future users have valid roles to log in with, check the &lt;code&gt;/admin/#/authorization/roles&lt;/code&gt; area on your CHT instance for valid roles:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="valid.roles.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/training/users-bulk-load/valid.roles.png"
+alt="CHT admin showing a list of valid roles in the Role column on the left"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;CHT admin showing a list of valid roles in the Role column on the left&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;</description></item></channel></rss>

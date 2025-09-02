@@ -1,222 +1,222 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Messaging Gateways</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/</link><description>Recent content in Messaging Gateways on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/index.xml" rel="self" type="application/rss+xml"/><item><title>CHT Gateway</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/</guid><description>
-&lt;div class="section-pages-list">
-&lt;h3>Content in this section &lt;/h3>
-&lt;ul>
-&lt;li>
-&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/configuration/">Configuration&lt;/a>
-&lt;/li>
-&lt;li>
-&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/phones/">Phones&lt;/a>
-&lt;/li>
-&lt;li>
-&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/troubleshooting/">Troubleshooting&lt;/a>
-&lt;/li>
-&lt;/ul>
-&lt;/div></description></item><item><title>Africa’s Talking SMS Aggregator</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/africas-talking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/africas-talking/</guid><description>
-&lt;p>As of v3.6.0, SMS messages can be sent and received using the &lt;a href="https://africastalking.com" target="_blank" rel="noopener">Africa&amp;rsquo;s Talking&lt;/a> service.&lt;/p>
-&lt;h2>Africa&amp;rsquo;s Talking configuration&lt;span class="hx-absolute -hx-mt-20" id="africas-talking-configuration">&lt;/span>
-&lt;a href="#africas-talking-configuration" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>First, run &lt;code>openssl rand -hex 32&lt;/code> in your terminal to generate a long unique key that you will use as the &lt;code>cht-api-key&lt;/code>.&lt;/p>
-&lt;p>Log on to the &lt;a href="https://account.africastalking.com/auth/login" target="_blank" rel="noopener">Africa&amp;rsquo;s Talking Dashboard&lt;/a> and configure the two callback URLs as follows.&lt;/p>
-&lt;ul>
-&lt;li>Delivery Reports: &lt;code>https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/delivery-reports?key=&amp;lt;cht-api-key&amp;gt;&lt;/code>&lt;/li>
-&lt;li>Incoming Messages: &lt;code>https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/incoming-messages?key=&amp;lt;cht-api-key&amp;gt;&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;p>Next, in Africa&amp;rsquo;s Talking dashboard, generate an &amp;ldquo;API Key&amp;rdquo; that you will use as the &lt;code>at-api-key&lt;/code>.&lt;/p>
-&lt;p>Next, save the &lt;code>at-api-key&lt;/code> in your CHT Core configuration as covered below.&lt;/p>
-&lt;h2>CHT Core configuration&lt;span class="hx-absolute -hx-mt-20" id="cht-core-configuration">&lt;/span>
-&lt;a href="#cht-core-configuration" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>API keys&lt;span class="hx-absolute -hx-mt-20" id="api-keys">&lt;/span>
-&lt;a href="#api-keys" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The Africa&amp;rsquo;s Talking integration uses the CHT Credentials service to retrieve the API keys using the IDs &lt;code>africastalking.com:incoming&lt;/code> and &lt;code>africastalking.com:outgoing&lt;/code>.&lt;/p>
-&lt;p>Use the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api#put-apiv1credentials" >CHT credentials API&lt;/a> to securely store the credentials by running the commands below.&lt;/p>
-&lt;ul>
-&lt;li>
-&lt;p>&lt;code>curl -X PUT -H &amp;quot;Content-Type: text/plain&amp;quot; https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;hostname&amp;gt;/api/v1/credentials/africastalking.com:incoming -d 'cht-api-key'&lt;/code>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;code>curl -X PUT -H &amp;quot;Content-Type: text/plain&amp;quot; https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;hostname&amp;gt;/api/v1/credentials/africastalking.com:outgoing -d 'at-api-key'&lt;/code>&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;h3>App settings&lt;span class="hx-absolute -hx-mt-20" id="app-settings">&lt;/span>
-&lt;a href="#app-settings" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Update your app settings as follows.&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sms&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;outgoing_service&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;africas-talking&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;reply_to&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;africa&amp;#39;s talking shortcode&amp;gt;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;africas_talking&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;username&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;africa&amp;#39;s talking username&amp;gt;&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&lt;div class="section-pages-list"&gt;
+&lt;h3&gt;Content in this section &lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/configuration/"&gt;Configuration&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/phones/"&gt;Phones&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href="https://docs.communityhealthtoolkit.org/building/messaging/gateways/gateway/troubleshooting/"&gt;Troubleshooting&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;</description></item><item><title>Africa’s Talking SMS Aggregator</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/africas-talking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/africas-talking/</guid><description>
+&lt;p&gt;As of v3.6.0, SMS messages can be sent and received using the &lt;a href="https://africastalking.com" target="_blank" rel="noopener"&gt;Africa&amp;rsquo;s Talking&lt;/a&gt; service.&lt;/p&gt;
+&lt;h2&gt;Africa&amp;rsquo;s Talking configuration&lt;span class="hx-absolute -hx-mt-20" id="africas-talking-configuration"&gt;&lt;/span&gt;
+&lt;a href="#africas-talking-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;First, run &lt;code&gt;openssl rand -hex 32&lt;/code&gt; in your terminal to generate a long unique key that you will use as the &lt;code&gt;cht-api-key&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Log on to the &lt;a href="https://account.africastalking.com/auth/login" target="_blank" rel="noopener"&gt;Africa&amp;rsquo;s Talking Dashboard&lt;/a&gt; and configure the two callback URLs as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Delivery Reports: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/delivery-reports?key=&amp;lt;cht-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Incoming Messages: &lt;code&gt;https://&amp;lt;hostname&amp;gt;/api/v1/sms/africastalking/incoming-messages?key=&amp;lt;cht-api-key&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Next, in Africa&amp;rsquo;s Talking dashboard, generate an &amp;ldquo;API Key&amp;rdquo; that you will use as the &lt;code&gt;at-api-key&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Next, save the &lt;code&gt;at-api-key&lt;/code&gt; in your CHT Core configuration as covered below.&lt;/p&gt;
+&lt;h2&gt;CHT Core configuration&lt;span class="hx-absolute -hx-mt-20" id="cht-core-configuration"&gt;&lt;/span&gt;
+&lt;a href="#cht-core-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;API keys&lt;span class="hx-absolute -hx-mt-20" id="api-keys"&gt;&lt;/span&gt;
+&lt;a href="#api-keys" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The Africa&amp;rsquo;s Talking integration uses the CHT Credentials service to retrieve the API keys using the IDs &lt;code&gt;africastalking.com:incoming&lt;/code&gt; and &lt;code&gt;africastalking.com:outgoing&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Use the &lt;a href="https://docs.communityhealthtoolkit.org/apps/reference/api#put-apiv1credentials" &gt;CHT credentials API&lt;/a&gt; to securely store the credentials by running the commands below.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;curl -X PUT -H &amp;quot;Content-Type: text/plain&amp;quot; https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;hostname&amp;gt;/api/v1/credentials/africastalking.com:incoming -d 'cht-api-key'&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;curl -X PUT -H &amp;quot;Content-Type: text/plain&amp;quot; https://&amp;lt;user&amp;gt;:&amp;lt;pass&amp;gt;@&amp;lt;hostname&amp;gt;/api/v1/credentials/africastalking.com:outgoing -d 'at-api-key'&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;App settings&lt;span class="hx-absolute -hx-mt-20" id="app-settings"&gt;&lt;/span&gt;
+&lt;a href="#app-settings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Update your app settings as follows.&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;sms&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;outgoing_service&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;africas-talking&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;reply_to&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking shortcode&amp;gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;africas_talking&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;username&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;lt;africa&amp;#39;s talking username&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;h2>Testing&lt;span class="hx-absolute -hx-mt-20" id="testing">&lt;/span>
-&lt;a href="#testing" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;p>To test your integration, set your &lt;code>username&lt;/code> to &lt;code>sandbox&lt;/code>, log in to &lt;a href="https://account.africastalking.com" target="_blank" rel="noopener">Africa&amp;rsquo;s Talking&lt;/a>, and go to the Sandbox app.&lt;/p></description></item><item><title>RapidPro Messaging Gateway</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/</guid><description>
-&lt;p>As of v3.11.0, messages can be sent and received using &lt;a href="https://docs.communityhealthtoolkit.org/building/integrations/rapidpro/" target="_blank" rel="noopener">RapidPro&lt;/a> as a messaging gateway.&lt;/p>
-&lt;h2>RapidPro configuration&lt;span class="hx-absolute -hx-mt-20" id="rapidpro-configuration">&lt;/span>
-&lt;a href="#rapidpro-configuration" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>Store globals&lt;span class="hx-absolute -hx-mt-20" id="store-globals">&lt;/span>
-&lt;a href="#store-globals" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Generate a long unique key to use as the &lt;code>cht_api_key&lt;/code>.&lt;/p>
-&lt;p>Log in to your RapidPro dashboard, go to the globals page (&lt;code>/global/&lt;/code>) and create two globals with the following data:&lt;/p>
-&lt;ul>
-&lt;li>name: &lt;code>cht url&lt;/code>, value: &lt;code>https://&amp;lt;your-cht-instance-host&amp;gt;/api/v2/sms/rapidpro/incoming-messages&lt;/code>. For security the instance host &lt;strong>must not&lt;/strong> include basic authentication. (NB: This endpoint was added in CHT 4.1.0. If integrating with an earlier version you will need to use the earlier version with a typo in the URL: &lt;code>https://&amp;lt;your-cht-instance-host&amp;gt;/api/v1/sms/radpidpro/incoming-messages&lt;/code>)&lt;/li>
-&lt;li>name: &lt;code>cht api key&lt;/code>, value: &lt;code>&amp;lt;cht_api_key&amp;gt;&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Note&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>Please note that only letters, numbers, and hyphens are accepted when naming a global variable in RapidPro. However, any space(s) in the name will be replaced with underscore(s) when saved.
-For example, &lt;code>cht url&lt;/code> will be saved as &lt;code>cht_url&lt;/code>.&lt;/p>
-&lt;p>The names of these two global variables are arbitrary, but in this document we will keep referring to the names defined above.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div>
-&lt;p>Now visit the RapidPro workspace settings page (&lt;code>/org/home/&lt;/code>) and check your RapidPro API token (we&amp;rsquo;ll refer to this as the &lt;code>rapidpro_api_key&lt;/code>). We will use it later.&lt;/p>
-&lt;h3>Create a new flow&lt;span class="hx-absolute -hx-mt-20" id="create-a-new-flow">&lt;/span>
-&lt;a href="#create-a-new-flow" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>In your RapidPro dashboard, visit the flows page (&lt;code>/flow/&lt;/code>) and create a new flow. It only needs to contain a webhook, to relay the message to your CHT Core instance and handle possible errors.&lt;/p>
-&lt;figure>&lt;a href="flow_overview.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_overview.png"
-alt="flow_overview">&lt;/a>&lt;figcaption>
-&lt;p>flow_overview&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>Configure the new webhook:&lt;/p>
-&lt;ul>
-&lt;li>to &lt;code>POST&lt;/code> to the &lt;code>cht_url&lt;/code> you configured earlier:&lt;/li>
-&lt;/ul>
-&lt;figure>&lt;a href="flow_webhook_host.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_host.png"
-alt="flow_webhook_host">&lt;/a>&lt;figcaption>
-&lt;p>flow_webhook_host&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;ul>
-&lt;li>set the authorization and content-type headers&lt;/li>
-&lt;/ul>
-&lt;figure>&lt;a href="flow_webhook_headers.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_headers.png"
-alt="flow_webhook_headers">&lt;/a>&lt;figcaption>
-&lt;p>flow_webhook_headers&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;ul>
-&lt;li>set the body to relay the message to CHT in the expected format:&lt;/li>
-&lt;/ul>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="err">@(json(object(&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="err">run.uuid,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;from&amp;#34;&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="err">replace(urns.tel,&lt;/span>&lt;span class="s2">&amp;#34;tel:+&amp;#34;&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="s2">&amp;#34;+&amp;#34;&lt;/span>&lt;span class="err">),&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;content&amp;#34;&lt;/span>&lt;span class="err">,&lt;/span> &lt;span class="err">input.text&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">)))&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Testing&lt;span class="hx-absolute -hx-mt-20" id="testing"&gt;&lt;/span&gt;
+&lt;a href="#testing" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To test your integration, set your &lt;code&gt;username&lt;/code&gt; to &lt;code&gt;sandbox&lt;/code&gt;, log in to &lt;a href="https://account.africastalking.com" target="_blank" rel="noopener"&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;, and go to the Sandbox app.&lt;/p&gt;</description></item><item><title>RapidPro Messaging Gateway</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/</guid><description>
+&lt;p&gt;As of v3.11.0, messages can be sent and received using &lt;a href="https://docs.communityhealthtoolkit.org/building/integrations/rapidpro/" target="_blank" rel="noopener"&gt;RapidPro&lt;/a&gt; as a messaging gateway.&lt;/p&gt;
+&lt;h2&gt;RapidPro configuration&lt;span class="hx-absolute -hx-mt-20" id="rapidpro-configuration"&gt;&lt;/span&gt;
+&lt;a href="#rapidpro-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Store globals&lt;span class="hx-absolute -hx-mt-20" id="store-globals"&gt;&lt;/span&gt;
+&lt;a href="#store-globals" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Generate a long unique key to use as the &lt;code&gt;cht_api_key&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Log in to your RapidPro dashboard, go to the globals page (&lt;code&gt;/global/&lt;/code&gt;) and create two globals with the following data:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name: &lt;code&gt;cht url&lt;/code&gt;, value: &lt;code&gt;https://&amp;lt;your-cht-instance-host&amp;gt;/api/v2/sms/rapidpro/incoming-messages&lt;/code&gt;. For security the instance host &lt;strong&gt;must not&lt;/strong&gt; include basic authentication. (NB: This endpoint was added in CHT 4.1.0. If integrating with an earlier version you will need to use the earlier version with a typo in the URL: &lt;code&gt;https://&amp;lt;your-cht-instance-host&amp;gt;/api/v1/sms/radpidpro/incoming-messages&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;name: &lt;code&gt;cht api key&lt;/code&gt;, value: &lt;code&gt;&amp;lt;cht_api_key&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
+&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Please note that only letters, numbers, and hyphens are accepted when naming a global variable in RapidPro. However, any space(s) in the name will be replaced with underscore(s) when saved.
+For example, &lt;code&gt;cht url&lt;/code&gt; will be saved as &lt;code&gt;cht_url&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The names of these two global variables are arbitrary, but in this document we will keep referring to the names defined above.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Now visit the RapidPro workspace settings page (&lt;code&gt;/org/home/&lt;/code&gt;) and check your RapidPro API token (we&amp;rsquo;ll refer to this as the &lt;code&gt;rapidpro_api_key&lt;/code&gt;). We will use it later.&lt;/p&gt;
+&lt;h3&gt;Create a new flow&lt;span class="hx-absolute -hx-mt-20" id="create-a-new-flow"&gt;&lt;/span&gt;
+&lt;a href="#create-a-new-flow" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;In your RapidPro dashboard, visit the flows page (&lt;code&gt;/flow/&lt;/code&gt;) and create a new flow. It only needs to contain a webhook, to relay the message to your CHT Core instance and handle possible errors.&lt;/p&gt;
+&lt;figure&gt;&lt;a href="flow_overview.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_overview.png"
+alt="flow_overview"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;flow_overview&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;Configure the new webhook:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;to &lt;code&gt;POST&lt;/code&gt; to the &lt;code&gt;cht_url&lt;/code&gt; you configured earlier:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="flow_webhook_host.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_host.png"
+alt="flow_webhook_host"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;flow_webhook_host&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;set the authorization and content-type headers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="flow_webhook_headers.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_headers.png"
+alt="flow_webhook_headers"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;flow_webhook_headers&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;set the body to relay the message to CHT in the expected format:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;@(json(object(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;,&lt;/span&gt; &lt;span class="err"&gt;run.uuid,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;from&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;,&lt;/span&gt; &lt;span class="err"&gt;replace(urns.tel,&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;tel:+&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;+&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;content&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;,&lt;/span&gt; &lt;span class="err"&gt;input.text&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;)))&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;figure>&lt;a href="flow_webhook_body.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_body.png"
-alt="flow_webhook_body">&lt;/a>&lt;figcaption>
-&lt;p>flow_webhook_body&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;h3>Create a new trigger&lt;span class="hx-absolute -hx-mt-20" id="create-a-new-trigger">&lt;/span>
-&lt;a href="#create-a-new-trigger" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Create a trigger (&lt;code>/trigger/&lt;/code>) to start the new flow when a message is not handled elsewhere.&lt;/p>
-&lt;figure>&lt;a href="trigger_select.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/trigger_select.png"
-alt="trigger_select">&lt;/a>&lt;figcaption>
-&lt;p>trigger_select&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;p>For more details about RapidPro configuration, consult the &lt;a href="https://docs.communityhealthtoolkit.org/building/integrations/rapidpro/" target="_blank" rel="noopener">RapidPro integration documentation&lt;/a>.&lt;/p>
-&lt;h2>CHT Core configuration&lt;span class="hx-absolute -hx-mt-20" id="cht-core-configuration">&lt;/span>
-&lt;a href="#cht-core-configuration" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h2>&lt;h3>API keys&lt;span class="hx-absolute -hx-mt-20" id="api-keys">&lt;/span>
-&lt;a href="#api-keys" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>The RapidPro integration uses the CHT Credentials service to retrieve the API keys using the IDs &lt;code>rapidpro:incoming&lt;/code> and &lt;code>rapidpro:outgoing&lt;/code>. Use the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api#put-apiv1credentials" >CHT credentials API&lt;/a> to securely store the credentials.&lt;br>
-&lt;code>rapidpro:incoming&lt;/code> should contain the value of the long unique key generated earlier &lt;code>&amp;lt;cht_api_key&amp;gt;&lt;/code> to verify incoming requests from RapidPro.&lt;br>
-&lt;code>rapidpro:outgoing&lt;/code> should contain your RapidPro API token &lt;code>&amp;lt;rapidpro_api_key&amp;gt;&lt;/code> to authenticate requests made against RapidPro&amp;rsquo;s API.&lt;/p>
-&lt;h3>App settings&lt;span class="hx-absolute -hx-mt-20" id="app-settings">&lt;/span>
-&lt;a href="#app-settings" class="subheading-anchor" aria-label="Permalink for this section">&lt;/a>&lt;/h3>&lt;p>Update your app settings as follows.&lt;/p>
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code">
-&lt;div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sms&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;outgoing_service&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;rapidpro&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;rapidpro&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;url&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;&amp;lt;RapidPro instance url&amp;gt;&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/div>&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0">
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;figure&gt;&lt;a href="flow_webhook_body.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/flow_webhook_body.png"
+alt="flow_webhook_body"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;flow_webhook_body&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;h3&gt;Create a new trigger&lt;span class="hx-absolute -hx-mt-20" id="create-a-new-trigger"&gt;&lt;/span&gt;
+&lt;a href="#create-a-new-trigger" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Create a trigger (&lt;code&gt;/trigger/&lt;/code&gt;) to start the new flow when a message is not handled elsewhere.&lt;/p&gt;
+&lt;figure&gt;&lt;a href="trigger_select.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro/trigger_select.png"
+alt="trigger_select"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;trigger_select&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;For more details about RapidPro configuration, consult the &lt;a href="https://docs.communityhealthtoolkit.org/building/integrations/rapidpro/" target="_blank" rel="noopener"&gt;RapidPro integration documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;CHT Core configuration&lt;span class="hx-absolute -hx-mt-20" id="cht-core-configuration"&gt;&lt;/span&gt;
+&lt;a href="#cht-core-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;API keys&lt;span class="hx-absolute -hx-mt-20" id="api-keys"&gt;&lt;/span&gt;
+&lt;a href="#api-keys" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The RapidPro integration uses the CHT Credentials service to retrieve the API keys using the IDs &lt;code&gt;rapidpro:incoming&lt;/code&gt; and &lt;code&gt;rapidpro:outgoing&lt;/code&gt;. Use the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api#put-apiv1credentials" &gt;CHT credentials API&lt;/a&gt; to securely store the credentials.&lt;br&gt;
+&lt;code&gt;rapidpro:incoming&lt;/code&gt; should contain the value of the long unique key generated earlier &lt;code&gt;&amp;lt;cht_api_key&amp;gt;&lt;/code&gt; to verify incoming requests from RapidPro.&lt;br&gt;
+&lt;code&gt;rapidpro:outgoing&lt;/code&gt; should contain your RapidPro API token &lt;code&gt;&amp;lt;rapidpro_api_key&amp;gt;&lt;/code&gt; to authenticate requests made against RapidPro&amp;rsquo;s API.&lt;/p&gt;
+&lt;h3&gt;App settings&lt;span class="hx-absolute -hx-mt-20" id="app-settings"&gt;&lt;/span&gt;
+&lt;a href="#app-settings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Update your app settings as follows.&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;sms&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;outgoing_service&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;rapidpro&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;rapidpro&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;url&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&amp;lt;RapidPro instance url&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
 title="Copy code"
->
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4">&lt;/div>
-&lt;/button>
-&lt;/div>
-&lt;/div>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200">
-&lt;p class="hx-flex hx-items-center hx-font-medium">&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>&lt;/svg>Important&lt;/p>
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7">
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0">&lt;p>The RapidPro API endpoints are rate-limited, meaning that requests to send or check the status of messages beyond a certain number per hour will be blocked. The limit is currently 2500 actions per hour, and may change without notice. Check out the &lt;a href="https://rapidpro.io/api/v2/#rate-limiting" target="_blank" rel="noopener">RapidPro API reference&lt;/a> for more details. If sending a message or retrieving a status update fails, it will be retried automatically again later.&lt;/p>
-&lt;p>When the outgoing message service is set to RapidPro or the host/account are changed, CHT Core will request state updates for all messages that aren&amp;rsquo;t in one of the final states: &lt;code>delivered&lt;/code>, &lt;code>failed&lt;/code>, &lt;code>denied&lt;/code>, or &lt;code>cleared&lt;/code>. Each of these request counts towards your quota. Since the messages are unlikely to exist on the new RapidPro service, these requests will fail on every retry and consume your request quota. It is therefore important that all outgoing messages have a final state before switching RapidPro accounts or hosts. The status can be set to &lt;code>failed&lt;/code> for messages that should not be resent without user intervention, or to &lt;code>scheduled&lt;/code> for those that should be automatically sent with the new RapidPro account.&lt;/p>&lt;/div>
-&lt;/div>
-&lt;/div></description></item><item><title>Installing RapidPro - CHT Gateway Android APK</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/</guid><description>
-&lt;p>RapidPro - CHT uses your Android phone to send and receive messages on your behalf.&lt;/p>
-&lt;p>Due to restrictions that Google has placed on Android applications that send SMS messages, RapidPro - CHT applications can no longer be distributed through the Google Play Store. You will need to download the application file and install it using the steps below:&lt;/p>
-&lt;ol>
-&lt;li>
-&lt;p>&lt;strong>Download App&lt;/strong> - On your Android device, open your browser and download the app by entering the URL: &lt;code>&lt;a href="https://rapidpro.app.medicmobile.org/android/" target="_blank" rel="noopener">https://rapidpro.app.medicmobile.org/android/&lt;/a>&lt;/code>&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Launch the RapidPro - CHT installer&lt;/strong> - Open the notifications shade by dragging from the top and select the downloaded file.
-&lt;figure>&lt;a href="apk_download.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download.png"
-alt="download">&lt;/a>&lt;figcaption>
-&lt;p>download&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Tap Settings&lt;/strong> - You will be taken to a screen with &amp;ldquo;allow from this source&amp;rdquo; toggle
-&lt;figure>&lt;a href="apk_download_settings.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_settings.png"
-alt="settings">&lt;/a>&lt;figcaption>
-&lt;p>settings&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Toggle allow from this source&lt;/strong> - Make sure &amp;ldquo;allow from this source&amp;rdquo; toggle is in the On position. The go back and click install
-&lt;figure>&lt;a href="apk_download_allow_install.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_allow_install.png"
-alt="Toggle allow from this source">&lt;/a>&lt;figcaption>
-&lt;p>Toggle allow from this source&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;figure>&lt;a href="apk_download_confirm_install.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_confirm_install.png"
-alt="Confirm Toggle allow from this source">&lt;/a>&lt;figcaption>
-&lt;p>Confirm Toggle allow from this source&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Open RapidPro - CHT&lt;/strong> - Once RapidPro - CHT has been installed, open the app drawer and tap on the RapidPro - CHT icon to start the app.
-&lt;figure>&lt;a href="apk_download_start_app.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_start_app.png"
-alt="Open RapidPro - CHT">&lt;/a>&lt;figcaption>
-&lt;p>Open RapidPro - CHT&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>&lt;strong>Send Claim Code&lt;/strong> - When you first open RapidPro - CHT, the app will register your device with Google and our servers. Once that is complete, it will display a claim code. Copy that claim code in the form to the left and send it to your supporting engineers at Medic to connect your device.
-&lt;figure>&lt;a href="apk_download_copy_claim.png">&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_copy_claim.png"
-alt="Copy and Send Claim Code">&lt;/a>&lt;figcaption>
-&lt;p>Copy and Send Claim Code&lt;/p>
-&lt;/figcaption>
-&lt;/figure>
-&lt;/p>
-&lt;/li>
-&lt;/ol></description></item></channel></rss>
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-indigo-200 hx-bg-indigo-100 hx-text-indigo-900 dark:hx-border-indigo-200/30 dark:hx-bg-indigo-900/30 dark:hx-text-indigo-200"&gt;
+&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Important&lt;/p&gt;
+&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
+&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;The RapidPro API endpoints are rate-limited, meaning that requests to send or check the status of messages beyond a certain number per hour will be blocked. The limit is currently 2500 actions per hour, and may change without notice. Check out the &lt;a href="https://rapidpro.io/api/v2/#rate-limiting" target="_blank" rel="noopener"&gt;RapidPro API reference&lt;/a&gt; for more details. If sending a message or retrieving a status update fails, it will be retried automatically again later.&lt;/p&gt;
+&lt;p&gt;When the outgoing message service is set to RapidPro or the host/account are changed, CHT Core will request state updates for all messages that aren&amp;rsquo;t in one of the final states: &lt;code&gt;delivered&lt;/code&gt;, &lt;code&gt;failed&lt;/code&gt;, &lt;code&gt;denied&lt;/code&gt;, or &lt;code&gt;cleared&lt;/code&gt;. Each of these request counts towards your quota. Since the messages are unlikely to exist on the new RapidPro service, these requests will fail on every retry and consume your request quota. It is therefore important that all outgoing messages have a final state before switching RapidPro accounts or hosts. The status can be set to &lt;code&gt;failed&lt;/code&gt; for messages that should not be resent without user intervention, or to &lt;code&gt;scheduled&lt;/code&gt; for those that should be automatically sent with the new RapidPro account.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>Installing RapidPro - CHT Gateway Android APK</title><link>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/</guid><description>
+&lt;p&gt;RapidPro - CHT uses your Android phone to send and receive messages on your behalf.&lt;/p&gt;
+&lt;p&gt;Due to restrictions that Google has placed on Android applications that send SMS messages, RapidPro - CHT applications can no longer be distributed through the Google Play Store. You will need to download the application file and install it using the steps below:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Download App&lt;/strong&gt; - On your Android device, open your browser and download the app by entering the URL: &lt;code&gt;&lt;a href="https://rapidpro.app.medicmobile.org/android/" target="_blank" rel="noopener"&gt;https://rapidpro.app.medicmobile.org/android/&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Launch the RapidPro - CHT installer&lt;/strong&gt; - Open the notifications shade by dragging from the top and select the downloaded file.
+&lt;figure&gt;&lt;a href="apk_download.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download.png"
+alt="download"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;download&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Tap Settings&lt;/strong&gt; - You will be taken to a screen with &amp;ldquo;allow from this source&amp;rdquo; toggle
+&lt;figure&gt;&lt;a href="apk_download_settings.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_settings.png"
+alt="settings"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;settings&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Toggle allow from this source&lt;/strong&gt; - Make sure &amp;ldquo;allow from this source&amp;rdquo; toggle is in the On position. The go back and click install
+&lt;figure&gt;&lt;a href="apk_download_allow_install.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_allow_install.png"
+alt="Toggle allow from this source"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Toggle allow from this source&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;figure&gt;&lt;a href="apk_download_confirm_install.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_confirm_install.png"
+alt="Confirm Toggle allow from this source"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Confirm Toggle allow from this source&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Open RapidPro - CHT&lt;/strong&gt; - Once RapidPro - CHT has been installed, open the app drawer and tap on the RapidPro - CHT icon to start the app.
+&lt;figure&gt;&lt;a href="apk_download_start_app.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_start_app.png"
+alt="Open RapidPro - CHT"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Open RapidPro - CHT&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Send Claim Code&lt;/strong&gt; - When you first open RapidPro - CHT, the app will register your device with Google and our servers. Once that is complete, it will display a claim code. Copy that claim code in the form to the left and send it to your supporting engineers at Medic to connect your device.
+&lt;figure&gt;&lt;a href="apk_download_copy_claim.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/messaging/gateways/rapidpro_cht_gateway/apk_download_copy_claim.png"
+alt="Copy and Send Claim Code"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Copy and Send Claim Code&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>
