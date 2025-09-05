@@ -1,4 +1,45 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Debugging Applications</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/</link><description>Recent content in Debugging Applications on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/building/guides/debugging/index.xml" rel="self" type="application/rss+xml"/><item><title>Obtaining Browser and Phone Logs</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/obtaining-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/obtaining-logs/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Troubleshooting</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/</link><description>Recent content in Troubleshooting on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/index.xml" rel="self" type="application/rss+xml"/><item><title>Revalidate invalid reports</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/</guid><description>
+&lt;p&gt;You may encounter a dreaded case when reports coming in to a Medic Webapp instance have a red indicator instead of the green indicator.&lt;/p&gt;
+&lt;figure&gt;&lt;a href="invalid_report.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/invalid-reports/invalid_report.png"
+alt="Invalid reports"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Invalid reports&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;This may be caused by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Missing forms in the &lt;code&gt;app_settings&lt;/code&gt; config.&lt;/li&gt;
+&lt;li&gt;Missing or incorrect fields in the input form. e.g Missing patient ID, or Patient ID with letters&lt;/li&gt;
+&lt;li&gt;Extra fields in the input form. This happens when you don&amp;rsquo;t configure for some fields in the app_settings.json of the webapp&lt;/li&gt;
+&lt;li&gt;Configuring some forms in the wrong section of the app_settings i.e &lt;code&gt;registrations&lt;/code&gt; and &lt;code&gt;patient_reports&lt;/code&gt;. Forms that don&amp;rsquo;t have a patient_id field because it is generated afterwards, e.g ANCR, IMMR, go to the &lt;code&gt;registrations&lt;/code&gt; section, while form that have a patient_id field e.g ANCP, ANCV, IMMV; go to the &lt;code&gt;patient_reports&lt;/code&gt; section&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;How to solve&lt;span class="hx-absolute -hx-mt-20" id="how-to-solve"&gt;&lt;/span&gt;
+&lt;a href="#how-to-solve" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To revalidate an invalid report, we need to clear the errors field on the doc (set it to []). Updating this field from Futon will not work and will result in an endless update process. The recommended way to do it is to download the doc, update it and then upload it. This will also ensure propagation and replication in couchdb.&lt;/p&gt;
+&lt;p&gt;To download a doc, use:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;curl &amp;#39;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt;&amp;#39; &amp;gt; filename.json&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;filename.json&lt;/code&gt; is the local file in your computer you have stored the doc json&lt;/p&gt;
+&lt;p&gt;Update &lt;code&gt;filename.json&lt;/code&gt;: Set &amp;ldquo;errors&amp;rdquo; to [] and remove &amp;ldquo;accept_patient_reports&amp;rdquo; transition so that sentinel can revalidate the report.&lt;/p&gt;
+&lt;p&gt;Upload &lt;code&gt;filename.json&lt;/code&gt; with:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;curl -X PUT hhttps://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;instance&amp;gt;.app.medicmobile.org/medic/&amp;lt;doc id&amp;gt; -d @filename.json --header &amp;#34;Content-Type: application/json&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>Obtaining Browser and Phone Logs</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/obtaining-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/obtaining-logs/</guid><description>
 &lt;p&gt;There are many places where useful logs reside. This details all those places, and the easiest way to get a hold of them.&lt;/p&gt;
 &lt;h2&gt;On a laptop or desktop&lt;span class="hx-absolute -hx-mt-20" id="on-a-laptop-or-desktop"&gt;&lt;/span&gt;
 &lt;a href="#on-a-laptop-or-desktop" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To check if there are relevant logs open up the developer console in your browser. The shortcut is probably COMMAND+OPTION+I on MacOS, or CTRL+SHIFT+I on Linux and Windows. Click the console tab and copy out any errors or logging that you think is relevant.&lt;/p&gt;
@@ -12,7 +53,7 @@
 &lt;h3&gt;Step 3&lt;span class="hx-absolute -hx-mt-20" id="step-3"&gt;&lt;/span&gt;
 &lt;a href="#step-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;On your phone, you will see a popup &lt;em&gt;&amp;ldquo;Allow USB debugging. The computer&amp;rsquo;s RSA fingerprint&amp;hellip;&amp;rdquo;&lt;/em&gt;, click &lt;em&gt;&amp;ldquo;OK&amp;rdquo;&lt;/em&gt;.&lt;/p&gt;
 &lt;/div&gt;
-&lt;figure&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/allow_usb_debugging.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/allow_usb_debugging.png"
+&lt;figure&gt;&lt;a href="https://docs.communityhealthtoolkit.org/allow_usb_debugging.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/images/allow_usb_debugging.png"
 alt="Allow USB debugging"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;p&gt;Allow USB debugging&lt;/p&gt;
 &lt;/figcaption&gt;
@@ -28,7 +69,7 @@ alt="Allow USB debugging"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;a href="#step-2-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Within a command line session, write the following command: &lt;code&gt;adb start-server&lt;/code&gt;.&lt;/p&gt;
 &lt;h3&gt;Step 3&lt;span class="hx-absolute -hx-mt-20" id="step-3-1"&gt;&lt;/span&gt;
 &lt;a href="#step-3-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To check if your phone is properly connected, write the command &lt;code&gt;adb devices&lt;/code&gt;. This will list the devices connected.&lt;/p&gt;
-&lt;figure&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/adb_devices.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/adb_devices.png"
+&lt;figure&gt;&lt;a href="https://docs.communityhealthtoolkit.org/images/adb_devices.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/images/adb_devices.png"
 alt="ADB Devices"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;p&gt;ADB Devices&lt;/p&gt;
 &lt;/figcaption&gt;
@@ -61,118 +102,65 @@ title="Copy code"
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;h2&gt;On the server&lt;span class="hx-absolute -hx-mt-20" id="on-the-server"&gt;&lt;/span&gt;
-&lt;a href="#on-the-server" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Some unexpected errors are caught and stored in &lt;code&gt;feedback&lt;/code&gt; docs and stored on the phone and later synced to CouchDB on the server. To access these, look for docs in the &lt;code&gt;medic-user-{username}-meta&lt;/code&gt; or &lt;code&gt;medic-users-meta&lt;/code&gt; databases. This is particularly useful to debug issues where you do not have physical access to the device. More information is available under &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/" &gt;Managing Databases&lt;/a&gt;.&lt;/p&gt;</description></item><item><title>Securely Sharing Your Development Environment</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/secure-sharing-of-developer-instance/</guid><description>
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-red-200 hx-bg-red-100 hx-text-red-900 dark:hx-border-red-200/30 dark:hx-bg-red-900/30 dark:hx-text-red-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Caution&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Be extra careful with this process! The end result will be that your development instance will be accessible to the internet. If you have simple logins and passwords like &amp;ldquo;admin/test.223&amp;rdquo; because you thought it was just your local dev instance and it doesn&amp;rsquo;t matter, now it matters! Whenever you&amp;rsquo;re not using the SSH tunnel for testing, shut it down so there&amp;rsquo;s no more remote access.&lt;/p&gt;
-&lt;p&gt;Never expose a development instance to the internet where you&amp;rsquo;ve replicated production data locally. Well, maybe not never, but with extreme care and intention.&lt;/p&gt;
-&lt;p&gt;Also not - if you only want to test with mobile devices that require a valid TLS certificate, do not use method. Instead, use &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/#nginx-local-ip" &gt;nginx-local-ip&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h2&gt;Overview&lt;span class="hx-absolute -hx-mt-20" id="overview"&gt;&lt;/span&gt;
-&lt;a href="#overview" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;When using a local &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" &gt;development environment&lt;/a&gt;, you may want to share your work with other collaborators. By using a publicly accessible web server, you can receive the secure https requests and forward them back to your CHT instance which doesn&amp;rsquo;t have https set up:&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/SSH-tunnel-diagram.svg" &gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/guides/debugging/images/SSH-tunnel-diagram.svg" width=100% height=100%&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Once you have this web server set up, you may continue to use it whenever you want by simply reconnecting to it via the secure tunnel.&lt;/p&gt;
-&lt;h2&gt;Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites"&gt;&lt;/span&gt;
-&lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;This guide assumes:&lt;/p&gt;
+&lt;a href="#on-the-server" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Some unexpected errors are caught and stored in &lt;code&gt;feedback&lt;/code&gt; docs and stored on the phone and later synced to CouchDB on the server. To access these, look for docs in the &lt;code&gt;medic-user-{username}-meta&lt;/code&gt; or &lt;code&gt;medic-users-meta&lt;/code&gt; databases. This is particularly useful to debug issues where you do not have physical access to the device. More information is available under &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/" &gt;Managing Databases&lt;/a&gt;.&lt;/p&gt;</description></item><item><title>Replicating Production Data Locally</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/replicating-production-data-locally/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/replicating-production-data-locally/</guid><description>
+&lt;p&gt;Sometimes there will be a production problem that you need to dig into locally to solve. This guide explains how to:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;You have a local &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" &gt;dev instance&lt;/a&gt; set up of cht-core&lt;/li&gt;
-&lt;li&gt;You have the &lt;a href="https://play.google.com/store/apps/details?id=org.medicmobile.webapp.mobile&amp;amp;hl=en_US" target="_blank" rel="noopener"&gt;generic Medic app&lt;/a&gt; installed on your Android device. This version allows you to enter a custom CHT URL on first run.&lt;/li&gt;
-&lt;li&gt;You have an Ubuntu &amp;gt;18.04 server with a public IP and a DNS entry that you can SSH into and have sudo on&lt;/li&gt;
-&lt;li&gt;You have Apache &amp;gt;2.4.29 installed on the Ubuntu server and can add a new vhost to it, including an SSL cert. (nginx could be used instead as well, but not covered here)&lt;/li&gt;
-&lt;li&gt;You have certbot installed from letsencrypt.org&lt;/li&gt;
+&lt;li&gt;Copy the data from an instance to a local CouchDB database&lt;/li&gt;
+&lt;li&gt;Run a local webapp instance with that data&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The steps in this guide can be done on any of the cheap server providers out there (&lt;a href="https://digitalocean.com" target="_blank" rel="noopener"&gt;Digital Ocean&lt;/a&gt; has a $5/mo server).&lt;/p&gt;
-&lt;h2&gt;Steps&lt;span class="hx-absolute -hx-mt-20" id="steps"&gt;&lt;/span&gt;
-&lt;a href="#steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Create a DNS entry. Let&amp;rsquo;s assume it&amp;rsquo;s &lt;code&gt;cht.domain.com&lt;/code&gt;. It should point to the IP of your Ubuntu server. If you do not already have a domain name with DNS services that you can use, you can sign up for a free service to do this like &lt;a href="https://www.noip.com/remote-access" target="_blank" rel="noopener"&gt;noip.com&lt;/a&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;On your Ubuntu server, create a new apache vhost in &lt;code&gt;/etc/apache2/sites-available/100-cht.domain.com.conf&lt;/code&gt; with the following contents:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;pre&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
-ServerName cht.domain.com
-RewriteEngine on
-RewriteRule (.*) https://cht.domain.com%{REQUEST_URI}
-&amp;lt;/VirtualHost&amp;gt;
-&amp;lt;IfModule mod_ssl.c&amp;gt;
-&amp;lt;VirtualHost *:443&amp;gt;
-ServerName cht.domain.com
-SSLEngine On
-&amp;lt;IfModule mod_headers.c&amp;gt;
-Header always set Strict-Transport-Security &amp;#34;max-age=63072000; preload&amp;#34;
-&amp;lt;/IfModule&amp;gt;
-RewriteEngine on
-Include /etc/letsencrypt/options-ssl-apache.conf
-SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
-SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
-ProxyPass / http://localhost:8081/
-ProxyPassReverse / http://localhost:8081/
-RequestHeader set X-Forwarded-Proto &amp;#34;https&amp;#34;
-&amp;lt;/VirtualHost&amp;gt;
-&amp;lt;/IfModule&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
-&lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
-title="Copy code"
-&gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;/button&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Enable the new site: &lt;code&gt;a2ensite 100-cht.domain.com&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Restart apache and ensure there&amp;rsquo;s no errors: &lt;code&gt;apachectl restart&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Create the TLS certificate: &lt;code&gt;certbot -d cht.domain.com&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;When prompted choose no redirect: &amp;ldquo;No redirect - Make no further changes to the webserver configuration.&amp;rdquo;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Restart apache and ensure there&amp;rsquo;s no errors: &lt;code&gt;apachectl restart&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;In a browser, test that you can connect to your server with no errors at &lt;a href="https://cht.domain.com" target="_blank" rel="noopener"&gt;https://cht.domain.com&lt;/a&gt; (you may get a &lt;code&gt;500&lt;/code&gt; error, but you shouldn&amp;rsquo;t get any TLS errors)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Ensure your cht-core local dev instance is running by going to http://localhost:5988/&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;On your local dev box, set up the SSH tunnel with: &lt;code&gt;ssh -NT -R 8081:127.0.0.1:5988 cht.domain.com&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;This assumes your local username is the same as it is on cht.domain.com. This command will hang and you may exit when down with &lt;code&gt;ctrl + c&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;In a browser, test again that you now see your local dev instance and it loads correctly at &lt;a href="https://cht.domain.com" target="_blank" rel="noopener"&gt;https://cht.domain.com&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If needed, reset the Medic app on your phone so that it prompts which instance to use&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;In the app on your phone, choose &amp;ldquo;custom&amp;rdquo; for which instance to use and enter &lt;a href="https://cht.domain.com" target="_blank" rel="noopener"&gt;https://cht.domain.com&lt;/a&gt;. You should now see your local dev instance in the CHT Android device. Happy testing!&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2&gt;Tunnel command breakdown&lt;span class="hx-absolute -hx-mt-20" id="tunnel-command-breakdown"&gt;&lt;/span&gt;
-&lt;a href="#tunnel-command-breakdown" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;From the SSH command in step 10 above:&lt;/p&gt;
-&lt;figure&gt;&lt;a href="../images/ssh-ports.svg"&gt;&lt;img src="../images/ssh-ports.svg"
-alt="Explanation of ports and IPs from SSH"&gt;&lt;/a&gt;&lt;figcaption&gt;
-&lt;p&gt;Explanation of ports and IPs from SSH&lt;/p&gt;
-&lt;/figcaption&gt;
-&lt;/figure&gt;
+&lt;h2&gt;First, a note about data safety&lt;span class="hx-absolute -hx-mt-20" id="first-a-note-about-data-safety"&gt;&lt;/span&gt;
+&lt;a href="#first-a-note-about-data-safety" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Production data is medical data. It&amp;rsquo;s HIV statuses and pregnancies. It&amp;rsquo;s important, and it&amp;rsquo;s not yours. If you&amp;rsquo;re downloading it, do so on an encrypted drive and delete it once you&amp;rsquo;re done with it.&lt;/p&gt;
+&lt;h2&gt;Step 1: Get the data&lt;span class="hx-absolute -hx-mt-20" id="step-1-get-the-data"&gt;&lt;/span&gt;
+&lt;a href="#step-1-get-the-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;First thing is to get the data onto your local CouchDB. It&amp;rsquo;s advisable to create a new DB for this, so that you have a fresh untouched collection of data that isn&amp;rsquo;t mixed in with anything you have locally.&lt;/p&gt;
+&lt;h3&gt;Small production instances&lt;span class="hx-absolute -hx-mt-20" id="small-production-instances"&gt;&lt;/span&gt;
+&lt;a href="#small-production-instances" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;If there isn&amp;rsquo;t much data you can replicate the entire DB locally. You can initiate this either from your local Fauxton, or from the command line. You must use an administrator username and password for this at both the source and destination.&lt;/p&gt;
+&lt;p&gt;For Fauxton, navigate to http://localhost:5984/_utils/#/replication/_create
+For command line, see: &lt;a href="https://docs.couchdb.org/en/stable/api/server/common.html#replicate" target="_blank" rel="noopener"&gt;https://docs.couchdb.org/en/stable/api/server/common.html#replicate&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Note that replication may stall on one document, and you may end up with your local DB having one less document than the source. This is due to how our URLs are setup: the replicator gets confused and considers &lt;code&gt;login&lt;/code&gt; (ie &lt;code&gt;https://url/login&lt;/code&gt;) to be a document. You can safely ignore this difference - you&amp;rsquo;re good to go once your destination database has one less document than the source.&lt;/p&gt;
+&lt;h3&gt;Large production instances&lt;span class="hx-absolute -hx-mt-20" id="large-production-instances"&gt;&lt;/span&gt;
+&lt;a href="#large-production-instances" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;If the instance is too large to replicate locally (or you are too impatient), you can replicate the data accessible to a single user. This process downloads a user&amp;rsquo;s data into a browser and then copies that data into a CouchDB database.&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;code&gt;8081&lt;/code&gt; - Remote port on cht.domain.com to listen to. This is the same port that apache redirects to in step 2 above.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;127.0.0.1&lt;/code&gt; - Host to send forwarded traffic to. In this case, your local machine.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;5988&lt;/code&gt; - Local port where traffic from step one will be sent. In this case, your instance of the CHT&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;cht.domain.com&lt;/code&gt; - Public domain where you have an SSH account and we&amp;rsquo;ll attach port &lt;code&gt;8081&lt;/code&gt; to from step 1.&lt;/li&gt;
-&lt;/ol&gt;</description></item><item><title>Sharing 4.x Logs</title><link>https://docs.communityhealthtoolkit.org/building/guides/debugging/sharing-4x-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/guides/debugging/sharing-4x-logs/</guid><description>
+&lt;li&gt;Open Firefox and navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;false&lt;/code&gt; to disable Content Security Policies.&lt;/li&gt;
+&lt;li&gt;Navigate to the instance and login as the user with the data you want. &lt;em&gt;(If you want more data, like an entire district, you could consider logging in as a new user with a contact document at your desired place in the contact hierarchy. But that is an exercise for the reader)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Wait for the data to replicate. You know this is done once the app lets you interact with it. &lt;em&gt;(If you want to get the user&amp;rsquo;s data before purging, consider disabling purging. Another exercise for the reader)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Make sure your local CouchDB has CORS enabled: &lt;a href="https://docs.couchdb.org/en/stable/config/http.html#cors" target="_blank" rel="noopener"&gt;https://docs.couchdb.org/en/stable/config/http.html#cors&lt;/a&gt;. Consider using &lt;a href="https://github.com/pouchdb/add-cors-to-couchdb#user-content-what-it-does" target="_blank" rel="noopener"&gt;add-cors-to-couchdb&lt;/a&gt; or its recommended settings.&lt;/li&gt;
+&lt;li&gt;Allow your CouchDB to be accessible via &lt;code&gt;https&lt;/code&gt;. One way is to run &lt;code&gt;ngrok http PORT&lt;/code&gt;. The &lt;code&gt;PORT&lt;/code&gt; &lt;em&gt;(&lt;code&gt;5984&lt;/code&gt; by default)&lt;/em&gt; can be found in database configuration using fauxton under the &lt;code&gt;chttpd&lt;/code&gt; section. This will make your CouchDB accessible via a url like &lt;code&gt;https://abcd1234.ngrok.io&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Open the console in Firefox and run &lt;code&gt;await PouchDB.replicate('medic-user-XXX', 'https://your:admin@abcd1234.ngrok.io/YYY');&lt;/code&gt;. Here &lt;code&gt;XXX&lt;/code&gt; is the name you logged in as, and &lt;code&gt;YYY&lt;/code&gt; is the name of a database in which to store the data.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Note&lt;/strong&gt;: If you get 401s make sure that: your CouchDB credentials are right; and you don&amp;rsquo;t have a local session in the same browser already (session cookies can take precedence over basic auth); and if you&amp;rsquo;re running CouchDB in Docker you have exposed both &lt;code&gt;5984&lt;/code&gt; and &lt;code&gt;5986&lt;/code&gt; to localhost.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Wait for the replication to complete. In Fauxton you should see the database YYY with the same number of documents reported during the user&amp;rsquo;s initial replication.&lt;/li&gt;
+&lt;li&gt;Log out of the instance and clear your data from the developer console (Application -&amp;gt; Clear storage).&lt;/li&gt;
+&lt;li&gt;Navigate to &lt;code&gt;about:config&lt;/code&gt;. Set &lt;code&gt;security.csp.enable&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt; to re-enable Content Security Policies.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Regardless, do this too&lt;span class="hx-absolute -hx-mt-20" id="regardless-do-this-too"&gt;&lt;/span&gt;
+&lt;a href="#regardless-do-this-too" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To log in as a specific prod user you need to also copy them from the prod &lt;code&gt;_users&lt;/code&gt; database into your own local &lt;code&gt;_users&lt;/code&gt; database. The simplest way to do this is to just open the DB in Fauxton, find the document and copy it on your clipboard, then create a new document in your local &lt;code&gt;_users&lt;/code&gt; DB and paste it in, deleting the &lt;code&gt;_rev&lt;/code&gt; property.&lt;/p&gt;
+&lt;p&gt;You could also use this opportunity to change the password to something easier to work with locally. To do this, add a &lt;code&gt;password&lt;/code&gt; property into the document with the password you want in plain text. CouchDB will convert this to a properly hashed password on save.&lt;/p&gt;
+&lt;h2&gt;Step 2, run it locally&lt;span class="hx-absolute -hx-mt-20" id="step-2-run-it-locally"&gt;&lt;/span&gt;
+&lt;a href="#step-2-run-it-locally" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;First you need to decide if you need a local development environment (unless you already have one, in which case you might as well use it), or are happy to just use &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener"&gt;Horticulturalist&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A local development environment will be useful to you if:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;You want to change code locally&lt;/li&gt;
+&lt;li&gt;You want to see useful, non-minified stack traces, or otherwise browse / step through non-minified code in the browser&lt;/li&gt;
+&lt;li&gt;You want to deploy a version of the code older than &lt;code&gt;2.14.0&lt;/code&gt;, as they are not available in Horticulturalist&amp;rsquo;s repos.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Option 1, local development environment&lt;span class="hx-absolute -hx-mt-20" id="option-1-local-development-environment"&gt;&lt;/span&gt;
+&lt;a href="#option-1-local-development-environment" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;If you don&amp;rsquo;t already have a local dev env, follow the instructions on the &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/core/dev-environment/" &gt;development setup instructions&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Then you need to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Push the code you want to run via &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY npm run build-dev&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Start API and Sentinel by running &lt;code&gt;COUCH_URL=http://your:admin@localhost:5984/YYY node api/server&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Once you&amp;rsquo;ve done all of that you should be able to log in with your user.&lt;/p&gt;
+&lt;h3&gt;Option 2, horticulturalist&lt;span class="hx-absolute -hx-mt-20" id="option-2-horticulturalist"&gt;&lt;/span&gt;
+&lt;a href="#option-2-horticulturalist" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Follow the instructions on the &lt;a href="https://github.com/medic/horticulturalist" target="_blank" rel="noopener"&gt;horticulturalist repo&lt;/a&gt; to get it installed. Then:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Make sure that the &lt;code&gt;medic&lt;/code&gt; DB doesn&amp;rsquo;t exist, so that you have a fresh database.&lt;/li&gt;
+&lt;li&gt;Replicate your local PROD DB into a new &lt;code&gt;medic&lt;/code&gt; database using the Fauxton console.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;horti --local --bootstrap=XXX&lt;/code&gt;, where &lt;code&gt;XXX&lt;/code&gt; is the version you want to use (maybe the same one as production?)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You should now be able to log in as that user locally!&lt;/p&gt;</description></item><item><title>Sharing Logs</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/sharing-4x-logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/troubleshooting/sharing-4x-logs/</guid><description>
 &lt;p&gt;CHT 4.x moves from a monolithic container MedicOS to discrete containers, each service hosting one service of the CHT. When troubleshooting an issue with your CHT instance, it can be hard to list each container, see it&amp;rsquo;s status, gather up logs for each container and then share all this information with Medic or other support staff. To ease this pain, a script was written which automates the process.&lt;/p&gt;
 &lt;h2&gt;Prerequisites&lt;span class="hx-absolute -hx-mt-20" id="prerequisites"&gt;&lt;/span&gt;
 &lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;This assumes you have access to the command line on the server where the CHT is running locally or via SSH.&lt;/p&gt;
