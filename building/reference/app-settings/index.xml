@@ -2943,4 +2943,75 @@ title="Copy code"
 &lt;h2&gt;Troubleshooting&lt;span class="hx-absolute -hx-mt-20" id="troubleshooting"&gt;&lt;/span&gt;
 &lt;a href="#troubleshooting" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Configuration is validated when Sentinel starts. Issues with the configuration will be show in the Sentinel logs.&lt;/p&gt;
 &lt;p&gt;Errors occurring during the client-side transition will be recorded in the browser&amp;rsquo;s console. This is where problems with processing reports from the replace forms will be logged.&lt;/p&gt;
-&lt;p&gt;Errors occurring during the server-side transition will be recorded in the Sentinel logs and on the contact doc for the original user. So, if the client-side transition marks the original user for replacement, but Sentinel fails to create the new user, the failure will be recorded on the original contact doc in the &lt;code&gt;errors&lt;/code&gt; array.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;Errors occurring during the server-side transition will be recorded in the Sentinel logs and on the contact doc for the original user. So, if the client-side transition marks the original user for replacement, but Sentinel fails to create the new user, the failure will be recorded on the original contact doc in the &lt;code&gt;errors&lt;/code&gt; array.&lt;/p&gt;
+&lt;h3&gt;Resetting the sentinel sequence ID to skip a large backlog&lt;span class="hx-absolute -hx-mt-20" id="resetting-the-sentinel-sequence-id-to-skip-a-large-backlog"&gt;&lt;/span&gt;
+&lt;a href="#resetting-the-sentinel-sequence-id-to-skip-a-large-backlog" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;In some cases, a CHT instance may develop a very large sentinel backlog that would take too long to process, preventing new transitions from being applied to incoming reports. In these situations, you can reset the sentinel sequence ID to skip processing the backlog.&lt;/p&gt;
+&lt;p&gt;Follow these steps to reset the sentinel sequence ID:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Confirm you have a sentinel backlog&lt;/strong&gt; in watchdog. This will likely be in the thousands or millions. While it may be decreasing, you&amp;rsquo;ll notice that it could take weeks or months to reach zero. During this backlog processing, no new sentinel transitions will be processed:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="sentinel-backlog.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/reference/app-settings/transitions/sentinel-backlog.png"
+alt="Screenshot showing a sentinel backlog in watchdog"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Get the current sequence ID&lt;/strong&gt; for the medic database via a &lt;code&gt;curl&lt;/code&gt; call. Be sure to replace &lt;code&gt;&amp;lt;password&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;cht-url&amp;gt;&lt;/code&gt; with the correct values:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;curl -qs https://medic:&amp;lt;password&amp;gt;@&amp;lt;cht-url&amp;gt;/medic/ | jq &amp;#34;.update_seq&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This will show a long string (approximately 400 characters) starting with a number, for example:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;307933-g1AAAAO1eJyV0j1OwzAUB3CLIiEQUsXAJRiQP2I7ZoErQGsxMMV2oigqMDFzil4BUk-sTJyCKzAwMtOGZ8cLUlXJ9vCGJ__k97cXCKHjduLQiX18sq0zV4TKcwybLKC197CPXr3_hjLA6tqJQcgd3kProOSmFLzYdnQ3eKP1J5QXcBN4FEHJqeSK5oPrYfiAcg3uCNa3EaywZI0j-WDvvYfyC2664XsEi6bCWDX54Ezr5RilT-BFBJlzkjKWCZrnYdiMQS5Hzr5FjsqS1kzmcp33q2CuE_YVMaNajNtcTGs9D2Kfj5pzijMqcrFL-HRBnKV3vYuYsbUqRHZqZ5B-EDfpCabjmJRWxGWPeQq2CuPqXmSC8pCXPxCoUuHmSfqJkCVaF2Tpj9wfVKv_m&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;In Fauxton&lt;/strong&gt;, go to the transitions-seq document by navigating to:&lt;/p&gt;
+&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;https://your-instance-url:port/_utils/#database/medic-sentinel/_local/transitions-seq&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;You&amp;rsquo;ll notice that before editing, the leading integer in the &amp;ldquo;value&amp;rdquo; field is lower than what you found in step 2.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Stop the sentinel container&lt;/strong&gt;. This step is critical - if you don&amp;rsquo;t stop sentinel, it may overwrite your changes to the sequence ID, and the backlog will not be cleared.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Edit the value field&lt;/strong&gt; to paste in the string you got from step 2 and click &amp;ldquo;Save Changes&amp;rdquo;:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="sentinel-edit-sequence.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/reference/app-settings/transitions/sentinel-edit-sequence.png"
+alt="Screenshot showing the sequence ID edit in Fauxton"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Restart the Sentinel container&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Check watchdog&lt;/strong&gt; which should now show a sharp drop in the backlog to zero:&lt;/p&gt;
+&lt;figure&gt;&lt;a href="sentinel-after-reset.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/reference/app-settings/transitions/sentinel-after-reset.png"
+alt="Screenshot showing watchdog after resetting sentinel sequence"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note that this will skip processing all reports in the backlog. Only use this approach when you&amp;rsquo;re confident that skipping the backlog processing is acceptable for your deployment.&lt;/p&gt;</description></item></channel></rss>
