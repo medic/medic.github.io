@@ -4,58 +4,58 @@
 &lt;p&gt;As users continually generate new reports their performance may naturally degrade as a result. You can use purging to remove older documents that are no longer relevant from their devices. Purging only removes documents from user&amp;rsquo;s devices: these reports are still available for online analytics and impact metrics.&lt;/p&gt;
 &lt;p&gt;Purging is disabled by default, and is enabled if a purge function is specified in &lt;code&gt;app_settings.json&lt;/code&gt;, along with a run schedule.&lt;/p&gt;
 &lt;p&gt;The following example would purge all reports that were created more than a year ago:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;fn&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;function(userCtx, contact, reports, messages, chtScriptApi, permissions) { const old = Date.now() - (1000 * 60 * 60 * 24 * 365); return reports.filter(r =&amp;gt; r.reported_date &amp;lt; old).map(r =&amp;gt; r._id);}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;text_expression&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;at 12 am on Sunday&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;strong&gt;Purging is both very powerful and also very dangerous&lt;/strong&gt;. Read the rest of this document carefully to make sure you completely understand how to purge and the ramifications of doing so, before using purging in your project.&lt;/p&gt;
-&lt;h2&gt;Server-side&lt;span class="hx-absolute -hx-mt-20" id="server-side"&gt;&lt;/span&gt;
+&lt;h2&gt;Server-side&lt;span class="hx:absolute hx:-mt-20" id="server-side"&gt;&lt;/span&gt;
 &lt;a href="#server-side" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Purging runs on the server on a configurable schedule.&lt;/p&gt;
 &lt;p&gt;It will iterate over all users to generate a list of unique roles groups that represent every user. Each group will have their purged docs saved in an individual database.&lt;/p&gt;
-&lt;p&gt;Then, it will iterate over all existent contacts, collecting all reports about that contact along with all sms messages that the contact has sent or received. This is similar to the scoping you may have encountered when configuring &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/" &gt;tasks&lt;/a&gt; and &lt;a href="https://docs.communityhealthtoolkit.org/building/targets/targets-js/" &gt;targets&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Then, it will iterate over all existent contacts, collecting all reports about that contact along with all sms messages that the contact has sent or received. This is similar to the scoping you may have encountered when configuring &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/"&gt;tasks&lt;/a&gt; and &lt;a href="https://docs.communityhealthtoolkit.org/building/targets/targets-js/"&gt;targets&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The configured purge function runs over all combinations of purge scope (contact + reports + messages) and user context (unique list of roles) to determine which docs should be purged.&lt;/p&gt;
 &lt;p&gt;The resulting list of docs to be purged is compared to the existent purged docs so that only the differences are saved (old purges are reverted and new purges are added).&lt;/p&gt;
 &lt;p&gt;A document is considered purged for a user if a document with the same id, prefixed by &lt;code&gt;purge&lt;/code&gt;, exists in the corresponding purge database.&lt;/p&gt;
 &lt;p&gt;The following user:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;org.couchdb.user:&amp;lt;your user&amp;gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;roles&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;district_admin&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;supervisor&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;would get their purges from a &lt;code&gt;medic-purged-role-&amp;lt;role_hash&amp;gt;&lt;/code&gt; where &lt;code&gt;role_hash&lt;/code&gt; is an md5 hash of the user&amp;rsquo;s roles.&lt;/p&gt;
 &lt;p&gt;When users sync (includes initial sync), they will only download documents that are not purged for their roles.&lt;/p&gt;
-&lt;h2&gt;Client-side&lt;span class="hx-absolute -hx-mt-20" id="client-side"&gt;&lt;/span&gt;
+&lt;h2&gt;Client-side&lt;span class="hx:absolute hx:-mt-20" id="client-side"&gt;&lt;/span&gt;
 &lt;a href="#client-side" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Periodically a user&amp;rsquo;s device calls an API endpoint that returns batches of doc ids that have been purged since last time the same device checked. This is done in the background so the user is not disrupted from their work.&lt;/p&gt;
 &lt;p&gt;The system is similar to CouchDB replication, in the sense that a &lt;code&gt;checkpointer&lt;/code&gt; document is saved in the corresponding server-side database, that stores the &lt;code&gt;last_seq&lt;/code&gt; that the device has downloaded and is used to get the next batch of ids. Purging many documents while the application is running is an expensive and potentially disruptive activity, so instead the ids are stored until the next time the app is started.&lt;/p&gt;
 &lt;p&gt;Then, when the user launches the app again during the bootstrap phase the app checks if there are any documents to purge, and if so deletes them all before starting up as usual. Doing the deletion prior to startup is relatively fast and designed to disrupt the user as little as possible.&lt;/p&gt;
-&lt;h2&gt;Configuration&lt;span class="hx-absolute -hx-mt-20" id="configuration"&gt;&lt;/span&gt;
+&lt;h2&gt;Configuration&lt;span class="hx:absolute hx:-mt-20" id="configuration"&gt;&lt;/span&gt;
 &lt;a href="#configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To enable purging, write your purge configuration to &lt;code&gt;purge.js&lt;/code&gt; in your project root:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;exports&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;text_expression&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;at 9 am on Sunday&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;run_every_days&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -73,44 +73,44 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[...&lt;/span&gt;&lt;span class="nx"&gt;reportsToPurge&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="nx"&gt;messagesToPurge&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;To disable purging, you need to explicitly configure the purge key with an empty object value in the &lt;code&gt;app_settings.json&lt;/code&gt; file, as in this example:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;Purge configuration&lt;span class="hx-absolute -hx-mt-20" id="purge-configuration"&gt;&lt;/span&gt;
+&lt;h3&gt;Purge configuration&lt;span class="hx:absolute hx:-mt-20" id="purge-configuration"&gt;&lt;/span&gt;
 &lt;a href="#purge-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;As shown above, you should be exporting a property &lt;code&gt;fn&lt;/code&gt; defining a self contained function: it should have no outside dependencies - like used variables, required modules or call outside functions.&lt;/p&gt;
 &lt;p&gt;This function takes six parameters:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;userCtx&lt;/code&gt;, an object with the user&amp;rsquo;s &lt;code&gt;roles&lt;/code&gt; as fields. For more information read the &lt;a href="https://docs.couchdb.org/en/stable/json-structure.html#userctx-object" target="_blank" rel="noopener"&gt;documentation for the User Context Object&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;userCtx&lt;/code&gt;, an object with the user&amp;rsquo;s &lt;code&gt;roles&lt;/code&gt; as fields. For more information read the &lt;a href="https://docs.couchdb.org/en/stable/json-structure.html#userctx-object"target="_blank" rel="noopener"&gt;documentation for the User Context Object&lt;/a&gt;.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;contact&lt;/code&gt;, the contact document of a patient or other contact who has reports about them.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;reports&lt;/code&gt;, an array of all reports for that subject that are present on the server.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;messages&lt;/code&gt;, an array of sms messages that the contact has sent or received.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;chtScriptApi&lt;/code&gt; (Optional) the CHT API that provides CHT-Core Framework&amp;rsquo;s functions to other parts of the app. More info on the API can be found &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/" &gt;here&lt;/a&gt;. Added in 4.3.0.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;permissions&lt;/code&gt; (Optional) string or array of permissions that the user has. More info on permissions can be found &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/user-permissions/" &gt;here&lt;/a&gt;. Added in 4.3.0.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chtScriptApi&lt;/code&gt; (Optional) the CHT API that provides CHT-Core Framework&amp;rsquo;s functions to other parts of the app. More info on the API can be found &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/"&gt;here&lt;/a&gt;. Added in 4.3.0.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;permissions&lt;/code&gt; (Optional) string or array of permissions that the user has. More info on permissions can be found &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/user-permissions/"&gt;here&lt;/a&gt;. Added in 4.3.0.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;And should return an array of &lt;code&gt;_id&lt;/code&gt; values for docs you would like to be purged (or &lt;code&gt;undefined&lt;/code&gt; / nothing if you don&amp;rsquo;t wish to purge anything). `Only ids of docs that were passed to the function are valid for purging: you are not allowed to purge other documents.&lt;/p&gt;
 &lt;p&gt;In the cases of reports that do not have subjects or their subjects are not found, the &lt;code&gt;purge&lt;/code&gt; function will receive an empty object as &lt;code&gt;contact&lt;/code&gt;. In the cases of reports about deleted contacts, the &lt;code&gt;purge&lt;/code&gt; function will receive a &lt;code&gt;{ _deleted: true }&lt;/code&gt; object as the &lt;code&gt;contact&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;As of &lt;strong&gt;3.9.0&lt;/strong&gt;, &lt;code&gt;task&lt;/code&gt; documents that are in a terminal state (&lt;code&gt;Cancelled&lt;/code&gt;, &lt;code&gt;Completed&lt;/code&gt;, &lt;code&gt;Failed&lt;/code&gt;) are purged if their &lt;code&gt;end_date&lt;/code&gt; is more than 60 days ago (relative to server date).
 As of &lt;strong&gt;3.9.0&lt;/strong&gt;, &lt;code&gt;target&lt;/code&gt; documents are purged if their reporting period is more than 6 months ago (relative to server date). Purging &lt;code&gt;task&lt;/code&gt; and &lt;code&gt;target&lt;/code&gt; documents happens automatically on every purge run. The intervals and required states are not configurable.&lt;/p&gt;
-&lt;h3&gt;Schedule configuration&lt;span class="hx-absolute -hx-mt-20" id="schedule-configuration"&gt;&lt;/span&gt;
+&lt;h3&gt;Schedule configuration&lt;span class="hx:absolute hx:-mt-20" id="schedule-configuration"&gt;&lt;/span&gt;
 &lt;a href="#schedule-configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;You must set a schedule for purging to run server-side.
 Depending on the size of the database and server capacity, purging could be a lengthy and resource intensive operation, so it is recommended you run purge on a schedule that your server can sustain (for example at nighttime in the weekends).&lt;/p&gt;
 &lt;p&gt;You can also change the frequency of local purge downloads (default being every 7 days).&lt;/p&gt;
@@ -135,36 +135,36 @@ Depending on the size of the database and server capacity, purging could be a le
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;text_expression&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Any valid text expression to describe the interval of running purge server-side. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#text" target="_blank" rel="noopener"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Any valid text expression to describe the interval of running purge server-side. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#text"target="_blank" rel="noopener"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;no if &lt;code&gt;cron&lt;/code&gt; provided&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;cron&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Any valid Cron expression to describe the interval of running purge server-side. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#cron" target="_blank" rel="noopener"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Any valid Cron expression to describe the interval of running purge server-side. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#cron"target="_blank" rel="noopener"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
 &lt;td&gt;no if &lt;code&gt;text_expression&lt;/code&gt; provided&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;Example of purge configured in your app_settings:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;purge&amp;#34;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;fn&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;function(userCtx, contact, reports, messages) { return []; }&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;cron&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;0 1 * * SUN&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;text_expression&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;at 1:00 am on Sun&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;run_every_days&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h2&gt;Considerations&lt;span class="hx-absolute -hx-mt-20" id="considerations"&gt;&lt;/span&gt;
-&lt;a href="#considerations" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Purged documents server-side&lt;span class="hx-absolute -hx-mt-20" id="purged-documents-server-side"&gt;&lt;/span&gt;
+&lt;h2&gt;Considerations&lt;span class="hx:absolute hx:-mt-20" id="considerations"&gt;&lt;/span&gt;
+&lt;a href="#considerations" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Purged documents server-side&lt;span class="hx:absolute hx:-mt-20" id="purged-documents-server-side"&gt;&lt;/span&gt;
 &lt;a href="#purged-documents-server-side" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Purging is run as a scheduled task in Sentinel.&lt;/p&gt;
 &lt;p&gt;Purging does not touch documents in the &lt;code&gt;medic&lt;/code&gt; database, everything is done in separate purge databases(&lt;code&gt;medic-purged-roles-&amp;lt;roles-hash&amp;gt;&lt;/code&gt;).&lt;/p&gt;
 &lt;p&gt;The purge databases names contain an md5 of the JSON representation of a list of unique roles.
@@ -215,7 +215,7 @@ They also contain a &lt;code&gt;_local/info&lt;/code&gt; doc where the roles are
 &lt;p&gt;Purging is reversible. If you update your purge function, when running purge the old invalid purges will be deleted. This does not mean that devices will automatically re-download documents that become unpurged. In order for the user to re-download a previously purged document, the document either needs to be updated in the &lt;code&gt;medic&lt;/code&gt; database on the server or the user has to download all data again.&lt;/p&gt;
 &lt;p&gt;Running purge will not remove old purge databases, even if they don&amp;rsquo;t correspond to any existent users. Their removal is a manual process.&lt;/p&gt;
 &lt;p&gt;Purge does not run when adding new roles or adding said new roles to users. It also does not run when an existent user is updated to have a new unique list of roles (one that purge has not run over yet). This means that roles need to be planned carefully in order to take advantage of serverside purge. If purge has not run for the user&amp;rsquo;s list of roles at the moment of initial replication, the user will download &lt;strong&gt;all&lt;/strong&gt; documents - only to be purged later.&lt;/p&gt;
-&lt;h3&gt;Purged documents client-side&lt;span class="hx-absolute -hx-mt-20" id="purged-documents-client-side"&gt;&lt;/span&gt;
+&lt;h3&gt;Purged documents client-side&lt;span class="hx:absolute hx:-mt-20" id="purged-documents-client-side"&gt;&lt;/span&gt;
 &lt;a href="#purged-documents-client-side" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The key thing to keep in mind while purging is that &lt;strong&gt;documents that you purge are deleted on user&amp;rsquo;s device&lt;/strong&gt;. This sounds obvious, but it&amp;rsquo;s important to understand &lt;em&gt;how&lt;/em&gt; this affects the running of the application:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Any &lt;strong&gt;rules&lt;/strong&gt; you have written that presume that the document exists may break. For example, if the document completes a task, purging it will reopen that task, unless you &lt;em&gt;also&lt;/em&gt; purge the document that created the task in the first place (while making sure that purging &lt;em&gt;that&lt;/em&gt; report doesn&amp;rsquo;t break more things!)&lt;/li&gt;
@@ -228,23 +228,23 @@ They also contain a &lt;code&gt;_local/info&lt;/code&gt; doc where the roles are
 &lt;p&gt;Users may search for their own documents, and use data from them in novel ways you may not anticipate. It&amp;rsquo;s important to work with your users to ensure documents are only removed once there are no uses for them.&lt;/p&gt;
 &lt;p&gt;It is key then, that you test your purge rules thoroughly!&lt;/p&gt;</description></item><item><title>CouchDB replication</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/replication/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/replication/</guid><description>
 &lt;p&gt;Replication is what we call it when users download a copy of the data on to their device.&lt;/p&gt;
-&lt;h2&gt;Restricting replication&lt;span class="hx-absolute -hx-mt-20" id="restricting-replication"&gt;&lt;/span&gt;
+&lt;h2&gt;Restricting replication&lt;span class="hx:absolute hx:-mt-20" id="restricting-replication"&gt;&lt;/span&gt;
 &lt;a href="#restricting-replication" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;If the user has an online role they can access all the data, otherwise they will get restricted access to the data.&lt;/p&gt;
-&lt;h3&gt;Restriction by place&lt;span class="hx-absolute -hx-mt-20" id="restriction-by-place"&gt;&lt;/span&gt;
+&lt;h3&gt;Restriction by place&lt;span class="hx:absolute hx:-mt-20" id="restriction-by-place"&gt;&lt;/span&gt;
 &lt;a href="#restriction-by-place" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The most common restriction is by place. This is where we check the user&amp;rsquo;s &lt;code&gt;facility_id&lt;/code&gt; property, and allow access to all contacts that are descendants of that place, and all reports and messages that are about one of those descendants.&lt;/p&gt;
 &lt;p&gt;For example, if a CHP&amp;rsquo;s &lt;code&gt;facility_id&lt;/code&gt; property is set to the ID of the Maori Hill clinic, then they will be able to see all patients and all reports about patients at that clinic.&lt;/p&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Starting in v4.9.0, users with the &lt;code&gt;can_have_multiple_places&lt;/code&gt; permission can be assigned more than one &lt;code&gt;facility_id&lt;/code&gt;. The primary use case for this is for Supervisors who manage multiple areas. A video demonstration of setting up a multi-facility user and what this looks like from a user&amp;rsquo;s perspective can be found &lt;a href="https://forum.communityhealthtoolkit.org/t/support-for-supervisors-who-need-to-manage-multiple-areas/3497/2?u=michael" target="_blank" rel="noopener"&gt;on the forum&lt;/a&gt; and in the &lt;a href="https://youtu.be/hrhdrzP41gE?si=_7wglk7Nm7CCSFbY&amp;amp;t=606" target="_blank" rel="noopener"&gt;June 2024 CHT Round-up&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Starting in v4.9.0, users with the &lt;code&gt;can_have_multiple_places&lt;/code&gt; permission can be assigned more than one &lt;code&gt;facility_id&lt;/code&gt;. The primary use case for this is for Supervisors who manage multiple areas. A video demonstration of setting up a multi-facility user and what this looks like from a user&amp;rsquo;s perspective can be found &lt;a href="https://forum.communityhealthtoolkit.org/t/support-for-supervisors-who-need-to-manage-multiple-areas/3497/2?u=michael"target="_blank" rel="noopener"&gt;on the forum&lt;/a&gt; and in the &lt;a href="https://youtu.be/hrhdrzP41gE?si=_7wglk7Nm7CCSFbY&amp;amp;t=606"target="_blank" rel="noopener"&gt;June 2024 CHT Round-up&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;Depth&lt;span class="hx-absolute -hx-mt-20" id="depth"&gt;&lt;/span&gt;
+&lt;h3&gt;Depth&lt;span class="hx:absolute hx:-mt-20" id="depth"&gt;&lt;/span&gt;
 &lt;a href="#depth" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Sometimes though you want to only access contacts near the top of the hierarchy. This may be because returning all contacts would be too much data to be practical, or for patient privacy, or because it&amp;rsquo;s just not part of your workflow. In this case you can configure a replication depth for a specific role under &lt;code&gt;replication_depth&lt;/code&gt; in the app settings.&lt;/p&gt;
 &lt;p&gt;In 3.10, we add the ability to limit replication depth for reports, in conjunction with replication depth for contacts.
 In 4.18, we add the ability to allow replication of primary contacts and their reports at max depth.&lt;/p&gt;
-&lt;h5&gt;Code sample:&lt;span class="hx-absolute -hx-mt-20" id="code-sample"&gt;&lt;/span&gt;
-&lt;a href="#code-sample" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h5&gt;Code sample:&lt;span class="hx:absolute hx:-mt-20" id="code-sample"&gt;&lt;/span&gt;
+&lt;a href="#code-sample" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -263,40 +263,40 @@ In 4.18, we add the ability to allow replication of primary contacts and their r
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;em&gt;See Also&lt;/em&gt;: &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/replication_depth/"&gt;Replication Depth&lt;/a&gt;&lt;/p&gt;
-&lt;h5&gt;Contact Depth&lt;span class="hx-absolute -hx-mt-20" id="contact-depth"&gt;&lt;/span&gt;
+&lt;h5&gt;Contact Depth&lt;span class="hx:absolute hx:-mt-20" id="contact-depth"&gt;&lt;/span&gt;
 &lt;a href="#contact-depth" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;Contact depth is calculated relative to the user&amp;rsquo;s home place, having the user&amp;rsquo;s facility at depth = 0. Places and contacts that are direct children the facility are on depth = 1, and so on.&lt;/p&gt;
 &lt;p&gt;For example, considering the following contact hierarchy:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;pre&gt;&lt;code&gt;district &amp;gt; health_center &amp;gt; clinic &amp;gt; area &amp;gt; family &amp;gt; patient&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;district &amp;gt; health_center &amp;gt; clinic &amp;gt; area &amp;gt; family &amp;gt; patient&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;a &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;health_center&lt;/code&gt; level, and the following configuration:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;supervisor_role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;}]}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;supervisor_role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;}]}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -398,18 +398,18 @@ title="Copy code"
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h5&gt;Report Depth&lt;span class="hx-absolute -hx-mt-20" id="report-depth"&gt;&lt;/span&gt;
+&lt;h5&gt;Report Depth&lt;span class="hx:absolute hx:-mt-20" id="report-depth"&gt;&lt;/span&gt;
 &lt;a href="#report-depth" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;As of 3.10, &lt;code&gt;report_depth&lt;/code&gt; works similarly to &lt;code&gt;depth&lt;/code&gt;, but it&amp;rsquo;s applied to reports (documents with &lt;code&gt;&amp;quot;type&amp;quot;: &amp;quot;data_record&amp;quot;&lt;/code&gt;) alone, excepting reports that are submitted by the authenticated user.
 It only works in conjunction with &lt;code&gt;depth&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Following the examples above:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;supervisor_role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;report_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;}]}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;supervisor_role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;report_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;&amp;lt;variable&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;}]}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -620,47 +620,47 @@ title="Copy code"
 &lt;p&gt;If &lt;code&gt;report_depth&lt;/code&gt; is higher than &lt;code&gt;depth&lt;/code&gt;, it has no effect.&lt;/p&gt;
 &lt;p&gt;If &lt;code&gt;depth&lt;/code&gt; is omitted, the rule is invalid and will be ignored.&lt;/p&gt;
 &lt;p&gt;If a user&amp;rsquo;s roles match multiple &lt;code&gt;replication_depth&lt;/code&gt; entries, the one with the highest &lt;code&gt;depth&lt;/code&gt; is selected.&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role1&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role2&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role3&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;A user with &lt;code&gt;roles: [&amp;quot;role1&amp;quot;, &amp;quot;role2&amp;quot;, &amp;quot;role3&amp;quot;]&lt;/code&gt; will have a replication depth of 3.&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role1&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;report_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role2&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;report_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;role3&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;report_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;A user with &lt;code&gt;roles: [&amp;quot;role1&amp;quot;, &amp;quot;role2&amp;quot;, &amp;quot;role3&amp;quot;]&lt;/code&gt; will have a replication depth of 5 and report replication depth of 2.&lt;/p&gt;
-&lt;h5&gt;Replicate primary contacts&lt;span class="hx-absolute -hx-mt-20" id="replicate-primary-contacts"&gt;&lt;/span&gt;
+&lt;h5&gt;Replicate primary contacts&lt;span class="hx:absolute hx:-mt-20" id="replicate-primary-contacts"&gt;&lt;/span&gt;
 &lt;a href="#replicate-primary-contacts" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;&lt;em&gt;As of 4.18.0.&lt;/em&gt;&lt;br&gt;
 When a &lt;code&gt;replication_depth&lt;/code&gt; sets &lt;code&gt;replicate_primary_contacts&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt;, users with the assigned role will replicate the primary contacts of the places they are allowed to see. Primary contacts are replicated even if they are deeper than these users are allowed to download, and even if these contacts belong to other branches of the hierarchy. The primary contact is treated as if it is at the same depth as the place, and will follow the report replication depth of the place.&lt;/p&gt;
 &lt;p&gt;For example, considering the following settings:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;replication_depth&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -684,34 +684,34 @@ When a &lt;code&gt;replication_depth&lt;/code&gt; sets &lt;code&gt;replicate_pri
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;level5&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;parents&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;level4&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;parents&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;level1&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;level2&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;level3&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;level4&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;level5&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt; &lt;span class="err"&gt;s&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;For the configuration above, a user that has the role &lt;code&gt;chw&lt;/code&gt; is allowed to replicate contacts 2 levels below their facility and replicate reports for contacts 2 levels below their facility and replicate primary contacts. For a &lt;code&gt;chw&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt;, it will replicate contacts at &lt;code&gt;level2&lt;/code&gt;, &lt;code&gt;level3&lt;/code&gt; and &lt;code&gt;level4&lt;/code&gt;, along with their reports. They will also replicate the primary contact of a place at &lt;code&gt;level4&lt;/code&gt;, even if the primary contact is a child of a &lt;code&gt;level5&lt;/code&gt; contact, along with this contact&amp;rsquo;s reports.&lt;/p&gt;
 &lt;p&gt;A user that has the &lt;code&gt;supervisor&lt;/code&gt; role is allowed to replicate contacts 2 levels below their facility and replicate reports for contacts 1 level below their facility and replicate primary contacts.
 A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will replicate the same contacts as the &lt;code&gt;chp&lt;/code&gt; role above. Similar to the &lt;code&gt;chp&lt;/code&gt;, they will replicate primary contacts for places at &lt;code&gt;level4&lt;/code&gt;, but the &lt;code&gt;supervisor&lt;/code&gt; users will not replicate the reports of primary contacts because a primary contact of a &lt;code&gt;level4&lt;/code&gt; place has a depth of 2. The &lt;code&gt;supervisor&lt;/code&gt; will replicate reports for primary contacts of places at &lt;code&gt;level2&lt;/code&gt; or &lt;code&gt;level3&lt;/code&gt;.&lt;/p&gt;
-&lt;h3&gt;Supervisor signoff&lt;span class="hx-absolute -hx-mt-20" id="supervisor-signoff"&gt;&lt;/span&gt;
+&lt;h3&gt;Supervisor signoff&lt;span class="hx:absolute hx:-mt-20" id="supervisor-signoff"&gt;&lt;/span&gt;
 &lt;a href="#supervisor-signoff" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Some reports need to be signed off by a supervisor even though that supervisor doesn&amp;rsquo;t have the depth to see the patient the report is about. To achieve this the report needs a field named &lt;code&gt;needs_signoff&lt;/code&gt; with a value of &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
-&lt;h3&gt;Sensitive documents&lt;span class="hx-absolute -hx-mt-20" id="sensitive-documents"&gt;&lt;/span&gt;
+&lt;h3&gt;Sensitive documents&lt;span class="hx:absolute hx:-mt-20" id="sensitive-documents"&gt;&lt;/span&gt;
 &lt;a href="#sensitive-documents" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;We won&amp;rsquo;t replicate reports that are &lt;code&gt;private&lt;/code&gt; and are about the user when the sender is someone the user can&amp;rsquo;t access. A report is private when it has a property &lt;code&gt;doc.fields.private&lt;/code&gt; with a value of &lt;code&gt;true&lt;/code&gt;. For example, if a supervisor submits a private report about one of their CHPs, that CHP won&amp;rsquo;t be able to see it.&lt;/p&gt;</description></item><item><title>User telemetry</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/</guid><description>
 &lt;p&gt;&lt;em&gt;Introduced in v3.4.0&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;The app collects performance data on certain user actions which is then aggregated each day and replicated to the server. This can be used to evaluate the performance of the code and configuration and to evaluate where improvements can be made.&lt;/p&gt;
 &lt;p&gt;The aggregate doc for the previous day is created when the first telemetry item is recorded each day. This is stored in the &lt;code&gt;medic-user-&amp;lt;username&amp;gt;-meta&lt;/code&gt; database on the device and replicated to the server when an internet connection is available. This user specific server db is then replicated into the &lt;code&gt;medic-users-meta&lt;/code&gt; database which holds all aggregate telemetry docs for all users.&lt;/p&gt;
 &lt;p&gt;The aggregate docs&amp;rsquo; IDs follow the pattern &lt;code&gt;telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;day&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Versions prior to v3.12.0 do aggregate in a monthly basis instead of daily, and the aggregate docs&amp;rsquo; IDs follow the pattern &lt;code&gt;telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code&gt;.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Versions prior to v3.12.0 do aggregate in a monthly basis instead of daily, and the aggregate docs&amp;rsquo; IDs follow the pattern &lt;code&gt;telemetry-&amp;lt;year&amp;gt;-&amp;lt;month&amp;gt;-&amp;lt;username&amp;gt;-&amp;lt;uuid&amp;gt;&lt;/code&gt;.&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h2&gt;Performance data&lt;span class="hx-absolute -hx-mt-20" id="performance-data"&gt;&lt;/span&gt;
+&lt;h2&gt;Performance data&lt;span class="hx:absolute hx:-mt-20" id="performance-data"&gt;&lt;/span&gt;
 &lt;a href="#performance-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each aggregate data point has the following fields:&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -745,7 +745,7 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/table&gt;
 &lt;p&gt;The CHT records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications. Its purpose is to convert measurements into insights about user satisfaction, by specifying a uniform way to analyze and report on the degree to which measured performance meets user expectations.&lt;/p&gt;
 &lt;p&gt;The Apdex level is &lt;code&gt;satisfied&lt;/code&gt; when the duration is less than or equal to 3s; &lt;code&gt;tolerable&lt;/code&gt; when the duration is more than 3s but less than or equal to 12s; &lt;code&gt;frustrated&lt;/code&gt; when duration is more than 12s. The Apdex is recorded as a telemetry entry using the format: &lt;code&gt;&amp;lt;telemetry_field&amp;gt;:apdex:&amp;lt;satisfied/tolerable/frustrated&amp;gt;&lt;/code&gt;, for example, if the telemetry is about boot time and it had a tolerable performance, the Apdex is recorded as &lt;code&gt;boot_time:apdex:tolerable&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Note that this is not the same as &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/dashboards/#replication" &gt;synchronizing to the server apdex&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that this is not the same as &lt;a href="https://docs.communityhealthtoolkit.org/hosting/monitoring/dashboards/#replication"&gt;synchronizing to the server apdex&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Find below the list of telemetry data recorded by CHT:&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -1148,7 +1148,7 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;geolocation:failure:&amp;lt;x&amp;gt;&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;An unsuccessful GPS response. &lt;code&gt;x&lt;/code&gt; is a constant matching the &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError/code" target="_blank" rel="noopener"&gt;GeolocationPositionError&lt;/a&gt; or with one of the following values: &lt;code&gt;-1&lt;/code&gt; unknown failure, &lt;code&gt;-2&lt;/code&gt; timeout, or &lt;code&gt;-3&lt;/code&gt; geolocation services unavailable.&lt;/td&gt;
+&lt;td&gt;An unsuccessful GPS response. &lt;code&gt;x&lt;/code&gt; is a constant matching the &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError/code"target="_blank" rel="noopener"&gt;GeolocationPositionError&lt;/a&gt; or with one of the following values: &lt;code&gt;-1&lt;/code&gt; unknown failure, &lt;code&gt;-2&lt;/code&gt; timeout, or &lt;code&gt;-3&lt;/code&gt; geolocation services unavailable.&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1179,7 +1179,7 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h2&gt;Metadata&lt;span class="hx-absolute -hx-mt-20" id="metadata"&gt;&lt;/span&gt;
+&lt;h2&gt;Metadata&lt;span class="hx:absolute hx:-mt-20" id="metadata"&gt;&lt;/span&gt;
 &lt;a href="#metadata" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;When the aggregate doc is created the Telemetry service also includes a snapshot of some metadata.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -1195,7 +1195,7 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;month&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;The month the data was collected. Initially the month was 0 indexed (eg: 0=Jan, 1=Feb, &amp;hellip;), but from 3.8.0 &lt;a href="https://github.com/medic/cht-core/issues/5949" target="_blank" rel="noopener"&gt;this bug was fixed&lt;/a&gt; so it changed to 1 indexed (eg: 1=Jan, 2=Feb, &amp;hellip;). Added in 3.4.0.&lt;/td&gt;
+&lt;td&gt;The month the data was collected. Initially the month was 0 indexed (eg: 0=Jan, 1=Feb, &amp;hellip;), but from 3.8.0 &lt;a href="https://github.com/medic/cht-core/issues/5949"target="_blank" rel="noopener"&gt;this bug was fixed&lt;/a&gt; so it changed to 1 indexed (eg: 1=Jan, 2=Feb, &amp;hellip;). Added in 3.4.0.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;day&lt;/code&gt;&lt;/td&gt;
@@ -1243,7 +1243,7 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;deviceInfo.app.versionCode&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;The Internal &lt;a href="https://developer.android.com/reference/android/R.styleable#AndroidManifest_versionCode" target="_blank" rel="noopener"&gt;version code&lt;/a&gt; of the Android app. Only captured when running in the Android wrapper v0.9.0+. Added in 3.12.0.&lt;/td&gt;
+&lt;td&gt;The Internal &lt;a href="https://developer.android.com/reference/android/R.styleable#AndroidManifest_versionCode"target="_blank" rel="noopener"&gt;version code&lt;/a&gt; of the Android app. Only captured when running in the Android wrapper v0.9.0+. Added in 3.12.0.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;deviceInfo.software.androidVersion&lt;/code&gt;&lt;/td&gt;
@@ -1331,49 +1331,49 @@ A &lt;code&gt;supervisor&lt;/code&gt; at &lt;code&gt;level2&lt;/code&gt; will re
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h2&gt;Export data&lt;span class="hx-absolute -hx-mt-20" id="export-data"&gt;&lt;/span&gt;
-&lt;a href="#export-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Summary data via API&lt;span class="hx-absolute -hx-mt-20" id="summary-data-via-api"&gt;&lt;/span&gt;
-&lt;a href="#summary-data-via-api" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To get summary data with one item per user, see the &lt;code&gt;/api/v2/export/user-devices&lt;/code&gt; &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#get-apiv2exportuser-devices" &gt;API&lt;/a&gt;, which was added in CHT 4.7.0.&lt;/p&gt;
-&lt;h3&gt;Summary data via Node script&lt;span class="hx-absolute -hx-mt-20" id="summary-data-via-node-script"&gt;&lt;/span&gt;
-&lt;a href="#summary-data-via-node-script" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Telemetry data can be viewed directly in your browser with &lt;a href="https://couchdb.apache.org/fauxton-visual-guide/" target="_blank" rel="noopener"&gt;Fauxton&lt;/a&gt; at &lt;code&gt;https://{{CHT_INSTANCE_URL}}/_utils&lt;/code&gt;, and navigating the &lt;code&gt;medic-users-meta&lt;/code&gt; database.&lt;/p&gt;&lt;/div&gt;
+&lt;h2&gt;Export data&lt;span class="hx:absolute hx:-mt-20" id="export-data"&gt;&lt;/span&gt;
+&lt;a href="#export-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Summary data via API&lt;span class="hx:absolute hx:-mt-20" id="summary-data-via-api"&gt;&lt;/span&gt;
+&lt;a href="#summary-data-via-api" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To get summary data with one item per user, see the &lt;code&gt;/api/v2/export/user-devices&lt;/code&gt; &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#get-apiv2exportuser-devices"&gt;API&lt;/a&gt;, which was added in CHT 4.7.0.&lt;/p&gt;
+&lt;h3&gt;Summary data via Node script&lt;span class="hx:absolute hx:-mt-20" id="summary-data-via-node-script"&gt;&lt;/span&gt;
+&lt;a href="#summary-data-via-node-script" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Telemetry data can be viewed directly in your browser with &lt;a href="https://couchdb.apache.org/fauxton-visual-guide/"target="_blank" rel="noopener"&gt;Fauxton&lt;/a&gt; at &lt;code&gt;https://{{CHT_INSTANCE_URL}}/_utils&lt;/code&gt;, and navigating the &lt;code&gt;medic-users-meta&lt;/code&gt; database.&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;To bulk export all telemetry in JSON for further analysis or visualization, first meet these prerequisites:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;Ensure that both &lt;a href="https://nodejs.org/en/" target="_blank" rel="noopener"&gt;&lt;code&gt;node&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://www.npmjs.com/get-npm" target="_blank" rel="noopener"&gt;&lt;code&gt;npm&lt;/code&gt;&lt;/a&gt; are installed and that the needed &lt;code&gt;node&lt;/code&gt; libraries are installed: &lt;code&gt;npm install inquirer pouchdb-core fs path minimist pouchdb-adapter-http&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Ensure that both &lt;a href="https://nodejs.org/en/"target="_blank" rel="noopener"&gt;&lt;code&gt;node&lt;/code&gt;&lt;/a&gt; and &lt;a href="https://www.npmjs.com/get-npm"target="_blank" rel="noopener"&gt;&lt;code&gt;npm&lt;/code&gt;&lt;/a&gt; are installed and that the needed &lt;code&gt;node&lt;/code&gt; libraries are installed: &lt;code&gt;npm install inquirer pouchdb-core fs path minimist pouchdb-adapter-http&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;Get a current copy of the export script: &lt;code&gt;curl -s -o get_users_meta_docs.js https://raw.githubusercontent.com/medic/cht-core/master/scripts/get_users_meta_docs.js&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;To export the data open a terminal in the folder where you want to save the export, and run this command:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;node get_users_meta_docs.js --mode batch --type telemetry https://USERNAME:PASSWORD@COUCHDB_SERVER:COUCHDB_PORT/medic-users-meta &amp;gt; telemetry.json&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;node get_users_meta_docs.js --mode batch --type telemetry https://USERNAME:PASSWORD@COUCHDB_SERVER:COUCHDB_PORT/medic-users-meta &amp;gt; telemetry.json&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;For example, if your username is &lt;code&gt;admin&lt;/code&gt;, your password is &lt;code&gt;pass&lt;/code&gt;, your CouchDB server is &lt;code&gt;localhost&lt;/code&gt; and your CouchDB port is &lt;code&gt;5984&lt;/code&gt;, you would run:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;node get_users_meta_docs.js --mode batch --type telemetry https://admin:pass@localhost:5984/medic-users-meta &amp;gt; telemetry.json&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;node get_users_meta_docs.js --mode batch --type telemetry https://admin:pass@localhost:5984/medic-users-meta &amp;gt; telemetry.json&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;This will save a file named &lt;code&gt;telemetry.json&lt;/code&gt; containing all the telemetry data in the current directory.&lt;/p&gt;
-&lt;h2&gt;Telemetry Examples&lt;span class="hx-absolute -hx-mt-20" id="telemetry-examples"&gt;&lt;/span&gt;
-&lt;a href="#telemetry-examples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Offline user on Tecno KC8 Device&lt;span class="hx-absolute -hx-mt-20" id="offline-user-on-tecno-kc8-device"&gt;&lt;/span&gt;
-&lt;a href="#offline-user-on-tecno-kc8-device" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h2&gt;Telemetry Examples&lt;span class="hx:absolute hx:-mt-20" id="telemetry-examples"&gt;&lt;/span&gt;
+&lt;a href="#telemetry-examples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;Offline user on Tecno KC8 Device&lt;span class="hx:absolute hx:-mt-20" id="offline-user-on-tecno-kc8-device"&gt;&lt;/span&gt;
+&lt;a href="#offline-user-on-tecno-kc8-device" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;telemetry-2024-12-18-mrjones-5d2e1833-ed7a-46d7-a50e-b6f3becb9e14&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;1-c3b23df8b2701839d726576e3d87fd26&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -1609,18 +1609,18 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;auto_compaction&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;adapter&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;idb&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;Online user in the browser&lt;span class="hx-absolute -hx-mt-20" id="online-user-in-the-browser"&gt;&lt;/span&gt;
-&lt;a href="#online-user-in-the-browser" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h3&gt;Online user in the browser&lt;span class="hx:absolute hx:-mt-20" id="online-user-in-the-browser"&gt;&lt;/span&gt;
+&lt;a href="#online-user-in-the-browser" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;telemetry-2020-5-medic-016304ab-7167-4c97-93bb-a6626ef6128d&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;1-90a94d76eb30ac47e2f498b80cf54cd1&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -1741,13 +1741,13 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;auto_compaction&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;adapter&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;http&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description></item></channel></rss>

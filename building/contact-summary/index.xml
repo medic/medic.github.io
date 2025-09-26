@@ -2,36 +2,36 @@
 &lt;p&gt;This tutorial will take you through building a contact summary for CHT applications.&lt;/p&gt;
 &lt;p&gt;Contact summaries display basic information about the contact.&lt;/p&gt;
 &lt;p&gt;You will be adding a contact summary that displays information about a person&amp;rsquo;s &lt;em&gt;patient id&lt;/em&gt;, &lt;em&gt;age&lt;/em&gt;, &lt;em&gt;sex&lt;/em&gt;, &lt;em&gt;phone number&lt;/em&gt;, and information about the place they belong to ie. &lt;em&gt;parent&lt;/em&gt;.&lt;/p&gt;
-&lt;h2&gt;Brief Overview of Key Concepts&lt;span class="hx-absolute -hx-mt-20" id="brief-overview-of-key-concepts"&gt;&lt;/span&gt;
-&lt;a href="#brief-overview-of-key-concepts" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each &lt;em&gt;field&lt;/em&gt; that can be shown on a contact’s profile is defined as an object in the &lt;em&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/#contact-summarytemplatedjs-fields" &gt;fields array&lt;/a&gt;&lt;/em&gt; of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Brief Overview of Key Concepts&lt;span class="hx:absolute hx:-mt-20" id="brief-overview-of-key-concepts"&gt;&lt;/span&gt;
+&lt;a href="#brief-overview-of-key-concepts" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each &lt;em&gt;field&lt;/em&gt; that can be shown on a contact’s profile is defined as an object in the &lt;em&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/#contact-summarytemplatedjs-fields"&gt;fields array&lt;/a&gt;&lt;/em&gt; of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The &lt;em&gt;properties&lt;/em&gt; for each object determine how and when the field is shown.&lt;/p&gt;
-&lt;h2&gt;Required Resources&lt;span class="hx-absolute -hx-mt-20" id="required-resources"&gt;&lt;/span&gt;
-&lt;a href="#required-resources" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;You should have a functioning &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/" &gt;CHT instance with &lt;code&gt;cht-conf&lt;/code&gt; installed locally&lt;/a&gt;, and completed a &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/#3-create-and-upload-a-blank-project" &gt;project folder&lt;/a&gt; setup.&lt;/p&gt;
-&lt;h2&gt;Implementation Steps&lt;span class="hx-absolute -hx-mt-20" id="implementation-steps"&gt;&lt;/span&gt;
+&lt;h2&gt;Required Resources&lt;span class="hx:absolute hx:-mt-20" id="required-resources"&gt;&lt;/span&gt;
+&lt;a href="#required-resources" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;You should have a functioning &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/"&gt;CHT instance with &lt;code&gt;cht-conf&lt;/code&gt; installed locally&lt;/a&gt;, and completed a &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/#3-create-and-upload-a-blank-project"&gt;project folder&lt;/a&gt; setup.&lt;/p&gt;
+&lt;h2&gt;Implementation Steps&lt;span class="hx:absolute hx:-mt-20" id="implementation-steps"&gt;&lt;/span&gt;
 &lt;a href="#implementation-steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Create a &lt;code&gt;contact-summary.templated.js&lt;/code&gt; file. (This may have already been created by the initialise-project-layout command.)&lt;/p&gt;
-&lt;h3&gt;1. Add Dependencies and Variable Definitions&lt;span class="hx-absolute -hx-mt-20" id="1-add-dependencies-and-variable-definitions"&gt;&lt;/span&gt;
+&lt;h3&gt;1. Add Dependencies and Variable Definitions&lt;span class="hx:absolute hx:-mt-20" id="1-add-dependencies-and-variable-definitions"&gt;&lt;/span&gt;
 &lt;a href="#1-add-dependencies-and-variable-definitions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the following dependencies and variable definitions at the top of the file:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisContact&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;contact&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisLineage&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;lineage&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisLineage&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;lineage&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2"&gt;&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';"&gt;ℹ️&lt;/div&gt;&lt;/div&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;contact, reports, lineage are globally available for contact-summary.&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;contact, reports, lineage are globally available for contact-summary.&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;2. Define Contact Summary Fields&lt;span class="hx-absolute -hx-mt-20" id="2-define-contact-summary-fields"&gt;&lt;/span&gt;
+&lt;h3&gt;2. Define Contact Summary Fields&lt;span class="hx:absolute hx:-mt-20" id="2-define-contact-summary-fields"&gt;&lt;/span&gt;
 &lt;a href="#2-define-contact-summary-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Define the &lt;code&gt;patient_id&lt;/code&gt;, &lt;code&gt;age&lt;/code&gt;, &lt;code&gt;sex&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;, and &lt;code&gt;parent&lt;/code&gt; contact fields as shown below:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisContact&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;contact&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisLineage&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;lineage&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
@@ -41,25 +41,25 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;appliesToType&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;label&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;contact.sex&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;contact.sex.&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;thisContact&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;sex&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;translate&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;width&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;appliesToType&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;label&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;person.field.phone&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;thisContact&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;phone&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;width&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;appliesToType&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;person&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;label&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;contact.parent&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;thisLineage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;filter&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;lineage&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;];&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;];&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2"&gt;&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';"&gt;ℹ️&lt;/div&gt;&lt;/div&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;The contact field e.g. &lt;code&gt;patient_id&lt;/code&gt; and &lt;code&gt;date_of_birth&lt;/code&gt;, should exist in the contact&amp;rsquo;s document for it to return a value.&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;The contact field e.g. &lt;code&gt;patient_id&lt;/code&gt; and &lt;code&gt;date_of_birth&lt;/code&gt;, should exist in the contact&amp;rsquo;s document for it to return a value.&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;3. Export &lt;code&gt;fields&lt;/code&gt;&lt;span class="hx-absolute -hx-mt-20" id="3-export-fields"&gt;&lt;/span&gt;
+&lt;h3&gt;3. Export &lt;code&gt;fields&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="3-export-fields"&gt;&lt;/span&gt;
 &lt;a href="#3-export-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Export the defined fields as shown below:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisContact&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;contact&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;thisLineage&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;lineage&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
@@ -73,37 +73,37 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;exports&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;fields&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;fields&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;4. Compile and Upload App Settings&lt;span class="hx-absolute -hx-mt-20" id="4-compile-and-upload-app-settings"&gt;&lt;/span&gt;
+&lt;h3&gt;4. Compile and Upload App Settings&lt;span class="hx:absolute hx:-mt-20" id="4-compile-and-upload-app-settings"&gt;&lt;/span&gt;
 &lt;a href="#4-compile-and-upload-app-settings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To compile and upload app settings to your local instance, run the following command:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-zsh" data-lang="zsh"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs compile-app-settings upload-app-settings&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-zsh" data-lang="zsh"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;https://&amp;lt;username&amp;gt;:&amp;lt;password&amp;gt;@localhost --accept-self-signed-certs compile-app-settings upload-app-settings&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-rounded-lg hx-border hx-py-2 ltr:hx-pr-4 rtl:hx-pl-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-yellow-100 hx-bg-yellow-50 hx-text-yellow-900 dark:hx-border-yellow-200/30 dark:hx-bg-yellow-700/30 dark:hx-text-yellow-200"&gt;
-&lt;div class="ltr:hx-pl-3 ltr:hx-pr-2 rtl:hx-pr-3 rtl:hx-pl-2"&gt;&lt;div class="hx-select-none hx-text-xl" style="font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';"&gt;⚠️&lt;/div&gt;&lt;/div&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;Be sure to replace the values &lt;code&gt;&amp;lt;username&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;password&amp;gt;&lt;/code&gt; with the actual username and password of your test instance.&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;Be sure to replace the values &lt;code&gt;&amp;lt;username&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;password&amp;gt;&lt;/code&gt; with the actual username and password of your test instance.&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description></item><item><title>contact-summary.templated.js</title><link>https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/</guid><description>
 &lt;p&gt;Contact profile pages display basic information about the contact along with their history and upcoming tasks.
-A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summary" &gt;Fields&lt;/a&gt;, &lt;a href="#condition-cards" &gt;Cards&lt;/a&gt;, and &lt;a href="#care-guides" &gt;Care Guides&lt;/a&gt; available.&lt;/p&gt;
+A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summary"&gt;Fields&lt;/a&gt;, &lt;a href="#condition-cards"&gt;Cards&lt;/a&gt;, and &lt;a href="#care-guides"&gt;Care Guides&lt;/a&gt; available.&lt;/p&gt;
 &lt;p&gt;Helper variables and functions for the contact summary can be defined in &lt;code&gt;contact-summary-extras.js&lt;/code&gt;. There are several variables available to inspect to generate the summary information:&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -127,7 +127,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;targetDoc&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Doc with &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets" &gt;&lt;code&gt;target&lt;/code&gt;&lt;/a&gt; document of the contact, hydrated with the config information of every target it contains a value for. If there is no target document available (for example when viewing a contact that does not upload targets), this value will be &lt;code&gt;undefined&lt;/code&gt;. This value might also be &lt;code&gt;undefined&lt;/code&gt; if the contact has not yet synced the current target document. Added in &lt;code&gt;3.9.0&lt;/code&gt;.&lt;/td&gt;
+&lt;td&gt;Doc with &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets"&gt;&lt;code&gt;target&lt;/code&gt;&lt;/a&gt; document of the contact, hydrated with the config information of every target it contains a value for. If there is no target document available (for example when viewing a contact that does not upload targets), this value will be &lt;code&gt;undefined&lt;/code&gt;. This value might also be &lt;code&gt;undefined&lt;/code&gt; if the contact has not yet synced the current target document. Added in &lt;code&gt;3.9.0&lt;/code&gt;.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats&lt;/code&gt;&lt;/td&gt;
@@ -135,7 +135,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats.uhcInterval&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Object containing the start and end date of UHC reporting period, it is calculated from the &lt;code&gt;uhc.visit_count.month_start_date&lt;/code&gt; defined in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" &gt;app settings&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;Object containing the start and end date of UHC reporting period, it is calculated from the &lt;code&gt;uhc.visit_count.month_start_date&lt;/code&gt; defined in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson"&gt;app settings&lt;/a&gt;.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats.uhcInterval.start&lt;/code&gt;&lt;/td&gt;
@@ -147,7 +147,7 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats.homeVisits&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Object containing the contact&amp;rsquo;s home visits stats. The &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/#app_settingsjson-contact_types" &gt;contact&amp;rsquo;s type&lt;/a&gt; should have &lt;code&gt;count_visits&lt;/code&gt; enabled and the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" &gt;UHC visit count settings&lt;/a&gt; should be defined, additionally this information is only available for users that have &lt;code&gt;can_view_uhc_stats&lt;/code&gt; permission and that are not System Administrators.&lt;/td&gt;
+&lt;td&gt;Object containing the contact&amp;rsquo;s home visits stats. The &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/hierarchy/#app_settingsjson-contact_types"&gt;contact&amp;rsquo;s type&lt;/a&gt; should have &lt;code&gt;count_visits&lt;/code&gt; enabled and the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson"&gt;UHC visit count settings&lt;/a&gt; should be defined, additionally this information is only available for users that have &lt;code&gt;can_view_uhc_stats&lt;/code&gt; permission and that are not System Administrators.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats.homeVisits.lastVisitedDate&lt;/code&gt;&lt;/td&gt;
@@ -159,15 +159,15 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;uhcStats.homeVisits.countGoal&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Number, home visits goal, defined in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson" &gt;UHC visit count settings&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;Number, home visits goal, defined in the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/#app_settingsjson"&gt;UHC visit count settings&lt;/a&gt;.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;cht&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;Object containing the &lt;a href="#cht-api" &gt;CHT API&lt;/a&gt; for contact summary, targets and tasks. Added in &lt;code&gt;v3.12.0&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Object containing the &lt;a href="#cht-api"&gt;CHT API&lt;/a&gt; for contact summary, targets and tasks. Added in &lt;code&gt;v3.12.0&lt;/code&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h2&gt;CHT API&lt;span class="hx-absolute -hx-mt-20" id="cht-api"&gt;&lt;/span&gt;
+&lt;h2&gt;CHT API&lt;span class="hx:absolute hx:-mt-20" id="cht-api"&gt;&lt;/span&gt;
 &lt;a href="#cht-api" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;Introduced in v3.12.0&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Provides CHT-Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code&gt;cht&lt;/code&gt; reserved variable under the &lt;code&gt;v1&lt;/code&gt; version.&lt;/p&gt;
@@ -193,17 +193,17 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;tr&gt;
 &lt;td&gt;getExtensionLib(name)&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;name&lt;/code&gt;: String of script name&lt;/td&gt;
-&lt;td&gt;Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/extension-libs/" &gt;extension-libs&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/extension-libs/"&gt;extension-libs&lt;/a&gt;.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;analytics.getTargetDocs()&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;Returns three &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets" &gt;target&lt;/a&gt; documents of the contact, calculated for the last three reporting intervals, including the current one. When viewing one of the current logged in user&amp;rsquo;s associated facilities, returns the target documents for the contact associated with the current logged in user. Returns an empty array if no target documents are found (for example when viewing a contact that does not upload targets). &lt;em&gt;Introduced in v4.11.0&lt;/em&gt;&lt;/td&gt;
+&lt;td&gt;Returns three &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets"&gt;target&lt;/a&gt; documents of the contact, calculated for the last three reporting intervals, including the current one. When viewing one of the current logged in user&amp;rsquo;s associated facilities, returns the target documents for the contact associated with the current logged in user. Returns an empty array if no target documents are found (for example when viewing a contact that does not upload targets). &lt;em&gt;Introduced in v4.11.0&lt;/em&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h3&gt;CHT API&amp;rsquo;s code samples&lt;span class="hx-absolute -hx-mt-20" id="cht-apis-code-samples"&gt;&lt;/span&gt;
-&lt;a href="#cht-apis-code-samples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h3&gt;CHT API&amp;rsquo;s code samples&lt;span class="hx:absolute hx:-mt-20" id="cht-apis-code-samples"&gt;&lt;/span&gt;
+&lt;a href="#cht-apis-code-samples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;canEdit&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasPermissions&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_edit&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;canManagePlaces&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasPermissions&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_create_places&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;can_update_places&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;hasAnyGroup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasAnyPermission&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;
@@ -211,19 +211,19 @@ A contact&amp;rsquo;s profile page is defined by the &lt;a href="#contact-summar
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_view_reports&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;can_verify_reports&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;averageFn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getExtensionLib&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;average.js&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;targetDocs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;analytics&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getTargetDocs&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;targetDocs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;analytics&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getTargetDocs&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h2&gt;Contact Summary&lt;span class="hx-absolute -hx-mt-20" id="contact-summary"&gt;&lt;/span&gt;
+&lt;h2&gt;Contact Summary&lt;span class="hx:absolute hx:-mt-20" id="contact-summary"&gt;&lt;/span&gt;
 &lt;a href="#contact-summary" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each field that can be shown on a contact&amp;rsquo;s profile is defined as an object in the &lt;code&gt;fields&lt;/code&gt; array of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;. The properties for each object determine how and when the field is shown.&lt;/p&gt;
-&lt;h3&gt;&lt;code&gt;contact-summary.templated.js .fields[]&lt;/code&gt;&lt;span class="hx-absolute -hx-mt-20" id="contact-summarytemplatedjs-fields"&gt;&lt;/span&gt;
+&lt;h3&gt;&lt;code&gt;contact-summary.templated.js .fields[]&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="contact-summarytemplatedjs-fields"&gt;&lt;/span&gt;
 &lt;a href="#contact-summarytemplatedjs-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;!-- If you change this table, update the duplicate descriptions in ### Cards --&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -256,7 +256,7 @@ title="Copy code"
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;filter&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;The display filter to apply to the value, eg: &lt;code&gt;{ value: '2005-10-09', filter: 'age' }&lt;/code&gt; will render as &amp;ldquo;11 years&amp;rdquo;. Common filters are: &lt;code&gt;age&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;, &lt;code&gt;weeksPregnant&lt;/code&gt;, &lt;code&gt;relativeDate&lt;/code&gt;, &lt;code&gt;relativeDay&lt;/code&gt;, &lt;code&gt;fullDate&lt;/code&gt;, &lt;code&gt;simpleDate&lt;/code&gt;, &lt;code&gt;simpleDateTime&lt;/code&gt;, &lt;code&gt;lineage&lt;/code&gt;, &lt;code&gt;resourceIcon&lt;/code&gt;, &lt;code&gt;translate&lt;/code&gt;. For the complete list of filters, and more details on what each does, check out the code in &lt;a href="https://github.com/medic/cht-core/tree/3.15.x/webapp/src/ts/pipes" target="_blank" rel="noopener"&gt;&lt;code&gt;webapp/src/ts/pipes&lt;/code&gt; dir&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;The display filter to apply to the value, eg: &lt;code&gt;{ value: '2005-10-09', filter: 'age' }&lt;/code&gt; will render as &amp;ldquo;11 years&amp;rdquo;. Common filters are: &lt;code&gt;age&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;, &lt;code&gt;weeksPregnant&lt;/code&gt;, &lt;code&gt;relativeDate&lt;/code&gt;, &lt;code&gt;relativeDay&lt;/code&gt;, &lt;code&gt;fullDate&lt;/code&gt;, &lt;code&gt;simpleDate&lt;/code&gt;, &lt;code&gt;simpleDateTime&lt;/code&gt;, &lt;code&gt;lineage&lt;/code&gt;, &lt;code&gt;resourceIcon&lt;/code&gt;, &lt;code&gt;translate&lt;/code&gt;. For the complete list of filters, and more details on what each does, check out the code in &lt;a href="https://github.com/medic/cht-core/tree/3.15.x/webapp/src/ts/pipes"target="_blank" rel="noopener"&gt;&lt;code&gt;webapp/src/ts/pipes&lt;/code&gt; dir&lt;/a&gt;.&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -274,7 +274,7 @@ title="Copy code"
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;context&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;When &lt;code&gt;translate: true&lt;/code&gt; and &lt;code&gt;value&lt;/code&gt; uses &lt;a href="https://angular-translate.github.io/docs/#/guide/06_variable-replacement" target="_blank" rel="noopener"&gt;translation variables&lt;/a&gt;, this value should provide the translation variables.&lt;/td&gt;
+&lt;td&gt;When &lt;code&gt;translate: true&lt;/code&gt; and &lt;code&gt;value&lt;/code&gt; uses &lt;a href="https://angular-translate.github.io/docs/#/guide/06_variable-replacement"target="_blank" rel="noopener"&gt;translation variables&lt;/a&gt;, this value should provide the translation variables.&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -292,9 +292,9 @@ title="Copy code"
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;!-- TODO: See [How to configure profile pages]() for an example. --&gt;
-&lt;h2&gt;Condition Cards&lt;span class="hx-absolute -hx-mt-20" id="condition-cards"&gt;&lt;/span&gt;
+&lt;h2&gt;Condition Cards&lt;span class="hx:absolute hx:-mt-20" id="condition-cards"&gt;&lt;/span&gt;
 &lt;a href="#condition-cards" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each condition card is defined as a card object in the &lt;code&gt;cards&lt;/code&gt; array of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;. Condition cards are conditional and are configured to appear when a certain report is submitted or condition is met. The properties for each object determine how and when the card and its fields are shown.&lt;/p&gt;
-&lt;h3&gt;&lt;code&gt;contact-summary.templated.js .cards[]&lt;/code&gt;&lt;span class="hx-absolute -hx-mt-20" id="contact-summarytemplatedjs-cards"&gt;&lt;/span&gt;
+&lt;h3&gt;&lt;code&gt;contact-summary.templated.js .cards[]&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="contact-summarytemplatedjs-cards"&gt;&lt;/span&gt;
 &lt;a href="#contact-summarytemplatedjs-cards" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;!-- If you change the field data in this table, update the duplicate descriptions in ### Fields --&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -363,7 +363,7 @@ title="Copy code"
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;fields[n].filter&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;string&lt;/code&gt; or &lt;code&gt;function(report)&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;The display filter to apply to the value, eg: &lt;code&gt;{ value: '2005-10-09', filter: 'age' }&lt;/code&gt; will render as &amp;ldquo;11 years&amp;rdquo;. Common filters are: &lt;code&gt;age&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;, &lt;code&gt;weeksPregnant&lt;/code&gt;, &lt;code&gt;relativeDate&lt;/code&gt;, &lt;code&gt;relativeDay&lt;/code&gt;, &lt;code&gt;fullDate&lt;/code&gt;, &lt;code&gt;simpleDate&lt;/code&gt;, &lt;code&gt;simpleDateTime&lt;/code&gt;, &lt;code&gt;lineage&lt;/code&gt;, &lt;code&gt;resourceIcon&lt;/code&gt;, &lt;code&gt;translate&lt;/code&gt;. For the complete list of filters, and more details on what each does, check out the code in &lt;a href="https://github.com/medic/cht-core/tree/3.15.x/webapp/src/ts/pipes" target="_blank" rel="noopener"&gt;&lt;code&gt;webapp/src/ts/pipes&lt;/code&gt; dir&lt;/a&gt;.&lt;/td&gt;
+&lt;td&gt;The display filter to apply to the value, eg: &lt;code&gt;{ value: '2005-10-09', filter: 'age' }&lt;/code&gt; will render as &amp;ldquo;11 years&amp;rdquo;. Common filters are: &lt;code&gt;age&lt;/code&gt;, &lt;code&gt;phone&lt;/code&gt;, &lt;code&gt;weeksPregnant&lt;/code&gt;, &lt;code&gt;relativeDate&lt;/code&gt;, &lt;code&gt;relativeDay&lt;/code&gt;, &lt;code&gt;fullDate&lt;/code&gt;, &lt;code&gt;simpleDate&lt;/code&gt;, &lt;code&gt;simpleDateTime&lt;/code&gt;, &lt;code&gt;lineage&lt;/code&gt;, &lt;code&gt;resourceIcon&lt;/code&gt;, &lt;code&gt;translate&lt;/code&gt;. For the complete list of filters, and more details on what each does, check out the code in &lt;a href="https://github.com/medic/cht-core/tree/3.15.x/webapp/src/ts/pipes"target="_blank" rel="noopener"&gt;&lt;code&gt;webapp/src/ts/pipes&lt;/code&gt; dir&lt;/a&gt;.&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -381,21 +381,21 @@ title="Copy code"
 &lt;tr&gt;
 &lt;td&gt;&lt;code&gt;fields[n].context&lt;/code&gt;&lt;/td&gt;
 &lt;td&gt;&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;When &lt;code&gt;translate: true&lt;/code&gt; and &lt;code&gt;value&lt;/code&gt; uses &lt;a href="https://angular-translate.github.io/docs/#/guide/06_variable-replacement" target="_blank" rel="noopener"&gt;translation variables&lt;/a&gt;, this value should provide the translation variables. Only supports properties &lt;code&gt;count&lt;/code&gt; and &lt;code&gt;total&lt;/code&gt; on cards.&lt;/td&gt;
+&lt;td&gt;When &lt;code&gt;translate: true&lt;/code&gt; and &lt;code&gt;value&lt;/code&gt; uses &lt;a href="https://angular-translate.github.io/docs/#/guide/06_variable-replacement"target="_blank" rel="noopener"&gt;translation variables&lt;/a&gt;, this value should provide the translation variables. Only supports properties &lt;code&gt;count&lt;/code&gt; and &lt;code&gt;total&lt;/code&gt; on cards.&lt;/td&gt;
 &lt;td&gt;no&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;!-- TODO: See [How to configure profile pages]() for an example. --&gt;
-&lt;h2&gt;Care Guides&lt;span class="hx-absolute -hx-mt-20" id="care-guides"&gt;&lt;/span&gt;
-&lt;a href="#care-guides" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each care guide accessible from a contact profile is defined as an &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/" &gt;App Form&lt;/a&gt;. Context information can be provided to forms via the &lt;code&gt;context&lt;/code&gt; object of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Care Guides&lt;span class="hx:absolute hx:-mt-20" id="care-guides"&gt;&lt;/span&gt;
+&lt;a href="#care-guides" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each care guide accessible from a contact profile is defined as an &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/app/"&gt;App Form&lt;/a&gt;. Context information can be provided to forms via the &lt;code&gt;context&lt;/code&gt; object of &lt;code&gt;contact-summary.templated.js&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;To show an App Form on a contact&amp;rsquo;s profile, the form&amp;rsquo;s &lt;code&gt;expression&lt;/code&gt; field in its properties file must evaluate to true for that contact. The context information from the profile is accessible as the variable &lt;code&gt;summary&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The context data is also available directly within the app forms&amp;rsquo; XForm calculations, as &lt;code&gt;instance('contact-summary')/context/${variable}&lt;/code&gt;. For instance if &lt;code&gt;context.is_pregnant&lt;/code&gt; is used in the contact summary, it can be accessed in an XForm field&amp;rsquo;s calculation as &lt;code&gt;instance('contact-summary')/context/is_pregnant&lt;/code&gt;. Note that these fields are not available when editing a previously completed form, or when accessing the form from outside of the profile page.&lt;/p&gt;
 &lt;!-- TODO: See [How to configure profile pages]() and [How to build app forms]() for examples and more information. --&gt;
-&lt;h2&gt;Code samples&lt;span class="hx-absolute -hx-mt-20" id="code-samples"&gt;&lt;/span&gt;
+&lt;h2&gt;Code samples&lt;span class="hx:absolute hx:-mt-20" id="code-samples"&gt;&lt;/span&gt;
 &lt;a href="#code-samples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The following samples show how fields, cards, and care guide context comes together in the &lt;code&gt;contact-summary.templated.js&lt;/code&gt; file.&lt;/p&gt;
-&lt;h3&gt;&lt;code&gt;contact-summary.templated.js&lt;/code&gt;&lt;span class="hx-absolute -hx-mt-20" id="contact-summarytemplatedjs"&gt;&lt;/span&gt;
-&lt;a href="#contact-summarytemplatedjs" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h3&gt;&lt;code&gt;contact-summary.templated.js&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="contact-summarytemplatedjs"&gt;&lt;/span&gt;
+&lt;a href="#contact-summarytemplatedjs" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;exports&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;context&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;use_cases&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -446,18 +446,18 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;],&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h3&gt;&lt;code&gt;contact-summary-extras.js&lt;/code&gt;&lt;span class="hx-absolute -hx-mt-20" id="contact-summary-extrasjs"&gt;&lt;/span&gt;
-&lt;a href="#contact-summary-extrasjs" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;h3&gt;&lt;code&gt;contact-summary-extras.js&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="contact-summary-extrasjs"&gt;&lt;/span&gt;
+&lt;a href="#contact-summary-extrasjs" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;exports&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;isActivePregnancy&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;report&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// ...
@@ -471,26 +471,26 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;getSubsequentVisits&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;report&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// ...
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;h2&gt;Build&lt;span class="hx-absolute -hx-mt-20" id="build"&gt;&lt;/span&gt;
+&lt;h2&gt;Build&lt;span class="hx:absolute hx:-mt-20" id="build"&gt;&lt;/span&gt;
 &lt;a href="#build" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;To update the Contact profiles for an app, changes must be compiled into &lt;code&gt;app-settings&lt;/code&gt;, then uploaded.&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
-&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; cht --local compile-app-settings backup-app-settings upload-app-settings&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; cht --local compile-app-settings backup-app-settings upload-app-settings&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description></item></channel></rss>

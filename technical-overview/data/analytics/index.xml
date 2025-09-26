@@ -1,6 +1,6 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – PostgreSQL Analytics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/</link><description>Recent content in PostgreSQL Analytics on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/index.xml" rel="self" type="application/rss+xml"/><item><title>Data Flows for Analytics</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/</guid><description>
-&lt;p&gt;In this section, we focus on how data flows through the various components of the Community Health Toolkit. The CHT is built to support the delivery of quality community health care at the last mile. The CHT is designed to work in areas with low connectivity, which means it is an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/offline-first/" &gt;Offline-First&lt;/a&gt; toolkit for care provision. The architectural and technology choices in the stack are mostly guided by this principle, which will be evident in the discussion of the data management pipeline.&lt;/p&gt;
-&lt;h2&gt;Overview&lt;span class="hx-absolute -hx-mt-20" id="overview"&gt;&lt;/span&gt;
+&lt;p&gt;In this section, we focus on how data flows through the various components of the Community Health Toolkit. The CHT is built to support the delivery of quality community health care at the last mile. The CHT is designed to work in areas with low connectivity, which means it is an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/concepts/offline-first/"&gt;Offline-First&lt;/a&gt; toolkit for care provision. The architectural and technology choices in the stack are mostly guided by this principle, which will be evident in the discussion of the data management pipeline.&lt;/p&gt;
+&lt;h2&gt;Overview&lt;span class="hx:absolute hx:-mt-20" id="overview"&gt;&lt;/span&gt;
 &lt;a href="#overview" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;figure&gt;&lt;a href="data-flows.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/data-flows.png"
 alt="Data Flows"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;p&gt;Data Flows&lt;/p&gt;
@@ -10,25 +10,25 @@ alt="Data Flows"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;ul&gt;
 &lt;li&gt;Data are collected from the device of a health worker;&lt;/li&gt;
 &lt;li&gt;Data are pushed to an online instance from where data are available to other health workers, supervisors, and decision makers;&lt;/li&gt;
-&lt;li&gt;Data are transferred to a relational database (PostgreSQL) using &lt;a href="https://github.com/medic/cht-sync" target="_blank" rel="noopener"&gt;CHT Sync&lt;/a&gt; and made available for impact monitoring, data science projects, and visualizations;&lt;/li&gt;
+&lt;li&gt;Data are transferred to a relational database (PostgreSQL) using &lt;a href="https://github.com/medic/cht-sync"target="_blank" rel="noopener"&gt;CHT Sync&lt;/a&gt; and made available for impact monitoring, data science projects, and visualizations;&lt;/li&gt;
 &lt;li&gt;Access to PostreSQL is given to relevant parties at this level, for example members of the Research &amp;amp; Learning team for impact monitoring and data science;&lt;/li&gt;
-&lt;li&gt;Visualization platforms, such as &lt;a href="https://www.klipfolio.com/" target="_blank" rel="noopener"&gt;Klipfolio&lt;/a&gt; or &lt;a href="https://superset.apache.org/" target="_blank" rel="noopener"&gt;Superset&lt;/a&gt;, are then connected to PostgreSQL from where program managers and other partner representatives can access visualizations of their data for decision-making.&lt;/li&gt;
+&lt;li&gt;Visualization platforms, such as &lt;a href="https://www.klipfolio.com/"target="_blank" rel="noopener"&gt;Klipfolio&lt;/a&gt; or &lt;a href="https://superset.apache.org/"target="_blank" rel="noopener"&gt;Superset&lt;/a&gt;, are then connected to PostgreSQL from where program managers and other partner representatives can access visualizations of their data for decision-making.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2&gt;Details of the data flow&lt;span class="hx-absolute -hx-mt-20" id="details-of-the-data-flow"&gt;&lt;/span&gt;
+&lt;h2&gt;Details of the data flow&lt;span class="hx:absolute hx:-mt-20" id="details-of-the-data-flow"&gt;&lt;/span&gt;
 &lt;a href="#details-of-the-data-flow" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The layout detailed here is specific to how Medic supports its CHT partners at the moment. It is replicable and can be deployed as is or tweaked independent of Medic either by modifying or replacing pieces of it with other options.&lt;/p&gt;
-&lt;h3&gt;Current infrastructure&lt;span class="hx-absolute -hx-mt-20" id="current-infrastructure"&gt;&lt;/span&gt;
+&lt;h3&gt;Current infrastructure&lt;span class="hx:absolute hx:-mt-20" id="current-infrastructure"&gt;&lt;/span&gt;
 &lt;a href="#current-infrastructure" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;We look at this in three general phases.&lt;/p&gt;
-&lt;h4&gt;1. Data Collection&lt;span class="hx-absolute -hx-mt-20" id="1-data-collection"&gt;&lt;/span&gt;
+&lt;h4&gt;1. Data Collection&lt;span class="hx:absolute hx:-mt-20" id="1-data-collection"&gt;&lt;/span&gt;
 &lt;a href="#1-data-collection" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Data is collected in the community at the point of care, i.e. the community health worker interacting with the toolkit. These tools and their corresponding data stores are::-&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Mobile app -&amp;gt; PouchDB&lt;/li&gt;
 &lt;li&gt;Webapp -&amp;gt; PouchDB / CouchDB&lt;/li&gt;
 &lt;li&gt;Text forms / sms -&amp;gt; SMS gateway / SMS aggregator -&amp;gt; CouchDB&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The mobile app and webapp, when deployed for offline first use, use a local database namely PouchDB. Similar to CouchDB, it is a document-oriented database. The data collected in PouchDB is synced to an online CouchDB upon the user connecting to the internet. Local storage is not applicable to SMS; instead, an &lt;a href="https://github.com/medic/cht-gateway" target="_blank" rel="noopener"&gt;SMS gateway&lt;/a&gt; or an SMS aggregator (for example &lt;a href="https://africastalking.com" target="_blank" rel="noopener"&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;) is used to help get the data to an online CouchDB instance.&lt;/p&gt;
+&lt;p&gt;The mobile app and webapp, when deployed for offline first use, use a local database namely PouchDB. Similar to CouchDB, it is a document-oriented database. The data collected in PouchDB is synced to an online CouchDB upon the user connecting to the internet. Local storage is not applicable to SMS; instead, an &lt;a href="https://github.com/medic/cht-gateway"target="_blank" rel="noopener"&gt;SMS gateway&lt;/a&gt; or an SMS aggregator (for example &lt;a href="https://africastalking.com"target="_blank" rel="noopener"&gt;Africa&amp;rsquo;s Talking&lt;/a&gt;) is used to help get the data to an online CouchDB instance.&lt;/p&gt;
 &lt;p&gt;Ultimately all the data ends up in a CouchDB instance deployed in the cloud whether through data synchronization with PouchDB local to the health workers devices, use of SMS aggregators or gateway. It should be mentioned that you can have a deployment supported by all of webapp, mobile app and SMS and have all the data end up in the same CouchDB instance.&lt;/p&gt;
-&lt;h4&gt;2. Data Transformation&lt;span class="hx-absolute -hx-mt-20" id="2-data-transformation"&gt;&lt;/span&gt;
-&lt;a href="#2-data-transformation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-sync/" &gt;CHT Sync&lt;/a&gt; is used to move data from CouchDB to a relational database, PostgreSQL in this case. The choice of PostgreSQL for analytics dashboard data sources is to allow use of the more familiar SQL querying. It is an open source tool that can be &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" &gt;easily deployed&lt;/a&gt;. When deployed the service uses &lt;a href="https://docs.couchdb.org/en/stable/api/database/changes.html" target="_blank" rel="noopener"&gt;CouchDB&amp;rsquo;s changes feed&lt;/a&gt; which allows capturing of everything happening in CouchDB in incremental updates. It is run and monitored by the operating system where it is configured to fetch data at a configurable interval.&lt;/p&gt;
+&lt;h4&gt;2. Data Transformation&lt;span class="hx:absolute hx:-mt-20" id="2-data-transformation"&gt;&lt;/span&gt;
+&lt;a href="#2-data-transformation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-sync/"&gt;CHT Sync&lt;/a&gt; is used to move data from CouchDB to a relational database, PostgreSQL in this case. The choice of PostgreSQL for analytics dashboard data sources is to allow use of the more familiar SQL querying. It is an open source tool that can be &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/"&gt;easily deployed&lt;/a&gt;. When deployed the service uses &lt;a href="https://docs.couchdb.org/en/stable/api/database/changes.html"target="_blank" rel="noopener"&gt;CouchDB&amp;rsquo;s changes feed&lt;/a&gt; which allows capturing of everything happening in CouchDB in incremental updates. It is run and monitored by the operating system where it is configured to fetch data at a configurable interval.&lt;/p&gt;
 &lt;p&gt;Data copied over to PostgreSQL is first stored as raw json (document) making use of PostgreSQL&amp;rsquo;s jsonb data type to create an exact replica of a CouchDB database. From this, default views are created at deployment of the service and refreshed during every subsequent run. Additional custom materialized views created later are also refreshed at this time.&lt;/p&gt;
 &lt;p&gt;Custom materialized views and functions are added specific to a deployment&amp;rsquo;s needs. Generally the following naming convention is recommended:&lt;/p&gt;
 &lt;ul&gt;
@@ -38,7 +38,7 @@ alt="Data Flows"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;li&gt;Database functions are used as a way to join as much relevant data as possible for easier querying in analytics or dashboard visualizations.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Data in the views and functions mentioned in this section is as accurate as the accuracy of the SQL queries. Best practice is to begin the process of defining these objects at design in order to align analytics and dashboards requirements with workflows being deployed.&lt;/p&gt;
-&lt;h4&gt;3. Data Use&lt;span class="hx-absolute -hx-mt-20" id="3-data-use"&gt;&lt;/span&gt;
+&lt;h4&gt;3. Data Use&lt;span class="hx:absolute hx:-mt-20" id="3-data-use"&gt;&lt;/span&gt;
 &lt;a href="#3-data-use" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;The data in PostgreSQL is mostly either used by direct querying or via dashboard visualizations for impact monitoring and data driven-decision making. Database visualizations are built scoped to the requirements of supporting a successful deployment. The work of our Research &amp;amp; Learning team, specifically data science, is supported at the PostgreSQL level through updated contactviews, formviews, useviews and functions with access to these provided to relevant parties as and when needed. Our use of data follows our Privacy &amp;amp; Data Protection policy and is in accordance to agreements with our CHT partners.&lt;/p&gt;
 &lt;p&gt;As mentioned previously, formviews are built to present data in a structure similar to the data collection tool (form) used. Useviews are tailored to align with a use case, mostly using the formviews as the data sources. These are fundamentally guided by design of the workflows and should be interpreted in the context of the design materials including a document explaining the definitions of variables used.&lt;/p&gt;
 &lt;p&gt;The objects present here are not limited to views and functions. Additional tables can be added, for example providing mappings or supporting operations external to the functions available in the toolkit. In short, there is no limitation to the utility that can be added this level to support analytics and dashboards. That said, measures are taken to ensure controlled access, reliability and timely access of the data by the various parties. Some of these measures are:&lt;/p&gt;
@@ -50,12 +50,12 @@ alt="Data Flows"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;li&gt;Review of the dashboards as part of the design process;&lt;/li&gt;
 &lt;li&gt;Qualitative design activities to interrogate trends observed in the dashboards and iterate on them if need be;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3&gt;Beyond Our Current Pipeline&lt;span class="hx-absolute -hx-mt-20" id="beyond-our-current-pipeline"&gt;&lt;/span&gt;
-&lt;a href="#beyond-our-current-pipeline" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The &lt;a href="https://github.com/medic/cht-core" target="_blank" rel="noopener"&gt;cht-core&lt;/a&gt; is mostly data collection tools and is the first component of the data management pipeline. It is the core part of a deployment but the rest of the tools can be easily replaced with other preferred options. It also helps that CHT Sync is an open source tool which provides the opportunity for collaboration to extend its functionality to support other implementations. Klipfolio, the tool that we currently use for visualizations, is a proprietary tool but there are many open source options, such as &lt;a href="https://superset.incubator.apache.org/" target="_blank" rel="noopener"&gt;Apache Superset&lt;/a&gt; that are worth exploring and building into future iterations of our impact monitoring and analytics support for the CHT.&lt;/p&gt;
-&lt;h2&gt;Backup&lt;span class="hx-absolute -hx-mt-20" id="backup"&gt;&lt;/span&gt;
+&lt;h3&gt;Beyond Our Current Pipeline&lt;span class="hx:absolute hx:-mt-20" id="beyond-our-current-pipeline"&gt;&lt;/span&gt;
+&lt;a href="#beyond-our-current-pipeline" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The &lt;a href="https://github.com/medic/cht-core"target="_blank" rel="noopener"&gt;cht-core&lt;/a&gt; is mostly data collection tools and is the first component of the data management pipeline. It is the core part of a deployment but the rest of the tools can be easily replaced with other preferred options. It also helps that CHT Sync is an open source tool which provides the opportunity for collaboration to extend its functionality to support other implementations. Klipfolio, the tool that we currently use for visualizations, is a proprietary tool but there are many open source options, such as &lt;a href="https://superset.incubator.apache.org/"target="_blank" rel="noopener"&gt;Apache Superset&lt;/a&gt; that are worth exploring and building into future iterations of our impact monitoring and analytics support for the CHT.&lt;/p&gt;
+&lt;h2&gt;Backup&lt;span class="hx:absolute hx:-mt-20" id="backup"&gt;&lt;/span&gt;
 &lt;a href="#backup" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The machines running each of CouchDB and PostgreSQL instances are backed up daily.&lt;/p&gt;</description></item><item><title>Connecting to RDBMS from MacOS</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/rdbms-from-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/rdbms-from-mac/</guid><description>
 &lt;p&gt;Follow these steps on a Mac to generate your public/private keys and access the PostgreSQL server.&lt;/p&gt;
-&lt;h2&gt;Access Terminal&lt;span class="hx-absolute -hx-mt-20" id="access-terminal"&gt;&lt;/span&gt;
+&lt;h2&gt;Access Terminal&lt;span class="hx:absolute hx:-mt-20" id="access-terminal"&gt;&lt;/span&gt;
 &lt;a href="#access-terminal" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Terminal (Terminal.app) is the terminal emulator included in the macOS operating system. You can use this application to generate your SSH key.&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Open a new &lt;strong&gt;Finder&lt;/strong&gt; window&lt;/li&gt;
@@ -68,18 +68,18 @@ alt="Terminal"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;p&gt;Terminal&lt;/p&gt;
 &lt;/figcaption&gt;
 &lt;/figure&gt;
-&lt;h2&gt;Generate Key&lt;span class="hx-absolute -hx-mt-20" id="generate-key"&gt;&lt;/span&gt;
+&lt;h2&gt;Generate Key&lt;span class="hx:absolute hx:-mt-20" id="generate-key"&gt;&lt;/span&gt;
 &lt;a href="#generate-key" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;From Terminal, follow these instructions (see screenshot below):&lt;/p&gt;
-&lt;div class="steps hx-ml-4 hx-mb-12 ltr:hx-border-l rtl:hx-border-r hx-border-gray-200 ltr:hx-pl-6 rtl:hx-pr-6 dark:hx-border-neutral-800 [counter-reset:step]"&gt;
-&lt;h3&gt;Step 1&lt;span class="hx-absolute -hx-mt-20" id="step-1"&gt;&lt;/span&gt;
+&lt;div class="hextra-steps hx:ml-4 hx:mb-12 hx:ltr:border-l hx:rtl:border-r hx:border-gray-200 hx:ltr:pl-6 hx:rtl:pr-6 hx:dark:border-neutral-800 [counter-reset:step]"&gt;
+&lt;h3&gt;Step 1&lt;span class="hx:absolute hx:-mt-20" id="step-1"&gt;&lt;/span&gt;
 &lt;a href="#step-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Type: &lt;code&gt;ssh-keygen -t rsa&lt;/code&gt;&lt;/p&gt;
-&lt;h3&gt;Step 2&lt;span class="hx-absolute -hx-mt-20" id="step-2"&gt;&lt;/span&gt;
+&lt;h3&gt;Step 2&lt;span class="hx:absolute hx:-mt-20" id="step-2"&gt;&lt;/span&gt;
 &lt;a href="#step-2" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Hit return to use the default file / location&lt;/p&gt;
-&lt;h3&gt;Step 3&lt;span class="hx-absolute -hx-mt-20" id="step-3"&gt;&lt;/span&gt;
+&lt;h3&gt;Step 3&lt;span class="hx:absolute hx:-mt-20" id="step-3"&gt;&lt;/span&gt;
 &lt;a href="#step-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Enter a &lt;em&gt;passphrase&lt;/em&gt;&lt;/p&gt;
-&lt;h3&gt;Step 4&lt;span class="hx-absolute -hx-mt-20" id="step-4"&gt;&lt;/span&gt;
+&lt;h3&gt;Step 4&lt;span class="hx:absolute hx:-mt-20" id="step-4"&gt;&lt;/span&gt;
 &lt;a href="#step-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Enter your &lt;em&gt;passphrase&lt;/em&gt; again&lt;/p&gt;
-&lt;h3&gt;Step 5&lt;span class="hx-absolute -hx-mt-20" id="step-5"&gt;&lt;/span&gt;
+&lt;h3&gt;Step 5&lt;span class="hx:absolute hx:-mt-20" id="step-5"&gt;&lt;/span&gt;
 &lt;a href="#step-5" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Type: &lt;code&gt;cat ~/.ssh/id_rsa.pub&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;In the screenshot below:&lt;/p&gt;
@@ -88,10 +88,10 @@ alt="Terminal"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;li&gt;&lt;code&gt;(b)&lt;/code&gt; is the location and filename of your &lt;em&gt;&lt;strong&gt;public&lt;/strong&gt;&lt;/em&gt; key&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;(c)&lt;/code&gt; are the contents of your &lt;em&gt;&lt;strong&gt;public&lt;/strong&gt;&lt;/em&gt; key&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-blue-200 hx-bg-blue-100 hx-text-blue-900 dark:hx-border-blue-200/30 dark:hx-bg-blue-900/30 dark:hx-text-blue-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;You will need to provide the contents of &lt;code&gt;(c)&lt;/code&gt; to your Medic contact or RDBMS administrator. It should start with &lt;code&gt;ssh-rsa&lt;/code&gt; and end with something that looks like an email address.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;You will need to provide the contents of &lt;code&gt;(c)&lt;/code&gt; to your Medic contact or RDBMS administrator. It should start with &lt;code&gt;ssh-rsa&lt;/code&gt; and end with something that looks like an email address.&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;figure&gt;&lt;a href="ssh-commands.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/rdbms-from-mac/ssh-commands.png"
@@ -99,11 +99,11 @@ alt="SSH Commands"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;p&gt;SSH Commands&lt;/p&gt;
 &lt;/figcaption&gt;
 &lt;/figure&gt;
-&lt;h2&gt;Connect to PostgreSQL&lt;span class="hx-absolute -hx-mt-20" id="connect-to-postgresql"&gt;&lt;/span&gt;
+&lt;h2&gt;Connect to PostgreSQL&lt;span class="hx:absolute hx:-mt-20" id="connect-to-postgresql"&gt;&lt;/span&gt;
 &lt;a href="#connect-to-postgresql" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Copy your public key and provide it to your Medic contact or RDBMS administrator. Your public key is not sensitive and can be shared over slack, github, etc&amp;hellip;&lt;/p&gt;
 &lt;p&gt;Once the RDBMS administrator has added your public SSH key on RDBMS, the administrator will provide you with login credentials to the SSH server as well as for PostgreSQL.&lt;/p&gt;
 &lt;p&gt;Verify you can successfully connect to to the SSH server with &lt;code&gt;ssh -i ~/.ssh/id_rsa &amp;lt;user&amp;gt;@&amp;lt;rdbms host&amp;gt; -p &amp;lt;port&amp;gt;&lt;/code&gt;. If your setup is correct, you should login to the server and see the prompt of your terminal change to &lt;code&gt;&amp;lt;user&amp;gt;@rdbms:~$&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;You should be able to access PostgreSQL from a SQL client using the provided credentials. Some common SQL clients include: &lt;a href="https://www.pgadmin.org/" target="_blank" rel="noopener"&gt;pgAdmin&lt;/a&gt;, &lt;a href="https://dbeaver.io/" target="_blank" rel="noopener"&gt;DBeaver&lt;/a&gt;, &lt;a href="https://eggerapps.at/postico/" target="_blank" rel="noopener"&gt;Postico&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You should be able to access PostgreSQL from a SQL client using the provided credentials. Some common SQL clients include: &lt;a href="https://www.pgadmin.org/"target="_blank" rel="noopener"&gt;pgAdmin&lt;/a&gt;, &lt;a href="https://dbeaver.io/"target="_blank" rel="noopener"&gt;DBeaver&lt;/a&gt;, &lt;a href="https://eggerapps.at/postico/"target="_blank" rel="noopener"&gt;Postico&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;From your SQL client, use the settings mentioned below to connect. Be sure to select the &lt;em&gt;&lt;strong&gt;Private Key&lt;/strong&gt;&lt;/em&gt; that you generated above.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
@@ -161,10 +161,10 @@ alt="PG Connection Settings"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;/figcaption&gt;
 &lt;/figure&gt;</description></item><item><title>Connecting to RDBMS from Windows</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/rdbms-from-windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/rdbms-from-windows/</guid><description>
 &lt;p&gt;Connecting to RDBMS, the PostgreSQL server, is pretty stratightforward in nix systems. In Windows there are a couple of things you need to do to get it up and running.&lt;/p&gt;
-&lt;h2&gt;SSH Key Generation and Importing&lt;span class="hx-absolute -hx-mt-20" id="ssh-key-generation-and-importing"&gt;&lt;/span&gt;
+&lt;h2&gt;SSH Key Generation and Importing&lt;span class="hx:absolute hx:-mt-20" id="ssh-key-generation-and-importing"&gt;&lt;/span&gt;
 &lt;a href="#ssh-key-generation-and-importing" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;Download Puttygen from &lt;a href="https://www.ssh.com/ssh/putty/download" target="_blank" rel="noopener"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Download Puttygen from &lt;a href="https://www.ssh.com/ssh/putty/download"target="_blank" rel="noopener"&gt;here&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Run Puttygen Go to Windows Start menu → All Programs → PuTTY→ PuTTYgen.&lt;/p&gt;
@@ -178,8 +178,8 @@ alt="Putty-gen-key-pair"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;/figure&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;Convert the key generated from ssh2 format to openssh. Puttygen &lt;a href="https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygen-windows-into-key-pairs-us/2224204#2224204" target="_blank" rel="noopener"&gt;supports this&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;p&gt;Convert the key generated from ssh2 format to openssh. Puttygen &lt;a href="https://stackoverflow.com/questions/2224066/how-to-convert-ssh-keypairs-generated-using-puttygen-windows-into-key-pairs-us/2224204#2224204"target="_blank" rel="noopener"&gt;supports this&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;1. Open PuttyGen
 2. Click Load
 3. Load your private key
@@ -188,13 +188,13 @@ alt="Putty-gen-key-pair"&gt;&lt;/a&gt;&lt;figcaption&gt;
 6. Create the RFC 4716 version of the public key using ssh-keygen
 ssh-keygen -e -f ~/.ssh/id_dsa &amp;gt; ~/.ssh/id_dsa_com.pub
 6. Convert the RFC 4716 version of the public key to the OpenSSH format:
-ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+ssh-keygen -i -f ~/.ssh/id_dsa_com.pub &amp;gt; ~/.ssh/id_dsa.pub&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -248,14 +248,14 @@ alt="rdbms_2"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;/figure&gt;
 &lt;/li&gt;
 &lt;/ol&gt;</description></item><item><title>Contact Muting in SQL queries</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/muting_in_dashboards/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/muting_in_dashboards/</guid><description>
-&lt;p&gt;When a contact gets muted, two of &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/transitions/#muting" &gt;many things&lt;/a&gt; happen:&lt;/p&gt;
+&lt;p&gt;When a contact gets muted, two of &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/transitions/#muting"&gt;many things&lt;/a&gt; happen:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;The target contact and all of its descendants have a &lt;code&gt;muted&lt;/code&gt; property set equal to the date they were muted&lt;/li&gt;
 &lt;li&gt;an entry is added to the contact&amp;rsquo;s &lt;code&gt;muting_history&lt;/code&gt; in sentinel&amp;rsquo;s info docs&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;When building dashboards on Superset, Klipfolio, or other data visualization platforms, you might need to exclude these muted contacts from the visualized data. An easy way to do this is to check the contact&amp;rsquo;s &lt;code&gt;muted&lt;/code&gt; property which when present has the date value of when the contact was muted and when absent means that the contact is not muted. This works when you are only interested in seeing the latest data but it gets complicated when you want to look at a contact&amp;rsquo;s mute state from a certain period in the past.&lt;/p&gt;
 &lt;p&gt;For example, if a contact was muted in February and unmuted in May; If you check the contact&amp;rsquo;s mute state in March from June, you&amp;rsquo;d find that the contact would not have the muted property as it would have been removed during the &lt;code&gt;unmute&lt;/code&gt; in May. This is where the &lt;code&gt;muting_history&lt;/code&gt; comes in. A contact&amp;rsquo;s &lt;code&gt;muting_history&lt;/code&gt; contains all mute and unmute events stored in a JSON array. An example of the mute/unmute entries is shown below:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;_id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;_rev&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;3-01ecfdd2958baeaf16fc621c5622f4a9&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -277,18 +277,18 @@ alt="rdbms_2"&gt;&lt;/a&gt;&lt;figcaption&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;],&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;latest_replication_date&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;2020-10-30T15:46:45.482Z&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;initial_replication_date&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;2020-10-30T15:46:45.482Z&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;If you extract this data into a separate table you can get a timeline that you can use to check if the contact was muted at a certain point in the past. An example of this approach is shown below where the data is first extracted using the query:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_muting_history&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;contact_uuid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;muted_on&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
@@ -304,13 +304,13 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;type&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;text&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;info&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AND&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;muting_history&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;IS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;NOT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;NULL&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_muting_history&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;CROSS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;JOIN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;LATERAL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;json_populate_recordset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;null&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_muting_history&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;muting_history&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;muted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;report_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;uuid&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;CROSS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;JOIN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;LATERAL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;json_populate_recordset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;null&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_muting_history&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;muting_history&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;muted&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;report_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;uuid&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -352,7 +352,7 @@ title="Copy code"
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;You can query the table above (&lt;code&gt;mute_timeline&lt;/code&gt;) to check if the contact was muted in a certain period in time as shown below:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_uuid&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;IS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;NOT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;NULL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;muted&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt;
@@ -360,21 +360,21 @@ title="Copy code"
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;WHERE&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;contact_uuid&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*****&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AND&lt;/span&gt;&lt;span class="w"&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;date_trunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;muted_on&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;date_trunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;EXAMPLE_DATE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AND&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;unmuted_on&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;date_trunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;EXAMPLE_DATE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;1 day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="nb"&gt;interval&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;unmuted_on&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;date_trunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;EXAMPLE_DATE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;1 day&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="nb"&gt;interval&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;This query checks if a record exists for this contact where they were muted earlier or on &lt;code&gt;EXAMPLE_DATE&lt;/code&gt; and unmuted on or after the &lt;code&gt;EXAMPLE_DATE&lt;/code&gt;. For the earlier example where the contact was muted in February and unmuted in May if we pass February, March, or April as &lt;code&gt;EXAMPLE_DATE&lt;/code&gt;, we find a record because our &lt;code&gt;unmuted_on&lt;/code&gt; is always greater than &lt;code&gt;EXAMPLE_DATE&lt;/code&gt;. If we pass May going forward, we find no records that match our condition.&lt;/p&gt;</description></item><item><title>Querying Apdex Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/querying_apdex_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/querying_apdex_telemetry/</guid><description>
 &lt;p&gt;Added in &lt;code&gt;4.7.0&lt;/code&gt;, CHT now records the Apdex (Application Performance Index) that is an open standard for measuring performance of software applications.&lt;/p&gt;
-&lt;p&gt;Since Apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/" &gt;telemetry&lt;/a&gt; system, it is possible to view Apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/" &gt;analytics database&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Since Apdex is part of the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/"&gt;telemetry&lt;/a&gt; system, it is possible to view Apdex data directly from CouchDB. However, it is more useful when aggregated across many users, interactions, and/or days. With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/"&gt;analytics database&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;An example of an SQL to view the Apdex score:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;WITH apdex_telemetry_data AS (
 SELECT
 substring(metric from &amp;#39;^(.*):apdex:&amp;#39;) AS event_category,
@@ -407,18 +407,18 @@ tolerable_count,
 frustrated_count,
 ROUND(((satisfied_count &amp;#43; (tolerable_count / 2.0)) / total_event_count)::numeric, 2) AS apdex_score
 FROM apdex_scores
-ORDER BY apdex_score asc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+ORDER BY apdex_score asc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;The SQL query above calculates the Apdex scores for various events recorded in the &lt;code&gt;useview_telemetry_metrics&lt;/code&gt; table, providing insights into the performance of different aspects of the CHT. In some cases, it is helpful to visualize the number of occurrences of each metric in a date range:&lt;/p&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;WITH
 constants (days, start_date, end_date) AS (VALUES (&amp;lt;count_days_in_range&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;, &amp;lt;YYYY-MM-DD&amp;gt;)),
 apdex_metrics AS(
@@ -468,25 +468,25 @@ CASE
 WHEN apdex_result.actual_count &amp;gt;= apdex_result.expected_count THEN &amp;#39;TRUE&amp;#39; ELSE &amp;#39;FALSE&amp;#39;
 END AS meet_expectation
 FROM apdex_result
-ORDER BY apdex_result.metric ASC&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+ORDER BY apdex_result.metric ASC&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;Such queries are instrumental in identifying areas of the CHT that may require performance improvements by highlighting how different parts of the application meet user expectations in terms of load times and Apdex score.&lt;/p&gt;</description></item><item><title>Querying Training Cards Telemetry Data</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/querying_training_card_telemetry/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/querying_training_card_telemetry/</guid><description>
 &lt;p&gt;Introduced in &lt;code&gt;4.2.0&lt;/code&gt;, CHT has supported deployment of in-app training cards to facilitate remote training.&lt;/p&gt;
-&lt;p&gt;Since interaction with training cards logs &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/" &gt;telemetry data&lt;/a&gt;, it is possible to view the data directly from CouchDB. However, it is more useful when you can run queries that provide useful metrics about the usage of training cards aggregated across many users, and interactions.&lt;/p&gt;
-&lt;p&gt;With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/" &gt;analytics database&lt;/a&gt;. The couchDB data can be replicated using &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/" &gt;CHT Sync&lt;/a&gt; to a postgresql instance where you can then run the SQL queries.&lt;/p&gt;
+&lt;p&gt;Since interaction with training cards logs &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/telemetry/"&gt;telemetry data&lt;/a&gt;, it is possible to view the data directly from CouchDB. However, it is more useful when you can run queries that provide useful metrics about the usage of training cards aggregated across many users, and interactions.&lt;/p&gt;
+&lt;p&gt;With this in mind, it is typically easier to query the data using SQL from an &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/analytics/data-flows-for-analytics/"&gt;analytics database&lt;/a&gt;. The couchDB data can be replicated using &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/"&gt;CHT Sync&lt;/a&gt; to a postgresql instance where you can then run the SQL queries.&lt;/p&gt;
 &lt;p&gt;This guide includes several SQL queries that can act as a starting point for identifying useful metrics.&lt;/p&gt;
-&lt;div class="hx-overflow-x-auto hx-mt-6 hx-flex hx-flex-col hx-rounded-lg hx-border hx-py-4 hx-px-4 contrast-more:hx-border-current contrast-more:dark:hx-border-current hx-border-green-200 hx-bg-green-100 hx-text-green-900 dark:hx-border-green-200/30 dark:hx-bg-green-900/30 dark:hx-text-green-200"&gt;
-&lt;p class="hx-flex hx-items-center hx-font-medium"&gt;&lt;svg height=16px class="hx-inline-block hx-align-middle hx-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/&gt;&lt;/svg&gt;Tip&lt;/p&gt;
-&lt;div class="hx-w-full hx-min-w-0 hx-leading-7"&gt;
-&lt;div class="hx-mt-6 hx-leading-7 first:hx-mt-0"&gt;&lt;p&gt;Creating the following index can improve the performance of running these queries&lt;/p&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/&gt;&lt;/svg&gt;Tip&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Creating the following index can improve the performance of running these queries&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;CREATE INDEX idx_couchdb_users_meta_type ON couchdb_users_meta((doc-&amp;gt;&amp;gt;'type'));&lt;/code&gt;&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -494,7 +494,7 @@ title="Copy code"
 &lt;ol&gt;
 &lt;li&gt;Total number of users who have viewed a particular training set:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT
 &amp;#39;chp_self_assessment&amp;#39; AS form_name,
 COUNT(DISTINCT doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39;) AS total_users_viewed
@@ -502,20 +502,20 @@ FROM
 couchdb_users_meta
 WHERE
 doc-&amp;gt;&amp;gt;&amp;#39;type&amp;#39; = &amp;#39;telemetry&amp;#39;
-AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:render,count}&amp;#39;)::int, 0) &amp;gt; 0;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:render,count}&amp;#39;)::int, 0) &amp;gt; 0;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="2"&gt;
 &lt;li&gt;How many times each user has viewed but not completed the training:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user,
 SUM((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:render,count}&amp;#39;)::int) AS views_without_completion
@@ -528,20 +528,20 @@ AND NOT (doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:chp_
 GROUP BY
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39;
 ORDER BY
-views_without_completion DESC;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+views_without_completion DESC;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="3"&gt;
 &lt;li&gt;Number of times each user has viewed a particular training set (Includes those who have completed and those who have not completed):&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user,
 SUM((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:render,count}&amp;#39;)::int) AS times_viewed
@@ -553,20 +553,20 @@ AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_ass
 GROUP BY
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39;
 ORDER BY
-times_viewed desc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+times_viewed desc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="4"&gt;
 &lt;li&gt;How many times each user quit a particular training set:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user,
 SUM((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:quit,count}&amp;#39;)::int) AS times_quit
@@ -578,40 +578,40 @@ AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_ass
 GROUP BY
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39;
 ORDER BY
-times_quit desc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+times_quit desc;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="5"&gt;
 &lt;li&gt;List of users who have completed a particular training set:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT DISTINCT
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user
 FROM
 couchdb_users_meta
 WHERE
 doc-&amp;gt;&amp;gt;&amp;#39;type&amp;#39; = &amp;#39;telemetry&amp;#39;
-AND doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:chp_self_assessment:add:save&amp;#39;;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+AND doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:chp_self_assessment:add:save&amp;#39;;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="6"&gt;
 &lt;li&gt;Total number of users who have completed (submitted) a particular training set:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT
 &amp;#39;chp_self_assessment&amp;#39; AS form_name,
 COUNT(DISTINCT doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39;) AS total_users_completed
@@ -619,20 +619,20 @@ FROM
 couchdb_users_meta
 WHERE
 doc-&amp;gt;&amp;gt;&amp;#39;type&amp;#39; = &amp;#39;telemetry&amp;#39;
-AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:save,count}&amp;#39;)::int, 0) &amp;gt; 0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+AND COALESCE((doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:save,count}&amp;#39;)::int, 0) &amp;gt; 0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;ol start="7"&gt;
 &lt;li&gt;How long each user took on the training set for users who have completed the training:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;SELECT DISTINCT
 doc#&amp;gt;&amp;gt;&amp;#39;{metadata,user}&amp;#39; AS cht_user,
 COALESCE(doc#&amp;gt;&amp;gt;&amp;#39;{metrics,enketo:training:chp_self_assessment:add:user_edit_time,max}&amp;#39;,&amp;#39;0&amp;#39;)::int/1000 AS max_seconds_on_form,
@@ -641,13 +641,13 @@ FROM
 couchdb_users_meta
 WHERE
 doc-&amp;gt;&amp;gt;&amp;#39;type&amp;#39;=&amp;#39;telemetry&amp;#39;
-AND doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:chp_self_assessment:add:save&amp;#39;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"&gt;
+AND doc#&amp;gt;&amp;#39;{metrics}&amp;#39; ? &amp;#39;enketo:training:chp_self_assessment:add:save&amp;#39;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
-class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50"
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
 title="Copy code"
 &gt;
-&lt;div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
-&lt;div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
