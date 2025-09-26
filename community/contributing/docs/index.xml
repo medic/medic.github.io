@@ -389,6 +389,121 @@ title="Copy code"
 &lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;The opening &lt;code&gt;{{% schedule %}}&lt;/code&gt; and closing &lt;code&gt;{{% /schedule %}}&lt;/code&gt; shortcode must come before and after the markdown table respectively in order for it to correctly style the table.&lt;/p&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;h3&gt;Copy-paste-friendly Tables&lt;span class="hx:absolute hx:-mt-20" id="copy-paste-friendly-tables"&gt;&lt;/span&gt;
+&lt;a href="#copy-paste-friendly-tables" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;You can include a visual table in your documentation with a &lt;strong&gt;&amp;ldquo;Copy table&amp;rdquo; button&lt;/strong&gt; that makes it easy for users to copy the table contents (as TSV – tab-separated values). This is useful for sharing structured data that users may want to paste into a spreadsheet like Google Sheets or another tool.&lt;/p&gt;
+&lt;p&gt;Use the following shortcode format:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{{&amp;lt; copytable id=&amp;quot;example&amp;quot; label=&amp;quot;Copy table&amp;quot; &amp;gt;}}
+Column A Column B Column C
+Value-1 A1 B1
+Value-2 A2 B2
+{{&amp;lt;/ copytable &amp;gt;}}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This will render:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A nicely styled HTML table.&lt;/li&gt;
+&lt;li&gt;A &lt;strong&gt;Copy&lt;/strong&gt; button above the table.&lt;/li&gt;
+&lt;li&gt;When clicked, the button copies the table content (as plain text) to the clipboard.&lt;/li&gt;
+&lt;li&gt;A small “Copied!” message briefly appears to confirm the action.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Example output&lt;span class="hx:absolute hx:-mt-20" id="example-output"&gt;&lt;/span&gt;
+&lt;a href="#example-output" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;style&gt;
+:root {
+--btn-bg: #f3f4f6;
+--btn-text: #374151;
+--btn-border: #d1d5db;
+--btn-hover-bg: #e5e7eb;
+--btn-hover-text: #111827;
+--btn-active-bg: #d1d5db;
+}
+html.dark {
+--btn-bg: #1f2937;
+--btn-text: #e5e7eb;
+--btn-border: #4b5563;
+--btn-hover-bg: #374151;
+--btn-hover-text: #f9fafb;
+--btn-active-bg: #4b5563;
+}
+.copy-btn {
+display: inline-flex;
+align-items: center;
+gap: 0.5em;
+background: var(--btn-bg);
+color: var(--btn-text);
+border: 1px solid var(--btn-border);
+border-radius: 6px;
+padding: 0.35em 0.9em;
+font-size: 0.95em;
+font-weight: 500;
+cursor: pointer;
+transition: background 0.2s, color 0.2s, border 0.2s;
+margin-bottom: 0.2em;
+text-decoration: none;
+}
+.copy-btn:hover {
+background: var(--btn-hover-bg);
+color: var(--btn-hover-text);
+}
+.copy-btn:active {
+background: var(--btn-active-bg);
+}
+.copied-msg {
+display: none;
+color: #22c55e;
+font-weight: bold;
+margin-left: 10px;
+font-size: 1em;
+}
+.tsv-table-visual {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 0.5em;
+font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+font-size: 1em;
+background: transparent;
+}
+.tsv-table-visual th, .tsv-table-visual td {
+border: 1px solid #e5e7eb;
+padding: 6px 10px;
+background: transparent;
+}
+.tsv-table-visual th {
+background: #f3f4f6;
+font-weight: bold;
+}
+&lt;/style&gt;
+&lt;br&gt;
+&lt;button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('tsv-tsv').innerText);const msg=document.getElementById('copied-msg-tsv');msg.style.display='inline';setTimeout(function(){msg.style.display='none';},1500);"&gt;
+📋 Copy TSV
+&lt;/button&gt;
+&lt;span id="copied-msg-tsv" class="copied-msg"&gt;Copied!&lt;/span&gt;
+&lt;table class="tsv-table-visual"&gt;
+&lt;tr&gt;
+&lt;td&gt;Name&lt;/td&gt;
+&lt;td&gt;Role&lt;/td&gt;
+&lt;td&gt;Region &lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Fatou&lt;/td&gt;
+&lt;td&gt;CEO&lt;/td&gt;
+&lt;td&gt;Senegal &lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Jose&lt;/td&gt;
+&lt;td&gt;Developer&lt;/td&gt;
+&lt;td&gt;Costa Rica &lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;pre id="tsv-tsv" style="display:none;"&gt;
+Name Role Region
+Fatou CEO Senegal
+Jose Developer Costa Rica
+&lt;/pre&gt;
+&lt;h4&gt;Notes&lt;span class="hx:absolute hx:-mt-20" id="notes"&gt;&lt;/span&gt;
+&lt;a href="#notes" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;The copied content uses &lt;strong&gt;tab-separated values&lt;/strong&gt;, which work well in spreadsheets or plain text files.&lt;/li&gt;
+&lt;li&gt;The button adapts automatically to &lt;strong&gt;light and dark themes&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;You can customize the button label with the &lt;code&gt;label&lt;/code&gt; parameter (default: &lt;code&gt;&amp;quot;Copy table&amp;quot;&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3&gt;Grammar and punctuation in headers&lt;span class="hx:absolute hx:-mt-20" id="grammar-and-punctuation-in-headers"&gt;&lt;/span&gt;
 &lt;a href="#grammar-and-punctuation-in-headers" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Use title case for page &lt;code&gt;title&lt;/code&gt;, and sentence case for &lt;code&gt;linkTitle&lt;/code&gt; description. Do not end titles with periods.&lt;/p&gt;
 &lt;h3&gt;Angle brackets for placeholders&lt;span class="hx:absolute hx:-mt-20" id="angle-brackets-for-placeholders"&gt;&lt;/span&gt;

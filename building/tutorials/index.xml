@@ -981,34 +981,102 @@ title="Copy code"
 &lt;h2&gt;Required Resources&lt;span class="hx:absolute hx:-mt-20" id="required-resources"&gt;&lt;/span&gt;
 &lt;a href="#required-resources" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;You should have a &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/"&gt;functioning CHT instance with &lt;code&gt;cht-conf&lt;/code&gt; installed locally&lt;/a&gt; and a &lt;a href="https://docs.communityhealthtoolkit.org/building/local-setup/#3-create-and-upload-a-blank-project"&gt;project folder set up&lt;/a&gt; already.&lt;/p&gt;
 &lt;h2&gt;Implementation Steps&lt;span class="hx:absolute hx:-mt-20" id="implementation-steps"&gt;&lt;/span&gt;
-&lt;a href="#implementation-steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Create a new spread sheet in Google sheets or other preferred editor like Excel or Open Office. Name the spreadsheet &lt;code&gt;assessment&lt;/code&gt;. The final file name should be &lt;code&gt;assessment.xlsx&lt;/code&gt;.&lt;/p&gt;
+&lt;a href="#implementation-steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Create a new spread sheet in &lt;a href="https://workspace.google.com/products/sheets/"target="_blank" rel="noopener"&gt;Google Sheets&lt;/a&gt; or other preferred editor like &lt;a href="https://www.microsoft.com/en-us/microsoft-365/excel"target="_blank" rel="noopener"&gt;Excel&lt;/a&gt; or &lt;a href="https://www.libreoffice.org/"target="_blank" rel="noopener"&gt;LibreOffice&lt;/a&gt;. Name the spreadsheet &lt;code&gt;assessment&lt;/code&gt;. The final file name should be &lt;code&gt;assessment.xlsx&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Create 2 additional sheets. Rename the sheets &lt;code&gt;survey&lt;/code&gt;, &lt;code&gt;choices&lt;/code&gt; and &lt;code&gt;settings&lt;/code&gt;.&lt;/p&gt;
 &lt;h3&gt;1. Define XLS Survey/Form Fields&lt;span class="hx:absolute hx:-mt-20" id="1-define-xls-surveyform-fields"&gt;&lt;/span&gt;
-&lt;a href="#1-define-xls-surveyform-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Create the following columns in the survey sheet and then add the following rows that are populated automatically before the form is rendered to the user. These fields are usually hidden by default but can be accessed to display certain information about the person being assessed:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
+&lt;a href="#1-define-xls-surveyform-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;This rows are populated automatically before the form is rendered to the user. These fields are usually hidden by default but can be accessed to display certain information about the person being assessed.&lt;/p&gt;
+&lt;p&gt;Copy everything inside the table below by clicking the &amp;ldquo;📋 Copy survey sheet&amp;rdquo; button, then paste into cell A1 of a new sheet named &lt;code&gt;survey&lt;/code&gt; in Google Sheets or your prefered editor:&lt;/p&gt;
+&lt;style&gt;
+:root {
+--btn-bg: #f3f4f6;
+--btn-text: #374151;
+--btn-border: #d1d5db;
+--btn-hover-bg: #e5e7eb;
+--btn-hover-text: #111827;
+--btn-active-bg: #d1d5db;
+}
+html.dark {
+--btn-bg: #1f2937;
+--btn-text: #e5e7eb;
+--btn-border: #4b5563;
+--btn-hover-bg: #374151;
+--btn-hover-text: #f9fafb;
+--btn-active-bg: #4b5563;
+}
+.copy-btn {
+display: inline-flex;
+align-items: center;
+gap: 0.5em;
+background: var(--btn-bg);
+color: var(--btn-text);
+border: 1px solid var(--btn-border);
+border-radius: 6px;
+padding: 0.35em 0.9em;
+font-size: 0.95em;
+font-weight: 500;
+cursor: pointer;
+transition: background 0.2s, color 0.2s, border 0.2s;
+margin-bottom: 0.2em;
+text-decoration: none;
+}
+.copy-btn:hover {
+background: var(--btn-hover-bg);
+color: var(--btn-hover-text);
+}
+.copy-btn:active {
+background: var(--btn-active-bg);
+}
+.copied-msg {
+display: none;
+color: #22c55e;
+font-weight: bold;
+margin-left: 10px;
+font-size: 1em;
+}
+.tsv-table-visual {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 0.5em;
+font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+font-size: 1em;
+background: transparent;
+}
+.tsv-table-visual th, .tsv-table-visual td {
+border: 1px solid #e5e7eb;
+padding: 6px 10px;
+background: transparent;
+}
+.tsv-table-visual th {
+background: #f3f4f6;
+font-weight: bold;
+}
+&lt;/style&gt;
+&lt;br&gt;
+&lt;button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('tsv-survey').innerText);const msg=document.getElementById('copied-msg-survey');msg.style.display='inline';setTimeout(function(){msg.style.display='none';},1500);"&gt;
+📋 Copy survey sheet
+&lt;/button&gt;
+&lt;span id="copied-msg-survey" class="copied-msg"&gt;Copied!&lt;/span&gt;
+&lt;table class="tsv-table-visual"&gt;
 &lt;tr&gt;
-&lt;th&gt;type&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;label&lt;/th&gt;
-&lt;th&gt;required&lt;/th&gt;
-&lt;th&gt;relevant&lt;/th&gt;
-&lt;th&gt;appearance&lt;/th&gt;
-&lt;th&gt;constraint&lt;/th&gt;
-&lt;th&gt;constraint_message&lt;/th&gt;
-&lt;th&gt;calculation&lt;/th&gt;
-&lt;th&gt;choice_filter&lt;/th&gt;
-&lt;th&gt;hint&lt;/th&gt;
-&lt;th&gt;default&lt;/th&gt;
+&lt;td&gt;type&lt;/td&gt;
+&lt;td&gt;name&lt;/td&gt;
+&lt;td&gt;label&lt;/td&gt;
+&lt;td&gt;required&lt;/td&gt;
+&lt;td&gt;relevant&lt;/td&gt;
+&lt;td&gt;appearance&lt;/td&gt;
+&lt;td&gt;constraint&lt;/td&gt;
+&lt;td&gt;constraint_message&lt;/td&gt;
+&lt;td&gt;calculation&lt;/td&gt;
+&lt;td&gt;choice_filter&lt;/td&gt;
+&lt;td&gt;hint&lt;/td&gt;
+&lt;td&gt;default&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;begin group&lt;/td&gt;
 &lt;td&gt;inputs&lt;/td&gt;
 &lt;td&gt;Patient&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;./source = &amp;lsquo;user&amp;rsquo;&lt;/td&gt;
+&lt;td&gt;./source = &amp;#39;user&amp;#39;&lt;/td&gt;
 &lt;td&gt;field-list&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1021,7 +1089,6 @@ title="Copy code"
 &lt;td&gt;hidden&lt;/td&gt;
 &lt;td&gt;source&lt;/td&gt;
 &lt;td&gt;Source&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1043,13 +1110,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;hidden&lt;/td&gt;
 &lt;td&gt;task_id&lt;/td&gt;
 &lt;td&gt;Task_ID&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1071,7 +1136,6 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;string&lt;/td&gt;
@@ -1083,7 +1147,6 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;Select a person from the list&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
@@ -1091,7 +1154,6 @@ title="Copy code"
 &lt;td&gt;hidden&lt;/td&gt;
 &lt;td&gt;patient_id&lt;/td&gt;
 &lt;td&gt;Medic ID&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1113,13 +1175,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;begin group&lt;/td&gt;
 &lt;td&gt;parent&lt;/td&gt;
 &lt;td&gt;Parent&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1141,13 +1201,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;begin group&lt;/td&gt;
 &lt;td&gt;parent&lt;/td&gt;
 &lt;td&gt;Grandparent&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1169,13 +1227,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;hidden&lt;/td&gt;
 &lt;td&gt;name&lt;/td&gt;
 &lt;td&gt;CHW Name&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1197,13 +1253,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;begin group&lt;/td&gt;
 &lt;td&gt;parent&lt;/td&gt;
 &lt;td&gt;Great Grandparent&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1225,25 +1279,9 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;end group&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;end group&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1267,6 +1305,18 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;end group&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1281,11 +1331,9 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;end group&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1305,7 +1353,6 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;../inputs/contact/_id&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1319,38 +1366,15 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;../inputs/contact/name&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;Add the following rows that define the data collection fields below the existing rows (leave out the column names):&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;type&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;label&lt;/th&gt;
-&lt;th&gt;required&lt;/th&gt;
-&lt;th&gt;relevant&lt;/th&gt;
-&lt;th&gt;appearance&lt;/th&gt;
-&lt;th&gt;constraint&lt;/th&gt;
-&lt;th&gt;constraint_message&lt;/th&gt;
-&lt;th&gt;calculation&lt;/th&gt;
-&lt;th&gt;choice_filter&lt;/th&gt;
-&lt;th&gt;hint&lt;/th&gt;
-&lt;th&gt;default&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;begin group&lt;/td&gt;
 &lt;td&gt;group_assessment&lt;/td&gt;
 &lt;td&gt;Assessment&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1372,14 +1396,38 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;select_one symptom_duration&lt;/td&gt;
 &lt;td&gt;cough_duration&lt;/td&gt;
 &lt;td&gt;How long has the cough lasted?&lt;/td&gt;
 &lt;td&gt;yes&lt;/td&gt;
-&lt;td&gt;${cough} = &amp;lsquo;yes&amp;rsquo;&lt;/td&gt;
+&lt;td&gt;${cough} = &amp;#39;yes&amp;#39;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;select_one yes_no&lt;/td&gt;
+&lt;td&gt;fever&lt;/td&gt;
+&lt;td&gt;Does ${patient_name} have a fever?&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;select_one yes_no&lt;/td&gt;
+&lt;td&gt;diarrhea&lt;/td&gt;
+&lt;td&gt;Does ${patient_name} have diarrhea?&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
@@ -1400,21 +1448,122 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
-&lt;td&gt;&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3&gt;2. Define the Choices&lt;span class="hx:absolute hx:-mt-20" id="2-define-the-choices"&gt;&lt;/span&gt;
-&lt;a href="#2-define-the-choices" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the following column names and rows to the choices sheet:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
 &lt;tr&gt;
-&lt;th&gt;list_name&lt;/th&gt;
-&lt;th&gt;name&lt;/th&gt;
-&lt;th&gt;label&lt;/th&gt;
+&lt;td&gt;end group&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
+&lt;/table&gt;
+&lt;pre id="tsv-survey" style="display:none;"&gt;
+type name label required relevant appearance constraint constraint_message calculation choice_filter hint default
+begin group inputs Patient ./source = 'user' field-list
+hidden source Source user
+hidden source_id Source_ID
+hidden task_id Task_ID
+begin group contact Contact
+string _id Patient ID select-contact type-person Select a person from the list
+hidden patient_id Medic ID
+hidden name Patient Name
+begin group parent Parent
+hidden _id Family UUID
+begin group parent Grandparent
+hidden _id CHW Area UUID
+hidden name CHW Name
+hidden phone CHW Phone
+begin group parent Great Grandparent
+hidden _id CU UUID
+end group
+end group
+end group
+end group
+end group
+calculate patient_id ../inputs/contact/_id
+calculate patient_name ../inputs/contact/name
+begin group group_assessment Assessment
+select_one yes_no cough Does ${patient_name} have a cough? yes
+select_one symptom_duration cough_duration How long has the cough lasted? yes ${cough} = 'yes'
+select_one yes_no fever Does ${patient_name} have a fever? yes
+select_one yes_no diarrhea Does ${patient_name} have diarrhea? yes
+end group
+end group
+&lt;/pre&gt;
+&lt;h3&gt;2. Define the Choices&lt;span class="hx:absolute hx:-mt-20" id="2-define-the-choices"&gt;&lt;/span&gt;
+&lt;a href="#2-define-the-choices" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Copy everything inside the table below by clicking the &amp;ldquo;📋 Copy choices sheet&amp;rdquo; button, then paste into cell A1 of a new sheet named &lt;code&gt;choices&lt;/code&gt; in Google Sheets or your prefered editor:&lt;/p&gt;
+&lt;style&gt;
+:root {
+--btn-bg: #f3f4f6;
+--btn-text: #374151;
+--btn-border: #d1d5db;
+--btn-hover-bg: #e5e7eb;
+--btn-hover-text: #111827;
+--btn-active-bg: #d1d5db;
+}
+html.dark {
+--btn-bg: #1f2937;
+--btn-text: #e5e7eb;
+--btn-border: #4b5563;
+--btn-hover-bg: #374151;
+--btn-hover-text: #f9fafb;
+--btn-active-bg: #4b5563;
+}
+.copy-btn {
+display: inline-flex;
+align-items: center;
+gap: 0.5em;
+background: var(--btn-bg);
+color: var(--btn-text);
+border: 1px solid var(--btn-border);
+border-radius: 6px;
+padding: 0.35em 0.9em;
+font-size: 0.95em;
+font-weight: 500;
+cursor: pointer;
+transition: background 0.2s, color 0.2s, border 0.2s;
+margin-bottom: 0.2em;
+text-decoration: none;
+}
+.copy-btn:hover {
+background: var(--btn-hover-bg);
+color: var(--btn-hover-text);
+}
+.copy-btn:active {
+background: var(--btn-active-bg);
+}
+.copied-msg {
+display: none;
+color: #22c55e;
+font-weight: bold;
+margin-left: 10px;
+font-size: 1em;
+}
+.tsv-table-visual {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 0.5em;
+font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+font-size: 1em;
+background: transparent;
+}
+.tsv-table-visual th, .tsv-table-visual td {
+border: 1px solid #e5e7eb;
+padding: 6px 10px;
+background: transparent;
+}
+.tsv-table-visual th {
+background: #f3f4f6;
+font-weight: bold;
+}
+&lt;/style&gt;
+&lt;br&gt;
+&lt;button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('tsv-choices').innerText);const msg=document.getElementById('copied-msg-choices');msg.style.display='inline';setTimeout(function(){msg.style.display='none';},1500);"&gt;
+📋 Copy choices sheet
+&lt;/button&gt;
+&lt;span id="copied-msg-choices" class="copied-msg"&gt;Copied!&lt;/span&gt;
+&lt;table class="tsv-table-visual"&gt;
+&lt;tr&gt;
+&lt;td&gt;list_name&lt;/td&gt;
+&lt;td&gt;name&lt;/td&gt;
+&lt;td&gt;label&lt;/td&gt;
+&lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;yes_no&lt;/td&gt;
 &lt;td&gt;yes&lt;/td&gt;
@@ -1445,23 +1594,98 @@ title="Copy code"
 &lt;td&gt;14&lt;/td&gt;
 &lt;td&gt;14 days or more&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;
 &lt;/table&gt;
+&lt;pre id="tsv-choices" style="display:none;"&gt;
+list_name name label
+yes_no yes Yes
+yes_no no No
+symptom_duration 3 3 days or less
+symptom_duration 7 4 - 7 days
+symptom_duration 13 8 - 13 days
+symptom_duration 14 14 days or more
+&lt;/pre&gt;
 &lt;h3&gt;3. Define the XLS Settings&lt;span class="hx:absolute hx:-mt-20" id="3-define-the-xls-settings"&gt;&lt;/span&gt;
-&lt;a href="#3-define-the-xls-settings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the following column names and rows to the settings sheet:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
+&lt;a href="#3-define-the-xls-settings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Copy everything inside the table below by clicking the &amp;ldquo;📋 Copy settings sheet&amp;rdquo; button, then paste into cell A1 of a new sheet named &lt;code&gt;settings&lt;/code&gt; in Google Sheets or your prefered editor:&lt;/p&gt;
+&lt;style&gt;
+:root {
+--btn-bg: #f3f4f6;
+--btn-text: #374151;
+--btn-border: #d1d5db;
+--btn-hover-bg: #e5e7eb;
+--btn-hover-text: #111827;
+--btn-active-bg: #d1d5db;
+}
+html.dark {
+--btn-bg: #1f2937;
+--btn-text: #e5e7eb;
+--btn-border: #4b5563;
+--btn-hover-bg: #374151;
+--btn-hover-text: #f9fafb;
+--btn-active-bg: #4b5563;
+}
+.copy-btn {
+display: inline-flex;
+align-items: center;
+gap: 0.5em;
+background: var(--btn-bg);
+color: var(--btn-text);
+border: 1px solid var(--btn-border);
+border-radius: 6px;
+padding: 0.35em 0.9em;
+font-size: 0.95em;
+font-weight: 500;
+cursor: pointer;
+transition: background 0.2s, color 0.2s, border 0.2s;
+margin-bottom: 0.2em;
+text-decoration: none;
+}
+.copy-btn:hover {
+background: var(--btn-hover-bg);
+color: var(--btn-hover-text);
+}
+.copy-btn:active {
+background: var(--btn-active-bg);
+}
+.copied-msg {
+display: none;
+color: #22c55e;
+font-weight: bold;
+margin-left: 10px;
+font-size: 1em;
+}
+.tsv-table-visual {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 0.5em;
+font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+font-size: 1em;
+background: transparent;
+}
+.tsv-table-visual th, .tsv-table-visual td {
+border: 1px solid #e5e7eb;
+padding: 6px 10px;
+background: transparent;
+}
+.tsv-table-visual th {
+background: #f3f4f6;
+font-weight: bold;
+}
+&lt;/style&gt;
+&lt;br&gt;
+&lt;button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('tsv-settings').innerText);const msg=document.getElementById('copied-msg-settings');msg.style.display='inline';setTimeout(function(){msg.style.display='none';},1500);"&gt;
+📋 Copy settings sheet
+&lt;/button&gt;
+&lt;span id="copied-msg-settings" class="copied-msg"&gt;Copied!&lt;/span&gt;
+&lt;table class="tsv-table-visual"&gt;
 &lt;tr&gt;
-&lt;th&gt;form_title&lt;/th&gt;
-&lt;th&gt;form_id&lt;/th&gt;
-&lt;th&gt;version&lt;/th&gt;
-&lt;th&gt;style&lt;/th&gt;
-&lt;th&gt;path&lt;/th&gt;
-&lt;th&gt;instance_name&lt;/th&gt;
-&lt;th&gt;default_language&lt;/th&gt;
+&lt;td&gt;form_title&lt;/td&gt;
+&lt;td&gt;form_id&lt;/td&gt;
+&lt;td&gt;version&lt;/td&gt;
+&lt;td&gt;style&lt;/td&gt;
+&lt;td&gt;path&lt;/td&gt;
+&lt;td&gt;instance_name&lt;/td&gt;
+&lt;td&gt;default_language&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;Assess patient&lt;/td&gt;
 &lt;td&gt;assessment&lt;/td&gt;
@@ -1471,8 +1695,11 @@ title="Copy code"
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;en&lt;/td&gt;
 &lt;/tr&gt;
-&lt;/tbody&gt;
 &lt;/table&gt;
+&lt;pre id="tsv-settings" style="display:none;"&gt;
+form_title form_id version style path instance_name default_language
+Assess patient assessment 1 pages data en
+&lt;/pre&gt;
 &lt;h3&gt;4. Convert the XLSForm and Upload the XForm&lt;span class="hx:absolute hx:-mt-20" id="4-convert-the-xlsform-and-upload-the-xform"&gt;&lt;/span&gt;
 &lt;a href="#4-convert-the-xlsform-and-upload-the-xform" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the file to the &lt;code&gt;forms/app&lt;/code&gt; subfolder in your project.&lt;/p&gt;
 &lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
@@ -1508,7 +1735,9 @@ title="Copy code"
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;h2&gt;Next steps&lt;span class="hx:absolute hx:-mt-20" id="next-steps"&gt;&lt;/span&gt;
-&lt;a href="#next-steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In the next tutorial, you will define the form &lt;code&gt;&amp;lt;form_id&amp;gt;.properties.json&lt;/code&gt; which will allow you to define the form’s title and icon, as well as when and where the form should be available.&lt;/p&gt;</description></item><item><title>Application Tests</title><link>https://docs.communityhealthtoolkit.org/building/tutorials/application-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tutorials/application-tests/</guid><description>
+&lt;a href="#next-steps" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;&lt;a href="https://docs.communityhealthtoolkit.org/building/forms/form-properties/"&gt;Setting Form Properties&lt;/a&gt;&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Application Tests</title><link>https://docs.communityhealthtoolkit.org/building/tutorials/application-tests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/tutorials/application-tests/</guid><description>
 &lt;p&gt;This tutorial takes you through testing the various configurable components of CHT applications using &lt;a href="http://docs.communityhealthtoolkit.org/cht-conf-test-harness/"target="_blank" rel="noopener"&gt;&lt;code&gt;cht-conf-test-harness&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Prerequisites&lt;span class="hx:absolute hx:-mt-20" id="prerequisites"&gt;&lt;/span&gt;
 &lt;a href="#prerequisites" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Complete the following tutorials:&lt;/p&gt;
