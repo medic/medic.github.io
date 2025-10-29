@@ -1034,12 +1034,6 @@ class="hextra-card hx:group hx:flex hx:flex-col hx:justify-start hx:overflow-hid
 &lt;a href="#related-forum-posts" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="https://forum.communityhealthtoolkit.org/t/restoring-corrupted-couchdb-database/4551/1"target="_blank" rel="noopener"&gt;&amp;ldquo;Restoring corrupted couchdb database&amp;rdquo;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</description></item><item><title>Troubleshooting upgrades</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/</guid><description>
-&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200"&gt;
-&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/&gt;&lt;/svg&gt;&lt;/div&gt;
-&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
-&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;4.0.0 was released in November of 2022 so 4.x is mature and users have learned a number of important lessons on how to fix failed upgrades. Below are some specific tips as well as general practices on upgrading.&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
 &lt;p&gt;There&amp;rsquo;s a concept of upgrades &amp;ldquo;getting stuck&amp;rdquo; which mainly means that after many many hours an upgrade is not making any progress. Most likely, this will manifest as the progress bars in the upgrade admin web UI not increasing and &amp;ldquo;sticking&amp;rdquo; at a certain percentage. An alternate possibility is that the progress bars disappear altogether.&lt;/p&gt;
 &lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"&gt;
 &lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/&gt;&lt;/svg&gt;Warning&lt;/p&gt;
@@ -1058,6 +1052,39 @@ All upgrades are expected to succeed without issue. Do not attempt any fixes unl
 &lt;h2&gt;A go-to fix: restart&lt;span class="hx:absolute hx:-mt-20" id="a-go-to-fix-restart"&gt;&lt;/span&gt;
 &lt;a href="#a-go-to-fix-restart" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;A safe fix for any upgrade getting stuck is to restart all services. Any views that were being re-indexed will be picked up where they left off without losing any work. This should be your first step when trouble shooting a stuck upgrade.&lt;/p&gt;
 &lt;p&gt;If you&amp;rsquo;re able to, after a restart go back into the admin web GUI and try to upgrade again. Consider trying this at least twice.&lt;/p&gt;
+&lt;h2&gt;CHT 4.18.0 - 4.21.1: Error triggering update&lt;span class="hx:absolute hx:-mt-20" id="cht-4180---4211-error-triggering-update"&gt;&lt;/span&gt;
+&lt;a href="#cht-4180---4211-error-triggering-update" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;&lt;a href="https://github.com/medic/cht-core/issues/10296"target="_blank" rel="noopener"&gt;Issue #10296&lt;/a&gt;&lt;/strong&gt;: Requests will fail due to fetch implementation if headers are not sent within 5 minutes&lt;/p&gt;
+&lt;p&gt;API error:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;TypeError: fetch failed
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at node:internal/deps/undici/undici:15445:13
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at async /home/diana/.config/JetBrains/WebStorm2025.2/scratches/fetchtimeout.js:2:13 &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;[&lt;/span&gt;cause&lt;span class="o"&gt;]&lt;/span&gt;: HeadersTimeoutError: Headers Timeout Error
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at FastTimer.onParserTimeout &lt;span class="o"&gt;[&lt;/span&gt;as _onTimeout&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;node:internal/deps/undici/undici:6821:32&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at Timeout.onTick &lt;span class="o"&gt;[&lt;/span&gt;as _onTimeout&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;node:internal/deps/undici/undici:528:17&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at listOnTimeout &lt;span class="o"&gt;(&lt;/span&gt;node:internal/timers:608:17&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; at process.processTimers &lt;span class="o"&gt;(&lt;/span&gt;node:internal/timers:543:7&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; code: &lt;span class="s1"&gt;&amp;#39;UND_ERR_HEADERS_TIMEOUT&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Fix:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Wait until there are no more &lt;a href="https://michellephung.github.io/Fauxton-Visual-Guide/#page-active-tasks"target="_blank" rel="noopener"&gt;active tasks&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;When there are no more active tasks, start the same upgrade again from the admin UI. It should succeed without any errors this time.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure&gt;&lt;a href="upgrade.again.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/hosting/cht/upgrade-troubleshooting/upgrade.again.png"
+alt="Admin web GUI showing &amp;lsquo;Error triggering update&amp;rsquo; message at the top, and an arrow pointing to &amp;lsquo;Install&amp;rsquo; button as the next step"&gt;&lt;/a&gt;&lt;figcaption&gt;
+&lt;p&gt;Admin web GUI showing &amp;lsquo;Error triggering update&amp;rsquo; message at the top, and an arrow pointing to &amp;lsquo;Install&amp;rsquo; button as the next step&lt;/p&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
 &lt;h2&gt;CHT 4.0.x - 4.3.x: CouchDB Crashes&lt;span class="hx:absolute hx:-mt-20" id="cht-40x---43x-couchdb-crashes"&gt;&lt;/span&gt;
 &lt;a href="#cht-40x---43x-couchdb-crashes" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;&lt;a href="https://github.com/medic/cht-core/issues/9286"target="_blank" rel="noopener"&gt;Issue #9286&lt;/a&gt;&lt;/strong&gt;: Starting an upgrade that involves view indexing can cause CouchDB to crash on large databases (&amp;gt;30m docs). The upgrade will fail and you will see the logs below when you have this issue.&lt;/p&gt;
 &lt;p&gt;HAProxy:&lt;/p&gt;
