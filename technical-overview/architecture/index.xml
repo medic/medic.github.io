@@ -214,7 +214,66 @@ style Webapp fill: transparent
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;/template&lt;/strong&gt;: Contains the HTML templates that are used in the AngularJS components and directives.&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>CHT Conf</title><link>https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-conf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-conf/</guid><description>
+&lt;/ul&gt;
+&lt;h2&gt;Data Flows&lt;span class="hx:absolute hx:-mt-20" id="data-flows"&gt;&lt;/span&gt;
+&lt;a href="#data-flows" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h4&gt;Without cht-datasource&lt;span class="hx:absolute hx:-mt-20" id="without-cht-datasource"&gt;&lt;/span&gt;
+&lt;a href="#without-cht-datasource" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;pre class="mermaid hx:mt-6"&gt;
+flowchart TD
+subgraph webapp
+webapp/online[/Online User\]
+webapp/offline[/Offline User\]
+webapp/cht-datasource/offline/pouch[PouchDB]
+end
+subgraph api
+replication{Replication}
+api/router(( ))
+end
+couchdb[(CouchDB)]
+replication --&amp;gt;|POST medic/_bulk_get| couchdb
+webapp/offline --&amp;gt; webapp/cht-datasource/offline/pouch --&amp;gt;|/api/replication| replication
+webapp/online --&amp;gt; webapp/cht-datasource/offline/pouch --&amp;gt;|GET &amp;lt;_id&amp;gt;| api/router
+api/router --&amp;gt; |GET &amp;lt;_id&amp;gt;| couchdb
+&lt;/pre&gt;&lt;h4&gt;With cht-datasource&lt;span class="hx:absolute hx:-mt-20" id="with-cht-datasource"&gt;&lt;/span&gt;
+&lt;a href="#with-cht-datasource" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;pre class="mermaid hx:mt-6"&gt;
+flowchart TD
+subgraph webapp
+webapp/online[/Online User\]
+webapp/offline[/Offline User\]
+subgraph webapp/cht-datasource[cht-datasource]
+webapp/cht-datasource/online/fetch[fetch]
+webapp/cht-datasource/offline/pouch[PouchDB]
+end
+end
+subgraph api
+subgraph api/cht-datasource[cht-datasource]
+api/cht-datasource/pouch[PouchDB]
+end
+replication{Replication}
+end
+couchdb[(CouchDB)]
+api/cht-datasource/pouch --&amp;gt;|GET medic/&amp;lt;_id&amp;gt;| couchdb
+webapp/offline --&amp;gt; webapp/cht-datasource/offline/pouch --&amp;gt;|/api/replication| replication
+webapp/online --&amp;gt; webapp/cht-datasource/online/fetch --&amp;gt;|GET api/v1/person| api/cht-datasource
+replication --&amp;gt; |POST medic/_bulk_get| couchdb
+&lt;/pre&gt;&lt;h4&gt;Replication algorithm (simplified)&lt;span class="hx:absolute hx:-mt-20" id="replication-algorithm-simplified"&gt;&lt;/span&gt;
+&lt;a href="#replication-algorithm-simplified" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;pre class="mermaid hx:mt-6"&gt;
+sequenceDiagram
+participant webapp
+participant api
+participant couchdb
+webapp -&amp;gt;&amp;gt;api: GET api/replicaiton/get-ids
+api -&amp;gt;&amp;gt;couchdb: Query view &amp;lt;br /&amp;gt;medic/docs_by_replication_key
+couchdb -&amp;gt;&amp;gt;api: Returns docs for users hierarchy/shortcode
+api -&amp;gt;&amp;gt;api: Filter our purged docs
+api -&amp;gt;&amp;gt;webapp: Returns list of all doc ids/revs &amp;lt;br /&amp;gt;accessible to the user
+webapp -&amp;gt;&amp;gt;webapp: Compares with ids of all local docs
+webapp -&amp;gt;&amp;gt;couchdb: POST medic/_bulk_get &amp;lt;br /&amp;gt;(with the missing ids)
+couchdb -&amp;gt;&amp;gt; webapp: Returns requested docs
+webapp -&amp;gt;&amp;gt;api: POST api/v1/replication/get-deletes &amp;lt;br /&amp;gt;(with local ids not returned from get-ids)
+api &amp;lt;&amp;lt;-&amp;gt;&amp;gt; couchdb: Uses allDocs to check deleted status
+api -&amp;gt;&amp;gt;webapp: Returns list of docs to be deleted
+webapp -&amp;gt;&amp;gt;webapp: Deletes docs
+&lt;/pre&gt;</description></item><item><title>CHT Conf</title><link>https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-conf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-conf/</guid><description>
 &lt;p&gt;&lt;a href="https://github.com/medic/cht-conf"target="_blank" rel="noopener"&gt;CHT Conf&lt;/a&gt; is a command-line interface tool to manage and configure apps built using the &lt;a href="https://github.com/medic/cht-core"target="_blank" rel="noopener"&gt;CHT Core Framework&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Installation&lt;span class="hx:absolute hx:-mt-20" id="installation"&gt;&lt;/span&gt;
 &lt;a href="#installation" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Read more about setting up &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/cht-conf/"&gt;CHT Conf&lt;/a&gt;.&lt;/p&gt;
