@@ -91,14 +91,14 @@ title="Copy code"
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/medic/cht-core/issues/5906"target="_blank" rel="noopener"&gt;Make declarative config mandatory&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3&gt;Increase ecmaVersion ES linting to version 6&lt;span class="hx:absolute hx:-mt-20" id="increase-ecmaversion-es-linting-to-version-6"&gt;&lt;/span&gt;
-&lt;a href="#increase-ecmaversion-es-linting-to-version-6" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;h3&gt;CHT 4.0 - 4.4 upgrade to CHT 4.5 first&lt;span class="hx:absolute hx:-mt-20" id="cht-40---44-upgrade-to-cht-45-first"&gt;&lt;/span&gt;
+&lt;a href="#cht-40---44-upgrade-to-cht-45-first" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
 &lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;&lt;/div&gt;
 &lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
 &lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;Applies to: CHT versions between 4.0 and 4.4&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;Deployments running CHT Version 4.0 and 4.4 must upgrade to version 4.5 or later before upgrading to version 5.x.&lt;/p&gt;
+&lt;p&gt;Deployments running CHT Version 4.0 through 4.4 must upgrade to version 4.5 or later before upgrading to version 5.x. This accounts for changes to ecmaVersion ES linting to version 6.&lt;/p&gt;
 &lt;p&gt;Background information:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/medic/cht-core/issues/9202"target="_blank" rel="noopener"&gt;Increase ecmaversion linting for ddocs&lt;/a&gt;&lt;/li&gt;
@@ -182,9 +182,25 @@ title="Copy code"
 &lt;li&gt;The Nouveau index data on the server will be stored in &lt;code&gt;${COUCHDB_DATA}/nouveau&lt;/code&gt; for single-node CouchDBs and in &lt;code&gt;${DB1_DATA}/nouveau&lt;/code&gt; for clustered CouchDBs.&lt;/li&gt;
 &lt;li&gt;The following &lt;code&gt;medic-client&lt;/code&gt; views no longer exist. Be sure to update any custom scripts which use them: &lt;code&gt;contacts_by_freetext&lt;/code&gt;, &lt;code&gt;contacts_by_type_freetext&lt;/code&gt; and &lt;code&gt;reports_by_freetext&lt;/code&gt; .&lt;/li&gt;
 &lt;/ul&gt;
+&lt;h3&gt;Temporary downtime for replication and online search immediately after upgrade&lt;span class="hx:absolute hx:-mt-20" id="temporary-downtime-for-replication-and-online-search-immediately-after-upgrade"&gt;&lt;/span&gt;
+&lt;a href="#temporary-downtime-for-replication-and-online-search-immediately-after-upgrade" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;With the addition of both &lt;a href="https://docs.communityhealthtoolkit.org/releases/5_0_0/#reducing-hosting-total-cost-of-ownership"&gt;the disk use reduction&lt;/a&gt; feature and &lt;a href="https://docs.communityhealthtoolkit.org/releases/5_0_0/#seconds-to-synchronize-lower-is-better"&gt;replication speed improvements&lt;/a&gt;, two indexes need to be built in CouchDB Nouveau after the upgrade. While these indexes are being created, there&amp;rsquo;s a brief initialization period where the following services will become available shortly:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Replication for offline users - Replication will start working once the indexing jobs complete. In the meantime, requests will timeout after 1h. Users will see &amp;ldquo;sync failed&amp;rdquo; messages.&lt;/li&gt;
+&lt;li&gt;Search for online users - Search functionality will return results as soon as indexing finishes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The indexes build automatically; no manual intervention is required. This is a one-time process that occurs only when upgrading from 4.x to 5.0. Subsequent upgrades from 5.0 to later versions and fresh 5.0 installations are unaffected.&lt;/p&gt;
+&lt;p&gt;What to expect:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Small deployments: Indexes typically complete within minutes, and you may not notice any service interruption.&lt;/li&gt;
+&lt;li&gt;Large deployments: Index building may take up to 24 hours, depending on data volume.&lt;/li&gt;
+&lt;li&gt;All deployments: Services automatically resume normal operation once indexing completes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Monitoring progress:
+You can track the indexing progress in real-time by navigating to Fauxton&amp;rsquo;s active tasks page at &lt;code&gt;/_utils/#/activetasks&lt;/code&gt; (for example, &lt;code&gt;https://cht.example.com/_utils/#/activetasks&lt;/code&gt;). Once all &lt;code&gt;search_indexer&lt;/code&gt; tasks have disappeared from the list, the upgrade is complete and all services are operational.&lt;/p&gt;
 &lt;p&gt;Background information:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/medic/cht-core/issues/9542"target="_blank" rel="noopener"&gt;Reduce disk space with CouchDB Nouveau (TCO)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/medic/cht-core/issues/10460"target="_blank" rel="noopener"&gt;Temporary downtime for replication and online search immediately after 5.0 upgrade&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</description></item><item><title>Preparing to Upgrade to CHT 4.0</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/migration/preparing-for-4/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/migration/preparing-for-4/</guid><description>
 &lt;h2&gt;Introduction&lt;span class="hx:absolute hx:-mt-20" id="introduction"&gt;&lt;/span&gt;
 &lt;a href="#introduction" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;CHT releases use &lt;a href="https://en.wikipedia.org/wiki/Semver#Semantic_versioning"target="_blank" rel="noopener"&gt;Semantic Versioning&lt;/a&gt; (also known as &amp;ldquo;SemVer&amp;rdquo;) which means that the CHT upgrade from the major 3.x version to the 4.x version denotes there are breaking changes. The key to a successful upgrade will be to understand and plan for these breaking changes. Aside from the Docker hosting infrastructure (out of scope for this prep document), the two breaking changes are around CHT Android and Enketo.&lt;/p&gt;
