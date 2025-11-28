@@ -190,6 +190,28 @@ title="Copy code"
 &lt;li&gt;The Nouveau index data on the server will be stored in &lt;code&gt;${COUCHDB_DATA}/nouveau&lt;/code&gt; for single-node CouchDBs and in &lt;code&gt;${DB1_DATA}/nouveau&lt;/code&gt; for clustered CouchDBs.&lt;/li&gt;
 &lt;li&gt;The following &lt;code&gt;medic-client&lt;/code&gt; views no longer exist. Be sure to update any custom scripts which use them: &lt;code&gt;contacts_by_freetext&lt;/code&gt;, &lt;code&gt;contacts_by_type_freetext&lt;/code&gt; and &lt;code&gt;reports_by_freetext&lt;/code&gt; .&lt;/li&gt;
 &lt;/ul&gt;
+&lt;h3&gt;Additional disk storage required for upgrading&lt;span class="hx:absolute hx:-mt-20" id="additional-disk-storage-required-for-upgrading"&gt;&lt;/span&gt;
+&lt;a href="#additional-disk-storage-required-for-upgrading" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;IMPORTANT: Disk Space Requirement for 5.x Upgrade&lt;/p&gt;
+&lt;p&gt;Before upgrading to version 5.x, ensure your instance has at least 5x the current disk space used. This is a critical requirement for a successful upgrade. Insufficient disk space may cause the upgrade to fail.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;An internal mechanism of CouchDB requires &lt;strong&gt;up to 5x disk space&lt;/strong&gt; when updating views. As a side-effect of all the performance and TCO changes in 5.0.0, some views were either moved or removed, and as a result, two large design documents need reindexing.&lt;/p&gt;
+&lt;p&gt;In our testing, the total database storage size increased during indexing to 5x, as seen in this graph:&lt;/p&gt;
+&lt;div class="hextra-cards hx:mt-4 hx:gap-4 hx:grid not-prose" style="--hextra-cards-grid-cols: 3;"&gt;
+&lt;a
+class="hextra-card hx:group hx:flex hx:flex-col hx:justify-start hx:overflow-hidden hx:rounded-lg hx:border hx:border-gray-200 hx:text-current hx:no-underline hx:dark:shadow-none hx:hover:shadow-gray-100 hx:dark:hover:shadow-none hx:shadow-gray-100 hx:active:shadow-sm hx:active:shadow-gray-200 hx:transition-all hx:duration-200 hx:hover:border-gray-300 hx:bg-gray-100 hx:shadow-sm hx:dark:border-neutral-700 hx:dark:bg-neutral-800 hx:dark:text-gray-50 hx:hover:shadow-lg hx:dark:hover:border-neutral-500 hx:dark:hover:bg-neutral-700"&gt;&lt;img
+alt="Disk space storage requirement during 5.0.0 upgrade"
+class="hextra-card-image"
+loading="lazy"
+decoding="async"
+src="https://docs.communityhealthtoolkit.org/releases/images/5_0_reduction2.png"
+/&gt;&lt;span class="hextra-card-icon hx:flex hx:font-semibold hx:items-start hx:gap-2 hx:p-4 hx:text-gray-700 hx:hover:text-gray-900 hx:dark:text-neutral-200 hx:dark:hover:text-neutral-50"&gt;Disk space storage requirement during 5.0.0 upgrade&lt;/span&gt;&lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;This issue is not limited to the upgrade to 5.0.0 alone. &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/requirements/#production-hosting"target="_blank" rel="noopener"&gt;Any upgrade that requires indexing new views requires additional disk space.&lt;/a&gt;&lt;/p&gt;
 &lt;h3&gt;Temporary downtime for replication and online search immediately after upgrade&lt;span class="hx:absolute hx:-mt-20" id="temporary-downtime-for-replication-and-online-search-immediately-after-upgrade"&gt;&lt;/span&gt;
 &lt;a href="#temporary-downtime-for-replication-and-online-search-immediately-after-upgrade" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;With the addition of both &lt;a href="https://docs.communityhealthtoolkit.org/releases/5_0_0/#reducing-hosting-total-cost-of-ownership"&gt;the disk use reduction&lt;/a&gt; feature and &lt;a href="https://docs.communityhealthtoolkit.org/releases/5_0_0/#seconds-to-synchronize-lower-is-better"&gt;replication speed improvements&lt;/a&gt;, two indexes need to be built in CouchDB Nouveau after the upgrade. While these indexes are being created, there&amp;rsquo;s a brief initialization period where the following services will become available shortly:&lt;/p&gt;
 &lt;ul&gt;
