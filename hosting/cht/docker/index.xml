@@ -445,7 +445,140 @@ title="Copy code"
 &lt;p&gt;A &lt;code&gt;servername&lt;/code&gt; parameter may be added to all requests to the haproxy/couchdb by setting the environment variable &lt;code&gt;ADD_SERVERNAME_TO_HTTP_AGENT&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;A similar change can be made for the http clients used in the application by setting &lt;code&gt;PROXY_CHANGE_ORIGIN&lt;/code&gt; to &lt;code&gt;true&lt;/code&gt;. This sets the &lt;code&gt;changeOrigin&lt;/code&gt; parameter of all the &lt;code&gt;http-proxy&lt;/code&gt; clients to &lt;code&gt;true&lt;/code&gt;, which &amp;ldquo;changes the origin of the host header to the target URL&amp;rdquo;. See &lt;a href="https://www.npmjs.com/package/http-proxy#options" rel="external"&gt;http-proxy: options&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-&lt;/details&gt;</description></item><item><title>Viewing server logs in CHT</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/docker/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/docker/logs/</guid><description>
+&lt;/details&gt;</description></item><item><title>Changing the password for the medic user</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/docker/password/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/docker/password/</guid><description>
+&lt;p&gt;The &lt;code&gt;medic&lt;/code&gt; username and password play a special role: not only can CHT administrators use it in the web GUI or for API calls, but all docker services also use it internally when connecting to CouchDB.&lt;/p&gt;
+&lt;p&gt;To change the password, first update it in CouchDB, then update your environment file and finally restart. A down time of less than 10 minutes will be incurred, so plan accordingly.&lt;/p&gt;
+&lt;p&gt;For users wanting to only use the command line, see the CouchDB docs &lt;a href="https://docs.couchdb.org/en/stable/intro/security.html#password-changing" rel="external"&gt;to change the password&lt;/a&gt; and then &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/password/#update-environment-variable"&gt;proceed to step #4&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;CHT is running, current password is known&lt;span class="hx:absolute hx:-mt-20" id="cht-is-running-current-password-is-known"&gt;&lt;/span&gt;
+&lt;a href="#cht-is-running-current-password-is-known" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;div class="hextra-steps hx:ml-4 hx:mb-12 hx:ltr:border-l hx:rtl:border-r hx:border-gray-200 hx:ltr:pl-6 hx:rtl:pr-6 hx:dark:border-neutral-800 [counter-reset:step]"&gt;
+&lt;h3&gt;Log in&lt;span class="hx:absolute hx:-mt-20" id="log-in"&gt;&lt;/span&gt;
+&lt;a href="#log-in" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Using the CHT URL and the &lt;code&gt;medic&lt;/code&gt; user, log into the CHT. Assuming a URL of &lt;code&gt;cht.example.com&lt;/code&gt; go to the login page at &lt;code&gt;https://cht.example.com/medic/login&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If there is already an active session, the CHT will redirect you to &lt;code&gt;/admin/&lt;/code&gt; - there is then no need to login.&lt;/p&gt;
+&lt;h3&gt;Go to Fauxton&lt;span class="hx:absolute hx:-mt-20" id="go-to-fauxton"&gt;&lt;/span&gt;
+&lt;a href="#go-to-fauxton" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Every CHT instance ships with the default CouchDB web GUI called &lt;a href="https://docs.couchdb.org/en/stable/fauxton/index.html" rel="external"&gt;Fauxton&lt;/a&gt;. It is accessible at &lt;code&gt;/_utils/&lt;/code&gt;, so if the CHT URL is &lt;code&gt;cht.example.com&lt;/code&gt;, Fauxton can be found at &lt;code&gt;https://cht.example.com/_utils/&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Change the password in Fauxton&lt;span class="hx:absolute hx:-mt-20" id="change-the-password-in-fauxton"&gt;&lt;/span&gt;
+&lt;a href="#change-the-password-in-fauxton" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-purple-200 hx:bg-purple-100 hx:text-purple-900 hx:dark:border-purple-200/30 hx:dark:bg-purple-900/30 hx:dark:text-purple-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Important&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;After this step, the CHT instance will no longer be accessible because API is locked out (Error 503). The following steps fix API&amp;rsquo;s access.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Click the user icon in the lower left, enter the new password in &amp;ldquo;Password&amp;rdquo; and in &amp;ldquo;Verify Password&amp;rdquo; and click &amp;ldquo;Change&amp;rdquo;.&lt;/p&gt;
+&lt;p&gt;
+&lt;img src="../password/Fauxton.png" alt="Fauxton.png" loading="lazy" /&gt;&lt;/p&gt;
+&lt;h3&gt;Update environment variable&lt;span class="hx:absolute hx:-mt-20" id="update-environment-variable"&gt;&lt;/span&gt;
+&lt;a href="#update-environment-variable" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Assuming a &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/installation/"&gt;production install&lt;/a&gt;, edit the &lt;code&gt;.env&lt;/code&gt; file located at &lt;code&gt;/home/ubuntu/cht/upgrade-service/.env&lt;/code&gt; on your CHT server. Find the line starting with &lt;code&gt;COUCHDB_PASSWORD&lt;/code&gt;. Edit the password there to match what you used in the prior step.&lt;/p&gt;
+&lt;p&gt;For example, if the password used in step #3 above was &lt;code&gt;hug-guide-twirl-grew-angel-poise-squad&lt;/code&gt;, the final line would look like this:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;COUCHDB_PASSWORD&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;hug-guide-twirl-grew-angel-poise-squad &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;Restart the CHT&lt;span class="hx:absolute hx:-mt-20" id="restart-the-cht"&gt;&lt;/span&gt;
+&lt;a href="#restart-the-cht" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Still assuming a &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/installation/"&gt;production install&lt;/a&gt;, restart the CHT with the following 2 commands. This grants API and all other services access with the new password:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; /home/ubuntu/cht/upgrade-service/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker compose up --detach&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;CHT is failing to start, current password &lt;em&gt;not&lt;/em&gt; known&lt;span class="hx:absolute hx:-mt-20" id="cht-is-failing-to-start-current-password--not-known"&gt;&lt;/span&gt;
+&lt;a href="#cht-is-failing-to-start-current-password--not-known" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;There may be a scenario where either the &lt;code&gt;medic&lt;/code&gt; user password was lost or if password was changed in step #3 above was miss-typed such that it is not known.&lt;/p&gt;
+&lt;div class="hextra-steps hx:ml-4 hx:mb-12 hx:ltr:border-l hx:rtl:border-r hx:border-gray-200 hx:ltr:pl-6 hx:rtl:pr-6 hx:dark:border-neutral-800 [counter-reset:step]"&gt;
+&lt;h3&gt;Check the password in the .env file&lt;span class="hx:absolute hx:-mt-20" id="check-the-password-in-the-env-file"&gt;&lt;/span&gt;
+&lt;a href="#check-the-password-in-the-env-file" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Run this command to output your current password:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grep COUCHDB_PASSWORD /home/ubuntu/cht/upgrade-service/.env &lt;span class="p"&gt;|&lt;/span&gt; cut -d&lt;span class="s1"&gt;&amp;#39;=&amp;#39;&lt;/span&gt; -f2&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Before continuing, check if this password works in a web browser to log into the CHT. If it works, it is a much more simple recovery process than below. If that password does not work, continue with the steps below.&lt;/p&gt;
+&lt;h3&gt;Get a shell on the CouchDB container&lt;span class="hx:absolute hx:-mt-20" id="get-a-shell-on-the-couchdb-container"&gt;&lt;/span&gt;
+&lt;a href="#get-a-shell-on-the-couchdb-container" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;On the command line of the server where the CHT is hosted, run the following command:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker &lt;span class="nb"&gt;exec&lt;/span&gt; -it &lt;span class="k"&gt;$(&lt;/span&gt;docker ps --filter &lt;span class="s2"&gt;&amp;#34;name=^cht-couchdb*&amp;#34;&lt;/span&gt; -q&lt;span class="k"&gt;)&lt;/span&gt; bash&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;A command prompt for the &lt;code&gt;root&lt;/code&gt; user should now be shown:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ docker &lt;span class="nb"&gt;exec&lt;/span&gt; -it &lt;span class="k"&gt;$(&lt;/span&gt;docker ps --filter &lt;span class="s2"&gt;&amp;#34;name=^cht-couchdb*&amp;#34;&lt;/span&gt; -q&lt;span class="k"&gt;)&lt;/span&gt; bash
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;root@e87a858793d6:/#&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;Update the ini file for couch&lt;span class="hx:absolute hx:-mt-20" id="update-the-ini-file-for-couch"&gt;&lt;/span&gt;
+&lt;a href="#update-the-ini-file-for-couch" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Still using the &lt;code&gt;root&lt;/code&gt; user on the CouchDB container, replace &lt;code&gt;PASSWORD&lt;/code&gt; with the password from step #1 above and run these two commands:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;P&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;PASSWORD&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sed -i &lt;span class="s2"&gt;&amp;#34;s/medic =.*/medic = &lt;/span&gt;&lt;span class="nv"&gt;$P&lt;/span&gt;&lt;span class="s2"&gt;/g&amp;#34;&lt;/span&gt; /opt/couchdb/etc/local.d/cluster-credentials.ini&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;For example, if step #1 gave a result of &lt;code&gt;hug-guide-twirl-grew-angel-poise-squad&lt;/code&gt;, this would be the two commands to run:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;P&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;hug-guide-twirl-grew-angel-poise-squad&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sed -i &lt;span class="s2"&gt;&amp;#34;s/medic =.*/medic = &lt;/span&gt;&lt;span class="nv"&gt;$P&lt;/span&gt;&lt;span class="s2"&gt;/g&amp;#34;&lt;/span&gt; /opt/couchdb/etc/local.d/cluster-credentials.ini&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;Restart the CHT&lt;span class="hx:absolute hx:-mt-20" id="restart-the-cht-1"&gt;&lt;/span&gt;
+&lt;a href="#restart-the-cht-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Restart the CouchDB inside CHT with the following command, assuming default &lt;a href="https://docs.communityhealthtoolkit.org/hosting/cht/docker/installation/"&gt;install process&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker restart &lt;span class="k"&gt;$(&lt;/span&gt;docker ps --filter &lt;span class="s2"&gt;&amp;#34;name=^cht-couchdb*&amp;#34;&lt;/span&gt; -q&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>Viewing server logs in CHT</title><link>https://docs.communityhealthtoolkit.org/hosting/cht/docker/logs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/hosting/cht/docker/logs/</guid><description>
 &lt;p&gt;CHT has the following services running via Docker and each can have its logs queried:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;nginx&lt;/li&gt;
