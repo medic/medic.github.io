@@ -1273,6 +1273,63 @@ title="Copy code"
 &lt;a href="#input-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;code&gt;contact&lt;/code&gt; forms have access to a variety of &lt;a href="https://docs.communityhealthtoolkit.org/building/forms/configuring/form-inputs/#app-forms"&gt;input data&lt;/a&gt;.&lt;/p&gt;
 &lt;h3&gt;Settings sheet&lt;span class="hx:absolute hx:-mt-20" id="settings-sheet"&gt;&lt;/span&gt;
 &lt;a href="#settings-sheet" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The &lt;code&gt;form_id&lt;/code&gt; should follow the pattern &lt;code&gt;contact:CONTACT_TYPE_ID:ACTION&lt;/code&gt; where CONTACT_TYPE_ID is the contact_type id for the contact and ACTION is &lt;code&gt;create&lt;/code&gt; or &lt;code&gt;edit&lt;/code&gt;. (e.g. &lt;code&gt;contact:clinic:create&lt;/code&gt;)&lt;/p&gt;
+&lt;h2&gt;Uploading Binary Attachments&lt;span class="hx:absolute hx:-mt-20" id="uploading-binary-attachments"&gt;&lt;/span&gt;
+&lt;a href="#uploading-binary-attachments" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;em&gt;Added in 5.1.0.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Contact forms can include binary data, such as photos or other files, which are submitted and saved as attachments on the contact document. Attachment uploads are supported in both create and edit contact forms. Note that attachment uploads are only supported for the main contact document; any file attachments defined within sibling or repeat groups will also be attached to the main document.&lt;/p&gt;
+&lt;p&gt;To add an image upload field, use the &lt;code&gt;image&lt;/code&gt; type in XLSForm. For a generic file upload, use the &lt;code&gt;file&lt;/code&gt; type. Alternatively, to mark any element as having binary data, add an &lt;code&gt;instance::type&lt;/code&gt; column to the XLSForm and specify &lt;code&gt;binary&lt;/code&gt; in the element&amp;rsquo;s row.&lt;/p&gt;
+&lt;p&gt;The following example adds a photo field to a person contact form:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;type&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;label::en&lt;/th&gt;
+&lt;th&gt;hint::en&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;image&lt;/td&gt;
+&lt;td&gt;photo&lt;/td&gt;
+&lt;td&gt;Photo&lt;/td&gt;
+&lt;td&gt;Take a photo or select from gallery&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The equivalent XForm XML for the above example is:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;&amp;lt;!-- Model --&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;photo/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;&amp;lt;!-- Bind --&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;bind&lt;/span&gt; &lt;span class="na"&gt;nodeset=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/person/photo&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;binary&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;&amp;lt;!-- Body --&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;upload&lt;/span&gt; &lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/person/photo&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;mediatype=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;image/*&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;label&amp;gt;&lt;/span&gt;Photo&lt;span class="nt"&gt;&amp;lt;/label&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;hint&amp;gt;&lt;/span&gt;Take a photo or select from gallery&lt;span class="nt"&gt;&amp;lt;/hint&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/upload&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; If the contact form is accessed via CHT Android and uses a file picker to upload files, include the &lt;code&gt;READ_EXTERNAL_STORAGE&lt;/code&gt; permission to allow access to files on the device. Add the following line to the branded app&amp;rsquo;s &lt;code&gt;AndroidManifest.xml&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;uses-permission&lt;/span&gt; &lt;span class="na"&gt;android:name=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;android.permission.READ_EXTERNAL_STORAGE&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;h2&gt;Properties&lt;span class="hx:absolute hx:-mt-20" id="properties"&gt;&lt;/span&gt;
 &lt;a href="#properties" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The meta information in the &lt;code&gt;{contact_type_id}-{create|edit}.properties.json&lt;/code&gt; file defines additional configuration controlling when the form is available and checks that will be performed when submitting the form.&lt;/p&gt;
 &lt;h3&gt;&lt;code&gt;forms/contact/{contact_type_id}-{create|edit}.properties.json&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="formscontactcontact_type_id-createeditpropertiesjson"&gt;&lt;/span&gt;
