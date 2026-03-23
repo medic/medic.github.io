@@ -92,6 +92,7 @@ display: none;
 &lt;li&gt;&lt;a href="#get-apiv2usersusername"&gt;GET /api/v2/users/{{username}}&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#post-apiv1users"&gt;POST /api/v1/users&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#post-apiv2users"&gt;POST /api/v2/users&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#post-apiv3users"&gt;POST /api/v3/users&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#post-apiv1usersusername"&gt;POST /api/v1/users/{{username}}&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#delete-apiv1usersusername"&gt;DELETE /api/v1/users/{{username}}&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#get-apiv1users-info"&gt;GET /api/v1/users-info&lt;/a&gt;&lt;/li&gt;
@@ -4755,10 +4756,167 @@ title="Copy code"
 &lt;/button&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;h3&gt;POST /api/v3/users&lt;span class="hx:absolute hx:-mt-20" id="post-apiv3users"&gt;&lt;/span&gt;
+&lt;a href="#post-apiv3users" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;em&gt;Added in 4.9.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Create a new user using a JSON payload. This endpoint supports assigning a user to one or more places (multi-facility users).&lt;/p&gt;
+&lt;h4&gt;Headers&lt;span class="hx:absolute hx:-mt-20" id="headers-4"&gt;&lt;/span&gt;
+&lt;a href="#headers-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Key&lt;/th&gt;
+&lt;th&gt;Value&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Content-Type&lt;/td&gt;
+&lt;td&gt;application/json&lt;/td&gt;
+&lt;td&gt;Processes request body as JSON.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-21"&gt;&lt;/span&gt;
+&lt;a href="#permissions-21" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;[&lt;code&gt;can_edit&lt;/code&gt;, &lt;code&gt;can_create_users&lt;/code&gt;]&lt;/p&gt;
+&lt;p&gt;Multiple places are only supported if the user role has the &lt;code&gt;can_have_multiple_places&lt;/code&gt; permission.&lt;/p&gt;
+&lt;h4&gt;Request Body&lt;span class="hx:absolute hx:-mt-20" id="request-body"&gt;&lt;/span&gt;
+&lt;a href="#request-body" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;username&lt;/code&gt; (string, required): Unique username for authentication.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;password&lt;/code&gt; (string, required unless using token_login or oidc): Password for the user.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;roles&lt;/code&gt; (array, required): List of roles assigned to the user.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;place&lt;/code&gt; (string or array, required for offline users):
+&lt;ul&gt;
+&lt;li&gt;A single place ID (string), or&lt;/li&gt;
+&lt;li&gt;An array of place IDs (for multi-facility users).&lt;br&gt;
+Multiple places require the &lt;code&gt;can_have_multiple_places&lt;/code&gt; permission.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;contact&lt;/code&gt; (string or object, required for offline users): Contact associated with the user.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;phone&lt;/code&gt; (string, required if &lt;code&gt;token_login&lt;/code&gt; is enabled): Phone number for SMS login.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;token_login&lt;/code&gt; (boolean, optional): Enable login via SMS.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;oidc_username&lt;/code&gt; (string, optional): External identity provider username.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fullname&lt;/code&gt; (string, optional): Full name of the user.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;email&lt;/code&gt; (string, optional): Email address.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;known&lt;/code&gt; (boolean, optional): Indicates if the user has logged in before.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-1"&gt;&lt;/span&gt;
+&lt;a href="#example-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Create a user assigned to multiple places:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-http" data-lang="http"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;POST /api/v3/users
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;username&amp;#34;: &amp;#34;john&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;password&amp;#34;: &amp;#34;StrongPass123!&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;roles&amp;#34;: [&amp;#34;chw_supervisor&amp;#34;],
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;place&amp;#34;: [
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;fe4da0f9-7d65-4834-bb42-88a5239bbd3b&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;a12bc34d-5678-90ef-gh12-ijkl34567890&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; ],
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;contact&amp;#34;: &amp;#34;65416b8ceb53ff88ac1847654501aeb3&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt; &amp;#34;fullname&amp;#34;: &amp;#34;John Doe&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Response&lt;span class="hx:absolute hx:-mt-20" id="response"&gt;&lt;/span&gt;
+&lt;a href="#response" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;HTTP/1.1 200
+Content-Type: application/json
+{
+&amp;#34;user&amp;#34;: {
+&amp;#34;id&amp;#34;: &amp;#34;org.couchdb.user:john&amp;#34;,
+&amp;#34;rev&amp;#34;: &amp;#34;1-abc123&amp;#34;
+},
+&amp;#34;user-settings&amp;#34;: {
+&amp;#34;id&amp;#34;: &amp;#34;org.couchdb.user:john&amp;#34;,
+&amp;#34;rev&amp;#34;: &amp;#34;1-def456&amp;#34;
+}
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-3"&gt;&lt;/span&gt;
+&lt;a href="#errors-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;h5&gt;Missing required fields&lt;span class="hx:absolute hx:-mt-20" id="missing-required-fields"&gt;&lt;/span&gt;
+&lt;a href="#missing-required-fields" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;#34;error&amp;#34;: &amp;#34;Missing required fields: username, password&amp;#34;
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h5&gt;Invalid password&lt;span class="hx:absolute hx:-mt-20" id="invalid-password"&gt;&lt;/span&gt;
+&lt;a href="#invalid-password" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;#34;error&amp;#34;: &amp;#34;The password is too easy to guess.&amp;#34;
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h5&gt;Multiple places not allowed&lt;span class="hx:absolute hx:-mt-20" id="multiple-places-not-allowed"&gt;&lt;/span&gt;
+&lt;a href="#multiple-places-not-allowed" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;#34;error&amp;#34;: &amp;#34;This user cannot have multiple places&amp;#34;
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h5&gt;Invalid contact or place&lt;span class="hx:absolute hx:-mt-20" id="invalid-contact-or-place"&gt;&lt;/span&gt;
+&lt;a href="#invalid-contact-or-place" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+&amp;#34;error&amp;#34;: &amp;#34;Contact is not within place.&amp;#34;
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;h3&gt;POST /api/v1/users/{{username}}&lt;span class="hx:absolute hx:-mt-20" id="post-apiv1usersusername"&gt;&lt;/span&gt;
 &lt;a href="#post-apiv1usersusername" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Allows you to change property values on a user account. &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#supported-properties"&gt;Properties listed above&lt;/a&gt; are supported except for &lt;code&gt;contact.parent&lt;/code&gt;. Creating or modifying people through the user is not supported, see the &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#people"&gt;People section&lt;/a&gt;.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-21"&gt;&lt;/span&gt;
-&lt;a href="#permissions-21" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;code&gt;can_update_users&lt;/code&gt;, &lt;code&gt;can_update_places&lt;/code&gt;, &lt;code&gt;can_update_people&lt;/code&gt;&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-22"&gt;&lt;/span&gt;
+&lt;a href="#permissions-22" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;code&gt;can_update_users&lt;/code&gt;, &lt;code&gt;can_update_places&lt;/code&gt;, &lt;code&gt;can_update_people&lt;/code&gt;&lt;/p&gt;
 &lt;h4&gt;Updating yourself&lt;span class="hx:absolute hx:-mt-20" id="updating-yourself"&gt;&lt;/span&gt;
 &lt;a href="#updating-yourself" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;You do not need any of the above permissions if the user you are modifying is yourself. However, you are not allowed to modify your &lt;code&gt;type&lt;/code&gt;, &lt;code&gt;roles&lt;/code&gt;, &lt;code&gt;contact&lt;/code&gt; or &lt;code&gt;place&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Further more, if you&amp;rsquo;re updating your &lt;code&gt;password&lt;/code&gt; you must be authenticating via Basic Auth (either the header or in the URL). This is to ensure the password is known at time of request, and no one is hijacking a cookie.&lt;/p&gt;
@@ -4818,8 +4976,8 @@ title="Copy code"
 &lt;/div&gt;
 &lt;h3&gt;DELETE /api/v1/users/{{username}}&lt;span class="hx:absolute hx:-mt-20" id="delete-apiv1usersusername"&gt;&lt;/span&gt;
 &lt;a href="#delete-apiv1usersusername" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Delete a user. Does not affect a person or place associated to a user.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-22"&gt;&lt;/span&gt;
-&lt;a href="#permissions-22" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;code&gt;can_delete_users&lt;/code&gt;&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-23"&gt;&lt;/span&gt;
+&lt;a href="#permissions-23" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;&lt;code&gt;can_delete_users&lt;/code&gt;&lt;/p&gt;
 &lt;h4&gt;URL Parameters&lt;span class="hx:absolute hx:-mt-20" id="url-parameters-4"&gt;&lt;/span&gt;
 &lt;a href="#url-parameters-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -4861,8 +5019,8 @@ title="Copy code"
 &lt;h3&gt;GET /api/v1/users-info&lt;span class="hx:absolute hx:-mt-20" id="get-apiv1users-info"&gt;&lt;/span&gt;
 &lt;a href="#get-apiv1users-info" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Returns the total number of documents an offline user would replicate (&lt;code&gt;total_docs&lt;/code&gt;), the number of docs excluding tasks the user would replicate (&lt;code&gt;warn_docs&lt;/code&gt;), along with a &lt;code&gt;warn&lt;/code&gt; flag if this number exceeds the recommended limit (now set at 10 000).&lt;/p&gt;
 &lt;p&gt;When the authenticated requester has an offline role, it returns the requester doc count.&lt;/p&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-1"&gt;&lt;/span&gt;
-&lt;a href="#example-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-2"&gt;&lt;/span&gt;
+&lt;a href="#example-2" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;GET /api/v1/users-info -H &amp;#39;Cookie: AuthSession=OFFLINE_USER_SESSION;&amp;#39;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
@@ -4920,8 +5078,8 @@ title="Copy code"
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;When requested as an online user, the number of tasks are never counted and never returned, so &lt;code&gt;warn_docs&lt;/code&gt; is always equal to &lt;code&gt;total_docs&lt;/code&gt;.&lt;/p&gt;
-&lt;h6&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-2"&gt;&lt;/span&gt;
-&lt;a href="#example-2" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h6&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h6&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-3"&gt;&lt;/span&gt;
+&lt;a href="#example-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h6&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;GET /api/v1/users-info?facility_id={{facility_uuid}}&amp;amp;role={{role}}&amp;amp;contact_id={{contact_uuid}} -H &amp;#39;Cookie: AuthSession=OFFLINE_USER_SESSION;&amp;#39;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
@@ -4981,8 +5139,8 @@ title="Copy code"
 &lt;h2&gt;Bulk Operations&lt;span class="hx:absolute hx:-mt-20" id="bulk-operations"&gt;&lt;/span&gt;
 &lt;a href="#bulk-operations" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;h3&gt;POST /api/v1/bulk-delete&lt;span class="hx:absolute hx:-mt-20" id="post-apiv1bulk-delete"&gt;&lt;/span&gt;
 &lt;a href="#post-apiv1bulk-delete" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Bulk delete endpoint for deleting large numbers of documents. Docs will be batched into groups of 100 and will be sent sequentially to couch (new batch sent after the previous one has returned). The response will be chunked JSON (one batch at a time), so if you wish to get an indication of progress you will need to parse incomplete JSON (with a library such as &lt;a href="https://github.com/indgov/partial-json-parser" rel="external"&gt;&lt;code&gt;partial-json-parser&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-23"&gt;&lt;/span&gt;
-&lt;a href="#permissions-23" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Only available to online users.&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-24"&gt;&lt;/span&gt;
+&lt;a href="#permissions-24" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Only available to online users.&lt;/p&gt;
 &lt;h4&gt;Parameters&lt;span class="hx:absolute hx:-mt-20" id="parameters-1"&gt;&lt;/span&gt;
 &lt;a href="#parameters-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;table&gt;
 &lt;thead&gt;
@@ -4999,8 +5157,8 @@ title="Copy code"
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;An array of objects each with an &lt;code&gt;_id&lt;/code&gt; property is required (rather than an array of strings representing ids) to ensure forwards compatibility if we choose to require that any additional document information (such as &lt;code&gt;_rev&lt;/code&gt;) also be passed in to this endpoint.&lt;/p&gt;
-&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-3"&gt;&lt;/span&gt;
-&lt;a href="#errors-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;If an error is encountered part-way through the response (eg on the third batch), it&amp;rsquo;s impossible to send new headers to indicate a 5xx error, so the connection will simply be terminated (as recommended here &lt;a href="https://github.com/expressjs/express/issues/2700)" rel="external"&gt;https://github.com/expressjs/express/issues/2700)&lt;/a&gt;.&lt;/p&gt;
+&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-4"&gt;&lt;/span&gt;
+&lt;a href="#errors-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;If an error is encountered part-way through the response (eg on the third batch), it&amp;rsquo;s impossible to send new headers to indicate a 5xx error, so the connection will simply be terminated (as recommended here &lt;a href="https://github.com/expressjs/express/issues/2700)" rel="external"&gt;https://github.com/expressjs/express/issues/2700)&lt;/a&gt;.&lt;/p&gt;
 &lt;h4&gt;Examples&lt;span class="hx:absolute hx:-mt-20" id="examples-28"&gt;&lt;/span&gt;
 &lt;a href="#examples-28" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;POST /api/v1/bulk-delete
@@ -5053,8 +5211,8 @@ title="Copy code"
 &lt;h3&gt;GET /api/v1/monitoring&lt;span class="hx:absolute hx:-mt-20" id="get-apiv1monitoring"&gt;&lt;/span&gt;
 &lt;a href="#get-apiv1monitoring" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;em&gt;DEPRECATED: use &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/api/#get-apiv2monitoring"&gt;/api/v2/monitoring&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-24"&gt;&lt;/span&gt;
-&lt;a href="#permissions-24" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-25"&gt;&lt;/span&gt;
+&lt;a href="#permissions-25" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
 &lt;h4&gt;Examples&lt;span class="hx:absolute hx:-mt-20" id="examples-29"&gt;&lt;/span&gt;
 &lt;a href="#examples-29" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;h5&gt;JSON format&lt;span class="hx:absolute hx:-mt-20" id="json-format"&gt;&lt;/span&gt;
 &lt;a href="#json-format" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
@@ -5211,16 +5369,16 @@ title="Copy code"
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-4"&gt;&lt;/span&gt;
-&lt;a href="#errors-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-5"&gt;&lt;/span&gt;
+&lt;a href="#errors-5" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
 &lt;li&gt;A metric of &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; (for string values) or &lt;code&gt;-1&lt;/code&gt; (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li&gt;
 &lt;li&gt;If no response or an error response is received the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3&gt;GET /api/v2/monitoring&lt;span class="hx:absolute hx:-mt-20" id="get-apiv2monitoring"&gt;&lt;/span&gt;
 &lt;a href="#get-apiv2monitoring" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Available as of 3.12.x.
 Used to retrieve a range of metrics about the instance. While the output is human-readable this is intended for automated monitoring allowing for tracking trends over time and alerting about potential issues.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-25"&gt;&lt;/span&gt;
-&lt;a href="#permissions-25" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-26"&gt;&lt;/span&gt;
+&lt;a href="#permissions-26" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
 &lt;h4&gt;Examples&lt;span class="hx:absolute hx:-mt-20" id="examples-30"&gt;&lt;/span&gt;
 &lt;a href="#examples-30" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;h5&gt;JSON format&lt;span class="hx:absolute hx:-mt-20" id="json-format-1"&gt;&lt;/span&gt;
 &lt;a href="#json-format-1" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
@@ -5472,8 +5630,8 @@ title="Copy code"
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-5"&gt;&lt;/span&gt;
-&lt;a href="#errors-5" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
+&lt;h4&gt;Errors&lt;span class="hx:absolute hx:-mt-20" id="errors-6"&gt;&lt;/span&gt;
+&lt;a href="#errors-6" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;ul&gt;
 &lt;li&gt;A metric of &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; (for string values) or &lt;code&gt;-1&lt;/code&gt; (for numeric values) indicates an error occurred while querying the metric - check the API logs for details.&lt;/li&gt;
 &lt;li&gt;If no response or an error response is received the instance is unreachable. Thus, this API can be used as an uptime monitoring endpoint.&lt;/li&gt;
 &lt;/ul&gt;
@@ -5510,15 +5668,15 @@ title="Copy code"
 &lt;a href="#get-apiv1express-metrics" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;&lt;em&gt;Added in 4.3.0&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Used to retrieve a range of metrics for monitoring CHT API&amp;rsquo;s performance and internals. This API is used by &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/architecture/cht-watchdog/"&gt;CHT Watchdog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The response is formatted for the &lt;a href="https://prometheus.io/docs/concepts/data_model/" rel="external"&gt;Prometheus Data Model&lt;/a&gt;. The metrics exposed are defined by the &lt;a href="https://www.npmjs.com/package/prometheus-api-metrics" rel="external"&gt;prometheus-api-metrics package&lt;/a&gt; and include optional default metrics and garbage collection metrics.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-26"&gt;&lt;/span&gt;
-&lt;a href="#permissions-26" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-27"&gt;&lt;/span&gt;
+&lt;a href="#permissions-27" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;No permissions required.&lt;/p&gt;
 &lt;h2&gt;Upgrades&lt;span class="hx:absolute hx:-mt-20" id="upgrades"&gt;&lt;/span&gt;
 &lt;a href="#upgrades" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;All of these endpoints require the &lt;code&gt;can_configure&lt;/code&gt; permission.&lt;/p&gt;
 &lt;p&gt;All of these endpoints are asynchronous. Progress can be followed by watching the &lt;code&gt;horti-upgrade&lt;/code&gt; document and looking at the &lt;code&gt;log&lt;/code&gt; property.&lt;/p&gt;
 &lt;h3&gt;POST /api/v1/upgrade&lt;span class="hx:absolute hx:-mt-20" id="post-apiv1upgrade"&gt;&lt;/span&gt;
 &lt;a href="#post-apiv1upgrade" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Performs a complete upgrade to the provided version. This is equivalent of calling &lt;code&gt;/api/v1/upgrade/stage&lt;/code&gt; and then &lt;code&gt;/api/v1/upgrade/complete&lt;/code&gt; once staging has finished.&lt;/p&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-3"&gt;&lt;/span&gt;
-&lt;a href="#example-3" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-4"&gt;&lt;/span&gt;
+&lt;a href="#example-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;POST /api/v1/upgrade
 {
 &amp;#34;build&amp;#34;: {
@@ -5569,8 +5727,8 @@ Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-4"&gt;&lt;/span&gt;
-&lt;a href="#example-4" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-5"&gt;&lt;/span&gt;
+&lt;a href="#example-5" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;GET /api/v1/hydrate?doc_ids=[&amp;#34;id1&amp;#34;,&amp;#34;missingId&amp;#34;,&amp;#34;id3&amp;#34;]&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
@@ -5616,8 +5774,8 @@ title="Copy code"
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-5"&gt;&lt;/span&gt;
-&lt;a href="#example-5" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-6"&gt;&lt;/span&gt;
+&lt;a href="#example-6" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;POST /api/v1/hydrate
 Content-Type: application/json
 {
@@ -5673,8 +5831,8 @@ Only allowed for users with &amp;ldquo;online&amp;rdquo; roles.&lt;/p&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-6"&gt;&lt;/span&gt;
-&lt;a href="#example-6" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-7"&gt;&lt;/span&gt;
+&lt;a href="#example-7" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;GET /api/v1/contacts-by-phone?phone=&amp;#34;%2B40-(744)-999-999&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
@@ -5723,8 +5881,8 @@ title="Copy code"
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-7"&gt;&lt;/span&gt;
-&lt;a href="#example-7" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-8"&gt;&lt;/span&gt;
+&lt;a href="#example-8" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;POST /api/v1/contacts-by-phone
 Content-Type: application/json
 {
@@ -5783,8 +5941,8 @@ Only allowed for users with &amp;ldquo;_admin&amp;rdquo; role.&lt;/p&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-8"&gt;&lt;/span&gt;
-&lt;a href="#example-8" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;h4&gt;Example&lt;span class="hx:absolute hx:-mt-20" id="example-9"&gt;&lt;/span&gt;
+&lt;a href="#example-9" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;GET /api/v1/users-doc-count?user=mary&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
 &lt;button
 class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
@@ -5859,8 +6017,8 @@ title="Copy code"
 &lt;a href="#impact" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;em&gt;Added in 5.0.0&lt;/em&gt;&lt;/p&gt;
 &lt;h3&gt;GET /api/v1/impact&lt;span class="hx:absolute hx:-mt-20" id="get-apiv1impact"&gt;&lt;/span&gt;
 &lt;a href="#get-apiv1impact" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Returns aggregated impact metrics.&lt;/p&gt;
-&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-27"&gt;&lt;/span&gt;
-&lt;a href="#permissions-27" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Only available to online users.&lt;/p&gt;
+&lt;h4&gt;Permissions&lt;span class="hx:absolute hx:-mt-20" id="permissions-28"&gt;&lt;/span&gt;
+&lt;a href="#permissions-28" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Only available to online users.&lt;/p&gt;
 &lt;h4&gt;Examples&lt;span class="hx:absolute hx:-mt-20" id="examples-31"&gt;&lt;/span&gt;
 &lt;a href="#examples-31" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
 &lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sh" data-lang="sh"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;GET /api/v1/impact&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
