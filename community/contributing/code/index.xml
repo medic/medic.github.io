@@ -1773,6 +1773,90 @@ registry.&lt;/p&gt;
 and need to publish a new package then modify the package name (in
 package.json) to specify a organizational scope, like &lt;code&gt;@medic/moment&lt;/code&gt; and publish it.&lt;/p&gt;
 &lt;p&gt;For more info see &lt;a href="https://docs.npmjs.com/creating-and-publishing-an-org-scoped-package" rel="external"&gt;Publishing an Org Scoped Package&lt;/a&gt;.&lt;/p&gt;</description></item><item><title>Static Analysis</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/static-analysis/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/static-analysis/</guid><description>
+&lt;h2&gt;Zizmor&lt;span class="hx:absolute hx:-mt-20" id="zizmor"&gt;&lt;/span&gt;
+&lt;a href="#zizmor" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href="https://github.com/woodruffw/zizmor" rel="external"&gt;Zizmor&lt;/a&gt; is a static analysis tool for GitHub Actions workflows. It catches security issues that code-focused linters miss, including:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Unpinned action references&lt;/strong&gt; — actions pinned by tag (for example, &lt;code&gt;actions/checkout@v4&lt;/code&gt;) can silently change if the tag is moved; pinning to a full 40-character commit SHA prevents this&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Missing or overly permissive &lt;code&gt;permissions&lt;/code&gt; blocks&lt;/strong&gt; — restricting each workflow&amp;rsquo;s token permissions limits the blast radius of a compromised workflow&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Script injection&lt;/strong&gt; — GitHub context values (for example, &lt;code&gt;${{ github.event.pull_request.title }}&lt;/code&gt;) used directly in &lt;code&gt;run:&lt;/code&gt; steps can be exploited; moving them to environment variables neutralises the risk&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cache poisoning&lt;/strong&gt; — workflows triggered by pull requests that use caching can be exploited by a malicious fork PR to poison the cache&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;CI workflow&lt;span class="hx:absolute hx:-mt-20" id="ci-workflow"&gt;&lt;/span&gt;
+&lt;a href="#ci-workflow" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Zizmor runs automatically on every pull request and push to &lt;code&gt;master&lt;/code&gt;:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Trigger&lt;/th&gt;
+&lt;th&gt;Mode&lt;/th&gt;
+&lt;th&gt;Output&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Pull request&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--offline&lt;/code&gt; (no GitHub API calls)&lt;/td&gt;
+&lt;td&gt;Workflow annotations&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Push to &lt;code&gt;master&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Online&lt;/td&gt;
+&lt;td&gt;SARIF report uploaded to the repository &lt;strong&gt;Security&lt;/strong&gt; tab&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The CI configuration lives in &lt;code&gt;.github/workflows/zizmor.yml&lt;/code&gt; and the suppression config in &lt;code&gt;.github/zizmor.yml&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Keeping action hashes current&lt;span class="hx:absolute hx:-mt-20" id="keeping-action-hashes-current"&gt;&lt;/span&gt;
+&lt;a href="#keeping-action-hashes-current" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;All action references in CHT Core are pinned to a full 40-character commit SHA with the human-readable version in a comment, for example:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- &lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# v4&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href="https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot" rel="external"&gt;Dependabot&lt;/a&gt; keeps these hashes current automatically. It is configured in &lt;code&gt;.github/dependabot.yml&lt;/code&gt; for the &lt;code&gt;github-actions&lt;/code&gt; ecosystem and opens pull requests on a weekly schedule (Saturdays) when new action versions are released. A cooldown is configured so patch updates are applied after 3 days, minor after 7 days, and major after 14 days — all Dependabot PRs go through normal code review before merging.&lt;/p&gt;
+&lt;h3&gt;Running locally&lt;span class="hx:absolute hx:-mt-20" id="running-locally"&gt;&lt;/span&gt;
+&lt;a href="#running-locally" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip install zizmor
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;zizmor --offline .github/workflows/&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Running in &lt;code&gt;--offline&lt;/code&gt; mode does not require a GitHub token and is sufficient to catch most issues.&lt;/p&gt;
+&lt;h3&gt;Handling findings&lt;span class="hx:absolute hx:-mt-20" id="handling-findings"&gt;&lt;/span&gt;
+&lt;a href="#handling-findings" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;When zizmor flags an issue in your pull request:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;If the issue is a genuine concern&lt;/strong&gt;: fix it before merging. Common fixes are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Pin an action to a commit SHA (see &lt;a href="https://docs.communityhealthtoolkit.org/community/contributing/code/static-analysis/#keeping-action-hashes-current"&gt;Keeping action hashes current&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Add a &lt;code&gt;permissions&lt;/code&gt; block scoped to only what the job needs&lt;/li&gt;
+&lt;li&gt;Move a &lt;code&gt;${{ github.* }}&lt;/code&gt; expression to an &lt;code&gt;env:&lt;/code&gt; variable so it is never interpolated directly in a shell command&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;If the finding is an accepted low-risk exception&lt;/strong&gt;, suppress it using one of two methods:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Inline comment&lt;/strong&gt; (preferred for a single line): add &lt;code&gt;# zizmor: ignore[rule-name]&lt;/code&gt; at the end of the flagged line in the workflow file&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Config file&lt;/strong&gt; (preferred for an entire file): add an entry to &lt;code&gt;.github/zizmor.yml&lt;/code&gt; under the relevant rule&amp;rsquo;s &lt;code&gt;ignore:&lt;/code&gt; list&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In both cases, add a comment explaining why the finding is acceptable and the date the risk was accepted, so the reasoning is preserved for future reviewers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h2&gt;ESLint&lt;span class="hx:absolute hx:-mt-20" id="eslint"&gt;&lt;/span&gt;
 &lt;a href="#eslint" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;All code must pass an eslint check which runs early in the CI cycle and uses the &lt;a href="https://github.com/medic/eslint-config" rel="external"&gt;standard Medic ESLint configuration&lt;/a&gt;.&lt;/p&gt;
 &lt;h3&gt;Linting&lt;span class="hx:absolute hx:-mt-20" id="linting"&gt;&lt;/span&gt;
