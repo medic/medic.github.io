@@ -770,14 +770,170 @@ data-copied-label="Copied!"
 &lt;h2&gt;Advanced usage&lt;span class="hx:absolute hx:-mt-20" id="advanced-usage"&gt;&lt;/span&gt;
 &lt;a href="#advanced-usage" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Extension libraries are simply JavaScript functions executed in the context of the CHT web application. This means technically they can be used to do things like manipulating the DOM for fine-grained control of how elements are displayed in a form.&lt;/p&gt;
 &lt;p&gt;Advanced integrations like this are not explicitly supported (they may break in future versions of the CHT). However, they can be a powerful tool for developers looking to extend the CHT without having to fork the entire project.&lt;/p&gt;
-&lt;p&gt;See &lt;a href="https://ruky.me/hacking-cht-user-interface-with-javascript-to-format-content/" rel="external"&gt;this blog post&lt;/a&gt; from a community member for more information and inspiration on the kinds of things that can be achieved with extension libs!&lt;/p&gt;</description></item><item><title>CHT API</title><link>https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/</guid><description>
+&lt;p&gt;See &lt;a href="https://ruky.me/hacking-cht-user-interface-with-javascript-to-format-content/" rel="external"&gt;this blog post&lt;/a&gt; from a community member for more information and inspiration on the kinds of things that can be achieved with extension libs!&lt;/p&gt;</description></item><item><title>ui-extensions</title><link>https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/</guid><description>
+&lt;p&gt;&lt;em&gt;Introduced in v5.2.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;UI Extensions are &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components" rel="external"&gt;custom web components&lt;/a&gt; that can extend the functionality/content of the CHT web application. This is an advanced feature and requires an app developer with some software development experience.&lt;/p&gt;
+&lt;p&gt;An example of a use for this feature is a custom landing page for users containing content specific to a deployment.&lt;/p&gt;
+&lt;h2&gt;Types&lt;span class="hx:absolute hx:-mt-20" id="types"&gt;&lt;/span&gt;
+&lt;a href="#types" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Currently, there are two supported types of UI Extensions.&lt;/p&gt;
+&lt;h3&gt;Header tab extensions&lt;span class="hx:absolute hx:-mt-20" id="header-tab-extensions"&gt;&lt;/span&gt;
+&lt;a href="#header-tab-extensions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;figure&gt;&lt;a href="screenshot-header_tab.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/screenshot-header_tab.png"
+alt="Screenshot showing a header tab extension"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;Extensions with the &lt;code&gt;header_tab&lt;/code&gt; type are included in the webapp interface as a new top-level tab (along with &amp;ldquo;People&amp;rdquo;, &amp;ldquo;Tasks&amp;rdquo;, etc).&lt;/p&gt;
+&lt;p&gt;Use the &lt;code&gt;weight&lt;/code&gt; &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/#ui-extension-properties"&gt;property&lt;/a&gt; to control the placement of the UI Extensions in relation to the other visible &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/header_tabs/"&gt;header tabs&lt;/a&gt;. Tabs with a lower weight will be listed first and the first tab will be the default landing page when the app first opens.&lt;/p&gt;
+&lt;p&gt;Use the &lt;code&gt;accent_color&lt;/code&gt; &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/#ui-extension-properties"&gt;property&lt;/a&gt; to control the color of the tool-bar at the top of the interface.&lt;/p&gt;
+&lt;h3&gt;Sidebar tab extensions&lt;span class="hx:absolute hx:-mt-20" id="sidebar-tab-extensions"&gt;&lt;/span&gt;
+&lt;a href="#sidebar-tab-extensions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;figure&gt;&lt;a href="screenshot-sidebar_tab.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/screenshot-sidebar_tab.png"
+alt="Screenshot showing a sidebar tab extension"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;Extensions with the &lt;code&gt;sidebar_tab&lt;/code&gt; type are included in the webapp interface as new tabs available from the sidebar menu (along with &amp;ldquo;Training Materials&amp;rdquo;, &amp;ldquo;About&amp;rdquo;, etc).&lt;/p&gt;
+&lt;p&gt;Use the &lt;code&gt;accent_color&lt;/code&gt; &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/ui-extensions/#ui-extension-properties"&gt;property&lt;/a&gt; to control the color of the tool-bar at the top of the interface.&lt;/p&gt;
+&lt;h2&gt;Building&lt;span class="hx:absolute hx:-mt-20" id="building"&gt;&lt;/span&gt;
+&lt;a href="#building" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The configuration for a UI Extension consists of a JavaScript file which exports a &lt;code&gt;class&lt;/code&gt; extending &lt;code&gt;HTMLElement&lt;/code&gt; and a &lt;code&gt;properties.json&lt;/code&gt; file containing the configuration for the extension. These files should be added into the &lt;code&gt;/ui-extensions&lt;/code&gt; directory in the project&amp;rsquo;s config directory.&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;- config
+- ui-extensions
+- my-extension.js
+- my-extension.properties.json&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;UI Extension Properties&lt;span class="hx:absolute hx:-mt-20" id="ui-extension-properties"&gt;&lt;/span&gt;
+&lt;a href="#ui-extension-properties" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The &lt;code&gt;.properties.json&lt;/code&gt; file contains the configuration for each UI Extension.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Property&lt;/th&gt;
+&lt;th&gt;Required&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;extension_type&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;The type of the extension (&lt;code&gt;header_tab&lt;/code&gt;, &lt;code&gt;sidebar_tab&lt;/code&gt;).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;title&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;The translation key for the title of the UI Extension.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;roles&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;An array of &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/app-settings/user-roles/"&gt;user role names&lt;/a&gt; that have access to the extension. Only users with one (or more) of the specified roles will be able to access the extension. If no &lt;code&gt;roles&lt;/code&gt; are set, the extension will be available to all users.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;icon&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;The FontAwesome class (beginning with &lt;code&gt;fa-&lt;/code&gt;) to use as the extension icon. Must not be combined with &lt;code&gt;resource_icon&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;resource_icon&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;The &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/resources/"&gt;resources key&lt;/a&gt; for the image to use as the extension icon. Must not be combined with &lt;code&gt;icon&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;accent_color&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;A &lt;a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Colors/Color_values" rel="external"&gt;CSS color value&lt;/a&gt; to use as the accent color for the extension.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;weight&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;The numerical &amp;ldquo;weight&amp;rdquo; used to determine the extension ordering. Lower values come first.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;config&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Custom object containing any properties that should be passed to the constructed web component via &lt;code&gt;this.inputs.config&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;Web component class&lt;span class="hx:absolute hx:-mt-20" id="web-component-class"&gt;&lt;/span&gt;
+&lt;a href="#web-component-class" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The extension JavaScript file must export a &lt;code&gt;class&lt;/code&gt; that extends &lt;code&gt;HTMLElement&lt;/code&gt;. This class represents the custom web component that will be available to the user in the webapp. The functionality that can be included in this web component is essentially limitless. Additionally, a number of resources are provided to the web component allowing for better integration with the CHT data model.&lt;/p&gt;
+&lt;h4&gt;Constructor&lt;span class="hx:absolute hx:-mt-20" id="constructor"&gt;&lt;/span&gt;
+&lt;a href="#constructor" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;The &lt;code&gt;constructor&lt;/code&gt; of the class is called when the element is created, but before it is inserted on the DOM. It can be used to do any initialization that does not require access to the DOM or other external context. This is a good place to attach the &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components#shadow_dom_2" rel="external"&gt;shadow DOM&lt;/a&gt; to properly insulate the web component from the rest of the web app.&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;super&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;attachShadow&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt; &lt;span class="nx"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;open&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;&lt;code&gt;connectedCallback()&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="connectedcallback"&gt;&lt;/span&gt;
+&lt;a href="#connectedcallback" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;The &lt;code&gt;connectedCallback()&lt;/code&gt; method is called when the element is added to the DOM. This is a good place to finalize the component initialization (set up event listeners, fetch data, render content, etc).&lt;/p&gt;
+&lt;p&gt;This basic example demonstrates how HTML and CSS for the component can be set:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;connectedCallback&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;shadowRoot&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;innerHTML&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; &amp;lt;style&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; h1 {
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; color: blue;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; &amp;lt;/style&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; &amp;lt;h1&amp;gt;Hello World&amp;lt;/h1&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sb"&gt; `&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Input data&lt;span class="hx:absolute hx:-mt-20" id="input-data"&gt;&lt;/span&gt;
+&lt;a href="#input-data" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;Input data is available to the component logic in the &lt;code&gt;this.inputs&lt;/code&gt; root level property.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Property&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;userContactSummary&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;The &lt;a href="https://docs.communityhealthtoolkit.org/building/contact-summary/contact-summary-templated/"&gt;contact-summary context&lt;/a&gt; for the contact associated with the logged in user.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;config&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Optional. This object will contain the data loaded from &lt;code&gt;config&lt;/code&gt; property of the UI Extension&amp;rsquo;s &lt;code&gt;properties.json&lt;/code&gt; file (if it exists).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4&gt;CHT API&lt;span class="hx:absolute hx:-mt-20" id="cht-api"&gt;&lt;/span&gt;
+&lt;a href="#cht-api" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;
 &lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
 &lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;&lt;/div&gt;
 &lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
 &lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;Introduced in v3.12.0&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;Provides CHT Core Framework&amp;rsquo;s functions to contact summary, targets and tasks. The API is available in the &lt;code&gt;cht&lt;/code&gt; reserved variable under the &lt;code&gt;v1&lt;/code&gt; version.&lt;/p&gt;
+&lt;p&gt;Provides CHT Core Framework&amp;rsquo;s functions to contact summary, targets, tasks, etc. The API is available in the &lt;code&gt;cht&lt;/code&gt; reserved variable under the &lt;code&gt;v1&lt;/code&gt; version.&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -806,6 +962,158 @@ data-copied-label="Copied!"
 &lt;td&gt;analytics.getTargetDocs()&lt;/td&gt;
 &lt;td&gt;&lt;/td&gt;
 &lt;td&gt;Returns three &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets"&gt;target&lt;/a&gt; documents of the contact, calculated for the last three reporting intervals, including the current one. When viewing one of the current logged in user&amp;rsquo;s associated facilities, returns the target documents for the contact associated with the current logged in user. Returns an empty array if no target documents are found (for example when viewing a contact that does not upload targets). &lt;em&gt;Introduced in v4.11.0&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;translate(key, interpolateParams)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;key&lt;/code&gt;: The translation key.&lt;br&gt;&lt;code&gt;interpolateParams&lt;/code&gt;: (Optional) Object containing values to be used in the translated string.&lt;/td&gt;
+&lt;td&gt;Returns the value in the current user&amp;rsquo;s language from the &lt;a href="https://docs.communityhealthtoolkit.org/building/translations/localizing/"&gt;app translations&lt;/a&gt; for the given key.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;getResource(name)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;name&lt;/code&gt;: The name key of the resource to get&lt;/td&gt;
+&lt;td&gt;Returns the data for a &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/resources/"&gt;configured resource&lt;/a&gt;. The returned object contains a &lt;code&gt;content_type&lt;/code&gt; property defining the type of resource (e.g. &lt;code&gt;image/png&lt;/code&gt;). The &lt;code&gt;data&lt;/code&gt; property contains the Base64 representation of the resource.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;CHT API&amp;rsquo;s code samples&lt;span class="hx:absolute hx:-mt-20" id="cht-apis-code-samples"&gt;&lt;/span&gt;
+&lt;a href="#cht-apis-code-samples" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-js" data-lang="js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;canEdit&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasPermissions&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_edit&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;canManagePlaces&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasPermissions&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_create_places&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;can_update_places&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;hasAnyGroup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;hasAnyPermission&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_view_messages&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;can_view_message_action&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;can_view_reports&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;can_verify_reports&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;averageFn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getExtensionLib&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;average.js&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;targetDocs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;analytics&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getTargetDocs&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h5&gt;CHT Data model&lt;span class="hx:absolute hx:-mt-20" id="cht-data-model"&gt;&lt;/span&gt;
+&lt;a href="#cht-data-model" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;The &lt;code&gt;cht&lt;/code&gt; API can also be used to interact directly with the CHT data model to read/create/update data for contacts, reports, etc. See &lt;a href="https://docs.communityhealthtoolkit.org/cht-datasource/" rel="external"&gt;the cht-datasource docs&lt;/a&gt; for more details.&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-.js" data-lang=".js"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;contactId&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;inputs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;userContactSummary&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contact_id&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;userContact&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;await&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;cht&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;v1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;person&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getByUuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;contactId&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Uploading/deleting UI Extensions&lt;span class="hx:absolute hx:-mt-20" id="uploadingdeleting-ui-extensions"&gt;&lt;/span&gt;
+&lt;a href="#uploadingdeleting-ui-extensions" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Use cht-conf to upload all configured UI Extensions:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUCH_URL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; upload-ui-extensions&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Individual UI extensions can be uploaded by including their name when running the command. If you have a UI extension defined in &lt;code&gt;hello.js&lt;/code&gt;/&lt;code&gt;hello.properties.json&lt;/code&gt;, running this command will only upload that extension:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUCH_URL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; upload-ui-extensions -- hello&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;cht-conf can also be used to delete all UI Extensions from an instance:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUCH_URL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; delete-ui-extensions&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Additionally, individual UI Extensions can be deleted by including their name when running the command:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-shell" data-lang="shell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cht --url&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUCH_URL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; delete-ui-extensions -- hello&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>CHT API</title><link>https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/reference/_partial_cht_api/</guid><description>
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;Introduced in v3.12.0&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Provides CHT Core Framework&amp;rsquo;s functions to contact summary, targets, tasks, etc. The API is available in the &lt;code&gt;cht&lt;/code&gt; reserved variable under the &lt;code&gt;v1&lt;/code&gt; version.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Function&lt;/th&gt;
+&lt;th&gt;Arguments&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;hasPermissions(permissions, userRoles)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;permissions&lt;/code&gt;: String or array of permission name(s).&lt;br&gt;&lt;code&gt;userRoles&lt;/code&gt;: (Optional) Array of user roles. Default to the current logged in user.&lt;/td&gt;
+&lt;td&gt;Returns true if the user has the permission(s), otherwise returns false.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;hasAnyPermission(permissionsGroups, userRoles)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;permissionsGroups&lt;/code&gt;: Array of groups of permission name(s).&lt;br&gt;&lt;code&gt;userRoles&lt;/code&gt;: (Optional) Array of user roles. Default to the current logged in user.&lt;/td&gt;
+&lt;td&gt;Returns true if the user has all the permissions of any of the provided groups, otherwise returns false.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;getExtensionLib(name)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;name&lt;/code&gt;: String of script name&lt;/td&gt;
+&lt;td&gt;Returns an executable function identified by the given name configured as &lt;a href="https://docs.communityhealthtoolkit.org/building/reference/extension-libs/"&gt;extension-libs&lt;/a&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;analytics.getTargetDocs()&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Returns three &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/db-schema/#targets"&gt;target&lt;/a&gt; documents of the contact, calculated for the last three reporting intervals, including the current one. When viewing one of the current logged in user&amp;rsquo;s associated facilities, returns the target documents for the contact associated with the current logged in user. Returns an empty array if no target documents are found (for example when viewing a contact that does not upload targets). &lt;em&gt;Introduced in v4.11.0&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;translate(key, interpolateParams)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;key&lt;/code&gt;: The translation key.&lt;br&gt;&lt;code&gt;interpolateParams&lt;/code&gt;: (Optional) Object containing values to be used in the translated string.&lt;/td&gt;
+&lt;td&gt;Returns the value in the current user&amp;rsquo;s language from the &lt;a href="https://docs.communityhealthtoolkit.org/building/translations/localizing/"&gt;app translations&lt;/a&gt; for the given key.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;getResource(name)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;name&lt;/code&gt;: The name key of the resource to get&lt;/td&gt;
+&lt;td&gt;Returns the data for a &lt;a href="https://docs.communityhealthtoolkit.org/building/branding/resources/"&gt;configured resource&lt;/a&gt;. The returned object contains a &lt;code&gt;content_type&lt;/code&gt; property defining the type of resource (e.g. &lt;code&gt;image/png&lt;/code&gt;). The &lt;code&gt;data&lt;/code&gt; property contains the Base64 representation of the resource.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
