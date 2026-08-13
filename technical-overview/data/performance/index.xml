@@ -1,4 +1,261 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Tracking and Improving Performance</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/</link><description>Recent content in Tracking and Improving Performance on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/index.xml" rel="self" type="application/rss+xml"/><item><title>Purging</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/purging/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/purging/</guid><description>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Community Health Toolkit – Tracking and Improving Performance</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/</link><description>Recent content in Tracking and Improving Performance on Community Health Toolkit</description><generator>Hugo -- gohugo.io</generator><language>en</language><atom:link href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/index.xml" rel="self" type="application/rss+xml"/><item><title>Archiving</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/archiving/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/archiving/</guid><description>
+&lt;p&gt;&lt;em&gt;Only available in 5.3.0 and above&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Archiving moves outdated documents from the primary &lt;code&gt;medic&lt;/code&gt; database to a separate &lt;code&gt;medic-archive&lt;/code&gt; database. This keeps the primary database small while the archived documents remain available for analytics and audit purposes.&lt;/p&gt;
+&lt;p&gt;Archiving differs from &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/purging/"&gt;purging&lt;/a&gt; in two important ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Purging removes documents from user devices while keeping them in the &lt;code&gt;medic&lt;/code&gt; database, whereas archiving removes documents from the &lt;code&gt;medic&lt;/code&gt; database entirely. Archived documents are copied to &lt;code&gt;medic-archive&lt;/code&gt; and then purged from &lt;code&gt;medic&lt;/code&gt;, leaving no trace in the changes feed.&lt;/li&gt;
+&lt;li&gt;Purging is conditional on user roles: the purge function decides per roles group, so a document can be purged for one user and not for another. Archiving is unconditional: an archived document is removed for all users.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/&gt;&lt;/svg&gt;Warning&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Archived documents are no longer available to the CHT application. They cannot be viewed in the app, used in &lt;a href="https://docs.communityhealthtoolkit.org/building/tasks/tasks-js/"&gt;tasks&lt;/a&gt;, &lt;a href="https://docs.communityhealthtoolkit.org/building/targets/targets-js/"&gt;targets&lt;/a&gt;, or contact summaries, and they are deleted from user devices on the next sync. Make sure the documents are no longer needed before archiving them.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Benefits&lt;span class="hx:absolute hx:-mt-20" id="benefits"&gt;&lt;/span&gt;
+&lt;a href="#benefits" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Improved overall server performance.&lt;/strong&gt; A smaller &lt;code&gt;medic&lt;/code&gt; database means less work for CouchDB across the board: reads, writes, compaction, and backups all get faster as the database shrinks.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Faster indexing.&lt;/strong&gt; Every document in &lt;code&gt;medic&lt;/code&gt; is processed by every view and search index. With fewer documents, indexes build and update faster, both in day-to-day operation and after upgrades, when views are rebuilt from scratch.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Faster replication.&lt;/strong&gt; Calculating which documents each user can replicate is proportional to the size of the &lt;code&gt;medic&lt;/code&gt; database. Removing outdated documents speeds up initial replication and routine syncs for all users.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Reduced disk usage.&lt;/strong&gt; The &lt;code&gt;medic-archive&lt;/code&gt; database has no indexes, so archived documents cost only their raw storage. The same documents occupy dramatically less disk space in &lt;code&gt;medic-archive&lt;/code&gt; than they did in &lt;code&gt;medic&lt;/code&gt;, where every document also carries its share of view and search index storage.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Data is retained.&lt;/strong&gt; Unlike deleting documents, archiving keeps the full document, including attachments, along with an audit entry recording when it was archived. The data stays available for compliance and analytics purposes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;How it works&lt;span class="hx:absolute hx:-mt-20" id="how-it-works"&gt;&lt;/span&gt;
+&lt;a href="#how-it-works" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Archiving is a pipeline with three stages:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;You submit a list of document IDs to the &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/archiving/#queueing-documents-for-archiving"&gt;archive API endpoint&lt;/a&gt;. API validates the payload and queues the job for Sentinel.&lt;/li&gt;
+&lt;li&gt;Sentinel processes the queued jobs, either on a &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/archiving/#configuration"&gt;configurable schedule&lt;/a&gt; or immediately (within the next Sentinel 5-minute job queue cycle) when no schedule is configured. Each document is copied to &lt;code&gt;medic-archive&lt;/code&gt; and then purged from &lt;code&gt;medic&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;When users sync, archived documents are treated as deleted and are removed from their devices.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Queueing documents for archiving&lt;span class="hx:absolute hx:-mt-20" id="queueing-documents-for-archiving"&gt;&lt;/span&gt;
+&lt;a href="#queueing-documents-for-archiving" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Determining &lt;em&gt;which&lt;/em&gt; documents to archive is currently a manual process. For example, you can use analytics queries to find reports older than a retention threshold, or contacts that have been inactive for years.&lt;/p&gt;
+&lt;p&gt;A good place to start when considering which documents to archive is to evaluate your current purge configuration and see which documents are already marked as purged for all user roles.&lt;/p&gt;
+&lt;p&gt;Submit the document IDs to the archive endpoint:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;pre&gt;&lt;code&gt;POST /api/v1/archive&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The request must:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be authenticated as a database admin.&lt;/li&gt;
+&lt;li&gt;Use the &lt;code&gt;Content-Type: text/csv&lt;/code&gt; header.&lt;/li&gt;
+&lt;li&gt;Contain one document ID per line. Surrounding double quotes are stripped and blank lines are ignored, so a single-column CSV export works as-is.&lt;/li&gt;
+&lt;li&gt;Be at most 32 MB. Split larger ID lists across multiple requests.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For example:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;curl -X POST &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; -H &lt;span class="s2"&gt;&amp;#34;Content-Type: text/csv&amp;#34;&lt;/span&gt; &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --data-binary @doc-ids.csv &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; https://&amp;lt;admin&amp;gt;:&amp;lt;password&amp;gt;@&amp;lt;host&amp;gt;/api/v1/archive&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The endpoint splits the IDs into archive jobs and responds with &lt;code&gt;202 Accepted&lt;/code&gt; and the list of created jobs:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;jobs&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;archive:0197c2f0-9a41-7000-8000-000000000000&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;count&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;100000&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;archive:0197c2f0-9a42-7000-8000-000000000001&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;count&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;25000&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Jobs are persisted while the payload streams in, so a mid-payload failure can leave some jobs queued even though the request returns an error. Retrying the full payload is safe because archiving is idempotent; duplicate jobs only cost redundant processing.&lt;/p&gt;
+&lt;h2&gt;Replication&lt;span class="hx:absolute hx:-mt-20" id="replication"&gt;&lt;/span&gt;
+&lt;a href="#replication" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Archived documents appear as deleted to syncing clients. Users who have an archived document on their device delete it during their next sync, and initial replication never downloads archived documents. Users are not notified that documents were archived, so as with purging, the expectation is that documents are only archived once they are no longer relevant to users.&lt;/p&gt;
+&lt;h2&gt;Analytics and cht-sync&lt;span class="hx:absolute hx:-mt-20" id="analytics-and-cht-sync"&gt;&lt;/span&gt;
+&lt;a href="#analytics-and-cht-sync" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Archiving is invisible to &lt;a href="https://docs.communityhealthtoolkit.org/hosting/analytics/"&gt;CHT Sync&lt;/a&gt;. Because archived documents are purged rather than deleted, they disappear from the changes feed without leaving deletion records, and cht-sync — which watches the changes feed — never learns that anything happened. Documents that were synced to PostgreSQL before being archived remain there, so archived data stays available for analytics. Documents that are archived before cht-sync has synced them never reach PostgreSQL.&lt;/p&gt;
+&lt;h2&gt;Configuration&lt;span class="hx:absolute hx:-mt-20" id="configuration"&gt;&lt;/span&gt;
+&lt;a href="#configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Archiving requires no configuration to work: with no &lt;code&gt;archive&lt;/code&gt; settings, Sentinel processes queued jobs as soon as they are submitted, and runs until the queue is drained.&lt;/p&gt;
+&lt;p&gt;Depending on the number of documents queued, archiving can be a lengthy and resource intensive operation. You can configure a schedule so processing runs when your server is under light load, and bound how long each run lasts:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;archive&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;cron&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;0 22 * * *&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;duration&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;4 hours&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The same schedule expressed as a text expression:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;//&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;other app_settings settings&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;archive&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;text_expression&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;at 10:00 pm&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;duration&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;4 hours&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Some examples of valid text expressions:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;text expression&lt;/th&gt;
+&lt;th&gt;runs&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;&amp;quot;at 10:00 pm&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Every day at 10:00 pm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;&amp;quot;at 00:00 on Sunday&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Every Sunday at midnight&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;&amp;quot;at 11:00 pm on Fri and Sat&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Every Friday and Saturday at 11:00 pm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Text expressions are evaluated in the server&amp;rsquo;s local time.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;property&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;th&gt;required&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;text_expression&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Any valid text expression to describe when archiving runs. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#text" rel="external"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;cron&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Any valid Cron expression to describe when archiving runs. For more information, see &lt;a href="https://bunkat.github.io/later/parsers.html#cron" rel="external"&gt;LaterJS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;duration&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Maximum length of each run, as &lt;code&gt;&amp;quot;&amp;lt;number&amp;gt; &amp;lt;unit&amp;gt;&amp;quot;&lt;/code&gt;. For example, &lt;code&gt;&amp;quot;30 minutes&amp;quot;&lt;/code&gt; or &lt;code&gt;&amp;quot;4 hours&amp;quot;&lt;/code&gt;. When omitted, each run continues until the queue is drained.&lt;/td&gt;
+&lt;td&gt;no&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Monitoring&lt;span class="hx:absolute hx:-mt-20" id="monitoring"&gt;&lt;/span&gt;
+&lt;a href="#monitoring" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Each archive job writes a log document to the &lt;code&gt;medic-logs&lt;/code&gt; database with the same ID as the job. The log document outlives the job and is the durable record of its lifecycle:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;property&lt;/th&gt;
+&lt;th&gt;value type&lt;/th&gt;
+&lt;th&gt;description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;status&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;String&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;running&lt;/code&gt;, &lt;code&gt;completed&lt;/code&gt;, or &lt;code&gt;failed&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;cursor&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number&lt;/td&gt;
+&lt;td&gt;How many of the job&amp;rsquo;s IDs have been processed&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;total&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number&lt;/td&gt;
+&lt;td&gt;The total number of IDs in the job&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;start_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number&lt;/td&gt;
+&lt;td&gt;Timestamp of when processing started&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;updated_date&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Number&lt;/td&gt;
+&lt;td&gt;Timestamp of the last progress update&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;errors&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Array&lt;/td&gt;
+&lt;td&gt;The last 10 errors, each with a &lt;code&gt;date&lt;/code&gt; and &lt;code&gt;message&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;A job whose log has &lt;code&gt;status: &amp;quot;failed&amp;quot;&lt;/code&gt; has exhausted its 10 attempts and was removed from the queue. Review the &lt;code&gt;errors&lt;/code&gt; entries, resolve the underlying problem, and resubmit the remaining IDs to the archive endpoint.&lt;/p&gt;
+&lt;p&gt;Each archived document also has an audit entry recording that it was archived and when.&lt;/p&gt;
+&lt;h2&gt;Considerations&lt;span class="hx:absolute hx:-mt-20" id="considerations"&gt;&lt;/span&gt;
+&lt;a href="#considerations" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Archiving is meant to be permanent.&lt;/strong&gt; Archived documents live on in &lt;code&gt;medic-archive&lt;/code&gt; and &lt;a href="https://docs.communityhealthtoolkit.org/technical-overview/data/performance/archiving/#restoring-archived-documents"&gt;restoring one&lt;/a&gt; is a manual, per-document process. Do not archive documents you expect to need again.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Rules may break.&lt;/strong&gt; As with purging, any tasks or targets that depend on an archived document lose access to it. For example, archiving a report that completed a task reopens that task unless the document that created the task is also archived.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Users may be confused.&lt;/strong&gt; Documents disappear from devices without notification. Work with your users to ensure documents are only archived once there is no use for them.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Restoring archived documents&lt;span class="hx:absolute hx:-mt-20" id="restoring-archived-documents"&gt;&lt;/span&gt;
+&lt;a href="#restoring-archived-documents" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;There is no automated way to restore an archived document, but you can restore one manually:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Retrieve the document from the &lt;code&gt;medic-archive&lt;/code&gt; database.&lt;/li&gt;
+&lt;li&gt;Remove its &lt;code&gt;_rev&lt;/code&gt; and &lt;code&gt;archive_date&lt;/code&gt; properties.&lt;/li&gt;
+&lt;li&gt;Save the document to the &lt;code&gt;medic&lt;/code&gt; database &lt;strong&gt;twice&lt;/strong&gt;: save it once, then save the resulting revision again without any changes. A single write recreates the exact revision that user devices already deleted, so syncing devices skip it and the document stays deleted on the device. The second write creates a revision that devices have never seen, which they download and which wins over the local deletion.&lt;/li&gt;
+&lt;li&gt;Delete the document from the &lt;code&gt;medic-archive&lt;/code&gt; database. This step is required: replication treats any document present in &lt;code&gt;medic-archive&lt;/code&gt; as deleted, so users cannot download the restored document while it remains in the archive.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;On their next sync, users with access to the document download it again with its original content.&lt;/p&gt;
+&lt;h2&gt;Server-side processing&lt;span class="hx:absolute hx:-mt-20" id="server-side-processing"&gt;&lt;/span&gt;
+&lt;a href="#server-side-processing" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Sentinel processes queued jobs in creation order, working through each job&amp;rsquo;s IDs in batches of
+1 000. For each batch, Sentinel:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Copies the documents, including attachments, to the &lt;code&gt;medic-archive&lt;/code&gt; database. An &lt;code&gt;archive_date&lt;/code&gt; timestamp is added to each archived document.&lt;/li&gt;
+&lt;li&gt;Records an audit entry for each archived document.&lt;/li&gt;
+&lt;li&gt;Purges the documents&amp;rsquo; metadata documents (&lt;code&gt;&amp;lt;id&amp;gt;-info&lt;/code&gt;) from &lt;code&gt;medic-sentinel&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Purges the documents from &lt;code&gt;medic&lt;/code&gt;, including all conflicting revisions, so they leave no trace in the changes feed.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Only contacts, reports, tasks, and targets can be archived. IDs of documents that are missing or of any other type, such as forms or settings, are silently skipped.&lt;/p&gt;
+&lt;p&gt;Every 10 batches, Sentinel queries the critical view indexes so that indexing keeps pace with the purges.&lt;/p&gt;
+&lt;p&gt;A job that fails is retried on the next run, resuming from the last completed batch. After 10 failed attempts the job is removed from the queue so it cannot block other jobs; its record remains in &lt;code&gt;medic-logs&lt;/code&gt;.&lt;/p&gt;</description></item><item><title>Purging</title><link>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/purging/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/technical-overview/data/performance/purging/</guid><description>
 &lt;p&gt;&lt;em&gt;Only available in 3.7.0 and above&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Purging is a tool that allows you to increase performance and available disk space for offline users (eg CHWs) by removing unneeded documents from their device.&lt;/p&gt;
 &lt;p&gt;As users continually generate new reports their performance may naturally degrade as a result. You can use purging to remove older documents that are no longer relevant from their devices. Purging only removes documents from user&amp;rsquo;s devices: these reports are still available for online analytics and impact metrics.&lt;/p&gt;
