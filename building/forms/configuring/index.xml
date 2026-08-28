@@ -1444,4 +1444,260 @@ data-copied-label="Copied!"
 &lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
 &lt;/button&gt;
 &lt;/div&gt;
-&lt;/div&gt;</description></item></channel></rss>
+&lt;/div&gt;</description></item><item><title>Capture GPS Location in Contact Forms</title><link>https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/</guid><description>
+&lt;p&gt;Contact forms can capture the device&amp;rsquo;s GPS location at the time a contact is created or edited. The geolocation widget handles the full capture experience automatically: it starts acquiring a position the instant the form renders, then shows progress, success, and failure states. It stores the result on the contact document.&lt;/p&gt;
+&lt;p&gt;After a successful capture, the widget asks whether the CHW is at the household or somewhere else, and records the answer alongside the coordinates.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Added in CHT &lt;code&gt;TBD&lt;/code&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-red-200 hx:bg-red-100 hx:text-red-900 hx:dark:border-red-200/30 hx:dark:bg-red-900/30 hx:dark:text-red-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Caution&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;This widget is designed for contact forms only. Adding it to a report form is unsupported and may produce unexpected behavior.&lt;/p&gt;
+&lt;p&gt;The widget&amp;rsquo;s default copy is written for households (&amp;ldquo;Household location already saved&amp;rdquo;, &amp;ldquo;Change household location&amp;rdquo;&amp;hellip; ). Nothing in the widget restricts it to household contacts specifically. It activates on any form field with an &lt;code&gt;appearance&lt;/code&gt; column value of &lt;code&gt;geolocation-capture&lt;/code&gt;, regardless of contact type. To use it on another contact type, override the &lt;code&gt;geolocation.edit.*&lt;/code&gt;, &lt;code&gt;geolocation.at.household&lt;/code&gt;, and &lt;code&gt;geolocation.somewhere.else&lt;/code&gt; translation keys with wording appropriate to that contact type. Otherwise the household-specific default text shows through.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;What gets stored&lt;span class="hx:absolute hx:-mt-20" id="what-gets-stored"&gt;&lt;/span&gt;
+&lt;a href="#what-gets-stored" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;When the form is submitted, CHT writes the following fields to the contact document.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Field&lt;/th&gt;
+&lt;th&gt;Value&lt;/th&gt;
+&lt;th&gt;Notes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;geolocation&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;GPS coordinates object&lt;/td&gt;
+&lt;td&gt;Written by CHT at save time. Set to the new coordinates only after a successful home capture; left unchanged in every other case (when keeping an existing location, when adding a non-home capture, or a failed capture). Cleared only when removing an existing location.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;geolocation_log&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Array of capture events&lt;/td&gt;
+&lt;td&gt;Append-only; grows on subsequent edits&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Each entry in &lt;code&gt;geolocation_log&lt;/code&gt; has this shape:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;timestamp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1234567890000&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;recording&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;latitude&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;1.23&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;longitude&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;4.56&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;accuracy&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;is_home&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;is_home&lt;/code&gt; is set to &lt;code&gt;true&lt;/code&gt; for home captures and &lt;code&gt;false&lt;/code&gt; for other-context captures. On GPS failure, &lt;code&gt;recording&lt;/code&gt; is an error object (&lt;code&gt;{ &amp;quot;code&amp;quot;: 2, &amp;quot;message&amp;quot;: &amp;quot;...&amp;quot; }&lt;/code&gt;) and &lt;code&gt;is_home&lt;/code&gt; is not present. &lt;code&gt;geolocation&lt;/code&gt; itself never holds an error. On failure, any existing &lt;code&gt;geolocation&lt;/code&gt; field on the contact is left untouched.&lt;/p&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;A failed GPS attempt is only logged to &lt;code&gt;geolocation_log&lt;/code&gt; when the contact had no prior location: the create-flow &amp;ldquo;Save without location&amp;rdquo; path, or editing a contact with no existing location. Choosing &lt;strong&gt;Remove household location&lt;/strong&gt; in edit mode never attempts a capture and never appends a log entry.&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2&gt;Configuration&lt;span class="hx:absolute hx:-mt-20" id="configuration"&gt;&lt;/span&gt;
+&lt;a href="#configuration" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="hextra-scrollbar hx:overflow-x-auto hx:overflow-y-hidden hx:overscroll-x-contain"&gt;
+&lt;div class="hx:mt-4 hx:flex hx:w-max hx:min-w-full hx:border-b hx:border-gray-200 hx:pb-px hx:dark:border-neutral-800" role="tablist"&gt;&lt;button class="hextra-tabs-toggle hx:cursor-pointer hx:data-[state=selected]:border-primary-500 hx:data-[state=selected]:text-primary-600 hx:data-[state=selected]:dark:border-primary-500 hx:data-[state=selected]:dark:text-primary-600 hx:mr-2 hx:rounded-t hx:p-2 hx:font-medium hx:leading-5 hx:transition-colors hx:-mb-0.5 hx:select-none hx:border-b-2 hx:border-transparent hx:text-gray-600 hx:hover:border-gray-200 hx:hover:text-black hx:dark:text-gray-200 hx:dark:hover:border-neutral-800 hx:dark:hover:text-white hx:hextra-focus-visible-inset" id="tabs-tab-tabs-00-0" role="tab" type="button" aria-controls="tabs-panel-tabs-00-0" aria-selected="true" tabindex="0" data-state="selected"&gt;&lt;span class="hx:inline-flex hx:items-center hx:gap-1.5"&gt;&lt;span&gt;XLSForm&lt;/span&gt;&lt;/span&gt;&lt;/button&gt;&lt;button class="hextra-tabs-toggle hx:cursor-pointer hx:data-[state=selected]:border-primary-500 hx:data-[state=selected]:text-primary-600 hx:data-[state=selected]:dark:border-primary-500 hx:data-[state=selected]:dark:text-primary-600 hx:mr-2 hx:rounded-t hx:p-2 hx:font-medium hx:leading-5 hx:transition-colors hx:-mb-0.5 hx:select-none hx:border-b-2 hx:border-transparent hx:text-gray-600 hx:hover:border-gray-200 hx:hover:text-black hx:dark:text-gray-200 hx:dark:hover:border-neutral-800 hx:dark:hover:text-white hx:hextra-focus-visible-inset" id="tabs-tab-tabs-00-1" role="tab" type="button" aria-controls="tabs-panel-tabs-00-1" aria-selected="false" tabindex="-1"&gt;&lt;span class="hx:inline-flex hx:items-center hx:gap-1.5"&gt;&lt;span&gt;XForm XML&lt;/span&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div&gt;&lt;div class="hextra-tabs-panel hx:rounded-sm hx:pt-6 hx:hidden hx:data-[state=selected]:block" id="tabs-panel-tabs-00-0" role="tabpanel" aria-labelledby="tabs-tab-tabs-00-0" aria-hidden="false" tabindex="0" data-state="selected"&gt;&lt;p&gt;Add the following row to the &lt;strong&gt;survey&lt;/strong&gt; sheet, within the existing contact group:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;type&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;label::en&lt;/th&gt;
+&lt;th&gt;appearance&lt;/th&gt;
+&lt;th&gt;required&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;string&lt;/td&gt;
+&lt;td&gt;geo_capture&lt;/td&gt;
+&lt;td&gt;Capture GPS location&lt;/td&gt;
+&lt;td&gt;geolocation-capture&lt;/td&gt;
+&lt;td&gt;yes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The field name (&lt;code&gt;geo_capture&lt;/code&gt; in this example) can be anything; only the &lt;code&gt;appearance&lt;/code&gt; value (&lt;code&gt;geolocation-capture&lt;/code&gt;) is the contract between the form and CHT. Set &lt;code&gt;required&lt;/code&gt; to &lt;code&gt;yes&lt;/code&gt; if you want to require the CHW to submit the geolocation data before continuing. The widget itself does not independently require this, so leaving it blank means the field can be left empty on submission.&lt;/p&gt;
+&lt;p&gt;For additional languages, add a &lt;code&gt;label::&amp;lt;lang&amp;gt;&lt;/code&gt; column for each language your deployment supports (for example, &lt;code&gt;label::fr&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Convert and upload the form with &lt;code&gt;cht-conf&lt;/code&gt; as usual.&lt;/p&gt;
+&lt;/div&gt;&lt;div class="hextra-tabs-panel hx:rounded-sm hx:pt-6 hx:hidden hx:data-[state=selected]:block" id="tabs-panel-tabs-00-1" role="tabpanel" aria-labelledby="tabs-tab-tabs-00-1" aria-hidden="true"&gt;&lt;p&gt;Here&amp;rsquo;s the same configuration as raw XForm XML. Three changes are required: a model field, a bind, and a body element.&lt;/p&gt;
+&lt;h3&gt;1. Model instance&lt;span class="hx:absolute hx:-mt-20" id="1-model-instance"&gt;&lt;/span&gt;
+&lt;a href="#1-model-instance" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the capture field inside the contact&amp;rsquo;s instance node:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;geo_capture/&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;2. Bind&lt;span class="hx:absolute hx:-mt-20" id="2-bind"&gt;&lt;/span&gt;
+&lt;a href="#2-bind" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add a bind for the capture field:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;bind&lt;/span&gt; &lt;span class="na"&gt;nodeset=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/contact/geo_capture&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;string&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;required=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;true()&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Replace &lt;code&gt;/data/contact/&lt;/code&gt; with the actual nodeset path for the contact group in your form. Set the &lt;code&gt;required=&amp;quot;true()&amp;quot;&lt;/code&gt; attribute if you want to require the CHW to submit the geolocation data when creating or editing the contact. The widget itself does not independently require this, so omitting the required bind means the field can be left empty on submission.&lt;/p&gt;
+&lt;h3&gt;3. Body&lt;span class="hx:absolute hx:-mt-20" id="3-body"&gt;&lt;/span&gt;
+&lt;a href="#3-body" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add the field inside a &lt;code&gt;field-list&lt;/code&gt; group:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;group&lt;/span&gt; &lt;span class="na"&gt;appearance=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;field-list&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/contact&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;input&lt;/span&gt; &lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/contact/geo_capture&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;appearance=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;geolocation-capture&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;label&lt;/span&gt; &lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;jr:itext(&amp;#39;/data/contact/geo_capture:label&amp;#39;)&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/input&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/group&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The &lt;code&gt;appearance=&amp;quot;geolocation-capture&amp;quot;&lt;/code&gt; value is the contract between the form and CHT. The field name (&lt;code&gt;geo_capture&lt;/code&gt; in this example) can be anything; only the appearance matters.&lt;/p&gt;
+&lt;h3&gt;Translations&lt;span class="hx:absolute hx:-mt-20" id="translations"&gt;&lt;/span&gt;
+&lt;a href="#translations" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Add a label for the capture field in the &lt;code&gt;&amp;lt;itext&amp;gt;&lt;/code&gt; section for each language your deployment supports:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;translation&lt;/span&gt; &lt;span class="na"&gt;lang=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;en&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;text&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/data/contact/geo_capture:label&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;value&amp;gt;&lt;/span&gt;Capture GPS location&lt;span class="nt"&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/text&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/translation&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2&gt;Widget behavior&lt;span class="hx:absolute hx:-mt-20" id="widget-behavior"&gt;&lt;/span&gt;
+&lt;a href="#widget-behavior" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Once the form is configured, GPS acquisition starts automatically the moment the form renders. There&amp;rsquo;s no capture button and no question gating it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;While GPS is acquiring:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A progress bar fills over up to 30 seconds while the widget waits for a position.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="gps-acquiring.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/gps-acquiring.png"
+alt="The geolocation widget showing a progress bar mid-fill while GPS is acquiring"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;On success:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The progress bar is replaced by a success message.&lt;/li&gt;
+&lt;li&gt;The widget shows a context question with two options: &amp;ldquo;I&amp;rsquo;m at the household&amp;rdquo; and &amp;ldquo;I&amp;rsquo;m somewhere else&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;Selecting either option records the choice and lets the CHW proceed to the next page.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="success.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/success.png"
+alt="The geolocation widget showing a success message with the &amp;#39;I&amp;#39;m at the household&amp;#39; and &amp;#39;I&amp;#39;m somewhere else&amp;#39; context question"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;On failure (weak or unavailable GPS signal):&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The progress bar is replaced by a failure message.&lt;/li&gt;
+&lt;li&gt;If the failure is due to a weak or unreliable signal, a message prompts the CHW to move to an area with better reception.&lt;/li&gt;
+&lt;li&gt;A retry button and a checkbox labeled &lt;strong&gt;Save without location&lt;/strong&gt; appear.&lt;/li&gt;
+&lt;li&gt;Tapping the retry button clears the failure state and starts a new capture attempt.&lt;/li&gt;
+&lt;li&gt;Checking &lt;strong&gt;Save without location&lt;/strong&gt; immediately cancels the in-progress capture. Unchecking it lets the CHW tap Retry to try again.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="failure-weak-signal.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/failure-weak-signal.png"
+alt="The geolocation widget showing a failure message, weak-signal message, Retry button, and the Save without location checkbox"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;When location permission is denied:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No progress bar or context question is shown. Instead, the widget displays a message telling the CHW that location access is turned off and directing them to their device settings.&lt;/li&gt;
+&lt;li&gt;A &lt;strong&gt;Save without location&lt;/strong&gt; checkbox appears. There&amp;rsquo;s no retry button, since there&amp;rsquo;s nothing to retry until permission changes.&lt;/li&gt;
+&lt;li&gt;This check covers a real browser or PWA permission denial, not only the Android-specific permission setting. No form configuration is required.&lt;/li&gt;
+&lt;li&gt;If the CHW grants permission while the form is still open, the widget detects the change automatically and drops back into the normal capture flow. No page reload or form restart is needed.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="permission-denied.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/permission-denied.png"
+alt="The geolocation widget showing a permission-denied message and the Save without location checkbox, with no Retry button"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;When GPS is unavailable on the device:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The widget shows a message that GPS isn&amp;rsquo;t available on the device, along with the &lt;strong&gt;Save without location&lt;/strong&gt; checkbox.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="gps-unavailable.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/gps-unavailable.png"
+alt="The geolocation widget showing a GPS-unavailable message and the Save without location checkbox"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;h2&gt;Edit mode&lt;span class="hx:absolute hx:-mt-20" id="edit-mode"&gt;&lt;/span&gt;
+&lt;a href="#edit-mode" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;When a contact already has a valid location on record (&lt;code&gt;geolocation&lt;/code&gt; set from an earlier successful capture), editing that contact activates a different widget state. No additional configuration is required.&lt;/p&gt;
+&lt;p&gt;As soon as the edit form opens, GPS starts acquiring silently in the background. There&amp;rsquo;s no progress bar to watch. The CHW finds out whether it succeeded by trying to select one of the capture options below.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Edit mode UI:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A badge reading &amp;ldquo;Household location already saved&amp;rdquo; confirms a location is on record. It&amp;rsquo;s static text. It doesn&amp;rsquo;t show the capture context or how long ago the location was captured.&lt;/li&gt;
+&lt;li&gt;Four radio options let the CHW choose what to do:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Option&lt;/th&gt;
+&lt;th&gt;Effect&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Keep saved household location (pre-selected)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;geolocation&lt;/code&gt; and &lt;code&gt;geolocation_log&lt;/code&gt; are left exactly as they are.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Change household location&lt;/td&gt;
+&lt;td&gt;Starts a home capture, the same as the create flow&amp;rsquo;s home context.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;I am not at the household&lt;/td&gt;
+&lt;td&gt;Starts an &amp;ldquo;other&amp;rdquo; capture, logged to &lt;code&gt;geolocation_log&lt;/code&gt;, but doesn&amp;rsquo;t overwrite &lt;code&gt;geolocation&lt;/code&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Remove household location&lt;/td&gt;
+&lt;td&gt;Clears &lt;code&gt;geolocation&lt;/code&gt; entirely. No GPS capture is attempted.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;figure&gt;&lt;a href="edit-mode-disabled.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/edit-mode-disabled.png"
+alt="Edit mode showing the saved-location badge and 4 radio options, with Change household location and I am not at the household disabled"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Change household location&lt;/strong&gt; and &lt;strong&gt;I am not at the household&lt;/strong&gt; stay disabled until the background GPS read succeeds. If that read fails, both re-disable and, if either was selected, the choice reverts to &lt;strong&gt;Keep saved household location&lt;/strong&gt;. A CHW can never select a capture option without a live, successful GPS read backing it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;&lt;a href="edit-mode-enabled.png"&gt;&lt;img src="https://docs.communityhealthtoolkit.org/building/forms/configuring/contact-geolocation/edit-mode-enabled.png"
+alt="Edit mode showing the saved-location badge and 4 radio options, with Change household location and I am not at the household enabled"&gt;&lt;/a&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;Contacts with only failed captures:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A contact whose prior captures all failed (for example, permission denied every time) is treated the same as a contact with no location. The standard create-mode UI is shown instead of the badge and radio options.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Contacts with no location recorded:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Editing a contact that has never had a location recorded shows the standard create-mode UI, plus a message that no GPS location has been recorded for the household yet.&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
