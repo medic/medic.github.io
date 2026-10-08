@@ -363,7 +363,82 @@ and added comprehensive tests including edge cases.&lt;/p&gt;
 &lt;li&gt;&lt;strong&gt;Test comprehensively.&lt;/strong&gt; Add tests for edge cases, not just the happy path. If you fixed a bug, include a regression test. AI-generated tests can miss corner cases that human reviewers will catch.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Own the quality.&lt;/strong&gt; Treat AI like a junior collaborator who needs supervision; you are the one signing off on the work. The CHT community and end users depend on the reliability of your contribution.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Verify dependencies and license compatibility&lt;/strong&gt;. Ensure any libraries suggested by AI are appropriate for the CHT context, properly licensed, and compatible with the supported technologies.&lt;/li&gt;
-&lt;/ul&gt;</description></item><item><title>Contributing Code</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/</guid><description>
+&lt;/ul&gt;
+&lt;h2&gt;Running AI Agents in a Sandbox&lt;span class="hx:absolute hx:-mt-20" id="running-ai-agents-in-a-sandbox"&gt;&lt;/span&gt;
+&lt;a href="#running-ai-agents-in-a-sandbox" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Whether you contribute code, build CHT apps, host CHT instances, or work with program data, you probably have access to information worth protecting. This can include logins for CHT instances and servers, ssh credentials, and data exports that contain personal health information. Communities trust the health programs that use the CHT to protect this information.&lt;/p&gt;
+&lt;p&gt;AI agents, such as Claude Code, can run commands, install packages, edit files, and connect to the internet on your behalf. Unless you set them up otherwise, they do all of this with the same permissions you have.&lt;/p&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:flex-col hx:rounded-lg hx:border hx:py-4 hx:px-4 hx:border-gray-200 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-blue-200 hx:bg-blue-100 hx:text-blue-900 hx:dark:border-blue-200/30 hx:dark:bg-blue-900/30 hx:dark:text-blue-200"&gt;
+&lt;p class="hx:flex hx:items-center hx:font-medium"&gt;&lt;svg height=16px class="hx:inline-block hx:align-middle hx:mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/&gt;&lt;/svg&gt;Note&lt;/p&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;&lt;strong&gt;Remember: AI agents can access everything you can.&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h3&gt;What could go wrong&lt;span class="hx:absolute hx:-mt-20" id="what-could-go-wrong"&gt;&lt;/span&gt;
+&lt;a href="#what-could-go-wrong" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;Most of the time, agents do what you ask. But because they have the same access as you, a few things can go wrong:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Agents can see things you didn&amp;rsquo;t mean to share.&lt;/strong&gt; An agent can read your SSH keys, cloud and GitHub credentials, &lt;code&gt;.env&lt;/code&gt; files, browser data, and any data exports saved on your computer.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Agents read untrusted content.&lt;/strong&gt; Issues, pull request comments, web pages, package READMEs, and MCP tool results can all contain hidden instructions. This is called &lt;em&gt;prompt injection&lt;/em&gt;. A successful injection can direct the agent to leak secrets or run harmful commands, and the agent cannot reliably tell these instructions apart from yours.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Agents make mistakes.&lt;/strong&gt; An agent that misreads a task can delete files, overwrite uncommitted work, force-push a branch, or remove the Docker volumes that hold your local CouchDB data.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Why use a sandbox&lt;span class="hx:absolute hx:-mt-20" id="why-use-a-sandbox"&gt;&lt;/span&gt;
+&lt;a href="#why-use-a-sandbox" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;You could manage these risks by being extra careful: approving every command yourself, keeping sensitive files off the computer you use with agents, and following a security checklist every session. That takes a lot of effort, and it&amp;rsquo;s easy to make a mistake. CHT maintainers have found it quicker and easier to work alongside agents in a &lt;em&gt;sandbox&lt;/em&gt;. A sandbox lets an agent work freely on your project but blocks it from reaching your credentials and other files unless you allow it.&lt;/p&gt;
+&lt;p&gt;Built-in agent guardrails are not a security boundary. Permission rules built into an agent are enforced by the agent itself. On the other hand, a sandbox enforced by the operating system applies to the agent and to every process it starts, no matter what the model decides to do.&lt;/p&gt;
+&lt;h3&gt;Recommended Sandbox: &lt;code&gt;nono&lt;/code&gt;&lt;span class="hx:absolute hx:-mt-20" id="recommended-sandbox-nono"&gt;&lt;/span&gt;
+&lt;a href="#recommended-sandbox-nono" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;The &lt;a href="https://nono.sh/" rel="external"&gt;nono&lt;/a&gt; sandboxing utility offers a good balance of simplicity, functionality, and configurability. To get started with &lt;code&gt;nono&lt;/code&gt;, follow the &lt;a href="https://nono.sh/docs/cli/getting_started/installation" rel="external"&gt;installation guide&lt;/a&gt; for your platform.&lt;/p&gt;
+&lt;p&gt;Once &lt;code&gt;nono&lt;/code&gt; has been installed, running Claude inside the sandbox is as simple as:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nono pull nolabs-ai/claude
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nono run --profile nolabs-ai/claude --allow-cwd -- claude&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This starts Claude with the &lt;code&gt;nolabs-ai/claude&lt;/code&gt; profile which gives access to the various necessary Claude configuration directories, full read/write access to the contents of the current directory, and access to the network. Access to sensitive locations such as your SSH keys and cloud credentials is blocked. This is a reasonable default sandbox that balances functionality with security.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;nono&lt;/code&gt; also makes it easy to &lt;a href="https://nono.sh/docs/cli/features/profiles-groups#profiles" rel="external"&gt;create a custom profile&lt;/a&gt; (e.g. one that extends &lt;code&gt;nolabs-ai/claude&lt;/code&gt;) with additional configurations.&lt;/p&gt;
+&lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-amber-200 hx:bg-amber-100 hx:text-amber-900 hx:dark:border-amber-200/30 hx:dark:bg-amber-900/30 hx:dark:text-amber-200"&gt;
+&lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
+&lt;div class="hx:mt-6 hx:leading-7 hx:first:mt-0"&gt;&lt;p&gt;Even inside a sandbox, keep production credentials and personal health information out of the directories you give your agent access to. By default, &lt;code&gt;nono&lt;/code&gt; gives the agent access to your user&amp;rsquo;s environment variables.&lt;/p&gt;
+&lt;p&gt;Avoid storing sensitive information such as API keys or passwords on disk or in environment variables. Instead, leverage &lt;code&gt;nono&lt;/code&gt;&amp;rsquo;s &lt;a href="https://nono.sh/docs/cli/features/credential-injection" rel="external"&gt;credential injection&lt;/a&gt; to load the necessary credentials from a secure store such as your system keyring or 1Password.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Shell Alias&lt;span class="hx:absolute hx:-mt-20" id="shell-alias"&gt;&lt;/span&gt;
+&lt;a href="#shell-alias" class="subheading-anchor" aria-label="Permalink for this section"&gt;&lt;/a&gt;&lt;/h4&gt;&lt;p&gt;To avoid typing the full &lt;code&gt;nono&lt;/code&gt; command every time, add an alias to your shell configuration file. For Bash, add this line to &lt;code&gt;~/.bashrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;alias&lt;/span&gt; claude-sbx&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;nono run --profile nolabs-ai/claude --allow-cwd -- claude&amp;#39;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Reload your configuration with &lt;code&gt;source ~/.bashrc&lt;/code&gt;, or open a new terminal. Then start a sandboxed Claude session from your project directory:&lt;/p&gt;
+&lt;div class="hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code"&gt;
+&lt;div&gt;&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;claude-sbx&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="hextra-code-copy-btn-container hx:opacity-0 hx:transition hx:group-hover/code:opacity-100 hx:flex hx:gap-1 hx:absolute hx:m-[11px] hx:right-0 hx:top-0"&gt;
+&lt;button
+class="hextra-code-copy-btn hx:group/copybtn hx:cursor-pointer hx:transition-all hx:active:opacity-50 hx:bg-primary-700/5 hx:border hx:border-black/5 hx:text-gray-600 hx:hover:text-gray-900 hx:rounded-md hx:p-1.5 hx:dark:bg-primary-300/10 hx:dark:border-white/10 hx:dark:text-gray-400 hx:dark:hover:text-gray-50"
+title="Copy code"
+aria-label="Copy code"
+data-copied-label="Copied!"
+&gt;
+&lt;div class="hextra-copy-icon hx:group-[.copied]/copybtn:hidden hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;div class="hextra-success-icon hx:hidden hx:group-[.copied]/copybtn:block hx:pointer-events-none hx:h-4 hx:w-4"&gt;&lt;/div&gt;
+&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>Contributing Code</title><link>https://docs.communityhealthtoolkit.org/community/contributing/code/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://docs.communityhealthtoolkit.org/community/contributing/code/</guid><description>
 &lt;div class="hx:overflow-x-auto hx:mt-6 hx:flex hx:rounded-lg hx:border hx:py-2 hx:ltr:pr-4 hx:rtl:pl-4 hx:contrast-more:border-current hx:contrast-more:dark:border-current hx:border-green-200 hx:bg-green-100 hx:text-green-900 hx:dark:border-green-200/30 hx:dark:bg-green-900/30 hx:dark:text-green-200"&gt;
 &lt;div class="hx:ltr:pl-3 hx:ltr:pr-2 hx:rtl:pr-3 hx:rtl:pl-2"&gt;&lt;svg height=1.2em class="hx:inline-block hx:align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/&gt;&lt;/svg&gt;&lt;/div&gt;
 &lt;div class="hx:w-full hx:min-w-0 hx:leading-7"&gt;
